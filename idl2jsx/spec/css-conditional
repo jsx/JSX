@@ -1,0 +1,1784 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang=en>
+ <head
+  profile="http://dublincore.org/documents/2008/08/04/dc-html/ http://www.w3.org/2006/03/hcard">
+  <meta content="text/html; charset=utf-8" http-equiv=Content-Type>
+  <title>CSS Conditional Rules Module Level 3</title>
+
+  <link href="http://purl.org/dc/terms/" rel=schema.dcterms>
+  <link href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright"
+   rel=dcterms.rights>
+  <meta content="CSS Conditional Rules Module Level 3" name=dcterms.title>
+  <meta content=text name=dcterms.type>
+  <meta content=2013-11-09 name=dcterms.date>
+  <meta content="L. David Baron" name=dcterms.creator>
+  <meta content=W3C name=dcterms.publisher>
+  <meta content="http://dev.w3.org/csswg/css3-conditional/"
+   name=dcterms.identifier>
+  <link href="../default.css" rel=stylesheet type="text/css">
+  <link href="../csslogo.ico" rel="shortcut icon" type="image/x-icon">
+  <link href="http://www.w3.org/StyleSheets/TR/W3C-ED.css" rel=stylesheet
+   type="text/css">
+  <script defer=defer
+   src="http://test.csswg.org/harness/annotate.js#css-conditional-3_dev"
+   type="text/javascript"></script>
+
+ <body class=h-entry>
+  <div class=head> <!--begin-logo-->
+   <p><a href="http://www.w3.org/"><img alt=W3C height=48
+    src="http://www.w3.org/Icons/w3c_home" width=72></a> <!--end-logo-->
+
+   <h1 class=p-name>CSS Conditional Rules Module Level 3</h1>
+
+   <h2 class="no-num no-toc">Editor's Draft <span class=dt-updated><span
+    class=value-title title=20131109> 9 November 2013</span></span></h2>
+
+   <dl>
+    <dt>This version:
+
+    <dd><a class=u-url href="http://dev.w3.org/csswg/css3-conditional/">
+     http://www.w3.org/TR/2013/ED-css3-conditional-20131109/</a>
+
+    <dt>Latest version:
+
+    <dd><a
+     href="http://www.w3.org/TR/css3-conditional/">http://www.w3.org/TR/css3-conditional/</a>
+
+    <dt>Editor's draft:
+
+    <dd><a
+     href="http://dev.w3.org/csswg/css3-conditional/">http://dev.w3.org/csswg/css3-conditional/</a>
+     (<a
+     href="https://dvcs.w3.org/hg/csswg/log/tip/css-conditional/Overview.src.html">change
+     log</a>, <a
+     href="https://dvcs.w3.org/hg/csswg/log/tip/css3-conditional/Overview.src.html">older
+     change log</a>)
+
+    <dt>Previous version:
+
+    <dd><a href="http://www.w3.org/TR/2013/CR-css3-conditional-20130404/"
+     rel=previous>http://www.w3.org/TR/2013/CR-css3-conditional-20130404/</a>
+
+    <dt>Editors:
+
+    <dd class="p-author h-card vcard"><a class="p-name fn u-url url"
+     href="http://dbaron.org/" rel=author>L. David Baron</a>, <a
+     class="p-org org h-org" href="http://www.mozilla.org/">Mozilla</a>
+
+    <dt>Issues list:
+
+    <dd>Maintained in document (only editor's draft is current)
+
+    <dt>Feedback:
+
+    <dd><a
+     href="mailto:www-style@w3.org?subject=%5Bcss3-conditional%5D%20feedback">www-style@w3.org</a>
+     with subject line “<kbd>[css3-conditional] <var>… message topic
+     …</var></kbd>” (<a
+     href="http://lists.w3.org/Archives/Public/www-style/"
+     rel=discussion>archives</a>)
+
+    <dt>Test suite:
+
+    <dd><a
+     href="http://test.csswg.org/suites/css3-conditional/nightly-unstable/">http://test.csswg.org/suites/css3-conditional/nightly-unstable/</a>
+   </dl>
+   <!--begin-copyright-->
+   <p class=copyright><a
+    href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright"
+    rel=license>Copyright</a> © 2013 <a href="http://www.w3.org/"><abbr
+    title="World Wide Web Consortium">W3C</abbr></a><sup>®</sup> (<a
+    href="http://www.csail.mit.edu/"><abbr
+    title="Massachusetts Institute of Technology">MIT</abbr></a>, <a
+    href="http://www.ercim.eu/"><abbr
+    title="European Research Consortium for Informatics and Mathematics">ERCIM</abbr></a>,
+    <a href="http://www.keio.ac.jp/">Keio</a>, <a
+    href="http://ev.buaa.edu.cn/">Beihang</a>), All Rights Reserved. W3C <a
+    href="http://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>,
+    <a
+    href="http://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a>
+    and <a
+    href="http://www.w3.org/Consortium/Legal/copyright-documents">document
+    use</a> rules apply.</p>
+   <!--end-copyright-->
+   <hr title="Separator for header">
+  </div>
+
+  <h2 class="no-num no-toc" id=abstract>Abstract</h2>
+
+  <p>CSS is a language for describing the rendering of structured documents
+   (such as HTML and XML) on screen, on paper, in speech, etc. <span
+   class=p-summary> This module contains the features of CSS for conditional
+   processing of parts of style sheets, conditioned on capabilities of the
+   processor or the document the style sheet is being applied to. It includes
+   and extends the functionality of CSS level 2 <a href="#ref-CSS21"
+   rel=biblioentry>[CSS21]<!--{{!CSS21}}--></a>, which builds on CSS level 1
+   <a href="#ref-CSS1" rel=biblioentry>[CSS1]<!--{{CSS1}}--></a>. The main
+   extensions compared to level 2 are allowing nesting of certain at-rules
+   inside ‘<a href="#at-ruledef-media"><code
+   class=css>@media</code></a>’, and the addition of the ‘<a
+   href="#at-ruledef-supports"><code class=css>@supports</code></a>’ rule
+   for conditional processing. </span>
+
+  <h2 class="no-num no-toc" id=status>Status of this document</h2>
+  <!--begin-status-->
+
+  <p>This is a public copy of the editors' draft. It is provided for
+   discussion only and may change at any moment. Its publication here does
+   not imply endorsement of its contents by W3C. Don't cite this document
+   other than as work in progress.
+
+  <p>The (<a
+   href="http://lists.w3.org/Archives/Public/www-style/">archived</a>) public
+   mailing list <a
+   href="mailto:www-style@w3.org?Subject=%5Bcss3-conditional%5D%20PUT%20SUBJECT%20HERE">
+   www-style@w3.org</a> (see <a
+   href="http://www.w3.org/Mail/Request">instructions</a>) is preferred for
+   discussion of this specification. When sending e-mail, please put the text
+   “css3-conditional” in the subject, preferably like this:
+   “[<!---->css3-conditional<!---->] <em>…summary of comment…</em>”
+
+  <p>This document was produced by the <a
+   href="http://www.w3.org/Style/CSS/members">CSS Working Group</a> (part of
+   the <a href="http://www.w3.org/Style/">Style Activity</a>).
+
+  <p>This document was produced by a group operating under the <a
+   href="http://www.w3.org/Consortium/Patent-Policy-20040205/">5 February
+   2004 W3C Patent Policy</a>. W3C maintains a <a
+   href="http://www.w3.org/2004/01/pp-impl/32061/status"
+   rel=disclosure>public list of any patent disclosures</a> made in
+   connection with the deliverables of the group; that page also includes
+   instructions for disclosing a patent. An individual who has actual
+   knowledge of a patent which the individual believes contains <a
+   href="http://www.w3.org/Consortium/Patent-Policy-20040205/#def-essential">Essential
+   Claim(s)</a> must disclose the information in accordance with <a
+   href="http://www.w3.org/Consortium/Patent-Policy-20040205/#sec-Disclosure">section
+   6 of the W3C Patent Policy</a>.</p>
+  <!--end-status-->
+
+  <p>See the section <a href="#cr-exit-criteria">“CR Exit Criteria”</a>
+   for details on advancing this specification to W3C Recommendation. The
+   specification will remain Candidate Recommendation at least until 2
+   October 2013. A <a
+   href="http://test.csswg.org/suites/css3-conditional/nightly-unstable/report/">test
+   suite and implementation report</a> are under development.
+
+  <p>See the section <a href="#changes">“Changes”</a> for changes since
+   the last Working Draft.
+
+  <p>The following features are at risk:
+
+  <ul>
+   <li>The inclusion of ‘<code class=css>@font-face</code>’ rules and
+    ‘<code class=css>@keyframes</code>’ rules as allowed within all of
+    the @-rules in this specification is at risk, though only because of the
+    relative rates of advancement of specifications. If this specification is
+    able to advance faster than one or both of the specifications defining
+    those rules, then the inclusion of those rules will move from this
+    specification to the specification defining those rules.
+
+   <li>The addition of support for @-rules inside of conditional grouping
+    rules is at risk; if interoperable implementations are not found, it may
+    be removed to advance the other features in this specification to
+    Proposed Recommendation.
+
+   <li>The ‘<a href="#at-ruledef-supports"><code
+    class=css>@supports</code></a>’ rule is at risk; if interoperable
+    implementations are not found, it may be removed to advance the other
+    features in this specification to Proposed Recommendation.
+  </ul>
+  <!--
+
+  Things to go in level 4:
+
+  * Create some way to put these new conditional things on an @import.
+  * The @document rule (commented out, down below).
+
+-->
+
+  <h2 class="no-num no-toc" id=contents>Table of contents</h2>
+  <!--begin-toc-->
+
+  <ul class=toc>
+   <li><a href="#introduction"><span class=secno>1. </span>Introduction</a>
+    <ul class=toc>
+     <li><a href="#context"><span class=secno>1.1. </span>Background</a>
+
+     <li><a href="#placement"><span class=secno>1.2. </span>Module
+      Interactions</a>
+
+     <li><a href="#conventions"><span class=secno>1.3. </span>Document
+      Conventions</a>
+    </ul>
+
+   <li><a href="#processing"><span class=secno>2. </span>Processing of
+    conditional group rules</a>
+
+   <li><a href="#contents-of"><span class=secno>3. </span>Contents of
+    conditional group rules</a>
+
+   <li><a href="#use"><span class=secno>4. </span>Placement of conditional
+    group rules</a>
+
+   <li><a href="#at-media"><span class=secno>5. </span>Media-specific style
+    sheets: the ‘<code class=css>@media</code>’ rule</a>
+
+   <li><a href="#at-supports"><span class=secno>6. </span>Feature queries:
+    the ‘<code class=css>@supports</code>’ rule</a>
+    <ul class=toc>
+     <li><a href="#support-definition"><span class=secno>6.1.
+      </span>Definition of support</a>
+    </ul>
+
+   <li><a href="#apis"><span class=secno>7. </span>APIs</a>
+    <ul class=toc>
+     <li><a href="#extentions-to-cssrule-interface"><span class=secno>7.1.
+      </span> Extensions to the <code>CSSRule</code> interface</a>
+
+     <li><a href="#the-cssgroupingrule-interface"><span class=secno>7.2.
+      </span> The <code>CSSGroupingRule</code> interface</a>
+
+     <li><a href="#the-cssconditionrule-interface"><span class=secno>7.3.
+      </span> The <code>CSSConditionRule</code> interface</a>
+
+     <li><a href="#the-cssmediarule-interface"><span class=secno>7.4. </span>
+      The <code>CSSMediaRule</code> interface</a>
+
+     <li><a href="#the-csssupportsrule-interface"><span class=secno>7.5.
+      </span> The <code>CSSSupportsRule</code> interface</a>
+
+     <li><a href="#the-css-interface"><span class=secno>7.6. </span> The
+      <code>CSS</code> interface, and the <code title="">supports()</code>
+      function</a>
+    </ul>
+
+   <li class=no-num><a href="#grammar">Grammar</a>
+
+   <li><a href="#conformance"><span class=secno>8. </span>Conformance</a>
+    <ul class=toc>
+     <li><a href="#base-modules"><span class=secno>8.1. </span>Base
+      Modules</a>
+
+     <li><a href="#conformance-classes"><span class=secno>8.2.
+      </span>Conformance Classes</a>
+
+     <li><a href="#partial"><span class=secno>8.3. </span> Partial
+      Implementations</a>
+
+     <li><a href="#experimental"><span class=secno>8.4. </span>Experimental
+      Implementations</a>
+
+     <li><a href="#cr-exit-criteria"><span class=secno>8.5. </span>CR Exit
+      Criteria</a>
+    </ul>
+
+   <li><a href="#changes"><span class=secno>9. </span> Changes</a>
+
+   <li class=no-num><a href="#acknowledgments">Acknowledgments</a>
+
+   <li class=no-num><a href="#references">References</a>
+    <ul class=toc>
+     <li class=no-num><a href="#normative-references">Normative
+      references</a>
+
+     <li class=no-num><a href="#other-references">Other references</a>
+    </ul>
+
+   <li class=no-num><a href="#index">Index</a>
+  </ul>
+  <!--end-toc-->
+
+  <h2 id=introduction><span class=secno>1. </span>Introduction</h2>
+
+  <h3 id=context><span class=secno>1.1. </span>Background</h3>
+
+  <p><em>This section is not normative.</em>
+
+  <p><a href="#ref-CSS21" rel=biblioentry>[CSS21]<!--{{!CSS21}}--></a>
+   defines one type of conditional group rule, the ‘<a
+   href="#at-ruledef-media"><code class=css>@media</code></a>’ rule, and
+   allows only style rules (not other @-rules) inside of it. The ‘<a
+   href="#at-ruledef-media"><code class=css>@media</code></a>’ rule
+   provides the ability to have media-specific style sheets, which is also
+   provided by style sheet linking features such as ‘<code
+   class=css>@import</code>’ and <code class=html>&lt;link&gt;</code>. The
+   restrictions on the contents of ‘<a href="#at-ruledef-media"><code
+   class=css>@media</code></a>’ rules made them less useful; they have
+   forced authors using CSS features involving @-rules in media-specific
+   style sheets to use separate style sheets for each medium.
+
+  <p>This specification extends the rules for the contents of conditional
+   group rules to allow other @-rules, which enables authors to combine CSS
+   features involving @-rules with media specific style sheets within a
+   single style sheet.
+
+  <p>This specification also defines an additional type of conditional group
+   rule, ‘<a href="#at-ruledef-supports"><code
+   class=css>@supports</code></a>’, to address author and user
+   requirements.
+
+  <p>The ‘<a href="#at-ruledef-supports"><code
+   class=css>@supports</code></a>’ rule allows CSS to be conditioned on
+   implementation support for CSS properties and values. This rule makes it
+   much easier for authors to use new CSS features and provide good fallback
+   for implementations that do not support those features. This is
+   particularly important for CSS features that provide new layout
+   mechanisms, and for other cases where a set of related styles needs to be
+   conditioned on property support.
+
+  <h3 id=placement><span class=secno>1.2. </span>Module Interactions</h3>
+
+  <p>This module replaces and extends the ‘<a
+   href="#at-ruledef-media"><code class=css>@media</code></a>’ rule feature
+   defined in <a href="#ref-CSS21"
+   rel=biblioentry>[CSS21]<!--{{!CSS21}}--></a> section <var>7.2.1</var> and
+   incorporates the modifications previously made non-normatively by <a
+   href="#ref-MEDIAQ" rel=biblioentry>[MEDIAQ]<!--{{!MEDIAQ}}--></a> section
+   <var>1</var>.
+
+  <p>Its current definition depends on @-rules defined in <a
+   href="#ref-CSS3-FONTS"
+   rel=biblioentry>[CSS3-FONTS]<!--{{!CSS3-FONTS}}--></a> and <a
+   href="#ref-CSS3-ANIMATIONS"
+   rel=biblioentry>[CSS3-ANIMATIONS]<!--{{!CSS3-ANIMATIONS}}--></a>, but that
+   dependency is only on the assumption that those modules will advance ahead
+   of this one. If this module advances faster, then the dependency will be
+   reversed.
+
+  <h3 id=conventions><span class=secno>1.3. </span>Document Conventions</h3>
+
+  <p>Conformance requirements are expressed with a combination of descriptive
+   assertions and RFC 2119 terminology. The key words “MUST”, “MUST
+   NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”,
+   “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in the
+   normative parts of this document are to be interpreted as described in RFC
+   2119. However, for readability, these words do not appear in all uppercase
+   letters in this specification.
+
+  <p>All of the text of this specification is normative except sections
+   explicitly marked as non-normative, examples, and notes. <a
+   href="#ref-RFC2119" rel=biblioentry>[RFC2119]<!--{{!RFC2119}}--></a>
+
+  <p>Examples in this specification are introduced with the words “for
+   example” or are set apart from the normative text with <code
+   class=html>class="example"</code>, like this:
+
+  <div class=example>
+   <p>This is an example of an informative example.
+  </div>
+
+  <p>Informative notes begin with the word “Note” and are set apart from
+   the normative text with <code class=html>class="note"</code>, like this:
+
+  <p class=note>Note, this is an informative note.
+
+  <h2 id=processing><span class=secno>2. </span>Processing of conditional
+   group rules</h2>
+
+  <p>This specification defines some CSS @-rules, called <dfn
+   id=conditional-group-rules>conditional group rules</dfn>, that associate a
+   condition with a group of other CSS rules. These different rules allow
+   testing different types of conditions, but share common behavior for how
+   their contents are used when the condition is true and when the condition
+   is false.
+
+  <div class=example>
+   <p>For example, this rule:
+
+   <pre>@media print {
+  /* hide navigation controls when printing */
+  #navigation { display: none }
+}</pre>
+
+   <p>causes a particular CSS rule (making elements with ID "navigation" be
+    display:none) apply only when the style sheet is used for a print medium.
+  </div>
+
+  <p>Each conditional group rule has a condition, which at any time evaluates
+   to true or false. When the condition is true, CSS processors
+   <strong>must</strong> apply the rules inside the group rule as though they
+   were at the group rule's location; when the condition is false, CSS
+   processors <strong>must not</strong> apply any of rules inside the group
+   rule. The current state of the condition does not affect the CSS object
+   model, in which the contents of the group rule always remain within the
+   group rule.
+
+  <p>This means that when multiple conditional group rules are nested, a rule
+   inside of both of them applies only when all of the rules' conditions are
+   true.
+
+  <div class=example>For example, with this set of nested rules:
+   <pre>@media print { // rule (1)
+  /* hide navigation controls when printing */
+  #navigation { display: none }
+  @media (max-width: 12cm) { // rule (2)
+    /* keep notes in flow when printing to narrow pages */
+    .note { float: none }
+  }
+}</pre>
+   the condition of the rule marked (1) is true for print media, and the
+   condition of the rule marked (2) is true when the width of the display
+   area (which for print media is the page box) is less than or equal to
+   12cm. Thus the rule ‘<code class=css>#navigation { display: none
+   }</code>’ applies whenever this style sheet is applied to print media,
+   and the rule ‘<code class=css>.note { float: none }</code>’ is applied
+   only when the style sheet is applied to print media <em>and</em> the width
+   of the page box is less than or equal to 12 centimeters.</div>
+
+  <p>When the condition for a conditional group rule changes, CSS processors
+   <strong>must</strong> reflect that the rules now apply or no longer apply,
+   except for properties whose definitions define effects of computed values
+   that persist past the lifetime of that value (such as for some properties
+   in <a href="#ref-CSS3-TRANSITIONS"
+   rel=biblioentry>[CSS3-TRANSITIONS]<!--{{CSS3-TRANSITIONS}}--></a> and <a
+   href="#ref-CSS3-ANIMATIONS"
+   rel=biblioentry>[CSS3-ANIMATIONS]<!--{{!CSS3-ANIMATIONS}}--></a>).
+
+  <h2 id=contents-of><span class=secno>3. </span>Contents of conditional
+   group rules</h2>
+
+  <p>The syntax of each conditional group rule consists of some syntax
+   specific to the type of rule followed by a <dfn id=group-rule-body>group
+   rule body</dfn>, which is a block (pair of braces) containing a sequence
+   of rules.
+
+  <p>A group rule body is allowed to contain style rules and any @-rules that
+   are allowed at the top level of a style sheet before and after a style
+   rule. This means that @-rules that must occur at the beginning of the
+   style sheet (such as ‘<code class=css>@charset</code>’, ‘<code
+   class=css>@import</code>’, and ‘<code class=css>@namespace</code>’
+   rules) are not allowed inside of conditional group rules. Conditional
+   group rules can be nested.
+
+  <p>In terms of the grammar, this specification defines the following
+   productions for use in the grammar of conditional group rules:
+
+  <p class=note>Note: Style rules are defined in grammars by the
+   <code>ruleset</code> production.
+
+  <pre><dfn id="nested_statement">nested_statement</dfn>
+  : ruleset | <a
+   href="#media"><i>media</i></a> | page | font_face_rule | keyframes_rule |
+    <a
+   href="#supports_rule"><i>supports_rule</i></a>
+  ;
+
+<dfn
+   id="group_rule_body">group_rule_body</dfn>
+  : '{' S* <a
+   href="#nested_statement"><i>nested_statement</i></a>* '}' S*
+  ;</pre>
+
+  <p> in which all the productions are defined in that grammar with the
+   exception of <code>font_face_rule</code> defined in <a
+   href="#ref-CSS3-FONTS"
+   rel=biblioentry>[CSS3-FONTS]<!--{{!CSS3-FONTS}}--></a>,
+   <code>keyframes_rule</code> defined in <a href="#ref-CSS3-ANIMATIONS"
+   rel=biblioentry>[CSS3-ANIMATIONS]<!--{{!CSS3-ANIMATIONS}}--></a>, and <a
+   href="#media"><code>media</code></a> and <a
+   href="#supports_rule"><code>supports_rule</code></a> defined in this
+   specification.
+
+  <p>In general, future CSS specifications that add new @-rules that are not
+   forbidden to occur after some other types of rules should modify this <a
+   href="#nested_statement"><code>nested_statement</code></a> production to
+   keep the grammar accurate.
+
+  <p>Style sheets <strong>must not</strong> use rules other than the allowed
+   ones inside conditional group rules.
+
+  <p>CSS processors <strong>must</strong> ignore rules that are not allowed
+   within a group rule, and <strong>must</strong> handle invalid rules inside
+   of group rules as described in <a
+   href="http://www.w3.org/TR/CSS21/syndata.html#parsing-errors">section 4.2
+   (Rules for handling parsing errors)</a>, <a
+   href="http://www.w3.org/TR/CSS21/syndata.html#at-rules">section 4.1.5
+   (At-rules)</a>, and <a
+   href="http://www.w3.org/TR/CSS21/syndata.html#rule-sets">section 4.1.7
+   (Rule sets, declaration blocks, and selectors)</a> of <a href="#ref-CSS21"
+   rel=biblioentry>[CSS21]<!--{{!CSS21}}--></a>.
+
+  <h2 id=use><span class=secno>4. </span>Placement of conditional group rules</h2>
+
+  <p>Conditional group rules are allowed at the top-level of a style sheet,
+   and inside other conditional group rules. CSS processors
+   <strong>must</strong> process such rules as <a
+   href="#processing">described above</a>.
+
+  <p>Any rules that are not allowed after a style rule (e.g., ‘<code
+   class=css>@charset</code>’, ‘<code class=css>@import</code>’, or
+   ‘<code class=css>@namespace</code>’ rules) are also not allowed after
+   a conditional group rule. Therefore, style sheets <strong>must
+   not</strong> place such rules after a conditional group rules, and CSS
+   processors <strong>must</strong> ignore such rules.
+
+  <h2 id=at-media><span class=secno>5. </span>Media-specific style sheets:
+   the ‘<a href="#at-ruledef-media"><code class=css>@media</code></a>’
+   rule</h2>
+
+  <p>The <dfn data-dfn-type=at-rule id=at-ruledef-media>@media</dfn> rule is
+   a conditional group rule whose condition is a media query. It consists of
+   the at-keyword ‘<a href="#at-ruledef-media"><code
+   class=css>@media</code></a>’ followed by a (possibly empty) media query
+   list (as defined in <a href="#ref-MEDIAQ"
+   rel=biblioentry>[MEDIAQ]<!--{{!MEDIAQ}}--></a>), followed by a group rule
+   body. The condition of the rule is the result of the media query.
+
+  <div class=example>
+   <p>This ‘<a href="#at-ruledef-media"><code
+    class=css>@media</code></a>’ rule:
+
+   <pre>@media screen and (min-width: 35em),
+       print and (min-width: 40em) {
+  #section_navigation { float: left; width: 10em; }
+}</pre>
+
+   <p>has the condition ‘<code class=css>screen and (min-width: 35em),
+    print and (min-width: 40em)</code>’, which is true for screen displays
+    whose viewport is at least 35 times the initial font size and for print
+    displays whose viewport is at least 40 times the initial font size. When
+    either of these is true, the condition of the rule is true, and the rule
+    ‘<code class=css>#section_navigation { float: left; width: 10em;
+    }</code>’ is applied.
+  </div>
+
+  <p>In terms of the grammar, this specification extends the <a
+   href="#media"><code>media</code></a> production in the <a
+   href="http://www.w3.org/TR/CSS21/grammar.html">Grammar of CSS 2.1</a> (<a
+   href="#ref-CSS21" rel=biblioentry>[CSS21]<!--{{!CSS21}}--></a>, Appendix
+   G) into:
+
+  <pre><dfn id=media>media</dfn>
+  : MEDIA_SYM S* media_query_list <a
+   href="#group_rule_body"><i>group_rule_body</i></a>
+  ;</pre>
+
+  <p>where the <a href="#group_rule_body"><code>group_rule_body</code></a>
+   production is defined in this specification, the
+   <code>media_query_list</code> production is defined in <a
+   href="#ref-MEDIAQ" rel=biblioentry>[MEDIAQ]<!--{{!MEDIAQ}}--></a>, and the
+   others are defined in the <a
+   href="http://www.w3.org/TR/CSS21/grammar.html">Grammar of CSS 2.1</a> (<a
+   href="#ref-CSS21" rel=biblioentry>[CSS21]<!--{{!CSS21}}--></a>, Appendix
+   G).
+
+  <h2 id=at-supports><span class=secno>6. </span>Feature queries: the ‘<a
+   href="#at-ruledef-supports"><code class=css>@supports</code></a>’ rule</h2>
+
+  <p>The <dfn data-dfn-type=at-rule id=at-ruledef-supports>@supports</dfn>
+   rule is a conditional group rule whose condition tests whether the user
+   agent supports CSS property:value pairs. Authors can use it to write style
+   sheets that use new features when available but degrade gracefully when
+   those features are not supported. CSS has existing mechanisms for graceful
+   degradation, such as ignoring unsupported properties or values, but these
+   are not always sufficient when large groups of styles need to be tied to
+   the support for certain features, as is the case for use of new layout
+   system features.
+
+  <p>The syntax of the condition in the ‘<a
+   href="#at-ruledef-supports"><code class=css>@supports</code></a>’ rule
+   is slightly more complicated than for the other conditional group rules
+   (though has some similarities to media queries) since:
+
+  <ul>
+   <li>negation is needed so that the new-feature styles and the fallback
+    styles can be separated (within the forward-compatible grammar's rules
+    for the syntax of @-rules), and not required to override each other
+
+   <li>conjunction (and) is needed so that multiple required features can be
+    tested
+
+   <li>disjunction (or) is needed when there are multiple alternative
+    features for a set of styles, particularly when some of those
+    alternatives are vendor-prefixed properties or values
+  </ul>
+
+  <p>Therefore, the syntax of the ‘<a href="#at-ruledef-supports"><code
+   class=css>@supports</code></a>’ rule allows testing for property:value
+   pairs, and arbitrary conjunctions (and), disjunctions (or), and negations
+   (not) of them.
+
+  <p>This extends the lexical scanner in the <a
+   href="http://www.w3.org/TR/CSS21/grammar.html">Grammar of CSS 2.1</a> (<a
+   href="#ref-CSS21" rel=biblioentry>[CSS21]<!--{{!CSS21}}--></a>, Appendix
+   G) by adding:
+
+  <pre>
+@{S}{U}{P}{P}{O}{R}{T}{S} {return <dfn
+   id="supports_sym">SUPPORTS_SYM</dfn>;}
+{O}{R}                    {return <dfn
+   id=or>OR</dfn>;}
+</pre>
+
+  <p>This then extends the grammar in the <a
+   href="http://www.w3.org/TR/CSS21/grammar.html">Grammar of CSS 2.1</a>,
+   using the lexical scanner there, with the additions of <code><a
+   href="http://www.w3.org/TR/css3-mediaqueries/#syntax">AND</a></code> and
+   <code><a
+   href="http://www.w3.org/TR/css3-mediaqueries/#syntax">NOT</a></code>
+   tokens defined in the Media Queries specification <a href="#ref-MEDIAQ"
+   rel=biblioentry>[MEDIAQ]<!--{{!MEDIAQ}}--></a> and the <a
+   href="#or"><code>OR</code></a> and <a
+   href="#supports_sym"><code>SUPPORTS_SYM</code></a> tokens defined above,
+   and with <code><a
+   href="http://www.w3.org/TR/CSS21/syndata.html#tokenization">declaration</a></code>,
+   <code><a
+   href="http://www.w3.org/TR/CSS21/syndata.html#tokenization">any</a></code>,
+   and <code><a
+   href="http://www.w3.org/TR/CSS21/syndata.html#tokenization">unused</a></code>
+   productions and the <code><a
+   href="http://www.w3.org/TR/CSS21/syndata.html#tokenization">FUNCTION</a></code>
+   token taken from the core syntax of CSS defined in <a
+   href="http://www.w3.org/TR/CSS21/syndata.html#tokenization">section 4.1.1
+   (Tokenization)</a> of <a href="#ref-CSS21"
+   rel=biblioentry>[CSS21]<!--{{!CSS21}}--></a>, by adding:
+
+  <pre><dfn id="supports_rule">supports_rule</dfn>
+  : <a
+   href="#supports_sym"><i>SUPPORTS_SYM</i></a> <a
+   href="http://www.w3.org/TR/CSS21/grammar.html#scanner"><i>S</i></a>* <a
+   href="#supports_condition"><i>supports_condition</i></a> <a
+   href="http://www.w3.org/TR/CSS21/grammar.html#scanner"><i>S</i></a>* <a
+   href="#group_rule_body"><i>group_rule_body</i></a>
+  ;
+
+<dfn
+   id="supports_condition">supports_condition</dfn>
+  : <a
+   href="#supports_negation"><i>supports_negation</i></a> | <a
+   href="#supports_conjunction"><i>supports_conjunction</i></a> | <a
+   href="#supports_disjunction"><i>supports_disjunction</i></a> |
+    <a
+   href="#supports_condition_in_parens"><i>supports_condition_in_parens</i></a>
+  ;
+
+<dfn
+   id="supports_condition_in_parens">supports_condition_in_parens</dfn>
+  : ( '(' <a
+   href="http://www.w3.org/TR/CSS21/grammar.html#scanner"><i>S</i></a>* <a
+   href="#supports_condition"><i>supports_condition</i></a> <a
+   href="http://www.w3.org/TR/CSS21/grammar.html#scanner"><i>S</i></a>* ')' ) | <a
+   href="#supports_declaration_condition"><i>supports_declaration_condition</i></a> |
+    <a
+   href="#general_enclosed"><i>general_enclosed</i></a>
+  ;
+
+<dfn
+   id="supports_negation">supports_negation</dfn>
+  : <a
+   href="http://www.w3.org/TR/css3-mediaqueries/#syntax"><i>NOT</i></a> <a
+   href="http://www.w3.org/TR/CSS21/grammar.html#scanner"><i>S</i></a>+ <a
+   href="#supports_condition_in_parens"><i>supports_condition_in_parens</i></a>
+  ;
+
+<dfn
+   id="supports_conjunction">supports_conjunction</dfn>
+  : <a
+   href="#supports_condition_in_parens"><i>supports_condition_in_parens</i></a> ( <a
+   href="http://www.w3.org/TR/CSS21/grammar.html#scanner"><i>S</i></a>+ <a
+   href="http://www.w3.org/TR/css3-mediaqueries/#syntax"><i>AND</i></a> <a
+   href="http://www.w3.org/TR/CSS21/grammar.html#scanner"><i>S</i></a>+ <a
+   href="#supports_condition_in_parens"><i>supports_condition_in_parens</i></a> )+
+  ;
+
+<dfn
+   id="supports_disjunction">supports_disjunction</dfn>
+  : <a
+   href="#supports_condition_in_parens"><i>supports_condition_in_parens</i></a> ( <a
+   href="http://www.w3.org/TR/CSS21/grammar.html#scanner"><i>S</i></a>+ <a
+   href="#or"><i>OR</i></a> <a
+   href="http://www.w3.org/TR/CSS21/grammar.html#scanner"><i>S</i></a>+ <a
+   href="#supports_condition_in_parens"><i>supports_condition_in_parens</i></a> )+
+  ;
+
+<dfn
+   id="supports_declaration_condition">supports_declaration_condition</dfn>
+  : '(' <a
+   href="http://www.w3.org/TR/CSS21/grammar.html#scanner"><i>S</i></a>* <a
+   href="http://www.w3.org/TR/CSS21/syndata.html#tokenization"><i>declaration</i></a> ')'
+  ;
+
+<dfn
+   id="general_enclosed">general_enclosed</dfn>
+  : ( <a
+   href="http://www.w3.org/TR/CSS21/syndata.html#tokenization"><i>FUNCTION</i></a> | '(' ) ( <a
+   href="http://www.w3.org/TR/CSS21/syndata.html#tokenization"><i>any</i></a> | <a
+   href="http://www.w3.org/TR/CSS21/syndata.html#tokenization"><i>unused</i></a> )* ')'
+  ;
+</pre>
+
+  <p> Implementations <strong>must</strong> parse ‘<a
+   href="#at-ruledef-supports"><code class=css>@supports</code></a>’ rules
+   based on the above grammar, and when interpreting the above grammar,
+   <strong>must</strong> match the production before an <code>|</code>
+   operator in preference to the one after it.
+
+  <p> The above grammar is purposely very loose for forwards-compatibility
+   reasons, since the <a
+   href="#general_enclosed"><code>general_enclosed</code></a> production
+   allows for substantial future extensibility. Any ‘<a
+   href="#at-ruledef-supports"><code class=css>@supports</code></a>’ rule
+   that does not parse according to the grammar above (that is, a rule that
+   does not match this loose grammar which includes the <a
+   href="#general_enclosed"><code>general_enclosed</code></a> production) is
+   invalid. Style sheets <strong>must not</strong> use such a rule and
+   processors <strong>must</strong> ignore such a rule (including all of its
+   contents).
+
+  <p>Each of these grammar terms is associated with a boolean result, as
+   follows:
+
+  <dl>
+   <dt>supports_condition
+
+   <dd> The result is the result of the single child term.
+
+   <dt>supports_condition_in_parens
+
+   <dd> The result is the result of the single <a
+    href="#supports_condition"><code>supports_condition</code></a> or <a
+    href="#supports_declaration_condition"><code>supports_declaration_condition</code></a>
+    child term.
+
+   <dt>supports_negation
+
+   <dd> The result is the <em>negation</em> of the result of the <a
+    href="#supports_condition_in_parens"><code>supports_condition_in_parens</code></a>
+    child term.
+
+   <dt>supports_conjunction
+
+   <dd> The result is true if the result of <em>all</em> of the <a
+    href="#supports_condition_in_parens"><code>supports_condition_in_parens</code></a>
+    child terms is true; otherwise it is false.
+
+   <dt>supports_disjunction
+
+   <dd> The result is true if the result of <em>any</em> of the <a
+    href="#supports_condition_in_parens"><code>supports_condition_in_parens</code></a>
+    child terms is true; otherwise it is false.
+
+   <dt>supports_declaration_condition
+
+   <dd> The result is whether the CSS processor <a
+    href="#support-definition">supports</a> the declaration within the
+    parentheses.
+
+   <dt>general_enclosed
+
+   <dd> The result is always false. Additionally, style sheets <strong>must
+    not</strong> write ‘<a href="#at-ruledef-supports"><code
+    class=css>@supports</code></a>’ rules that match this grammar
+    production. (In other words, this production exists only for future
+    extensibility, and is not part of the description of a valid style sheet
+    in this level of the specification.) <span class=note>Note that future
+    levels may define functions or other parenthesized expressions that can
+    evaluate to true.</span>
+  </dl>
+
+  <p>The condition of the ‘<a href="#at-ruledef-supports"><code
+   class=css>@supports</code></a>’ rule is the result of the <a
+   href="#supports_condition"><code>supports_condition</code></a> term that
+   is a child of the <a href="#supports_rule"><code>supports_rule</code></a>
+   term.
+
+  <div class=example>
+   <p>For example, the following rule
+
+   <pre>@supports ( display: flexbox ) {
+  body, #navigation, #content { display: flexbox; }
+  #navigation { background: blue; color: white; }
+  #article { background: white; color: black; }
+}</pre>
+
+   <p>applies the rules inside the ‘<a href="#at-ruledef-supports"><code
+    class=css>@supports</code></a>’ rule only when ‘<code
+    class=css>display: flexbox</code>’ is supported.
+  </div>
+
+  <div class=example>
+   <p>The following example shows an additional ‘<a
+    href="#at-ruledef-supports"><code class=css>@supports</code></a>’ rule
+    that can be used to provide an alternative for when ‘<code
+    class=css>display: flexbox</code>’ is not supported:
+
+   <pre>@supports not ( display: flexbox ) {
+  body { width: 100%; height: 100%; background: white; color: black; }
+  #navigation { width: 25%; }
+  #article { width: 75%; }
+}</pre>
+
+   <p>Note that the ‘<code class=property>width</code>’ declarations may
+    be harmful to the flexbox-based layout, so it is important that they be
+    present only in the non-flexbox styles.
+  </div>
+
+  <div class=example>
+   <p>The following example checks for support for the ‘<code
+    class=property>box-shadow</code>’ property, including checking for
+    support for vendor-prefixed versions of it. When the support is present,
+    it specifies both ‘<code class=property>box-shadow</code>’ (with the
+    prefixed versions) and ‘<code class=property>border</code>’ in a way
+    what would cause the box to become invisible were ‘<code
+    class=property>box-shadow</code>’ not supported.
+
+   <pre>.noticebox {
+  border: 1px solid black;
+  padding: 1px;
+}
+@supports ( box-shadow: 0 0 2px black inset ) or
+          ( -moz-box-shadow: 0 0 2px black inset ) or
+          ( -webkit-box-shadow: 0 0 2px black inset ) or
+          ( -o-box-shadow: 0 0 2px black inset ) {
+  .noticebox {
+    -moz-box-shadow: 0 0 2px black inset;
+    -webkit-box-shadow: 0 0 2px black inset;
+    -o-box-shadow: 0 0 2px black inset;
+    box-shadow: 0 0 2px black inset; /* unprefixed last */
+    /* override the rule above the @supports rule */
+    border: none;
+    padding: 2px;
+  }
+}</pre>
+  </div>
+
+  <p>To avoid confusion between ‘<code class=css>and</code>’ and ‘<a
+   href="#or"><code class=css>or</code></a>’, the syntax requires that both
+   ‘<code class=css>and</code>’ and ‘<a href="#or"><code
+   class=css>or</code></a>’ be specified explicitly (rather than, say,
+   using commas or spaces for one of them). Likewise, to avoid confusion
+   caused by precedence rules, the syntax does not allow ‘<code
+   class=css>and</code>’, ‘<a href="#or"><code
+   class=css>or</code></a>’, and ‘<code class=css>not</code>’ operators
+   to be mixed without a layer of parentheses.
+
+  <div class=example>
+   <p>For example, the following rule is not valid:
+
+   <pre class=illegal>@supports (transition-property: color) or
+          (animation-name: foo) and
+          (transform: rotate(10deg)) {
+  // ...
+}</pre>
+
+   <p>Instead, authors must write one of the following:
+
+   <pre>@supports ((transition-property: color) or
+           (animation-name: foo)) and
+          (transform: rotate(10deg)) {
+  // ...
+}</pre>
+
+   <pre>@supports (transition-property: color) or
+          ((animation-name: foo) and
+           (transform: rotate(10deg))) {
+  // ...
+}</pre>
+  </div>
+
+  <p>Furthermore, whitespace is required after a ‘<code
+   class=css>not</code>’ and on both sides of an ‘<code
+   class=css>and</code>’ or ‘<a href="#or"><code
+   class=css>or</code></a>’.
+
+  <p>The declaration being tested must always occur within parentheses, when
+   it is the only thing in the expression.
+
+  <p>
+
+  <div class=example>
+   <p>For example, the following rule is not valid:
+
+   <pre class=illegal>@supports display: flexbox {
+  // ...
+}</pre>
+
+   <p>Instead, authors must write:
+
+   <pre>@supports (display: flexbox) {
+  // ...
+}</pre>
+  </div>
+
+  <p>The syntax allows extra parentheses when they are not needed. This
+   flexibility is sometimes useful for authors (for example, when commenting
+   out parts of an expression) and may also be useful for authoring tools.
+
+  <div class=example>
+   <p>For example, authors may write:
+
+   <pre>@supports ((display: flexbox)) {
+  // ...
+}</pre>
+  </div>
+
+  <p>A trailing ‘<code class=css>!important</code>’ on a declaration
+   being tested is allowed, though it won't change the validity of the
+   declaration.
+
+  <div class=example>
+   <p>For example, the following rule is valid:
+
+   <pre>@supports (display: flexbox !important) {
+  // ...
+}</pre>
+  </div>
+
+  <h3 id=support-definition><span class=secno>6.1. </span>Definition of
+   support</h3>
+
+  <p>For forward-compatibility, <a
+   href="http://www.w3.org/TR/CSS21/syndata.html#declaration">section 4.1.8
+   (Declarations and properties)</a> of <a href="#ref-CSS21"
+   rel=biblioentry>[CSS21]<!--{{!CSS21}}--></a> defines rules for handling
+   invalid properties and values. CSS processors that do not implement or
+   partially implement a specification <strong>must</strong> treat any part
+   of a value that they do not implement, or do not have a usable level of
+   support for, as invalid according to this rule for handling invalid
+   properties and values, and therefore <strong>must</strong> discard the
+   declaration as a parse error.
+
+  <p>A CSS processor is considered to <dfn id=dfn-support>support</dfn> a
+   declaration (consisting of a property and value) if it accepts that
+   declaration (rather than discarding it as a parse error). If a processor
+   does not implement, with a usable level of support, the value given, then
+   it <strong>must not</strong> accept the declaration or claim support for
+   it.
+
+  <p class=note>Note that properties or values whose support is effectively
+   disabled by user preferences are still considered as supported by this
+   definition. For example, if a user has enabled a high-contrast mode that
+   causes colors to be overridden, the CSS processor is still considered to
+   support the ‘<code class=property>color</code>’ property even though
+   declarations of the ‘<code class=property>color</code>’ property may
+   have no effect. On the other hand, a developer-facing preference whose
+   purpose is to enable or disable support for an experimental CSS feature
+   does affect this definition of support.
+
+  <p>These rules (and the equivalence between them) allow authors to use
+   fallback (either in the <a href="#ref-CSS1"
+   rel=biblioentry>[CSS1]<!--{{CSS1}}--></a> sense of declarations that are
+   overridden by later declarations or with the new capabilities provided by
+   the ‘<a href="#at-ruledef-supports"><code
+   class=css>@supports</code></a>’ rule in this specification) that works
+   correctly for the features implemented. This applies especially to
+   compound values; implementations must implement all parts of the value in
+   order to consider the declaration supported, either inside a style rule or
+   in the declaration condition of an ‘<a href="#at-ruledef-supports"><code
+   class=css>@supports</code></a>’ rule.</p>
+  <!--
+<h2 id="at-document">Document queries: the '@document' rule</h2>
+
+<p>The <dfn>'@document' rule</dfn> is a conditional group
+rule whose condition depends on the
+<a href="#url-of-doc">URL of the document being styled</a>.
+This allows style sheets, particularly user style sheets, to have styles
+that only apply to a set of pages rather than to all pages using the
+style sheet.</p>
+
+<p class="issue">Given that this @-rule is intended primarily for user
+style sheets, what should this specification say about its use in author
+style sheets?  Should it be forbidden?  Should use instead be
+discouraged?  Or should this specification remain neutral on the
+topic, since there are valid uses in author style sheets?</p>
+
+<p id="url-of-doc">The <dfn>URL of the document being styled</dfn> is
+the URI at which the document is located, excluding any fragment
+identifiers.  (This means, for example, that HTTP redirects have been
+followed.)  If the styles are being applied inside a complete document
+embedded into the presentation of another (e.g., [[HTML5]]'s <code
+class="html">iframe</code>, <code class="html">object</code>, or <code
+class="html">img</code> elements), the relevant URI is that of the
+frame, not of its container.  However, if content from other documents
+is mixed in via mechanisms that mix content from one document into
+another (e.g., [[SVG11]]'s <code>use</code> element), then the
+address of the container document is used.</p>
+
+<p class="note">Note:  In [[HTML5]], this is the
+<a href="http://dev.w3.org/html5/spec/dom.html#documents">document's address</a>
+of a document in a
+<a href="http://dev.w3.org/html5/spec/browsers.html#browsing-context">browsing context</a>.</p>
+
+<div class="issue">What form of normalization is done on URLs and domains
+before matching?  In particular, this specification needs to describe:
+<ul>
+<li>what form is used for the <a href="#url-of-doc">URL of the document
+being styled</a> (and what has been normalized in that form)</li>
+<li>what normalization (if any) happens to the argument of each of the match
+functions before the comparison that they describe and</li>
+<li>whether the
+comparison algorithm used is string comparison or some other URL
+comparison algorithm.</li></ul></div>
+
+<p>The '@document' rule's condition is written as a
+comma-separated list of <dfn>URL matching functions</dfn>, and the
+condition evaluates to true whenever any one of those functions
+evaluates to true.  The following URL matching functions are
+permitted:</p>
+
+<dl>
+  <dt><dfn id="url-exact" title="url()|URL matching functions::exact">&lt;url&gt;</dfn></dt>
+
+  <dd>
+    <p>The 'url()' function is the <dfn>exact url matching
+    function</dfn>.  It evaluates to true whenever the <a
+    href="#url-of-doc">URL of the document being styled</a> is exactly
+    the URL given.</p>
+
+    <p class="Note">The 'url()' function, since it is a core syntax
+    element in CSS, is allowed (subject to different character
+    limitations and thus escaping requirements) to contain an unquoted
+    value (in addition to the string values that are allowed as
+    arguments for all four functions).</p>
+
+    <div class="example">
+      <p>For example, this rule:</p>
+<pre>@document url("http://www.w3.org/Style/CSS/") {
+  #summary { background: yellow; color: black}
+}</pre>
+      <p>styles the <code class="html">summary</code> element on the page
+      <code>http://www.w3.org/Style/CSS/</code>, but not on any other
+      pages.</p>
+    </div>
+  </dd>
+
+  <dt><dfn id="url-prefix" title="url-prefix()|URL matching functions::prefix">url-prefix(&lt;string&gt;)</dfn></dt>
+
+  <dd>
+    <p>The 'url-prefix()' function is the <dfn>url prefix
+    matching function</dfn>.  It evaluates to true whenever the
+    <a href="#url-of-doc">URL of the document being styled</a>
+    has the argument to the function as an
+    initial substring (which is true when the two strings are equal).
+    When the argument is the empty string, it evaluates to true for all
+    documents.</p>
+    <div class="example">
+      <p>For example, this rule:</p>
+<pre>@document url-prefix("http://www.w3.org/Style/CSS/") {
+  #summary { background: yellow; color: black}
+}</pre>
+      <p>styles the <code class="html">summary</code> element on the page
+      <code>http://www.w3.org/Style/CSS/</code> and on the page
+      <code>http://www.w3.org/Style/CSS/Test</code>, but it does not
+      affect the page <code>http://www.w3.org/</code> or the page
+      <code>http://www.example.com/Style/CSS/</code>.</p>
+    </div>
+  </dd>
+
+  <dt><dfn id="url-domain" title="domain()|URL matching functions::domain">domain(&lt;string&gt;)</dfn></dt>
+
+  <dd>
+    <p>The 'domain()' function is the <dfn>domain
+    matching function</dfn>.  It evaluates to true whenever
+    the <a href="#url-of-doc">URL of the document being styled</a>
+    has a host subcomponent (as defined in [[!URI]])
+    and that host subcomponent is exactly the argument to the
+    'domain()' function or a final substring of the host
+    component is a period (U+002E) immediately followed by the argument
+    to the 'domain()' function.</p>
+    <div class="example">
+      <p>For example, this rule:</p>
+<pre>@document domain("w3.org") {
+  body { font-size: 16px ! important }
+}</pre>
+      <p>changes the font size of the body element for pages such as
+      <code>http://www.w3.org/Style/CSS/</code> and
+      <code>http://w3.org/Style/CSS/</code> and
+      <code>http://lists.w3.org/Archives/Public/www-style/</code>
+      but it does not affect the page
+      <code>http://www.example.com/Style/CSS/</code>.</p>
+    </div>
+  </dd>
+
+  <dt><dfn id="url-regexp" title="regexp()|URL matching functions::regular expression">regexp(&lt;string&gt;)</dfn></dt>
+
+  <dd>
+    <p>The contents of the &lt;string&gt; argument <strong>must</strong>
+    match the JavaScript <code>Pattern</code> production
+    ([[!ECMA-262-5.1]], section 15.10.1).  However,
+    failing to do so is not a CSS syntax error and does not trigger any
+    error handling for CSS syntax errors.</p>
+
+    <p>The ''regexp()'' function evaluates to true whenever the string
+    argument compiled as a JavaScript regular expression with the
+    <code>global</code>, <code>ignoreCase</code> and
+    <code>multiline</code> flags <em>disabled</em>
+    (see [[!ECMA-262-5.1]], sections 15.10.7.2 through 15.10.7.4)
+    compiles successfully and the resulting regular expression matches
+    the entirety of the
+    <a href="#url-of-doc">URL of the document being styled</a>.</p>
+
+    <p class="note">Note that regular expression must match the entire
+    URL, not just a part of it.</p>
+
+    <p class="note">Note that this definition intentionally matches the
+    behavior of the <a
+    href="http://dev.w3.org/html5/spec/common-input-element-attributes.html#attr-input-pattern"><code class="html">pattern</code>
+    attribute</a> on the <code class="html">input</code> element
+    in [[HTML5]].</p>
+
+    <div class="example">
+      <p>For example, this rule:</p>
+<pre>@document regexp("http://www.w3.org/TR/\\d{4}/[^/]*-CSS2-\\d{8}/") {
+  body { font-size: 20px ! important }
+}</pre>
+      <p>changes the font size of the body element for pages such as
+      <code>http://www.w3.org/TR/2011/PR-CSS2-20110412/</code>.</p>
+      <p class="note">Note that the backslashes in the regular
+      expression require CSS escaping as ''\\''.</p>
+    </div>
+  </dd>
+
+</dl>
+
+<p>Implementations <strong>must</strong> treat any unknown URL matching
+functions as a syntax error, and thus ignore the '@document' rule.
+<span class="issue">Should we instead have more complicated error
+handling rules to make forward-compatibility work differently, or is
+this rule the best solution for such future expansion anyway?</span></p>
+
+<div class="issue">This syntax doesn't offer any ability to do negations,
+which has been requested in <a
+href="https://bugzilla.mozilla.org/show_bug.cgi?id=349813">Mozilla bug
+349813</a>.  Use cases that people have wanted negations for
+include:
+<ul>
+  <li>User style sheets that want a particular rule in general, but know
+  that that rule does more harm than good on specific sites.</li>
+  <li>Authors who have a rule that they want to apply to most of their
+  pages, but wish to make a few exceptions for.</li>
+</ul>
+</div>
+
+<p>This extends the lexical scanner in the
+<a href="http://www.w3.org/TR/CSS21/grammar.html">Grammar of CSS 2.1</a>
+([[!CSS21]], Appendix G) by adding:
+<pre>@{D}{O}{C}{U}{M}{E}{N}{T}	{return DOCUMENT_SYM;}</pre>
+<p>and the grammar by adding</p>
+<pre><dfn>document_rule</dfn>
+  : DOCUMENT_SYM S+ <i>url_match_fn</i> ( "," S* <i>url_match_fn</i> )* <i>group_rule_body</i>
+  ;
+
+<dfn>url_match_fn</dfn>
+  : (URI | FUNCTION S* STRING S* ')' ) S*
+  ;</pre>
+-->
+
+  <h2 id=apis><span class=secno>7. </span>APIs</h2>
+
+  <h3 id=extentions-to-cssrule-interface><span class=secno>7.1. </span>
+   Extensions to the <code>CSSRule</code> interface</h3>
+
+  <p>The <code>CSSRule</code> interface is extended as follows:
+
+  <pre class=idl>partial interface CSSRule {
+    const unsigned short SUPPORTS_RULE = 12;
+    <!--
+    const unsigned short DOCUMENT_RULE = 13;
+    -->
+}</pre>
+
+  <h3 id=the-cssgroupingrule-interface><span class=secno>7.2. </span> The <a
+   href="#cssgroupingrule"><code>CSSGroupingRule</code></a> interface</h3>
+
+  <p>The <dfn id=cssgroupingrule><code>CSSGroupingRule</code></dfn> interface
+   represents an at-rule that contains other rules nested inside itself.
+
+  <pre class=idl>interface CSSGroupingRule : CSSRule {
+    readonly attribute <a
+   href="http://www.w3.org/TR/DOM-Level-2-Style/css.html#CSS-CSSRuleList">CSSRuleList</a> cssRules;
+    unsigned long insertRule (DOMString rule, unsigned long index);
+    void deleteRule (unsigned long index);
+}</pre>
+
+  <dl class=idl-attributes>
+   <dt><code>cssRules</code> of type <code><a
+    href="http://www.w3.org/TR/DOM-Level-2-Style/css.html#CSS-CSSRuleList">CSSRuleList</a></code>,
+    readonly
+
+   <dd>The <code>cssRules</code> attribute must return a
+    <code>CSSRuleList</code> object for the list of CSS rules nested inside
+    the grouping rule.
+  </dl>
+
+  <dl class=idl-methods>
+   <dt><code>insertRule(DOMString rule, unsigned long index)</code>, returns
+    <code>unsigned long</code>
+
+   <dd> The <code>insertRule</code> operation must insert a CSS rule
+    <var>rule</var> into the CSS rule list returned by <code>cssRules</code>,
+    such that the inserted rule will be at position <var>index</var>, and any
+    rules previously at <var>index</var> or higher will increase their index
+    by one. It must throw INDEX_SIZE_ERR if index is greater than
+    <code>cssRules.length</code>. It must throw SYNTAX_ERR if the rule has a
+    syntax error and is unparseable; this does not include syntax errors
+    handled by error handling rules for constructs inside of the rule, but
+    this does include cases where the string given does not parse into a
+    single CSS rule (such as when the string is empty) or where there is
+    anything other than whitespace or comments after that single CSS rule. It
+    must throw HIERARCHY_REQUEST_ERR if the rule cannot be inserted at the
+    location specified, for example, if an ‘<code
+    class=css>@import</code>’ rule is inserted inside a group rule.
+    <p>The return value is the <var>index</var> parameter.
+
+   <dt><code>deleteRule (unsigned long index)</code>, return
+    <code>void</code>
+
+   <dd> The <code>deleteRule</code> operation must remove a CSS rule from the
+    CSS rule list returned by <code>cssRules</code> at <var>index</var>. It
+    must throw INDEX_SIZE_ERR if index is greater than or equal to
+    <code>cssRules.length</code>.
+  </dl>
+
+  <h3 id=the-cssconditionrule-interface><span class=secno>7.3. </span> The <a
+   href="#cssconditionrule"><code>CSSConditionRule</code></a> interface</h3>
+
+  <p>The <dfn id=cssconditionrule><code>CSSConditionRule</code></dfn>
+   interface represents all the "conditional" at-rules, which consist of a
+   condition and a statement block.
+
+  <pre class=idl>interface CSSConditionRule : CSSGroupingRule {
+    attribute DOMString conditionText;
+}</pre>
+
+  <dl class=idl-attributes>
+   <dt><code>conditionText</code> of type <code>DOMString</code>
+
+   <dd>
+    <p>The <code>conditionText</code> attribute represents the condition of
+     the rule. Since what this condition does varies between the derived
+     interfaces of <a
+     href="#cssconditionrule"><code>CSSConditionRule</code></a>, those
+     derived interfaces may specify different behavior for this attribute
+     (see, for example, <a href="#cssmediarule"><code>CSSMediaRule</code></a>
+     below). In the absence of such rule-specific behavior, the following
+     rules apply:
+
+    <p>The <code>conditionText</code> attribute, on getting, must return the
+     result of serializing the associated condition.
+
+    <p>On setting the <code>conditionText</code> attribute these steps must
+     be run:
+
+    <ol>
+     <li>Trim the given value of white space.
+
+     <li>If the given value matches the grammar of the appropriate condition
+      production for the given rule, replace the associated CSS condition
+      with the given value.
+
+     <li>Otherwise, do nothing.
+    </ol>
+  </dl>
+
+  <h3 id=the-cssmediarule-interface><span class=secno>7.4. </span> The <a
+   href="#cssmediarule"><code>CSSMediaRule</code></a> interface</h3>
+
+  <p>The <dfn id=cssmediarule><code>CSSMediaRule</code></dfn> interface
+   represents a ‘<a href="#at-ruledef-media"><code
+   class=css>@media</code></a>’ rule:
+
+  <pre class=idl>interface CSSMediaRule : CSSConditionRule {
+    readonly attribute <a
+   href="http://www.w3.org/TR/DOM-Level-2-Style/stylesheets.html#StyleSheets-MediaList">MediaList</a> media;
+}</pre>
+
+  <dl class=idl-attributes>
+   <dt><a href="#media"><code>media</code></a> of type <code><a
+    href="http://www.w3.org/TR/DOM-Level-2-Style/stylesheets.html#StyleSheets-MediaList">MediaList</a></code>,
+    readonly
+
+   <dd>The <a href="#media"><code>media</code></a> attribute must return a
+    <code>MediaList</code> object for the list of media queries specified
+    with the ‘<a href="#at-ruledef-media"><code
+    class=css>@media</code></a>’ rule.
+
+   <dt><code>conditionText</code> of type <code>DOMString</code>
+    (CSSMediaRule-specific definition for attribute on CSSConditionRule)
+
+   <dd>The <code>conditionText</code> attribute (defined on the <a
+    href="#cssconditionrule"><code>CSSConditionRule</code></a> parent rule),
+    on getting, must return the value of <code>media.mediaText</code> on the
+    rule.
+    <p>Setting the <code>conditionText</code> attribute must set the
+     <code>media.mediaText</code> attribute on the rule.
+  </dl>
+
+  <h3 id=the-csssupportsrule-interface><span class=secno>7.5. </span> The <a
+   href="#csssupportsrule"><code>CSSSupportsRule</code></a> interface</h3>
+
+  <p>The <dfn id=csssupportsrule><code>CSSSupportsRule</code></dfn> interface
+   represents a ‘<a href="#at-ruledef-supports"><code
+   class=css>@supports</code></a>’ rule.
+
+  <pre class=idl>interface CSSSupportsRule : CSSConditionRule {
+}</pre>
+
+  <dl class=idl-attributes>
+   <dt><code>conditionText</code> of type <code>DOMString</code>
+    (CSSSupportsRule-specific definition for attribute on CSSConditionRule)
+
+   <dd>The <code>conditionText</code> attribute (defined on the <a
+    href="#cssconditionrule"><code>CSSConditionRule</code></a> parent rule),
+    on getting, must return the condition that was specified, without any
+    logical simplifications, so that the returned condition will evaluate to
+    the same result as the specified condition in any conformant
+    implementation of this specification (including implementations that
+    implement future extensions allowed by the <a
+    href="#general_enclosed"><i>general_enclosed</i></a> exensibility
+    mechanism in this specification). In other words, token stream
+    simplifications are allowed (such as reducing whitespace to a single
+    space or omitting it in cases where it is known to be optional), but
+    logical simplifications (such as removal of unneeded parentheses, or
+    simplification based on evaluating results) are not allowed.
+  </dl>
+  <!--
+<h3 id="the-cssdocumentrule-interface">
+The <code>CSSDocumentRule</code> interface</h3>
+
+<p>The <dfn><code>CSSDocumentRule</code></dfn> interface represents a ''@document'' rule.</p>
+
+<pre class='idl'>interface CSSDocumentRule : CSSConditionRule {
+}</pre>
+-->
+
+  <h3 id=the-css-interface><span class=secno>7.6. </span> The <a
+   href="#CSS-interface"><code>CSS</code></a> interface, and the <code
+   title="">supports()</code> function</h3>
+
+  <p>The <dfn id=CSS-interface><code>CSS</code></dfn> interface holds useful
+   CSS-related functions that do not belong elsewhere.
+
+  <pre class=idl>interface CSS {
+  static boolean supports(DOMString property, DOMString value);
+  static boolean supports(DOMString conditionText);
+}</pre>
+
+  <dl class=idl-methods>
+   <dt><code>supports(DOMString property, DOMString value)</code>, returns
+    <code>boolean</code>
+
+   <dt><code>supports(DOMString conditionText)</code>, returns
+    <code>boolean</code>
+
+   <dd> When the <code title="">supports()</code> method is invoked with two
+    arguments <var>property</var> and <var>value</var>, it must return
+    <code>true</code> if <var>property</var> is a literal match for the name
+    of a CSS property that the UA supports, and <var>value</var> would be
+    successfully parsed as a supported value for that property. (Literal
+    match means that no CSS escape processing is performed, and leading and
+    trailing whitespace are not stripped, so any leading whitespace, trailing
+    whitespace, or CSS escapes equivalent to the name of a property would
+    cause the method to return <code>false</code>.) Otherwise, it must return
+    <code>false</code>.
+    <p> When invoked with a single <var>conditionText</var> argument, it must
+     return <code>true</code> if <var>conditionText</var>, when parsed and
+     evaluated as a <a
+     href="#supports_condition"><code>supports_condition</code></a>, would
+     return true. Otherwise, it must return <code>false</code>.
+  </dl>
+
+  <h2 class=no-num id=grammar>Grammar</h2>
+
+  <p>In order to allow these new @-rules in CSS style sheets, this
+   specification modifies the <code>stylesheet</code> production in the <a
+   href="http://www.w3.org/TR/CSS21/grammar.html">Appendix G</a> grammar of
+   <a href="#ref-CSS21" rel=biblioentry>[CSS21]<!--{{!CSS21}}--></a> by
+   replacing the <a href="#media"><code>media</code></a> production defined
+   in <a href="#ref-CSS21" rel=biblioentry>[CSS21]<!--{{!CSS21}}--></a> with
+   the <a href="#media"><code>media</code></a> production defined in this
+   one, and additionally inserting <code>| supports_rule</code> alongside
+   <code>ruleset | media | page</code>.
+
+  <h2 id=conformance><span class=secno>8. </span>Conformance</h2>
+
+  <h3 id=base-modules><span class=secno>8.1. </span>Base Modules</h3>
+
+  <p>This specification defines conformance in terms of base modules, which
+   are modules that this specification builds on top of. The base modules of
+   this module are:
+
+  <ul>
+   <li><a href="#ref-CSS21" rel=biblioentry>[CSS21]<!--{{!CSS21}}--></a>
+  </ul>
+
+  <p>All of the conformance requirements of all base modules are incorporated
+   as conformance requirements of this module, except where overridden by
+   this module.
+
+  <p>Additionally, all conformance requirements related to validity of syntax
+   in this module and all of its base modules are to be interpreted as though
+   all syntax in all of those modules is valid.
+
+  <div class=example>
+   <p>For example, this means that grammar presented in modules other than <a
+    href="#ref-CSS21" rel=biblioentry>[CSS21]<!--{{!CSS21}}--></a> must obey
+    the requirements that <a href="#ref-CSS21"
+    rel=biblioentry>[CSS21]<!--{{!CSS21}}--></a> defines for the parsing of
+    properties, and that requirements for handling invalid syntax in <a
+    href="#ref-CSS21" rel=biblioentry>[CSS21]<!--{{!CSS21}}--></a> do not
+    treat syntax added by other modules as invalid.
+  </div>
+
+  <p>Additionally, the set of valid syntax can be increased by the
+   conformance of a style sheet or processor to additional modules; use of
+   such syntax does not make a style sheet nonconformant and failure to treat
+   such syntax as invalid does not make a processor nonconformant.
+
+  <h3 id=conformance-classes><span class=secno>8.2. </span>Conformance
+   Classes</h3>
+
+  <p>Conformance to the CSS Conditional Rules Module is defined for three
+   conformance classes:
+
+  <dl>
+   <dt><dfn id=conform-style-sheet title="conformance::style sheet">style
+    sheet</dfn>
+
+   <dd>A <a href="http://www.w3.org/TR/CSS21/conform.html#style-sheet">CSS
+    style sheet</a>.
+
+   <dt><dfn id=conform-processor
+    title="conformance::processor">processor</dfn>
+
+   <dd>A tool that reads CSS style sheets: it may be a renderer or <a
+    href="http://www.w3.org/TR/CSS21/conform.html#user-agent">user-agent</a>
+    that interprets the semantics of a style sheet and renders documents that
+    use style sheets, or it may be a validator that checks style sheets.
+
+   <dt><dfn id=conform-authoring-tool
+    title="conformance::authoring tool">authoring tool</dfn>
+
+   <dd>A tool that writes a style sheet.
+  </dl>
+
+  <p>A style sheet is conformant to the CSS Conditional Rules Module if it
+   meets all of the conformance requirements in the module that are described
+   as requirements of style sheets.
+
+  <p>A processor is conformant to the CSS Conditional Rules Module if it
+   meets all applicable conformance requirements in the module that are
+   described as requirements of processors. In general, all requirements are
+   applicable to renderers. Requirements concerning a part of CSS not
+   performed by a processor are not applicable, e.g., requirements related to
+   rendering are not applicable to a validator. The inability of a processor
+   to correctly render a document due to limitations of the device does not
+   make it non-conformant. (For example, a renderer is not required to render
+   color on a monochrome monitor.)
+
+  <p>An authoring tool is conformant to the CSS Conditional Rules Module if
+   it writes style sheets that conform to the module and (if it reads CSS) it
+   is a conformant processor.
+
+  <h3 id=partial><span class=secno>8.3. </span> Partial Implementations</h3>
+
+  <p>So that authors can exploit the forward-compatible parsing rules to
+   assign fallback values, CSS renderers <strong>must</strong> treat as
+   invalid (and <a
+   href="http://www.w3.org/TR/CSS21/conform.html#ignore">ignore as
+   appropriate</a>) any at-rules, properties, property values, keywords, and
+   other syntactic constructs for which they have no usable level of support.
+   In particular, user agents <strong>must not</strong> selectively ignore
+   unsupported component values and honor supported values in a single
+   multi-value property declaration: if any value is considered invalid (as
+   unsupported values must be), CSS requires that the entire declaration be
+   ignored.
+
+  <h3 id=experimental><span class=secno>8.4. </span>Experimental
+   Implementations</h3>
+
+  <p>To avoid clashes with future CSS features, the CSS specifications
+   reserve a <a
+   href="http://www.w3.org/TR/CSS21/syndata.html#vendor-keywords">prefixed
+   syntax</a> for proprietary property and value extensions to CSS. The CSS
+   Working Group recommends that experimental implementations of features in
+   CSS Working Drafts also use vendor-prefixed property or value names. This
+   avoids any incompatibilities with future changes in the draft. Once a
+   specification reaches the Candidate Recommendation stage, implementors
+   should implement the non-prefixed syntax for any feature they consider to
+   be correctly implemented according to spec.
+
+  <h3 id=cr-exit-criteria><span class=secno>8.5. </span>CR Exit Criteria</h3>
+
+  <p>For this specification to be advanced to Proposed Recommendation, there
+   must be at least two independent, interoperable implementations of each
+   feature. Each feature may be implemented by a different set of products,
+   there is no requirement that all features be implemented by a single
+   product. For the purposes of this criterion, we define the following
+   terms:
+
+  <dl>
+   <dt>independent
+
+   <dd>each implementation must be developed by a different party and cannot
+    share, reuse, or derive from code used by another qualifying
+    implementation. Sections of code that have no bearing on the
+    implementation of this specification are exempt from this requirement.
+
+   <dt>interoperable
+
+   <dd>passing the respective test case(s) in the official CSS test suite,
+    or, if the implementation is not a Web browser, an equivalent test. Every
+    relevant test in the test suite should have an equivalent test created if
+    such a user agent (UA) is to be used to claim interoperability. In
+    addition if such a UA is to be used to claim interoperability, then there
+    must one or more additional UAs which can also pass those equivalent
+    tests in the same way for the purpose of interoperability. The equivalent
+    tests must be made publicly available for the purposes of peer review.
+
+   <dt>implementation
+
+   <dd>a user agent which:
+    <ol class=inline>
+     <li>implements the specification.
+
+     <li>is available to the general public. The implementation may be a
+      shipping product or other publicly available version (i.e., beta
+      version, preview release, or “nightly build”). Non-shipping product
+      releases must have implemented the feature(s) for a period of at least
+      one month in order to demonstrate stability.
+
+     <li>is not experimental (i.e., a version specifically designed to pass
+      the test suite and is not intended for normal usage going forward).
+    </ol>
+  </dl>
+
+  <p>The specification will remain Candidate Recommendation for at least six
+   months.
+
+  <h2 id=changes><span class=secno>9. </span> Changes</h2>
+
+  <p>The following (non-editorial) changes were made to this specification
+   since the <a
+   href="http://www.w3.org/TR/2012/WD-css3-conditional-20121213/">13 December
+   2012 Working Draft</a>:
+
+  <ul>
+   <li>Require whitespace around ‘<code class=css>and</code>’ and ‘<a
+    href="#or"><code class=css>or</code></a>’ and after ‘<code
+    class=css>not</code>’.
+
+   <li>Add note explaining that user preferences that effectively disable a
+    property (e.g., high-contrast mode disabling colors) do not effect the
+    definition of support.
+
+   <li>Describe requirements for conditionText getter on CSSSupportsRule.
+
+   <li>Clarify the definition of "literal match" in CSS.supports().
+
+   <li>Specify behavior of CSSGroupingRule.insertRule when given an empty
+    string or more than one syntactically valid rule.
+  </ul>
+
+  <h2 class=no-num id=acknowledgments>Acknowledgments</h2>
+
+  <p> Thanks to the ideas and feedback from Tab Atkins, Arthur Barstow, Ben
+   Callahan, <span lang=tr>Tantek Çelik</span>, Alex Danilo, Elika Etemad,
+   Pascal Germroth, <span lang=de>Björn Höhrmann</span>, Paul Irish, Brad
+   Kemper, <span lang=nl>Anne van Kesteren</span>, Vitor Menezes, Alex
+   Mogilevsky, Chris Moschini, James Nurthen, Simon Pieters, <span
+   lang=fr>Florian Rivoal</span>, <span lang=fr>Simon Sapin</span>, Nicholas
+   Shanks, Ben Ward, Zack Weinberg, Estelle Weyl, Boris Zbarsky, and all the
+   rest of the <a
+   href="http://lists.w3.org/Archives/Public/www-style/">www-style</a>
+   community.
+
+  <h2 class=no-num id=references>References</h2>
+
+  <h3 class=no-num id=normative-references>Normative references</h3>
+  <!--begin-normative-->
+  <!-- Sorted by label -->
+
+  <dl class=bibliography>
+   <dd style="display: none"><!-- keeps the doc valid if the DL is empty -->
+    <!---->
+
+   <dt id=ref-CSS21>[CSS21]
+
+   <dd>Bert Bos; et al. <a
+    href="http://www.w3.org/TR/2011/REC-CSS2-20110607"><cite>Cascading Style
+    Sheets Level 2 Revision 1 (CSS 2.1) Specification.</cite></a> 7 June
+    2011. W3C Recommendation. URL: <a
+    href="http://www.w3.org/TR/2011/REC-CSS2-20110607">http://www.w3.org/TR/2011/REC-CSS2-20110607</a>
+   </dd>
+   <!---->
+
+   <dt id=ref-CSS3-ANIMATIONS>[CSS3-ANIMATIONS]
+
+   <dd>Dean Jackson; et al. <a
+    href="http://www.w3.org/TR/2013/WD-css3-animations-20130219/"><cite>CSS
+    Animations.</cite></a> 19 February 2013. W3C Working Draft. (Work in
+    progress.) URL: <a
+    href="http://www.w3.org/TR/2013/WD-css3-animations-20130219/">http://www.w3.org/TR/2013/WD-css3-animations-20130219/</a>
+   </dd>
+   <!---->
+
+   <dt id=ref-CSS3-FONTS>[CSS3-FONTS]
+
+   <dd>John Daggett. <a
+    href="http://www.w3.org/TR/2013/CR-css-fonts-3-20131003/"><cite>CSS Fonts
+    Module Level 3.</cite></a> 3 October 2013. W3C Candidate Recommendation.
+    (Work in progress.) URL: <a
+    href="http://www.w3.org/TR/2013/CR-css-fonts-3-20131003/">http://www.w3.org/TR/2013/CR-css-fonts-3-20131003/</a>
+   </dd>
+   <!---->
+
+   <dt id=ref-MEDIAQ>[MEDIAQ]
+
+   <dd>Florian Rivoal. <a
+    href="http://www.w3.org/TR/2012/REC-css3-mediaqueries-20120619/"><cite>Media
+    Queries.</cite></a> 19 June 2012. W3C Recommendation. URL: <a
+    href="http://www.w3.org/TR/2012/REC-css3-mediaqueries-20120619/">http://www.w3.org/TR/2012/REC-css3-mediaqueries-20120619/</a>
+   </dd>
+   <!---->
+
+   <dt id=ref-RFC2119>[RFC2119]
+
+   <dd>S. Bradner. <a href="http://www.ietf.org/rfc/rfc2119.txt"><cite>Key
+    words for use in RFCs to Indicate Requirement Levels.</cite></a> Internet
+    RFC 2119. URL: <a
+    href="http://www.ietf.org/rfc/rfc2119.txt">http://www.ietf.org/rfc/rfc2119.txt</a>
+   </dd>
+   <!---->
+  </dl>
+  <!--end-normative-->
+
+  <h3 class=no-num id=other-references>Other references</h3>
+  <!--begin-informative-->
+  <!-- Sorted by label -->
+
+  <dl class=bibliography>
+   <dd style="display: none"><!-- keeps the doc valid if the DL is empty -->
+    <!---->
+
+   <dt id=ref-CSS1>[CSS1]
+
+   <dd>Håkon Wium Lie; Bert Bos. <a
+    href="http://www.w3.org/TR/2008/REC-CSS1-20080411"><cite>Cascading Style
+    Sheets (CSS1) Level 1 Specification.</cite></a> 11 April 2008. W3C
+    Recommendation. URL: <a
+    href="http://www.w3.org/TR/2008/REC-CSS1-20080411">http://www.w3.org/TR/2008/REC-CSS1-20080411</a>
+   </dd>
+   <!---->
+
+   <dt id=ref-CSS3-TRANSITIONS>[CSS3-TRANSITIONS]
+
+   <dd>Dean Jackson; et al. <a
+    href="http://www.w3.org/TR/2013/WD-css3-transitions-20130212/"><cite>CSS
+    Transitions.</cite></a> 12 February 2013. W3C Working Draft. (Work in
+    progress.) URL: <a
+    href="http://www.w3.org/TR/2013/WD-css3-transitions-20130212/">http://www.w3.org/TR/2013/WD-css3-transitions-20130212/</a>
+   </dd>
+   <!---->
+  </dl>
+  <!--end-informative-->
+
+  <h2 class=no-num id=index>Index</h2>
+  <!--begin-index-->
+
+  <ul class=indexlist>
+   <li>conditional group rules, <a href="#conditional-group-rules"
+    title="section 2."><strong>2.</strong></a>
+
+   <li>conformance
+    <ul>
+     <li>authoring tool, <a href="#conform-authoring-tool"
+      title="section 8.2."><strong>8.2.</strong></a>
+
+     <li>processor, <a href="#conform-processor"
+      title="section 8.2."><strong>8.2.</strong></a>
+
+     <li>style sheet, <a href="#conform-style-sheet"
+      title="section 8.2."><strong>8.2.</strong></a>
+    </ul>
+
+   <li><code>CSS</code>, <a href="#CSS-interface"
+    title="section 7.6."><strong>7.6.</strong></a>
+
+   <li><code>CSSConditionRule</code>, <a href="#cssconditionrule"
+    title="section 7.3."><strong>7.3.</strong></a>
+
+   <li><code>CSSGroupingRule</code>, <a href="#cssgroupingrule"
+    title="section 7.2."><strong>7.2.</strong></a>
+
+   <li><code>CSSMediaRule</code>, <a href="#cssmediarule"
+    title="section 7.4."><strong>7.4.</strong></a>
+
+   <li><code>CSSSupportsRule</code>, <a href="#csssupportsrule"
+    title="section 7.5."><strong>7.5.</strong></a>
+
+   <li>general_enclosed, <a href="#general_enclosed"
+    title="section 6."><strong>6.</strong></a>
+
+   <li>group rule body, <a href="#group-rule-body"
+    title="section 3."><strong>3.</strong></a>
+
+   <li>group_rule_body, <a href="#group_rule_body"
+    title="section 3."><strong>3.</strong></a>
+
+   <li>media, <a href="#media" title="section 5."><strong>5.</strong></a>
+
+   <li>@media, <a href="#at-ruledef-media"
+    title="section 5."><strong>5.</strong></a>
+
+   <li>nested_statement, <a href="#nested_statement"
+    title="section 3."><strong>3.</strong></a>
+
+   <li>OR, <a href="#or" title="section 6."><strong>6.</strong></a>
+
+   <li>support, <a href="#dfn-support"
+    title="section 6.1."><strong>6.1.</strong></a>
+
+   <li>@supports, <a href="#at-ruledef-supports"
+    title="section 6."><strong>6.</strong></a>
+
+   <li>supports_condition, <a href="#supports_condition"
+    title="section 6."><strong>6.</strong></a>
+
+   <li>supports_condition_in_parens, <a href="#supports_condition_in_parens"
+    title="section 6."><strong>6.</strong></a>
+
+   <li>supports_conjunction, <a href="#supports_conjunction"
+    title="section 6."><strong>6.</strong></a>
+
+   <li>supports_declaration_condition, <a
+    href="#supports_declaration_condition"
+    title="section 6."><strong>6.</strong></a>
+
+   <li>supports_disjunction, <a href="#supports_disjunction"
+    title="section 6."><strong>6.</strong></a>
+
+   <li>supports_negation, <a href="#supports_negation"
+    title="section 6."><strong>6.</strong></a>
+
+   <li>supports_rule, <a href="#supports_rule"
+    title="section 6."><strong>6.</strong></a>
+
+   <li>SUPPORTS_SYM, <a href="#supports_sym"
+    title="section 6."><strong>6.</strong></a>
+  </ul>
+  <!--end-index-->
+</html>
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-declaration:"~/SGML/HTML4.decl"
+sgml-default-doctype-name:"html"
+sgml-minimize-attributes:t
+sgml-nofill-elements:("pre" "style" "br")
+sgml-live-element-indicator:t
+sgml-omittag:nil
+sgml-shorttag:nil
+sgml-namecase-general:t
+sgml-general-insert-case:lower
+sgml-always-quote-attributes:t
+sgml-indent-step:nil
+sgml-indent-data:t
+sgml-parent-document:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->

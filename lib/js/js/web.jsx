@@ -47,7 +47,7 @@ final class dom {
 
 }
 
-/** @see http://www.w3.org/TR/dom/ */
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 native final class DOMException {
 
 	static __readonly__ var INDEX_SIZE_ERR : number/*unsigned short*/;
@@ -88,7 +88,7 @@ native final class DOMException {
 	// historical
 	static __readonly__ var TYPE_MISMATCH_ERR : number/*unsigned short*/;
 	       __readonly__ var TYPE_MISMATCH_ERR : number/*unsigned short*/;
-	// historical; use TypeError instead
+	// historical; use JavaScript's TypeError instead
 	static __readonly__ var SECURITY_ERR : number/*unsigned short*/;
 	       __readonly__ var SECURITY_ERR : number/*unsigned short*/;
 	static __readonly__ var NETWORK_ERR : number/*unsigned short*/;
@@ -109,74 +109,79 @@ native final class DOMException {
 
 } // end of DOMException
 
-/** @see http://www.w3.org/TR/dom/ */
-native final class DOMError {
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
+native class DOMError {
+
+	function constructor(name : string/*DOMString*/);
+	function constructor(name : string/*DOMString*/, message : string/*DOMString*/);
 
 	__readonly__ var name : string/*DOMString*/;
+	__readonly__ var message : string/*DOMString*/;
 
 } // end of DOMError
 
 /** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
 native class Event {
 
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	function constructor(type : string/*DOMString*/);
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	function constructor(type : string/*DOMString*/, eventInitDict : EventInit);
 
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	__readonly__ var type : string/*DOMString*/;
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	__readonly__ var target : Nullable.<EventTarget>;
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	__readonly__ var currentTarget : Nullable.<EventTarget>;
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	static __readonly__ var NONE : number/*unsigned short*/;
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	       __readonly__ var NONE : number/*unsigned short*/;
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	static __readonly__ var CAPTURING_PHASE : number/*unsigned short*/;
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	       __readonly__ var CAPTURING_PHASE : number/*unsigned short*/;
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	static __readonly__ var AT_TARGET : number/*unsigned short*/;
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	       __readonly__ var AT_TARGET : number/*unsigned short*/;
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	static __readonly__ var BUBBLING_PHASE : number/*unsigned short*/;
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	       __readonly__ var BUBBLING_PHASE : number/*unsigned short*/;
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	__readonly__ var eventPhase : number/*unsigned short*/;
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	function stopPropagation() : void;
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	function stopImmediatePropagation() : void;
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	__readonly__ var bubbles : boolean;
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	__readonly__ var cancelable : boolean;
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	function preventDefault() : void;
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	__readonly__ var defaultPrevented : boolean;
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	__readonly__ var isTrusted : boolean;
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	__readonly__ var timeStamp : number/*DOMTimeStamp*/;
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	function initEvent(type : string/*DOMString*/, bubbles : boolean, cancelable : boolean) : void;
 
 	// PhaseType
-	// Introduced in DOM Level 3:
+	// Introduced in DOM Level 3
+	function constructor();
 
 } // end of Event
 
 /* dictionary */ class EventInit {
 
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	var bubbles : boolean;
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	var cancelable : boolean;
 
 
@@ -185,52 +190,108 @@ native class Event {
 /** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
 native final class CustomEvent extends Event {
 
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	function constructor(type : string/*DOMString*/);
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	function constructor(type : string/*DOMString*/, eventInitDict : CustomEventInit);
 
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	__readonly__ var detail : variant/*any*/;
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
+	function initCustomEvent(type : string/*DOMString*/, bubbles : boolean, cancelable : boolean, detail : variant/*any*/) : void;
 
+	function constructor();
 
-	// Originally introduced (and deprecated) in DOM Level 3:
-	function initCustomEvent(typeArg : string/*DOMString*/, canBubbleArg : boolean, cancelableArg : boolean, detailArg : variant/*any*/) : void;
+	// Originally introduced (and deprecated) in DOM Level 3
 
 } // end of CustomEvent
 
 /** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
 /* dictionary */ class CustomEventInit extends EventInit {
 
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	var detail : variant/*any*/;
 
-	// Attributes from Event:
 	// inherits var bubbles : boolean;
 	// inherits var cancelable : boolean;
-	// Attributes for CustomEvent:
 
 } // end of CustomEventInit
 
 /** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
 native __fake__ class EventTarget {
 
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	function addEventListener(type : string/*DOMString*/, callback : Nullable.<function(:Event):void>/*EventListener?*/) : void;
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	function addEventListener(type : string/*DOMString*/, callback : Nullable.<function(:Event):void>/*EventListener?*/, capture : boolean) : void;
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	function removeEventListener(type : string/*DOMString*/, callback : Nullable.<function(:Event):void>/*EventListener?*/) : void;
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	function removeEventListener(type : string/*DOMString*/, callback : Nullable.<function(:Event):void>/*EventListener?*/, capture : boolean) : void;
-	/** @see http://www.w3.org/TR/dom/ */
+	/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 	function dispatchEvent(event : Event) : boolean;
 
-	// Modified in DOM Level 3:
+	// Modified in DOM Level 3
 
 } // end of EventTarget
 
-/** @see http://www.w3.org/TR/dom/ */
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
+native __fake__ class ParentNode {
+
+	__readonly__ var children : HTMLCollection;
+	__readonly__ var firstElementChild : Nullable.<Element>;
+	__readonly__ var lastElementChild : Nullable.<Element>;
+	__readonly__ var childElementCount : number/*unsigned long*/;
+	function prepend(...nodes : Node) : void;
+	function prepend(...nodes : string/*DOMString*/) : void;
+	function append(...nodes : Node) : void;
+	function append(...nodes : string/*DOMString*/) : void;
+	function query(relativeSelectors : string/*DOMString*/) : Nullable.<Element>;
+	function queryAll(relativeSelectors : string/*DOMString*/) : Array.<Element>/*Elements*/;
+	function querySelector(selectors : string/*DOMString*/) : Nullable.<Element>;
+	function querySelectorAll(selectors : string/*DOMString*/) : NodeList;
+
+} // end of ParentNode
+
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
+native __fake__ class ChildNode {
+
+	__readonly__ var previousElementSibling : Nullable.<Element>;
+	__readonly__ var nextElementSibling : Nullable.<Element>;
+	function before(...nodes : Node) : void;
+	function before(...nodes : string/*DOMString*/) : void;
+	function after(...nodes : Node) : void;
+	function after(...nodes : string/*DOMString*/) : void;
+	function replace(...nodes : Node) : void;
+	function replace(...nodes : string/*DOMString*/) : void;
+	function remove() : void;
+
+} // end of ChildNode
+
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
+native class NodeList {
+
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<Node>;
+	/* getter */
+	function item(index : number/*unsigned long*/) : Nullable.<Node>;
+	__readonly__ var length : number/*unsigned long*/;
+
+} // end of NodeList
+
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
+native class HTMLCollection {
+
+	__readonly__ var length : number/*unsigned long*/;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<Element>;
+	/* getter */
+	function item(index : number/*unsigned long*/) : Nullable.<Element>;
+	function __native_index_operator__(name : string/*DOMString*/) : Nullable.<Element>;
+	/* getter */
+	function namedItem(name : string/*DOMString*/) : Nullable.<Element>;
+
+} // end of HTMLCollection
+
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 native final class MutationObserver {
 
 	function constructor(callback : function(mutations:MutationRecord[],observer:MutationObserver):void/*MutationCallback*/);
@@ -241,7 +302,7 @@ native final class MutationObserver {
 
 } // end of MutationObserver
 
-/** @see http://www.w3.org/TR/dom/ */
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 /* dictionary */ class MutationObserverInit {
 
 	var childList : boolean;
@@ -254,7 +315,7 @@ native final class MutationObserver {
 
 } // end of MutationObserverInit
 
-/** @see http://www.w3.org/TR/dom/ */
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 native final class MutationRecord {
 
 	__readonly__ var type : string/*DOMString*/;
@@ -269,7 +330,7 @@ native final class MutationRecord {
 
 } // end of MutationRecord
 
-/** @see http://www.w3.org/TR/dom/ */
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 native class Node extends EventTarget {
 
 	static __readonly__ var ELEMENT_NODE : number/*unsigned short*/;
@@ -315,10 +376,6 @@ native class Node extends EventTarget {
 	__readonly__ var nextSibling : Nullable.<Node>;
 	var nodeValue : Nullable.<string>/*DOMString?*/;
 	var textContent : Nullable.<string>/*DOMString?*/;
-	function insertBefore(node : Node, child : Nullable.<Node>) : Node;
-	function appendChild(node : Node) : Node;
-	function replaceChild(node : Node, child : Node) : Node;
-	function removeChild(child : Node) : Node;
 	function normalize() : void;
 	function cloneNode() : Node;
 	function cloneNode(deep : boolean) : Node;
@@ -340,10 +397,14 @@ native class Node extends EventTarget {
 	function lookupPrefix(namespace : Nullable.<string>/*DOMString?*/) : Nullable.<string>/*DOMString?*/;
 	function lookupNamespaceURI(prefix : Nullable.<string>/*DOMString?*/) : Nullable.<string>/*DOMString?*/;
 	function isDefaultNamespace(namespace : Nullable.<string>/*DOMString?*/) : boolean;
+	function insertBefore(node : Node, child : Nullable.<Node>) : Node;
+	function appendChild(node : Node) : Node;
+	function replaceChild(node : Node, child : Node) : Node;
+	function removeChild(child : Node) : Node;
 
 } // end of Node
 
-/** @see http://www.w3.org/TR/dom/ */
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 native class Document extends Node {
 
 	function constructor();
@@ -378,15 +439,24 @@ native class Document extends Node {
 	function createTreeWalker(root : Node) : TreeWalker;
 	function createTreeWalker(root : Node, whatToShow : number/*unsigned long*/) : TreeWalker;
 	function createTreeWalker(root : Node, whatToShow : number/*unsigned long*/, filter : Nullable.<NodeFilter>) : TreeWalker;
-	// NEW
+
+	// implements ParentNode
+
+	__readonly__ var children : HTMLCollection;
+	__readonly__ var firstElementChild : Nullable.<Element>;
+	__readonly__ var lastElementChild : Nullable.<Element>;
+	__readonly__ var childElementCount : number/*unsigned long*/;
 	function prepend(...nodes : Node) : void;
 	function prepend(...nodes : string/*DOMString*/) : void;
 	function append(...nodes : Node) : void;
 	function append(...nodes : string/*DOMString*/) : void;
+	function query(relativeSelectors : string/*DOMString*/) : Nullable.<Element>;
+	function queryAll(relativeSelectors : string/*DOMString*/) : Array.<Element>/*Elements*/;
+	function querySelector(selectors : string/*DOMString*/) : Nullable.<Element>;
+	function querySelectorAll(selectors : string/*DOMString*/) : NodeList;
 
 	// implements DocumentEvent
 
-	// Modified in DOM Level 3:
 
 	/** @see http://dev.w3.org/csswg/cssom/ */
 	__readonly__ var styleSheets : StyleSheetList;
@@ -407,6 +477,25 @@ native class Document extends Node {
 	function elementsFromPoint(x : number/*double*/, y : number/*double*/) : Element[];
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	function caretPositionFromPoint(x : number/*double*/, y : number/*double*/) : Nullable.<CaretPosition>;
+
+	// implements GeometryUtils
+
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function getBoxQuads() : DOMQuad[];
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function getBoxQuads(options : BoxQuadOptions) : DOMQuad[];
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function convertQuadFromNode(quad : DOMQuad, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/) : DOMQuad;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function convertQuadFromNode(quad : DOMQuad, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/, options : ConvertCoordinateOptions) : DOMQuad;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function convertRectFromNode(rect : DOMRectReadOnly, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/) : DOMQuad;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function convertRectFromNode(rect : DOMRectReadOnly, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/, options : ConvertCoordinateOptions) : DOMQuad;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function convertPointFromNode(point : DOMPointInit, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/) : DOMPoint;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function convertPointFromNode(point : DOMPointInit, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/, options : ConvertCoordinateOptions) : DOMPoint;
 
 	// implements GlobalEventHandlers
 
@@ -528,20 +617,24 @@ native class Document extends Node {
 	var onwaiting : Nullable.<function(:Event):void>/*EventHandler*/;
 
 	/** @see http://www.w3.org/TR/touch-events/ */
-	function createTouch(view : AbstractView, target : EventTarget, identifier : number/*long*/, pageX : number/*long*/, pageY : number/*long*/, screenX : number/*long*/, screenY : number/*long*/) : Touch;
+	function createTouch(view : Window/*WindowProxy*/, target : EventTarget, identifier : number/*long*/, pageX : number/*long*/, pageY : number/*long*/, screenX : number/*long*/, screenY : number/*long*/) : Touch;
 	/** @see http://www.w3.org/TR/touch-events/ */
-	function createTouchList(touches : Touch[]) : TouchList;
-	/** @see http://www.w3.org/TR/touch-events/ */
-	function createTouchList(touch : Touch) : TouchList;
+	function createTouchList(...touches : Touch) : TouchList;
 
-	/** @see http://www.w3.org/TR/selectors-api/ */
-	function querySelector(selectors : string/*DOMString*/) : Nullable.<Element>;
-	/** @see http://www.w3.org/TR/selectors-api/ */
-	function querySelectorAll(selectors : string/*DOMString*/) : NodeList;
+
+	__readonly__ var fullscreenEnabled : Nullable.<boolean>;
+	__readonly__ var fullscreenElement : Nullable.<Element>;
+	__readonly__ var webkitFullscreenEnabled : Nullable.<boolean>;
+	__readonly__ var webkitFullscreenElement : Nullable.<Element>;
+	__readonly__ var mozFullscreenEnabled : Nullable.<boolean>;
+	__readonly__ var mozFullscreenElement : Nullable.<Element>;
+	function exitFullscreen() : void;
+	function webkitExitFullscreen() : void;
+	function mozExitFullscreen() : void;
 
 } // end of Document
 
-/** @see http://www.w3.org/TR/dom/ */
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 native final class XMLDocument extends Document {
 
 	/** @see http://www.w3.org/TR/html5/single-page.html */
@@ -549,10 +642,11 @@ native final class XMLDocument extends Document {
 
 } // end of XMLDocument
 
-/** @see http://www.w3.org/TR/dom/ */
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 native final class DOMImplementation {
 
 	function createDocumentType(qualifiedName : string/*DOMString*/, publicId : string/*DOMString*/, systemId : string/*DOMString*/) : DocumentType;
+	function createDocument(namespace : Nullable.<string>/*DOMString?*/, qualifiedName : string/*DOMString*/) : XMLDocument;
 	function createDocument(namespace : Nullable.<string>/*DOMString?*/, qualifiedName : string/*DOMString*/, doctype : Nullable.<DocumentType>) : XMLDocument;
 	function createHTMLDocument() : Document;
 	function createHTMLDocument(title : string/*DOMString*/) : Document;
@@ -560,29 +654,41 @@ native final class DOMImplementation {
 
 } // end of DOMImplementation
 
-/** @see http://www.w3.org/TR/dom/ */
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 native final class DocumentFragment extends Node {
 
-	// NEW
+	function constructor();
+
+
+	// implements ParentNode
+
+	__readonly__ var children : HTMLCollection;
+	__readonly__ var firstElementChild : Nullable.<Element>;
+	__readonly__ var lastElementChild : Nullable.<Element>;
+	__readonly__ var childElementCount : number/*unsigned long*/;
 	function prepend(...nodes : Node) : void;
 	function prepend(...nodes : string/*DOMString*/) : void;
 	function append(...nodes : Node) : void;
 	function append(...nodes : string/*DOMString*/) : void;
-
-	/** @see http://www.w3.org/TR/selectors-api/ */
+	function query(relativeSelectors : string/*DOMString*/) : Nullable.<Element>;
+	function queryAll(relativeSelectors : string/*DOMString*/) : Array.<Element>/*Elements*/;
 	function querySelector(selectors : string/*DOMString*/) : Nullable.<Element>;
-	/** @see http://www.w3.org/TR/selectors-api/ */
 	function querySelectorAll(selectors : string/*DOMString*/) : NodeList;
+
 
 } // end of DocumentFragment
 
-/** @see http://www.w3.org/TR/dom/ */
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 native final class DocumentType extends Node {
 
 	__readonly__ var name : string/*DOMString*/;
 	__readonly__ var publicId : string/*DOMString*/;
 	__readonly__ var systemId : string/*DOMString*/;
-	// NEW
+
+	// implements ChildNode
+
+	__readonly__ var previousElementSibling : Nullable.<Element>;
+	__readonly__ var nextElementSibling : Nullable.<Element>;
 	function before(...nodes : Node) : void;
 	function before(...nodes : string/*DOMString*/) : void;
 	function after(...nodes : Node) : void;
@@ -593,7 +699,7 @@ native final class DocumentType extends Node {
 
 } // end of DocumentType
 
-/** @see http://www.w3.org/TR/dom/ */
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 native class Element extends Node {
 
 	__readonly__ var namespaceURI : Nullable.<string>/*DOMString?*/;
@@ -612,20 +718,30 @@ native class Element extends Node {
 	function removeAttributeNS(namespace : Nullable.<string>/*DOMString?*/, localName : string/*DOMString*/) : void;
 	function hasAttribute(name : string/*DOMString*/) : boolean;
 	function hasAttributeNS(namespace : Nullable.<string>/*DOMString?*/, localName : string/*DOMString*/) : boolean;
+	function matches(selectors : string/*DOMString*/) : boolean;
 	function getElementsByTagName(localName : string/*DOMString*/) : HTMLCollection;
 	function getElementsByTagNameNS(namespace : Nullable.<string>/*DOMString?*/, localName : string/*DOMString*/) : HTMLCollection;
 	function getElementsByClassName(classNames : string/*DOMString*/) : HTMLCollection;
+
+	// implements ParentNode
+
 	__readonly__ var children : HTMLCollection;
 	__readonly__ var firstElementChild : Nullable.<Element>;
 	__readonly__ var lastElementChild : Nullable.<Element>;
-	__readonly__ var previousElementSibling : Nullable.<Element>;
-	__readonly__ var nextElementSibling : Nullable.<Element>;
 	__readonly__ var childElementCount : number/*unsigned long*/;
-	// NEW
 	function prepend(...nodes : Node) : void;
 	function prepend(...nodes : string/*DOMString*/) : void;
 	function append(...nodes : Node) : void;
 	function append(...nodes : string/*DOMString*/) : void;
+	function query(relativeSelectors : string/*DOMString*/) : Nullable.<Element>;
+	function queryAll(relativeSelectors : string/*DOMString*/) : Array.<Element>/*Elements*/;
+	function querySelector(selectors : string/*DOMString*/) : Nullable.<Element>;
+	function querySelectorAll(selectors : string/*DOMString*/) : NodeList;
+
+	// implements ChildNode
+
+	__readonly__ var previousElementSibling : Nullable.<Element>;
+	__readonly__ var nextElementSibling : Nullable.<Element>;
 	function before(...nodes : Node) : void;
 	function before(...nodes : string/*DOMString*/) : void;
 	function after(...nodes : Node) : void;
@@ -647,18 +763,16 @@ native class Element extends Node {
 	// implements GetStyleUtils
 
 	/** @see http://dev.w3.org/csswg/cssom/ */
-	__readonly__ var specifiedStyle : CSSStyleDeclaration;
+	__readonly__ var cascadedStyle : CSSStyleDeclaration;
 	/** @see http://dev.w3.org/csswg/cssom/ */
-	__readonly__ var defaultStyle : CSSStyleDeclaration;
-	/** @see http://dev.w3.org/csswg/cssom/ */
-	__readonly__ var computedStyle : CSSStyleDeclaration;
+	__readonly__ var rawComputedStyle : CSSStyleDeclaration;
 	/** @see http://dev.w3.org/csswg/cssom/ */
 	__readonly__ var usedStyle : CSSStyleDeclaration;
 
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	function getClientRects() : ClientRectList;
+	function getClientRects() : DOMRectList;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	function getBoundingClientRect() : ClientRect;
+	function getBoundingClientRect() : DOMRect;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	function scrollIntoView() : void;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
@@ -666,9 +780,9 @@ native class Element extends Node {
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	function scrollIntoView(top : boolean, options : ScrollOptions) : void;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	var scrollTop : variant/*(double or ScrollOptions)*/;
+	var scrollTop : variant/*(double or ScrollOptionsVertical)*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	var scrollLeft : variant/*(double or ScrollOptions)*/;
+	var scrollLeft : variant/*(double or ScrollOptionsHorizontal)*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	__readonly__ var scrollWidth : number/*double*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
@@ -682,25 +796,44 @@ native class Element extends Node {
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	__readonly__ var clientHeight : number/*double*/;
 
-	/** @see http://www.w3.org/TR/selectors-api/ */
-	function querySelector(selectors : string/*DOMString*/) : Nullable.<Element>;
-	/** @see http://www.w3.org/TR/selectors-api/ */
-	function querySelectorAll(selectors : string/*DOMString*/) : NodeList;
+	// implements GeometryUtils
+
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function getBoxQuads() : DOMQuad[];
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function getBoxQuads(options : BoxQuadOptions) : DOMQuad[];
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function convertQuadFromNode(quad : DOMQuad, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/) : DOMQuad;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function convertQuadFromNode(quad : DOMQuad, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/, options : ConvertCoordinateOptions) : DOMQuad;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function convertRectFromNode(rect : DOMRectReadOnly, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/) : DOMQuad;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function convertRectFromNode(rect : DOMRectReadOnly, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/, options : ConvertCoordinateOptions) : DOMQuad;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function convertPointFromNode(point : DOMPointInit, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/) : DOMPoint;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function convertPointFromNode(point : DOMPointInit, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/, options : ConvertCoordinateOptions) : DOMPoint;
+
+
+	function requestFullscreen() : void;
+	function webkitRequestFullscreen() : void;
+	function mozRequestFullscreen() : void;
 
 } // end of Element
 
-/** @see http://www.w3.org/TR/dom/ */
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 native final class Attr {
 
-	__readonly__ var name : string/*DOMString*/;
+	__readonly__ var localName : string/*DOMString*/;
 	var value : string/*DOMString*/;
+	__readonly__ var name : string/*DOMString*/;
 	__readonly__ var namespaceURI : Nullable.<string>/*DOMString?*/;
 	__readonly__ var prefix : Nullable.<string>/*DOMString?*/;
-	__readonly__ var localName : string/*DOMString*/;
 
 } // end of Attr
 
-/** @see http://www.w3.org/TR/dom/ */
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 native class CharacterData extends Node {
 
 	var data : string/*DOMString*/;
@@ -710,7 +843,11 @@ native class CharacterData extends Node {
 	function insertData(offset : number/*unsigned long*/, data : string/*DOMString*/) : void;
 	function deleteData(offset : number/*unsigned long*/, count : number/*unsigned long*/) : void;
 	function replaceData(offset : number/*unsigned long*/, count : number/*unsigned long*/, data : string/*DOMString*/) : void;
-	// NEW
+
+	// implements ChildNode
+
+	__readonly__ var previousElementSibling : Nullable.<Element>;
+	__readonly__ var nextElementSibling : Nullable.<Element>;
 	function before(...nodes : Node) : void;
 	function before(...nodes : string/*DOMString*/) : void;
 	function after(...nodes : Node) : void;
@@ -721,8 +858,11 @@ native class CharacterData extends Node {
 
 } // end of CharacterData
 
-/** @see http://www.w3.org/TR/dom/ */
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 native final class Text extends CharacterData {
+
+	function constructor();
+	function constructor(data : string/*DOMString*/);
 
 	function splitText(offset : number/*unsigned long*/) : Text;
 	__readonly__ var wholeText : string/*DOMString*/;
@@ -730,9 +870,28 @@ native final class Text extends CharacterData {
 	/** @see http://www.w3.org/TR/DOM-Parsing/ */
 	var serializeAsCDATA : boolean;
 
+	// implements GeometryUtils
+
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function getBoxQuads() : DOMQuad[];
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function getBoxQuads(options : BoxQuadOptions) : DOMQuad[];
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function convertQuadFromNode(quad : DOMQuad, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/) : DOMQuad;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function convertQuadFromNode(quad : DOMQuad, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/, options : ConvertCoordinateOptions) : DOMQuad;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function convertRectFromNode(rect : DOMRectReadOnly, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/) : DOMQuad;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function convertRectFromNode(rect : DOMRectReadOnly, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/, options : ConvertCoordinateOptions) : DOMQuad;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function convertPointFromNode(point : DOMPointInit, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/) : DOMPoint;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function convertPointFromNode(point : DOMPointInit, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/, options : ConvertCoordinateOptions) : DOMPoint;
+
 } // end of Text
 
-/** @see http://www.w3.org/TR/dom/ */
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 native final class ProcessingInstruction extends CharacterData {
 
 	__readonly__ var target : string/*DOMString*/;
@@ -744,12 +903,18 @@ native final class ProcessingInstruction extends CharacterData {
 
 } // end of ProcessingInstruction
 
-/** @see http://www.w3.org/TR/dom/ */
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 native final class Comment extends CharacterData {
-}
 
-/** @see http://www.w3.org/TR/dom/ */
+	function constructor();
+	function constructor(data : string/*DOMString*/);
+
+} // end of Comment
+
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 native final class Range {
+
+	function constructor();
 
 	__readonly__ var startContainer : Node;
 	__readonly__ var startOffset : number/*unsigned long*/;
@@ -757,15 +922,16 @@ native final class Range {
 	__readonly__ var endOffset : number/*unsigned long*/;
 	__readonly__ var collapsed : boolean;
 	__readonly__ var commonAncestorContainer : Node;
-	function setStart(refNode : Node, offset : number/*unsigned long*/) : void;
-	function setEnd(refNode : Node, offset : number/*unsigned long*/) : void;
-	function setStartBefore(refNode : Node) : void;
-	function setStartAfter(refNode : Node) : void;
-	function setEndBefore(refNode : Node) : void;
-	function setEndAfter(refNode : Node) : void;
+	function setStart(node : Node, offset : number/*unsigned long*/) : void;
+	function setEnd(node : Node, offset : number/*unsigned long*/) : void;
+	function setStartBefore(node : Node) : void;
+	function setStartAfter(node : Node) : void;
+	function setEndBefore(node : Node) : void;
+	function setEndAfter(node : Node) : void;
+	function collapse() : void;
 	function collapse(toStart : boolean) : void;
-	function selectNode(refNode : Node) : void;
-	function selectNodeContents(refNode : Node) : void;
+	function selectNode(node : Node) : void;
+	function selectNodeContents(node : Node) : void;
 	static __readonly__ var START_TO_START : number/*unsigned short*/;
 	       __readonly__ var START_TO_START : number/*unsigned short*/;
 	static __readonly__ var START_TO_END : number/*unsigned short*/;
@@ -790,17 +956,17 @@ native final class Range {
 	function createContextualFragment(fragment : string/*DOMString*/) : DocumentFragment;
 
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	function getClientRects() : ClientRectList;
+	function getClientRects() : DOMRectList;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	function getBoundingClientRect() : ClientRect;
+	function getBoundingClientRect() : DOMRect;
 
 } // end of Range
 
-/** @see http://www.w3.org/TR/dom/ */
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 native final class NodeIterator {
 
 	__readonly__ var root : Node;
-	__readonly__ var referenceNode : Nullable.<Node>;
+	__readonly__ var referenceNode : Node;
 	__readonly__ var pointerBeforeReferenceNode : boolean;
 	__readonly__ var whatToShow : number/*unsigned long*/;
 	__readonly__ var filter : Nullable.<NodeFilter>;
@@ -810,7 +976,7 @@ native final class NodeIterator {
 
 } // end of NodeIterator
 
-/** @see http://www.w3.org/TR/dom/ */
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 native final class TreeWalker {
 
 	__readonly__ var root : Node;
@@ -827,7 +993,7 @@ native final class TreeWalker {
 
 } // end of TreeWalker
 
-/** @see http://www.w3.org/TR/dom/ */
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 native final class NodeFilter {
 
 	// Constants for acceptNode()
@@ -874,42 +1040,7 @@ native final class NodeFilter {
 
 } // end of NodeFilter
 
-/** @see http://www.w3.org/TR/dom/ */
-native class NodeList {
-
-	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<Node>;
-	/* getter */
-	function item(index : number/*unsigned long*/) : Nullable.<Node>;
-	__readonly__ var length : number/*unsigned long*/;
-
-} // end of NodeList
-
-/** @see http://www.w3.org/TR/dom/ */
-native class HTMLCollection {
-
-	__readonly__ var length : number/*unsigned long*/;
-	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<Element>;
-	/* getter */
-	function item(index : number/*unsigned long*/) : Nullable.<Element>;
-	function __native_index_operator__(name : string/*DOMString*/) : Nullable.<Object>/*object?*/;
-	/* getter */
-	function namedItem(name : string/*DOMString*/) : Nullable.<Object>/*object?*/;
-	// only returns Element
-
-} // end of HTMLCollection
-
-/** @see http://www.w3.org/TR/dom/ */
-native final __fake__ class DOMStringList {
-
-	__readonly__ var length : number/*unsigned long*/;
-	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<string>/*DOMString?*/;
-	/* getter */
-	function item(index : number/*unsigned long*/) : Nullable.<string>/*DOMString?*/;
-	function contains(string : string/*DOMString*/) : boolean;
-
-} // end of DOMStringList
-
-/** @see http://www.w3.org/TR/dom/ */
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 native class DOMTokenList {
 
 	__readonly__ var length : number/*unsigned long*/;
@@ -924,7 +1055,7 @@ native class DOMTokenList {
 
 } // end of DOMTokenList
 
-/** @see http://www.w3.org/TR/dom/ */
+/** @see http://www.w3.org/TR/2013/WD-dom-20131107/ */
 native final class DOMSettableTokenList extends DOMTokenList {
 
 	var value : string/*DOMString*/;
@@ -948,7 +1079,6 @@ native final __fake__ class DocumentView {
 /** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
 native __fake__ class DocumentEvent {
 
-	// Modified in DOM Level 3:
 	function createEvent(eventInterface : string/*DOMString*/) : Event;
 
 } // end of DocumentEvent
@@ -958,10 +1088,10 @@ native class UIEvent extends Event {
 
 	__readonly__ var view : Nullable.<AbstractView>;
 	__readonly__ var detail : number/*long*/;
-	// Deprecated in DOM Level 3:
-	function initUIEvent(typeArg : string/*DOMString*/, canBubbleArg : boolean, cancelableArg : boolean, viewArg : Nullable.<AbstractView>, detailArg : number/*long*/) : void;
-	function constructor(typeArg : string/*DOMString*/);
-	function constructor(typeArg : string/*DOMString*/, dictUIEventInit : UIEventInit);
+	function constructor();
+
+	// Deprecated in DOM Level 3
+	function initUIEvent(typeArg : string/*DOMString*/, bubblesArg : boolean, cancelableArg : boolean, viewArg : Nullable.<AbstractView>, detailArg : number/*long*/) : void;
 
 } // end of UIEvent
 
@@ -969,11 +1099,10 @@ native class UIEvent extends Event {
 native final class FocusEvent extends UIEvent {
 
 	__readonly__ var relatedTarget : Nullable.<EventTarget>;
-	function constructor(typeArg : string/*DOMString*/);
-	function constructor(typeArg : string/*DOMString*/, focusEventInitDict : FocusEventInit);
+	function constructor();
 
-	// Originally introduced (and deprecated) in DOM Level 3:
-	function initFocusEvent(typeArg : string/*DOMString*/, canBubbleArg : boolean, cancelableArg : boolean, viewArg : Nullable.<AbstractView>, detailArg : number/*long*/, relatedTargetArg : Nullable.<EventTarget>) : void;
+	// Originally introduced (and deprecated) in DOM Level 3
+	function initFocusEvent(typeArg : string/*DOMString*/, bubblesArg : boolean, cancelableArg : boolean, viewArg : Nullable.<AbstractView>, detailArg : number/*long*/, relatedTargetArg : Nullable.<EventTarget>) : void;
 
 } // end of FocusEvent
 
@@ -991,13 +1120,12 @@ native class MouseEvent extends UIEvent {
 	__readonly__ var button : number/*unsigned short*/;
 	__readonly__ var buttons : number/*unsigned short*/;
 	__readonly__ var relatedTarget : Nullable.<EventTarget>;
-	// Deprecated in DOM Level 3:
-	function initMouseEvent(typeArg : string/*DOMString*/, canBubbleArg : boolean, cancelableArg : boolean, viewArg : Nullable.<AbstractView>, detailArg : number/*long*/, screenXArg : number/*long*/, screenYArg : number/*long*/, clientXArg : number/*long*/, clientYArg : number/*long*/, ctrlKeyArg : boolean, altKeyArg : boolean, shiftKeyArg : boolean, metaKeyArg : boolean, buttonArg : number/*unsigned short*/, relatedTargetArg : Nullable.<EventTarget>) : void;
-	// Introduced in DOM Level 3:
+	// Introduced in DOM Level 3
 	function getModifierState(keyArg : string/*DOMString*/) : boolean;
-	function constructor(typeArg : string/*DOMString*/);
-	function constructor(typeArg : string/*DOMString*/, mouseEventInitDict : MouseEventInit);
+	function constructor();
 
+	// Deprecated in DOM Level 3
+	function initMouseEvent(typeArg : string/*DOMString*/, bubblesArg : boolean, cancelableArg : boolean, viewArg : Nullable.<AbstractView>, detailArg : number/*long*/, screenXArg : number/*long*/, screenYArg : number/*long*/, clientXArg : number/*long*/, clientYArg : number/*long*/, ctrlKeyArg : boolean, altKeyArg : boolean, shiftKeyArg : boolean, metaKeyArg : boolean, buttonArg : number/*unsigned short*/, relatedTargetArg : Nullable.<EventTarget>) : void;
 
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	__readonly__ var pageX : number/*double*/;
@@ -1031,13 +1159,19 @@ native final class WheelEvent extends MouseEvent {
 	__readonly__ var deltaY : number/*double*/;
 	__readonly__ var deltaZ : number/*double*/;
 	__readonly__ var deltaMode : number/*unsigned long*/;
-	function constructor(typeArg : string/*DOMString*/);
-	function constructor(typeArg : string/*DOMString*/, wheelEventInitDict : WheelEventInit);
+	function constructor();
 
-	// Originally introduced (and deprecated) in DOM Level 3:
-	function initWheelEvent(typeArg : string/*DOMString*/, canBubbleArg : boolean, cancelableArg : boolean, viewArg : Nullable.<AbstractView>, detailArg : number/*long*/, screenXArg : number/*long*/, screenYArg : number/*long*/, clientXArg : number/*long*/, clientYArg : number/*long*/, buttonArg : number/*unsigned short*/, relatedTargetArg : Nullable.<EventTarget>, modifiersListArg : string/*DOMString*/, deltaXArg : number/*double*/, deltaYArg : number/*double*/, deltaZArg : number/*double*/, deltaMode : number/*unsigned long*/) : void;
+	// Originally introduced (and deprecated) in DOM Level 3
+	function initWheelEvent(typeArg : string/*DOMString*/, bubblesArg : boolean, cancelableArg : boolean, viewArg : Nullable.<AbstractView>, detailArg : number/*long*/, screenXArg : number/*long*/, screenYArg : number/*long*/, clientXArg : number/*long*/, clientYArg : number/*long*/, buttonArg : number/*unsigned short*/, relatedTargetArg : Nullable.<EventTarget>, modifiersListArg : string/*DOMString*/, deltaXArg : number/*double*/, deltaYArg : number/*double*/, deltaZArg : number/*double*/, deltaMode : number/*unsigned long*/) : void;
 
 } // end of WheelEvent
+
+/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
+native final class InputEvent extends Event {
+
+	__readonly__ var data : string/*DOMString*/;
+
+} // end of InputEvent
 
 /** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
 native final class KeyboardEvent extends UIEvent {
@@ -1051,11 +1185,6 @@ native final class KeyboardEvent extends UIEvent {
 	       __readonly__ var DOM_KEY_LOCATION_RIGHT : number/*unsigned long*/;
 	static __readonly__ var DOM_KEY_LOCATION_NUMPAD : number/*unsigned long*/;
 	       __readonly__ var DOM_KEY_LOCATION_NUMPAD : number/*unsigned long*/;
-	static __readonly__ var DOM_KEY_LOCATION_MOBILE : number/*unsigned long*/;
-	       __readonly__ var DOM_KEY_LOCATION_MOBILE : number/*unsigned long*/;
-	static __readonly__ var DOM_KEY_LOCATION_JOYSTICK : number/*unsigned long*/;
-	       __readonly__ var DOM_KEY_LOCATION_JOYSTICK : number/*unsigned long*/;
-	__readonly__ var char : string/*DOMString*/;
 	__readonly__ var key : string/*DOMString*/;
 	__readonly__ var location : number/*unsigned long*/;
 	__readonly__ var ctrlKey : boolean;
@@ -1063,15 +1192,13 @@ native final class KeyboardEvent extends UIEvent {
 	__readonly__ var altKey : boolean;
 	__readonly__ var metaKey : boolean;
 	__readonly__ var repeat : boolean;
-	__readonly__ var locale : string/*DOMString*/;
 	function getModifierState(keyArg : string/*DOMString*/) : boolean;
-	function constructor(typeArg : string/*DOMString*/);
-	function constructor(typeArg : string/*DOMString*/, keyboardEventInitDict : KeyboardEventInit);
+	function constructor();
 
-	// Originally introduced (and deprecated) in DOM Level 3:
-	function initKeyboardEvent(typeArg : string/*DOMString*/, canBubbleArg : boolean, cancelableArg : boolean, viewArg : Nullable.<AbstractView>, charArg : string/*DOMString*/, keyArg : string/*DOMString*/, locationArg : number/*unsigned long*/, modifiersListArg : string/*DOMString*/, repeat : boolean, localeArg : string/*DOMString*/) : void;
+	// Originally introduced (and deprecated) in DOM Level 3
+	function initKeyboardEvent(typeArg : string/*DOMString*/, bubblesArg : boolean, cancelableArg : boolean, viewArg : Nullable.<AbstractView>, detailArg : number/*long*/, keyArg : string/*DOMString*/, locationArg : number/*unsigned long*/, modifiersListArg : string/*DOMString*/, repeat : boolean) : void;
 
-	// The following support legacy user agents:
+	// The following support legacy user agents
 	__readonly__ var charCode : number/*unsigned long*/;
 	__readonly__ var keyCode : number/*unsigned long*/;
 	__readonly__ var which : number/*unsigned long*/;
@@ -1082,14 +1209,126 @@ native final class KeyboardEvent extends UIEvent {
 native final class CompositionEvent extends UIEvent {
 
 	__readonly__ var data : Nullable.<string>/*DOMString?*/;
-	__readonly__ var locale : string/*DOMString*/;
-	function constructor(typeArg : string/*DOMString*/);
-	function constructor(typeArg : string/*DOMString*/, compositionEventInitDict : CompositionEventInit);
+	function constructor();
 
-	// Originally introduced (and deprecated) in DOM Level 3:
-	function initCompositionEvent(typeArg : string/*DOMString*/, canBubbleArg : boolean, cancelableArg : boolean, viewArg : Nullable.<AbstractView>, dataArg : Nullable.<string>/*DOMString?*/, localeArg : string/*DOMString*/) : void;
+	// Originally introduced (and deprecated) in DOM Level 3
+	function initCompositionEvent(typeArg : string/*DOMString*/, bubblesArg : boolean, cancelableArg : boolean, viewArg : Nullable.<AbstractView>, dataArg : Nullable.<string>/*DOMString?*/) : void;
 
 } // end of CompositionEvent
+
+/* dictionary */ class UIEventInit extends EventInit {
+
+	// inherits var bubbles : boolean;
+	// inherits var cancelable : boolean;
+	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
+	var view : Nullable.<AbstractView>;
+	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
+	var detail : number/*long*/;
+
+} // end of UIEventInit
+
+/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
+/* dictionary */ class FocusEventInit {
+
+	var bubbles : boolean;
+	var cancelable : boolean;
+	var view : Nullable.<AbstractView>;
+	var detail : number/*long*/;
+	var relatedTarget : Nullable.<EventTarget>;
+
+} // end of FocusEventInit
+
+/** @see http://www.w3.org/TR/2dcontext/ */
+/* dictionary */ class MouseEventInit extends UIEventInit {
+
+	// inherits var bubbles : boolean;
+	// inherits var cancelable : boolean;
+	// inherits var view : Nullable.<AbstractView>;
+	// inherits var detail : number/*long*/;
+	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
+	var screenX : number/*long*/;
+	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
+	var screenY : number/*long*/;
+	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
+	var clientX : number/*long*/;
+	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
+	var clientY : number/*long*/;
+	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
+	var ctrlKey : boolean;
+	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
+	var shiftKey : boolean;
+	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
+	var altKey : boolean;
+	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
+	var metaKey : boolean;
+	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
+	var button : number/*unsigned short*/;
+	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
+	var buttons : number/*unsigned short*/;
+	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
+	var relatedTarget : Nullable.<EventTarget>;
+
+
+
+	var region : Nullable.<string>/*DOMString?*/;
+
+} // end of MouseEventInit
+
+/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
+/* dictionary */ class WheelEventInit {
+
+	var bubbles : boolean;
+	var cancelable : boolean;
+	var view : Nullable.<AbstractView>;
+	var detail : number/*long*/;
+	var screenX : number/*long*/;
+	var screenY : number/*long*/;
+	var clientX : number/*long*/;
+	var clientY : number/*long*/;
+	var ctrlKey : boolean;
+	var shiftKey : boolean;
+	var altKey : boolean;
+	var metaKey : boolean;
+	var button : number/*unsigned short*/;
+	var buttons : number/*unsigned short*/;
+	var relatedTarget : Nullable.<EventTarget>;
+	var deltaX : number/*double*/;
+	var deltaY : number/*double*/;
+	var deltaZ : number/*double*/;
+	var deltaMode : number/*unsigned long*/;
+
+} // end of WheelEventInit
+
+/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
+/* dictionary */ class KeyboardEventInit {
+
+	var bubbles : boolean;
+	var cancelable : boolean;
+	var view : Nullable.<AbstractView>;
+	var detail : number/*long*/;
+	var key : string/*DOMString*/;
+	var location : number/*unsigned long*/;
+	var ctrlKey : boolean;
+	var shiftKey : boolean;
+	var altKey : boolean;
+	var metaKey : boolean;
+	var repeat : boolean;
+	var charCode : number/*unsigned long*/;
+	var keyCode : number/*unsigned long*/;
+	var which : number/*unsigned long*/;
+
+} // end of KeyboardEventInit
+
+/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
+/* dictionary */ class CompositionEventInit {
+
+	var bubbles : boolean;
+	var cancelable : boolean;
+	var view : Nullable.<AbstractView>;
+	var detail : number/*long*/;
+	var data : Nullable.<string>/*DOMString?*/;
+
+} // end of CompositionEventInit
 
 /** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
 native final class MutationEvent extends Event {
@@ -1106,147 +1345,9 @@ native final class MutationEvent extends Event {
 	__readonly__ var newValue : string/*DOMString*/;
 	__readonly__ var attrName : string/*DOMString*/;
 	__readonly__ var attrChange : number/*unsigned short*/;
-	function initMutationEvent(typeArg : string/*DOMString*/, canBubbleArg : boolean, cancelableArg : boolean, relatedNodeArg : Nullable.<Node>, prevValueArg : string/*DOMString*/, newValueArg : string/*DOMString*/, attrNameArg : string/*DOMString*/, attrChangeArg : number/*unsigned short*/) : void;
+	function initMutationEvent(typeArg : string/*DOMString*/, bubblesArg : boolean, cancelableArg : boolean, relatedNodeArg : Nullable.<Node>, prevValueArg : string/*DOMString*/, newValueArg : string/*DOMString*/, attrNameArg : string/*DOMString*/, attrChangeArg : number/*unsigned short*/) : void;
 
 } // end of MutationEvent
-
-/* dictionary */ class UIEventInit extends EventInit {
-
-	// Attributes from Event:
-	// inherits var bubbles : boolean;
-	// inherits var cancelable : boolean;
-	// Attributes for UIEvent:
-	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-	var view : Nullable.<AbstractView>;
-	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-	var detail : number/*long*/;
-
-} // end of UIEventInit
-
-/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-/* dictionary */ class FocusEventInit {
-
-	// Attributes from Event:
-	var bubbles : boolean;
-	var cancelable : boolean;
-	// Attributes from UIEvent:
-	var view : Nullable.<AbstractView>;
-	var detail : number/*long*/;
-	// Attributes for FocusEvent:
-	var relatedTarget : Nullable.<EventTarget>;
-
-} // end of FocusEventInit
-
-/** @see http://www.w3.org/TR/2dcontext/ */
-/* dictionary */ class MouseEventInit extends UIEventInit {
-
-	// Attributes from Event:
-	// inherits var bubbles : boolean;
-	// inherits var cancelable : boolean;
-	// Attributes from UIEvent:
-	// inherits var view : Nullable.<AbstractView>;
-	// inherits var detail : number/*long*/;
-	// Attributes for MouseEvent:
-	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-	var screenX : number/*long*/;
-	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-	var screenY : number/*long*/;
-	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-	var clientX : number/*long*/;
-	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-	var clientY : number/*long*/;
-	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-	var ctrlKey : boolean;
-	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-	var shiftKey : boolean;
-	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-	var altKey : boolean;
-	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-	var metaKey : boolean;
-	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-	var button : number/*unsigned short*/;
-	// Note: "buttons" was not previously initializable through initMouseEvent!
-	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-	var buttons : number/*unsigned short*/;
-	/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-	var relatedTarget : Nullable.<EventTarget>;
-
-
-
-	var region : Nullable.<string>/*DOMString?*/;
-
-} // end of MouseEventInit
-
-/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-/* dictionary */ class WheelEventInit {
-
-	// Attributes from Event:
-	var bubbles : boolean;
-	var cancelable : boolean;
-	// Attributes from UIEvent:
-	var view : Nullable.<AbstractView>;
-	var detail : number/*long*/;
-	// Attributes from MouseEvent:
-	var screenX : number/*long*/;
-	var screenY : number/*long*/;
-	var clientX : number/*long*/;
-	var clientY : number/*long*/;
-	var ctrlKey : boolean;
-	var shiftKey : boolean;
-	var altKey : boolean;
-	var metaKey : boolean;
-	var button : number/*unsigned short*/;
-	// Note: "buttons" was not previously initializable through initMouseEvent!
-	var buttons : number/*unsigned short*/;
-	var relatedTarget : Nullable.<EventTarget>;
-	// Attributes for WheelEvent:
-	var deltaX : number/*double*/;
-	var deltaY : number/*double*/;
-	var deltaZ : number/*double*/;
-	var deltaMode : number/*unsigned long*/;
-
-} // end of WheelEventInit
-
-/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-/* dictionary */ class KeyboardEventInit {
-
-	// Attributes from Event:
-	var bubbles : boolean;
-	var cancelable : boolean;
-	// Attributes from UIEvent:
-	var view : Nullable.<AbstractView>;
-	var detail : number/*long*/;
-	// Attributes for KeyboardEvent:
-	var char : string/*DOMString*/;
-	var key : string/*DOMString*/;
-	var location : number/*unsigned long*/;
-	var ctrlKey : boolean;
-	var shiftKey : boolean;
-	var altKey : boolean;
-	var metaKey : boolean;
-	var repeat : boolean;
-	var locale : string/*DOMString*/;
-	// (Legacy) key attributes for KeyboardEvent:
-	var charCode : number/*unsigned long*/;
-	var keyCode : number/*unsigned long*/;
-	var which : number/*unsigned long*/;
-
-} // end of KeyboardEventInit
-
-/** @see http://www.w3.org/TR/DOM-Level-3-Events/ */
-/* dictionary */ class CompositionEventInit {
-
-	// Attributes from Event:
-	var bubbles : boolean;
-	var cancelable : boolean;
-	// Attributes from UIEvent:
-	var view : Nullable.<AbstractView>;
-	var detail : number/*long*/;
-	// Attributes for CompositionEvent:
-	var data : Nullable.<string>/*DOMString?*/;
-	var locale : string/*DOMString*/;
-
-} // end of CompositionEventInit
 
 /** @see http://www.w3.org/TR/progress-events/ */
 native final class ProgressEvent extends Event {
@@ -1442,9 +1543,9 @@ native final class MediaList {
 
 	var mediaText : string/*DOMString*/;
 	__readonly__ var length : number/*unsigned long*/;
-	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<string>/*DOMString*/;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<string>/*DOMString?*/;
 	/* getter */
-	function item(index : number/*unsigned long*/) : Nullable.<string>/*DOMString*/;
+	function item(index : number/*unsigned long*/) : Nullable.<string>/*DOMString?*/;
 	function appendMedium(medium : string/*DOMString*/) : void;
 	function deleteMedium(medium : string/*DOMString*/) : void;
 
@@ -1523,6 +1624,8 @@ native class CSSRule {
 	       __readonly__ var FONT_FACE_RULE : number/*unsigned short*/;
 	static __readonly__ var PAGE_RULE : number/*unsigned short*/;
 	       __readonly__ var PAGE_RULE : number/*unsigned short*/;
+	static __readonly__ var MARGIN_RULE : number/*unsigned short*/;
+	       __readonly__ var MARGIN_RULE : number/*unsigned short*/;
 	static __readonly__ var NAMESPACE_RULE : number/*unsigned short*/;
 	       __readonly__ var NAMESPACE_RULE : number/*unsigned short*/;
 	__readonly__ var type : number/*unsigned short*/;
@@ -1573,12 +1676,20 @@ native final class CSSMediaRule extends CSSGroupingRule {
 } // end of CSSMediaRule
 
 /** @see http://dev.w3.org/csswg/cssom/ */
-native final class CSSPageRule extends CSSRule {
+native final class CSSPageRule extends CSSGroupingRule {
 
 	var selectorText : string/*DOMString*/;
 	__readonly__ var style : CSSStyleDeclaration;
 
 } // end of CSSPageRule
+
+/** @see http://dev.w3.org/csswg/cssom/ */
+native final class CSSMarginRule extends CSSRule {
+
+	__readonly__ var name : string/*DOMString*/;
+	__readonly__ var style : CSSStyleDeclaration;
+
+} // end of CSSMarginRule
 
 /** @see http://dev.w3.org/csswg/cssom/ */
 native final class CSSNamespaceRule extends CSSRule {
@@ -1600,6 +1711,8 @@ native final class CSSStyleDeclaration {
 	function getPropertyPriority(property : string/*DOMString*/) : string/*DOMString*/;
 	function setProperty(property : string/*DOMString*/, value : string/*DOMString*/) : void;
 	function setProperty(property : string/*DOMString*/, value : string/*DOMString*/, priority : string/*DOMString*/) : void;
+	function setPropertyValue(property : string/*DOMString*/, value : string/*DOMString*/) : void;
+	function setPropertyPriority(property : string/*DOMString*/, priority : string/*DOMString*/) : void;
 	function removeProperty(property : string/*DOMString*/) : string/*DOMString*/;
 	__readonly__ var parentRule : Nullable.<CSSRule>;
 	var cssFloat : string/*DOMString*/;
@@ -2119,6 +2232,15 @@ native final __fake__ class Window extends EventTarget {
 	function matchMedia(query : string/*DOMString*/) : MediaQueryList;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	__readonly__ var screen : Screen;
+	// browsing context
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function moveTo(x : number/*double*/, y : number/*double*/) : void;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function moveBy(x : number/*double*/, y : number/*double*/) : void;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function resizeTo(x : number/*double*/, y : number/*double*/) : void;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function resizeBy(x : number/*double*/, y : number/*double*/) : void;
 	// viewport
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	__readonly__ var innerWidth : number/*double*/;
@@ -2154,6 +2276,8 @@ native final __fake__ class Window extends EventTarget {
 	__readonly__ var outerWidth : number/*double*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	__readonly__ var outerHeight : number/*double*/;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	__readonly__ var devicePixelRatio : number/*double*/;
 
 	// the current browsing context
 	__readonly__ var window : Window/*WindowProxy*/;
@@ -2331,22 +2455,49 @@ native final __fake__ class Window extends EventTarget {
 /** @see http://dev.w3.org/csswg/cssom/ */
 native __fake__ class GetStyleUtils {
 
-	__readonly__ var specifiedStyle : CSSStyleDeclaration;
-	__readonly__ var defaultStyle : CSSStyleDeclaration;
-	__readonly__ var computedStyle : CSSStyleDeclaration;
+	__readonly__ var cascadedStyle : CSSStyleDeclaration;
+	__readonly__ var rawComputedStyle : CSSStyleDeclaration;
 	__readonly__ var usedStyle : CSSStyleDeclaration;
 
 } // end of GetStyleUtils
 
 /** @see http://dev.w3.org/csswg/cssom/ */
 native final class PseudoElement extends GetStyleUtils {
-}
+
+	// implements GeometryUtils
+
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function getBoxQuads() : DOMQuad[];
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function getBoxQuads(options : BoxQuadOptions) : DOMQuad[];
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function convertQuadFromNode(quad : DOMQuad, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/) : DOMQuad;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function convertQuadFromNode(quad : DOMQuad, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/, options : ConvertCoordinateOptions) : DOMQuad;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function convertRectFromNode(rect : DOMRectReadOnly, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/) : DOMQuad;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function convertRectFromNode(rect : DOMRectReadOnly, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/, options : ConvertCoordinateOptions) : DOMQuad;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function convertPointFromNode(point : DOMPointInit, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/) : DOMPoint;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	function convertPointFromNode(point : DOMPointInit, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/, options : ConvertCoordinateOptions) : DOMPoint;
+
+} // end of PseudoElement
+
+native final class CSS {
+
+	/** @see http://dev.w3.org/csswg/cssom/ */
+	static function escape(ident : string/*DOMString*/) : string/*DOMString*/;
+
+	static function supports(property : string/*DOMString*/, value : string/*DOMString*/) : boolean;
+	static function supports(conditionText : string/*DOMString*/) : boolean;
+
+} // end of CSS
 
 /** @see http://dev.w3.org/csswg/cssom-view/ */
 /* dictionary */ class ScrollOptions {
 
-	var x : number/*double*/;
-	var y : number/*double*/;
 	var behavior : string/*ScrollBehavior*/;
 
 } // end of ScrollOptions
@@ -2378,15 +2529,29 @@ native final class CaretPosition {
 
 	__readonly__ var offsetNode : Node;
 	__readonly__ var offset : number/*unsigned long*/;
-	function getClientRect() : Nullable.<ClientRect>;
+	function getClientRect() : Nullable.<DOMRect>;
 
 } // end of CaretPosition
+
+/** @see http://dev.w3.org/csswg/cssom-view/ */
+/* dictionary */ class ScrollOptionsHorizontal extends ScrollOptions {
+
+	var x : number/*double*/;
+
+} // end of ScrollOptionsHorizontal
+
+/** @see http://dev.w3.org/csswg/cssom-view/ */
+/* dictionary */ class ScrollOptionsVertical extends ScrollOptions {
+
+	var y : number/*double*/;
+
+} // end of ScrollOptionsVertical
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native class HTMLElement extends Element {
 
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
-	__readonly__ var offsetParent : Element;
+	__readonly__ var offsetParent : Nullable.<Element>;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
 	__readonly__ var offsetTop : number/*double*/;
 	/** @see http://dev.w3.org/csswg/cssom-view/ */
@@ -2485,27 +2650,64 @@ native class HTMLElement extends Element {
 
 } // end of HTMLElement
 
+/** @see http://www.w3.org/TR/html5/single-page.html */
+native final class HTMLImageElement extends HTMLElement {
+
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	__readonly__ var x : number/*double*/;
+	/** @see http://dev.w3.org/csswg/cssom-view/ */
+	__readonly__ var y : number/*double*/;
+
+	var alt : string/*DOMString*/;
+	var src : string/*DOMString*/;
+	var crossOrigin : string/*DOMString*/;
+	var useMap : string/*DOMString*/;
+	var isMap : boolean;
+	var width : number/*unsigned long*/;
+	var height : number/*unsigned long*/;
+	__readonly__ var naturalWidth : number/*unsigned long*/;
+	__readonly__ var naturalHeight : number/*unsigned long*/;
+	__readonly__ var complete : boolean;
+
+	var name : string/*DOMString*/;
+	var lowsrc : string/*DOMString*/;
+	var align : string/*DOMString*/;
+	var hspace : number/*unsigned long*/;
+	var vspace : number/*unsigned long*/;
+	var longDesc : string/*DOMString*/;
+	var border : string/*DOMString*/;
+
+} // end of HTMLImageElement
+
 /** @see http://dev.w3.org/csswg/cssom-view/ */
-native final class ClientRectList {
+/* dictionary */ class BoxQuadOptions {
 
-	__readonly__ var length : number/*unsigned long*/;
-	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<ClientRect>;
-	/* getter */
-	function item(index : number/*unsigned long*/) : Nullable.<ClientRect>;
+	var box : string/*CSSBoxType*/;
+	var relativeTo : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/;
 
-} // end of ClientRectList
+} // end of BoxQuadOptions
 
 /** @see http://dev.w3.org/csswg/cssom-view/ */
-native final class ClientRect {
+/* dictionary */ class ConvertCoordinateOptions {
 
-	__readonly__ var top : number/*double*/;
-	__readonly__ var right : number/*double*/;
-	__readonly__ var bottom : number/*double*/;
-	__readonly__ var left : number/*double*/;
-	__readonly__ var width : number/*double*/;
-	__readonly__ var height : number/*double*/;
+	var fromBox : string/*CSSBoxType*/;
+	var toBox : string/*CSSBoxType*/;
 
-} // end of ClientRect
+} // end of ConvertCoordinateOptions
+
+/** @see http://dev.w3.org/csswg/cssom-view/ */
+native __fake__ class GeometryUtils {
+
+	function getBoxQuads() : DOMQuad[];
+	function getBoxQuads(options : BoxQuadOptions) : DOMQuad[];
+	function convertQuadFromNode(quad : DOMQuad, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/) : DOMQuad;
+	function convertQuadFromNode(quad : DOMQuad, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/, options : ConvertCoordinateOptions) : DOMQuad;
+	function convertRectFromNode(rect : DOMRectReadOnly, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/) : DOMQuad;
+	function convertRectFromNode(rect : DOMRectReadOnly, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/, options : ConvertCoordinateOptions) : DOMQuad;
+	function convertPointFromNode(point : DOMPointInit, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/) : DOMPoint;
+	function convertPointFromNode(point : DOMPointInit, from : Object/*(Text or Element or PseudoElement or Document)*//*GeometryNode*/, options : ConvertCoordinateOptions) : DOMPoint;
+
+} // end of GeometryUtils
 
 /** @see http://www.w3.org/TR/2012/WD-url-20120524/ */
 native class URL extends URLUtils {
@@ -2517,6 +2719,10 @@ native class URL extends URLUtils {
 	/** @see http://url.spec.whatwg.org/ */
 	function constructor(url : string/*DOMString*/, base : string/*DOMString*/);
 
+	/** @see http://url.spec.whatwg.org/ */
+	static function domainToASCII(domain : string/*DOMString*/) : string/*DOMString*/;
+	/** @see http://url.spec.whatwg.org/ */
+	static function domainToUnicode(domain : string/*DOMString*/) : string/*DOMString*/;
 
 	/** @see http://www.w3.org/TR/2012/WD-FileAPI-20121025/ */
 	static function createObjectURL(blob : Blob) : string/*DOMString*/;
@@ -2562,7 +2768,7 @@ native __fake__ class URLUtils {
 	var port : string/*DOMString*/;
 	var pathname : string/*DOMString*/;
 	var search : string/*DOMString*/;
-	var query : Nullable.<URLQuery>;
+	var searchParams : Nullable.<URLSearchParams>;
 	var hash : string/*DOMString*/;
 
 } // end of URLUtils
@@ -2582,38 +2788,41 @@ native final __fake__ class URLUtilsReadOnly {
 } // end of URLUtilsReadOnly
 
 /** @see http://url.spec.whatwg.org/ */
-native final class URLQuery {
+native final class URLSearchParams {
 
+	function append(name : string/*DOMString*/, value : string/*DOMString*/) : void;
+	function delete(name : string/*DOMString*/) : void;
 	function get(name : string/*DOMString*/) : Nullable.<string>/*DOMString?*/;
 	function getAll(name : string/*DOMString*/) : string[]/*sequence<DOMString>*/;
-	function set(name : string/*DOMString*/, value : string/*DOMString*/) : void;
-	function append(name : string/*DOMString*/, value : string/*DOMString*/) : void;
 	function has(name : string/*DOMString*/) : boolean;
-	function delete(name : string/*DOMString*/) : void;
-	__readonly__ var size : number/*unsigned long*/;
+	function set(name : string/*DOMString*/, value : string/*DOMString*/) : void;
 
-} // end of URLQuery
+} // end of URLSearchParams
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
-native final class HTMLAllCollection extends HTMLCollection {
+native final class HTMLAllCollection {
+
+	var length : number;
 
 	// inherits length and item(unsigned long index)
 	function item(name : string/*DOMString*/) : Object/*(HTMLCollection or Element)?*/;
-	override function __native_index_operator__(name : string/*DOMString*/) : Object/*(HTMLCollection or Element)?*/;
+	function __native_index_operator__(name : string/*DOMString*/) : Object/*(HTMLCollection or Element)?*/;
 	/* legacycaller getter */
-	override function namedItem(name : string/*DOMString*/) : Object/*(HTMLCollection or Element)?*/;
+	function namedItem(name : string/*DOMString*/) : Object/*(HTMLCollection or Element)?*/;
 	// shadows inherited namedItem()
 	function tags(tagName : string/*DOMString*/) : HTMLAllCollection;
 
 } // end of HTMLAllCollection
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
-native final class HTMLFormControlsCollection extends HTMLCollection {
+native final class HTMLFormControlsCollection {
+
+	var length : number;
 
 	// inherits length and item()
-	override function __native_index_operator__(name : string/*DOMString*/) : Object/*(RadioNodeList or Element)?*/;
+	function __native_index_operator__(name : string/*DOMString*/) : Object/*(RadioNodeList or Element)?*/;
 	/* legacycaller getter */
-	override function namedItem(name : string/*DOMString*/) : Object/*(RadioNodeList or Element)?*/;
+	function namedItem(name : string/*DOMString*/) : Object/*(RadioNodeList or Element)?*/;
 	// shadows inherited namedItem()
 
 } // end of HTMLFormControlsCollection
@@ -2958,7 +3167,7 @@ native final class HTMLAnchorElement extends HTMLElement {
 	/** @see http://url.spec.whatwg.org/ */
 	var search : string/*DOMString*/;
 	/** @see http://url.spec.whatwg.org/ */
-	var query : Nullable.<URLQuery>;
+	var searchParams : Nullable.<URLSearchParams>;
 	/** @see http://url.spec.whatwg.org/ */
 	var hash : string/*DOMString*/;
 
@@ -2996,30 +3205,6 @@ native final class HTMLModElement extends HTMLElement {
 	var dateTime : string/*DOMString*/;
 
 } // end of HTMLModElement
-
-/** @see http://www.w3.org/TR/html5/single-page.html */
-native final class HTMLImageElement extends HTMLElement {
-
-	var alt : string/*DOMString*/;
-	var src : string/*DOMString*/;
-	var crossOrigin : string/*DOMString*/;
-	var useMap : string/*DOMString*/;
-	var isMap : boolean;
-	var width : number/*unsigned long*/;
-	var height : number/*unsigned long*/;
-	__readonly__ var naturalWidth : number/*unsigned long*/;
-	__readonly__ var naturalHeight : number/*unsigned long*/;
-	__readonly__ var complete : boolean;
-
-	var name : string/*DOMString*/;
-	var lowsrc : string/*DOMString*/;
-	var align : string/*DOMString*/;
-	var hspace : number/*unsigned long*/;
-	var vspace : number/*unsigned long*/;
-	var longDesc : string/*DOMString*/;
-	var border : string/*DOMString*/;
-
-} // end of HTMLImageElement
 
 /** @see http://www.w3.org/TR/html5/single-page.html */
 native final class HTMLIFrameElement extends HTMLElement {
@@ -3181,7 +3366,7 @@ native class HTMLMediaElement extends HTMLElement {
 	__readonly__ var seeking : boolean;
 	// playback state
 	var currentTime : number/*double*/;
-	__readonly__ var duration : number/*unrestricted double*/;
+	__readonly__ var duration : number/*double*/;
 	__readonly__ var startDate : Date;
 	__readonly__ var paused : boolean;
 	var defaultPlaybackRate : number/*double*/;
@@ -3208,6 +3393,9 @@ native class HTMLMediaElement extends HTMLElement {
 	function addTextTrack(kind : string/*TextTrackKind*/) : TextTrack;
 	function addTextTrack(kind : string/*TextTrackKind*/, label : string/*DOMString*/) : TextTrack;
 	function addTextTrack(kind : string/*TextTrackKind*/, label : string/*DOMString*/, language : string/*DOMString*/) : TextTrack;
+
+	/** @see http://www.w3.org/TR/mediacapture-streams/ */
+	var srcObject : Nullable.<MediaStream>;
 
 } // end of HTMLMediaElement
 
@@ -3283,7 +3471,7 @@ native final class MediaController extends EventTarget {
 
 	__readonly__ var buffered : TimeRanges;
 	__readonly__ var seekable : TimeRanges;
-	__readonly__ var duration : number/*unrestricted double*/;
+	__readonly__ var duration : number/*double*/;
 	var currentTime : number/*double*/;
 	__readonly__ var paused : boolean;
 	__readonly__ var playbackState : string/*MediaControllerPlaybackState*/;
@@ -3449,7 +3637,7 @@ native final class HTMLAreaElement extends HTMLElement {
 	/** @see http://url.spec.whatwg.org/ */
 	var search : string/*DOMString*/;
 	/** @see http://url.spec.whatwg.org/ */
-	var query : Nullable.<URLQuery>;
+	var searchParams : Nullable.<URLSearchParams>;
 	/** @see http://url.spec.whatwg.org/ */
 	var hash : string/*DOMString*/;
 
@@ -3668,7 +3856,7 @@ native final class HTMLInputElement extends HTMLElement {
 	var defaultValue : string/*DOMString*/;
 	var value : string/*DOMString*/;
 	var valueAsDate : Nullable.<Date>;
-	var valueAsNumber : number/*unrestricted double*/;
+	var valueAsNumber : number/*double*/;
 	var width : number/*unsigned long*/;
 	function stepUp() : void;
 	function stepUp(n : number/*long*/) : void;
@@ -4159,15 +4347,13 @@ native final class Navigator extends NavigatorID {
 	// implements NavigatorUserMedia
 
 	/** @see http://www.w3.org/TR/mediacapture-streams/ */
-	function getUserMedia(constraints : Map.<variant>/*MediaStreamConstraints?*/, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/) : void;
-	/** @see http://www.w3.org/TR/mediacapture-streams/ */
-	function getUserMedia(constraints : Map.<variant>/*MediaStreamConstraints?*/, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/, errorCallback : Nullable.<function(error:NavigatorUserMediaError):void>/*NavigatorUserMediaErrorCallback?*/) : void;
+	function getUserMedia(constraints : Map.<variant>/*MediaStreamConstraints?*/, successCallback : function(stream:MediaStream):void/*NavigatorUserMediaSuccessCallback*/, errorCallback : function(error:NavigatorUserMediaError):void/*NavigatorUserMediaErrorCallback*/) : void;
 
 	// implements NavigatorUserMedia
 
 
-	function webkitGetUserMedia(constraints : Map.<variant>/*MediaStreamConstraints?*/, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/) : void;
-	function webkitGetUserMedia(constraints : Map.<variant>/*MediaStreamConstraints?*/, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/, errorCallback : Nullable.<function(error:NavigatorUserMediaError):void>/*NavigatorUserMediaErrorCallback?*/) : void;
+	function webkitGetUserMedia(constraints : Map.<variant>/*MediaStreamConstraints?*/, successCallback : function(stream:MediaStream):void/*NavigatorUserMediaSuccessCallback*/) : void;
+	function webkitGetUserMedia(constraints : Map.<variant>/*MediaStreamConstraints?*/, successCallback : function(stream:MediaStream):void/*NavigatorUserMediaSuccessCallback*/, errorCallback : Nullable.<function(error:NavigatorUserMediaError):void>/*NavigatorUserMediaErrorCallback?*/) : void;
 
 } // end of Navigator
 
@@ -4802,7 +4988,6 @@ native final class TouchList {
 	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<Touch>;
 	/* getter */
 	function item(index : number/*unsigned long*/) : Nullable.<Touch>;
-	function identifiedTouch(identifier : number/*long*/) : Touch;
 
 } // end of TouchList
 
@@ -5531,250 +5716,360 @@ native final class Notification extends EventTarget {
 
 } // end of NotificationOptions
 
-/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
-native final class AudioMediaStreamTrack extends MediaStreamTrack {
+/** @see http://dev.w3.org/fxtf/geometry/ */
+native class DOMPointReadOnly {
 
-	__readonly__ var canInsertDTMF : boolean;
-	function insertDTMF(tones : string/*DOMString*/) : void;
-	function insertDTMF(tones : string/*DOMString*/, duration : number/*long*/) : void;
+	__readonly__ var x : number/*double*/;
+	__readonly__ var y : number/*double*/;
+	__readonly__ var z : number/*double*/;
+	__readonly__ var w : number/*double*/;
 
-} // end of AudioMediaStreamTrack
+} // end of DOMPointReadOnly
 
-/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
-native final class RTCSessionDescription {
-
-	function constructor();
-	function constructor(descriptionInitDict : RTCSessionDescriptionInit);
-
-	var type : Nullable.<string>/*RTCSdpType?*/;
-	var sdp : Nullable.<string>/*DOMString?*/;
-
-} // end of RTCSessionDescription
-
-/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
-/* dictionary */ class RTCSessionDescriptionInit {
-
-	var type : string/*RTCSdpType*/;
-	var sdp : string/*DOMString*/;
-
-} // end of RTCSessionDescriptionInit
-
-/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
-native final class RTCIceCandidate {
+/** @see http://dev.w3.org/fxtf/geometry/ */
+native final class DOMPoint extends DOMPointReadOnly {
 
 	function constructor();
-	function constructor(candidateInitDict : RTCIceCandidateInit);
+	function constructor(point : DOMPointInit);
+	function constructor(x : number/*unrestricted double*/, y : number/*unrestricted double*/);
+	function constructor(x : number/*unrestricted double*/, y : number/*unrestricted double*/, z : number/*unrestricted double*/);
+	function constructor(x : number/*unrestricted double*/, y : number/*unrestricted double*/, z : number/*unrestricted double*/, w : number/*unrestricted double*/);
 
-	var candidate : Nullable.<string>/*DOMString?*/;
-	var sdpMid : Nullable.<string>/*DOMString?*/;
-	var sdpMLineIndex : Nullable.<number>/*unsigned short?*/;
+	// inherits var x : number/*double*/;
+	// inherits var y : number/*double*/;
+	// inherits var z : number/*double*/;
+	// inherits var w : number/*double*/;
 
-} // end of RTCIceCandidate
+} // end of DOMPoint
 
-/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
-/* dictionary */ class RTCIceCandidateInit {
+/** @see http://dev.w3.org/fxtf/geometry/ */
+/* dictionary */ class DOMPointInit {
 
-	var candidate : string/*DOMString*/;
-	var sdpMid : string/*DOMString*/;
-	var sdpMLineIndex : number/*unsigned short*/;
+	var x : number/*double*/;
+	var y : number/*double*/;
+	var z : number/*double*/;
+	var w : number/*double*/;
 
-} // end of RTCIceCandidateInit
+} // end of DOMPointInit
 
-/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
-/* dictionary */ class RTCIceServer {
+/** @see http://dev.w3.org/fxtf/geometry/ */
+native final class DOMRect extends DOMRectReadOnly {
 
-	var url : string/*DOMString*/;
-	var credential : Nullable.<string>/*nullable DOMString*/;
+	function constructor();
+	function constructor(x : number/*unrestricted double*/, y : number/*unrestricted double*/, width : number/*unrestricted double*/, height : number/*unrestricted double*/);
 
-} // end of RTCIceServer
+	// inherits var x : number/*double*/;
+	// inherits var y : number/*double*/;
+	// inherits var width : number/*double*/;
+	// inherits var height : number/*double*/;
 
-/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
-/* dictionary */ class RTCConfiguration {
+} // end of DOMRect
 
-	var iceServers : RTCIceServer[];
+/** @see http://dev.w3.org/fxtf/geometry/ */
+native class DOMRectReadOnly {
 
-} // end of RTCConfiguration
+	__readonly__ var x : number/*double*/;
+	__readonly__ var y : number/*double*/;
+	__readonly__ var width : number/*double*/;
+	__readonly__ var height : number/*double*/;
+	__readonly__ var top : number/*double*/;
+	__readonly__ var right : number/*double*/;
+	__readonly__ var bottom : number/*double*/;
+	__readonly__ var left : number/*double*/;
 
-/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
-native final class RTCPeerConnection extends EventTarget {
+} // end of DOMRectReadOnly
 
-	function constructor(configuration : RTCConfiguration);
-	function constructor(configuration : RTCConfiguration, constraints : Map.<variant>/*MediaConstraints*/);
+/** @see http://dev.w3.org/fxtf/geometry/ */
+native final class DOMRectList {
 
-	function createOffer(successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/) : void;
-	function createOffer(successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/, failureCallback : function(errorInformation:string/*DOMString*/):void/*RTCPeerConnectionErrorCallback*/) : void;
-	function createOffer(successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/, failureCallback : function(errorInformation:string/*DOMString*/):void/*RTCPeerConnectionErrorCallback*/, constraints : Map.<variant>/*MediaConstraints*/) : void;
-	function createAnswer(offer : RTCSessionDescription, successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/) : void;
-	function createAnswer(offer : RTCSessionDescription, successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/, failureCallback : Nullable.<function(errorInformation:string/*DOMString*/):void>/*RTCPeerConnectionErrorCallback?*/) : void;
-	function createAnswer(offer : RTCSessionDescription, successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/, failureCallback : Nullable.<function(errorInformation:string/*DOMString*/):void>/*RTCPeerConnectionErrorCallback?*/, constraints : Map.<variant>/*MediaConstraints*/) : void;
-	function createAnswer(offer : RTCSessionDescription, successCallback : function(sdp:RTCSessionDescription):void/*RTCSessionDescriptionCallback*/, failureCallback : Nullable.<function(errorInformation:string/*DOMString*/):void>/*RTCPeerConnectionErrorCallback?*/, constraints : Map.<variant>/*MediaConstraints*/, createProvisionalAnswer : boolean) : void;
-	function setLocalDescription(description : RTCSessionDescription) : void;
-	function setLocalDescription(description : RTCSessionDescription, successCallback : function():void/*RTCVoidCallback*/) : void;
-	function setLocalDescription(description : RTCSessionDescription, successCallback : function():void/*RTCVoidCallback*/, failureCallback : function(errorInformation:string/*DOMString*/):void/*RTCPeerConnectionErrorCallback*/) : void;
-	__readonly__ var localDescription : RTCSessionDescription;
-	function setRemoteDescription(description : RTCSessionDescription) : void;
-	function setRemoteDescription(description : RTCSessionDescription, successCallback : function():void/*RTCVoidCallback*/) : void;
-	function setRemoteDescription(description : RTCSessionDescription, successCallback : function():void/*RTCVoidCallback*/, failureCallback : function(errorInformation:string/*DOMString*/):void/*RTCPeerConnectionErrorCallback*/) : void;
-	__readonly__ var remoteDescription : RTCSessionDescription;
-	__readonly__ var readyState : string/*RTCPeerState*/;
-	function updateIce() : void;
-	function updateIce(configuration : Nullable.<RTCConfiguration>) : void;
-	function updateIce(configuration : Nullable.<RTCConfiguration>, constraints : Map.<variant>/*MediaConstraints?*/) : void;
-	function updateIce(configuration : Nullable.<RTCConfiguration>, constraints : Map.<variant>/*MediaConstraints?*/, restart : boolean) : void;
-	function addIceCandidate(candidate : RTCIceCandidate) : void;
-	__readonly__ var iceState : string/*RTCIceState*/;
-	__readonly__ var localStreams : MediaStream[]/*MediaStreamArray*/;
-	__readonly__ var remoteStreams : MediaStream[]/*MediaStreamArray*/;
-	function createDataChannel(label : string/*DOMString*/) : DataChannel;
-	function createDataChannel(label : string/*DOMString*/, dataChannelDict : DataChannelInit) : DataChannel;
-	var ondatachannel : Nullable.<function(:Event):void>/*EventHandler*/;
-	function addStream(stream : MediaStream) : void;
-	function addStream(stream : MediaStream, constraints : Map.<variant>/*MediaConstraints*/) : void;
-	function removeStream(stream : MediaStream) : void;
-	function close() : void;
-	var onnegotationneeded : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onicecandidate : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onopen : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onstatechange : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onaddstream : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onremovestream : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onicechange : Nullable.<function(:Event):void>/*EventHandler*/;
+	__readonly__ var length : number/*unsigned long*/;
+	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<DOMRect>;
+	/* getter */
+	function item(index : number/*unsigned long*/) : Nullable.<DOMRect>;
 
-} // end of RTCPeerConnection
+} // end of DOMRectList
 
-/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
-native final class DataChannel {
+/** @see http://dev.w3.org/fxtf/geometry/ */
+native final class DOMQuad {
 
-	__readonly__ var label : string/*DOMString*/;
-	__readonly__ var reliable : boolean;
-	__readonly__ var readyState : string/*DataChannelState*/;
-	__readonly__ var bufferedAmount : number/*unsigned long*/;
-	var onopen : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onerror : Nullable.<function(:Event):void>/*EventHandler*/;
-	var onclose : Nullable.<function(:Event):void>/*EventHandler*/;
-	function close() : void;
-	var onmessage : Nullable.<function(:Event):void>/*EventHandler*/;
-	var binaryType : string/*DOMString*/;
-	function send(data : string/*DOMString*/) : void;
-	function send(data : ArrayBuffer) : void;
-	function send(data : Blob) : void;
+	function constructor(p1 : DOMPointInit, p2 : DOMPointInit, p3 : DOMPointInit, p4 : DOMPointInit);
+	function constructor(rect : DOMRectReadOnly);
 
-} // end of DataChannel
+	__readonly__ var p1 : DOMPoint;
+	__readonly__ var p2 : DOMPoint;
+	__readonly__ var p3 : DOMPoint;
+	__readonly__ var p4 : DOMPoint;
+	__readonly__ var bounds : DOMRectReadOnly;
 
-/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
-/* dictionary */ class DataChannelInit {
+} // end of DOMQuad
 
-	var reliable : boolean;
+/** @see http://dev.w3.org/fxtf/geometry/ */
+native class DOMMatrixReadOnly {
 
-} // end of DataChannelInit
+	// These attributes are simple aliases for certain elements of the 4x4 matrix
+	__readonly__ var a : number/*double*/;
+	__readonly__ var b : number/*double*/;
+	__readonly__ var c : number/*double*/;
+	__readonly__ var d : number/*double*/;
+	__readonly__ var e : number/*double*/;
+	__readonly__ var f : number/*double*/;
+	__readonly__ var m11 : number/*double*/;
+	__readonly__ var m12 : number/*double*/;
+	__readonly__ var m13 : number/*double*/;
+	__readonly__ var m14 : number/*double*/;
+	__readonly__ var m21 : number/*double*/;
+	__readonly__ var m22 : number/*double*/;
+	__readonly__ var m23 : number/*double*/;
+	__readonly__ var m24 : number/*double*/;
+	__readonly__ var m31 : number/*double*/;
+	__readonly__ var m32 : number/*double*/;
+	__readonly__ var m33 : number/*double*/;
+	__readonly__ var m34 : number/*double*/;
+	__readonly__ var m41 : number/*double*/;
+	__readonly__ var m42 : number/*double*/;
+	__readonly__ var m43 : number/*double*/;
+	__readonly__ var m44 : number/*double*/;
+	// Immutable transform methods
+	function translate(tx : number/*unrestricted double*/, ty : number/*unrestricted double*/) : DOMMatrix;
+	function translate(tx : number/*unrestricted double*/, ty : number/*unrestricted double*/, tz : number/*unrestricted double*/) : DOMMatrix;
+	function scale(scale : number/*unrestricted double*/) : DOMMatrix;
+	function scale(scale : number/*unrestricted double*/, originX : number/*unrestricted double*/) : DOMMatrix;
+	function scale(scale : number/*unrestricted double*/, originX : number/*unrestricted double*/, originY : number/*unrestricted double*/) : DOMMatrix;
+	function scale3d(scale : number/*unrestricted double*/) : DOMMatrix;
+	function scale3d(scale : number/*unrestricted double*/, originX : number/*unrestricted double*/) : DOMMatrix;
+	function scale3d(scale : number/*unrestricted double*/, originX : number/*unrestricted double*/, originY : number/*unrestricted double*/) : DOMMatrix;
+	function scale3d(scale : number/*unrestricted double*/, originX : number/*unrestricted double*/, originY : number/*unrestricted double*/, originZ : number/*unrestricted double*/) : DOMMatrix;
+	function scaleNonUniform(scaleX : number/*unrestricted double*/) : DOMMatrix;
+	function scaleNonUniform(scaleX : number/*unrestricted double*/, scaleY : number/*unrestricted double*/) : DOMMatrix;
+	function scaleNonUniform(scaleX : number/*unrestricted double*/, scaleY : number/*unrestricted double*/, scaleZ : number/*unrestricted double*/) : DOMMatrix;
+	function scaleNonUniform(scaleX : number/*unrestricted double*/, scaleY : number/*unrestricted double*/, scaleZ : number/*unrestricted double*/, originX : number/*unrestricted double*/) : DOMMatrix;
+	function scaleNonUniform(scaleX : number/*unrestricted double*/, scaleY : number/*unrestricted double*/, scaleZ : number/*unrestricted double*/, originX : number/*unrestricted double*/, originY : number/*unrestricted double*/) : DOMMatrix;
+	function scaleNonUniform(scaleX : number/*unrestricted double*/, scaleY : number/*unrestricted double*/, scaleZ : number/*unrestricted double*/, originX : number/*unrestricted double*/, originY : number/*unrestricted double*/, originZ : number/*unrestricted double*/) : DOMMatrix;
+	function rotate(angle : number/*unrestricted double*/) : DOMMatrix;
+	function rotate(angle : number/*unrestricted double*/, originX : number/*unrestricted double*/) : DOMMatrix;
+	function rotate(angle : number/*unrestricted double*/, originX : number/*unrestricted double*/, originY : number/*unrestricted double*/) : DOMMatrix;
+	function rotateFromVector(x : number/*unrestricted double*/, y : number/*unrestricted double*/) : DOMMatrix;
+	function rotateAxisAngle(x : number/*unrestricted double*/, y : number/*unrestricted double*/, z : number/*unrestricted double*/, angle : number/*unrestricted double*/) : DOMMatrix;
+	function skewX(sx : number/*unrestricted double*/) : DOMMatrix;
+	function skewY(sy : number/*unrestricted double*/) : DOMMatrix;
+	function multiply(other : DOMMatrix) : DOMMatrix;
+	function flipX() : DOMMatrix;
+	function flipY() : DOMMatrix;
+	function inverse() : DOMMatrix;
+	// Helper methods
+	function is2D() : boolean;
+	function determinant() : number/*unrestricted double*/;
+	function transformPoint(point : DOMPointInit) : DOMPoint;
+	function toFloat32Array() : Float32Array;
+	function toFloat64Array() : Float64Array;
 
-/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
-native final class RTCPeerConnectionIceEvent extends Event {
+} // end of DOMMatrixReadOnly
 
-	function constructor(type : string/*DOMString*/, eventInitDict : RTCPeerConnectionIceEventInit);
+/** @see http://dev.w3.org/fxtf/geometry/ */
+native final class DOMMatrix extends DOMMatrixReadOnly {
 
-	__readonly__ var candidate : RTCIceCandidate;
+	function constructor();
+	function constructor(transformList : string/*DOMString*/);
+	function constructor(other : DOMMatrixReadOnly);
+	function constructor(array32 : Float32Array);
+	function constructor(array64 : Float64Array);
+	function constructor(numberSequence : number[]/*sequence<unrestricted double>*/);
+	function constructor(numberSequence : int[]/*sequence<unrestricted double>*/);
 
-} // end of RTCPeerConnectionIceEvent
+	// These attributes are simple aliases for certain elements of the 4x4 matrix
+	// inherits var a : number/*double*/;
+	// inherits var b : number/*double*/;
+	// inherits var c : number/*double*/;
+	// inherits var d : number/*double*/;
+	// inherits var e : number/*double*/;
+	// inherits var f : number/*double*/;
+	// inherits var m11 : number/*double*/;
+	// inherits var m12 : number/*double*/;
+	// inherits var m13 : number/*double*/;
+	// inherits var m14 : number/*double*/;
+	// inherits var m21 : number/*double*/;
+	// inherits var m22 : number/*double*/;
+	// inherits var m23 : number/*double*/;
+	// inherits var m24 : number/*double*/;
+	// inherits var m31 : number/*double*/;
+	// inherits var m32 : number/*double*/;
+	// inherits var m33 : number/*double*/;
+	// inherits var m34 : number/*double*/;
+	// inherits var m41 : number/*double*/;
+	// inherits var m42 : number/*double*/;
+	// inherits var m43 : number/*double*/;
+	// inherits var m44 : number/*double*/;
+	// Mutable transform methods
+	function multiplyBy(other : DOMMatrix) : void;
+	function preMultiplyBy(other : DOMMatrix) : void;
+	function translateBy(tx : number/*unrestricted double*/, ty : number/*unrestricted double*/) : void;
+	function translateBy(tx : number/*unrestricted double*/, ty : number/*unrestricted double*/, tz : number/*unrestricted double*/) : void;
+	function scaleBy(scale : number/*unrestricted double*/) : void;
+	function scaleBy(scale : number/*unrestricted double*/, originX : number/*unrestricted double*/) : void;
+	function scaleBy(scale : number/*unrestricted double*/, originX : number/*unrestricted double*/, originY : number/*unrestricted double*/) : void;
+	function scale3dBy(scale : number/*unrestricted double*/) : void;
+	function scale3dBy(scale : number/*unrestricted double*/, originX : number/*unrestricted double*/) : void;
+	function scale3dBy(scale : number/*unrestricted double*/, originX : number/*unrestricted double*/, originY : number/*unrestricted double*/) : void;
+	function scale3dBy(scale : number/*unrestricted double*/, originX : number/*unrestricted double*/, originY : number/*unrestricted double*/, originZ : number/*unrestricted double*/) : void;
+	function scaleNonUniformBy(scaleX : number/*unrestricted double*/) : void;
+	function scaleNonUniformBy(scaleX : number/*unrestricted double*/, scaleY : number/*unrestricted double*/) : void;
+	function scaleNonUniformBy(scaleX : number/*unrestricted double*/, scaleY : number/*unrestricted double*/, scaleZ : number/*unrestricted double*/) : void;
+	function scaleNonUniformBy(scaleX : number/*unrestricted double*/, scaleY : number/*unrestricted double*/, scaleZ : number/*unrestricted double*/, originX : number/*unrestricted double*/) : void;
+	function scaleNonUniformBy(scaleX : number/*unrestricted double*/, scaleY : number/*unrestricted double*/, scaleZ : number/*unrestricted double*/, originX : number/*unrestricted double*/, originY : number/*unrestricted double*/) : void;
+	function scaleNonUniformBy(scaleX : number/*unrestricted double*/, scaleY : number/*unrestricted double*/, scaleZ : number/*unrestricted double*/, originX : number/*unrestricted double*/, originY : number/*unrestricted double*/, originZ : number/*unrestricted double*/) : void;
+	function rotateBy(angle : number/*unrestricted double*/) : void;
+	function rotateBy(angle : number/*unrestricted double*/, originX : number/*unrestricted double*/) : void;
+	function rotateBy(angle : number/*unrestricted double*/, originX : number/*unrestricted double*/, originY : number/*unrestricted double*/) : void;
+	function rotateFromVectorBy(x : number/*unrestricted double*/, y : number/*unrestricted double*/) : void;
+	function rotateAxisAngleBy(x : number/*unrestricted double*/, y : number/*unrestricted double*/, z : number/*unrestricted double*/, angle : number/*unrestricted double*/) : void;
+	function skewXBy(sx : number/*unrestricted double*/) : void;
+	function skewYBy(sy : number/*unrestricted double*/) : void;
+	function invert() : void;
 
-/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
-/* dictionary */ class RTCPeerConnectionIceEventInit extends EventInit {
-
-	var candidate : RTCIceCandidate;
-
-} // end of RTCPeerConnectionIceEventInit
-
-/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
-native final class MediaStreamEvent extends Event {
-
-	function constructor(type : string/*DOMString*/, eventInitDict : MediaStreamEventInit);
-
-	__readonly__ var stream : Nullable.<MediaStream>;
-
-} // end of MediaStreamEvent
-
-/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
-/* dictionary */ class MediaStreamEventInit extends EventInit {
-
-	var stream : MediaStream;
-
-} // end of MediaStreamEventInit
-
-/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
-native final class DataChannelEvent extends Event {
-
-	function constructor(type : string/*DOMString*/, eventInitDict : DataChannelEventInit);
-
-	__readonly__ var channel : DataChannel;
-
-} // end of DataChannelEvent
-
-/** @see http://dev.w3.org/2011/webrtc/editor/webrtc.html */
-/* dictionary */ class DataChannelEventInit extends EventInit {
-
-	var channel : DataChannel;
-
-} // end of DataChannelEventInit
+} // end of DOMMatrix
 
 /** @see http://www.w3.org/TR/mediacapture-streams/ */
-native class MediaStream extends EventTarget {
+native final class MediaStream extends EventTarget {
 
-	function constructor(audioTracks : Nullable.<MediaStreamTrackList>, videoTracks : Nullable.<MediaStreamTrackList>);
+	function constructor();
+	function constructor(stream : MediaStream);
+	function constructor(tracks : MediaStreamTrack[]/*MediaStreamTrackSequence*/);
 
-	__readonly__ var label : string/*DOMString*/;
-	__readonly__ var audioTracks : MediaStreamTrackList;
-	__readonly__ var videoTracks : MediaStreamTrackList;
-	var ended : boolean;
-	var onended : Nullable.<function(:Event):void>/*Function?*/;
+	__readonly__ var id : string/*DOMString*/;
+	function getAudioTracks() : MediaStreamTrack[];
+	function getVideoTracks() : MediaStreamTrack[];
+	function getTrackById(trackId : string/*DOMString*/) : Nullable.<MediaStreamTrack>;
+	function addTrack(track : MediaStreamTrack) : void;
+	function removeTrack(track : MediaStreamTrack) : void;
+	function clone() : MediaStream;
+	__readonly__ var ended : boolean;
+	var onended : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onaddtrack : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onremovetrack : Nullable.<function(:Event):void>/*EventHandler*/;
 
 } // end of MediaStream
 
 /** @see http://www.w3.org/TR/mediacapture-streams/ */
-native final class LocalMediaStream extends MediaStream {
-
-	function stop() : void;
-
-} // end of LocalMediaStream
-
-/** @see http://www.w3.org/TR/mediacapture-streams/ */
-native class MediaStreamTrack {
+native class MediaStreamTrack extends EventTarget {
 
 	__readonly__ var kind : string/*DOMString*/;
+	__readonly__ var id : string/*DOMString*/;
 	__readonly__ var label : string/*DOMString*/;
 	var enabled : boolean;
-	static __readonly__ var LIVE : number/*unsigned short*/;
-	       __readonly__ var LIVE : number/*unsigned short*/;
-	static __readonly__ var MUTED : number/*unsigned short*/;
-	       __readonly__ var MUTED : number/*unsigned short*/;
-	static __readonly__ var ENDED : number/*unsigned short*/;
-	       __readonly__ var ENDED : number/*unsigned short*/;
-	__readonly__ var readyState : number/*unsigned short*/;
-	var onmute : Nullable.<function(:Event):void>/*Function?*/;
-	var onunmute : Nullable.<function(:Event):void>/*Function?*/;
-	var onended : Nullable.<function(:Event):void>/*Function?*/;
+	__readonly__ var muted : boolean;
+	var onmute : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onunmute : Nullable.<function(:Event):void>/*EventHandler*/;
+	__readonly__ var _readonly : boolean;
+	__readonly__ var remote : boolean;
+	__readonly__ var readyState : string/*MediaStreamTrackState*/;
+	var onstarted : Nullable.<function(:Event):void>/*EventHandler*/;
+	var onended : Nullable.<function(:Event):void>/*EventHandler*/;
+	static function getSourceInfos() : SourceInfo[];
+	function constraints() : Nullable.<MediaTrackConstraints>;
+	function states() : MediaSourceStates;
+	function capabilities() : Object/*(AllVideoCapabilities or AllAudioCapabilities)*/;
+	function applyConstraints(constraints : MediaTrackConstraints) : void;
+	var onoverconstrained : Nullable.<function(:Event):void>/*EventHandler*/;
+	function clone() : MediaStreamTrack;
+	function stop() : void;
 
 } // end of MediaStreamTrack
 
 /** @see http://www.w3.org/TR/mediacapture-streams/ */
-native final class MediaStreamTrackList {
+/* dictionary */ class SourceInfo {
 
-	__readonly__ var length : number/*unsigned long*/;
-	function item(index : number/*unsigned long*/) : MediaStreamTrack;
-	function add(track : MediaStreamTrack) : void;
-	function remove(track : MediaStreamTrack) : void;
-	var onaddtrack : Nullable.<function(:Event):void>/*Function?*/;
-	var onremovetrack : Nullable.<function(:Event):void>/*Function?*/;
+	var sourceId : string/*DOMString*/;
+	var kind : string/*DOMString*/;
+	var label : string/*DOMString*/;
 
-} // end of MediaStreamTrackList
+} // end of SourceInfo
+
+/** @see http://www.w3.org/TR/mediacapture-streams/ */
+/* dictionary */ class MediaStreamTrackEventInit extends EventInit {
+
+	var track : Nullable.<MediaStreamTrack>;
+
+} // end of MediaStreamTrackEventInit
+
+/** @see http://www.w3.org/TR/mediacapture-streams/ */
+native final class MediaStreamTrackEvent extends Event {
+
+	function constructor(type : string/*DOMString*/, eventInitDict : MediaStreamTrackEventInit);
+
+	__readonly__ var track : MediaStreamTrack;
+
+} // end of MediaStreamTrackEvent
+
+/** @see http://www.w3.org/TR/mediacapture-streams/ */
+native final class VideoStreamTrack extends MediaStreamTrack {
+
+	function constructor();
+	function constructor(videoConstraints : MediaTrackConstraints);
+
+	static function getSourceIds() : string[]/*sequence<DOMString>*/;
+
+} // end of VideoStreamTrack
+
+/** @see http://www.w3.org/TR/mediacapture-streams/ */
+native final class AudioStreamTrack extends MediaStreamTrack {
+
+	function constructor();
+	function constructor(audioConstraints : MediaTrackConstraints);
+
+	static function getSourceIds() : string[]/*sequence<DOMString>*/;
+
+} // end of AudioStreamTrack
+
+/** @see http://www.w3.org/TR/mediacapture-streams/ */
+/* dictionary */ class MediaSourceStates {
+
+	var sourceType : string/*SourceTypeEnum*/;
+	var sourceId : string/*DOMString*/;
+	var width : Nullable.<number>/*unsigned long?*/;
+	var height : Nullable.<number>/*unsigned long?*/;
+	var frameRate : Nullable.<number>/*float?*/;
+	var aspectRatio : Nullable.<number>/*float?*/;
+	var facingMode : Nullable.<string>/*VideoFacingModeEnum?*/;
+	var volume : Nullable.<number>/*unsigned long?*/;
+
+} // end of MediaSourceStates
+
+/** @see http://www.w3.org/TR/mediacapture-streams/ */
+/* dictionary */ class CapabilityRange {
+
+	var max : variant/*any*/;
+	var min : variant/*any*/;
+	var supported : boolean;
+
+} // end of CapabilityRange
+
+/** @see http://www.w3.org/TR/mediacapture-streams/ */
+/* dictionary */ class AllVideoCapabilities {
+
+	var sourceType : Nullable.<string[]/*sequence<DOMString>*/>/*CapabilityList?*/;
+	var sourceId : Nullable.<string[]/*sequence<DOMString>*/>/*CapabilityList?*/;
+	var width : Nullable.<CapabilityRange>;
+	var height : Nullable.<CapabilityRange>;
+	var frameRate : Nullable.<CapabilityRange>;
+	var aspectRatio : Nullable.<CapabilityRange>;
+	var facingMode : Nullable.<string[]/*sequence<DOMString>*/>/*CapabilityList?*/;
+
+} // end of AllVideoCapabilities
+
+/** @see http://www.w3.org/TR/mediacapture-streams/ */
+/* dictionary */ class AllAudioCapabilities {
+
+	var volume : Nullable.<CapabilityRange>;
+
+} // end of AllAudioCapabilities
 
 /** @see http://www.w3.org/TR/mediacapture-streams/ */
 native __fake__ class NavigatorUserMedia {
 
-	function getUserMedia(constraints : Map.<variant>/*MediaStreamConstraints?*/, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/) : void;
-	function getUserMedia(constraints : Map.<variant>/*MediaStreamConstraints?*/, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/, errorCallback : Nullable.<function(error:NavigatorUserMediaError):void>/*NavigatorUserMediaErrorCallback?*/) : void;
+	function getUserMedia(constraints : Map.<variant>/*MediaStreamConstraints?*/, successCallback : function(stream:MediaStream):void/*NavigatorUserMediaSuccessCallback*/, errorCallback : function(error:NavigatorUserMediaError):void/*NavigatorUserMediaErrorCallback*/) : void;
 
-	function webkitGetUserMedia(constraints : Map.<variant>/*MediaStreamConstraints?*/, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/) : void;
-	function webkitGetUserMedia(constraints : Map.<variant>/*MediaStreamConstraints?*/, successCallback : function(stream:LocalMediaStream):void/*NavigatorUserMediaSuccessCallback*/, errorCallback : Nullable.<function(error:NavigatorUserMediaError):void>/*NavigatorUserMediaErrorCallback?*/) : void;
+	function webkitGetUserMedia(constraints : Map.<variant>/*MediaStreamConstraints?*/, successCallback : function(stream:MediaStream):void/*NavigatorUserMediaSuccessCallback*/) : void;
+	function webkitGetUserMedia(constraints : Map.<variant>/*MediaStreamConstraints?*/, successCallback : function(stream:MediaStream):void/*NavigatorUserMediaSuccessCallback*/, errorCallback : Nullable.<function(error:NavigatorUserMediaError):void>/*NavigatorUserMediaErrorCallback?*/) : void;
 
 } // end of NavigatorUserMedia
 
@@ -5790,18 +6085,24 @@ native __fake__ class NavigatorUserMedia {
 /* dictionary */ class MediaTrackConstraints {
 
 	var mandatory : Map.<variant>/*MediaTrackConstraintSet?*/;
-	var optional : Map.<variant>[]/*MediaTrackConstraint[]?*/;
+	var _optional : Map.<variant>[]/*MediaTrackConstraint[]?*/;
 
 } // end of MediaTrackConstraints
 
 /** @see http://www.w3.org/TR/mediacapture-streams/ */
-native final __fake__ class NavigatorUserMediaError {
+native final __fake__ class NavigatorUserMediaError extends DOMError {
 
-	static __readonly__ var PERMISSION_DENIED : number/*unsigned short*/;
-	       __readonly__ var PERMISSION_DENIED : number/*unsigned short*/;
-	__readonly__ var code : number/*unsigned short*/;
+	__readonly__ var constraintName : Nullable.<string>/*DOMString?*/;
 
 } // end of NavigatorUserMediaError
+
+/** @see http://www.w3.org/TR/mediacapture-streams/ */
+/* dictionary */ class MinMaxConstraint {
+
+	var max : variant/*any*/;
+	var min : variant/*any*/;
+
+} // end of MinMaxConstraint
 
 /** @see http://www.w3.org/TR/2dcontext/ */
 native final class CanvasRenderingContext2D extends CanvasDrawingStyles {
@@ -5821,7 +6122,7 @@ native final class CanvasRenderingContext2D extends CanvasDrawingStyles {
 	function transform(a : number/*unrestricted double*/, b : number/*unrestricted double*/, c : number/*unrestricted double*/, d : number/*unrestricted double*/, e : number/*unrestricted double*/, f : number/*unrestricted double*/) : void;
 	function setTransform(a : number/*unrestricted double*/, b : number/*unrestricted double*/, c : number/*unrestricted double*/, d : number/*unrestricted double*/, e : number/*unrestricted double*/, f : number/*unrestricted double*/) : void;
 	// compositing
-	var globalAlpha : number/*unrestricted double*/;
+	var globalAlpha : number/*double*/;
 	// (default 1.0)
 	var globalCompositeOperation : string/*DOMString*/;
 	// (default source-over)
@@ -5837,11 +6138,11 @@ native final class CanvasRenderingContext2D extends CanvasDrawingStyles {
 	function createPattern(image : HTMLCanvasElement, repetition : string/*DOMString*/) : CanvasPattern;
 	function createPattern(image : HTMLVideoElement, repetition : string/*DOMString*/) : CanvasPattern;
 	// shadows
-	var shadowOffsetX : number/*unrestricted double*/;
+	var shadowOffsetX : number/*double*/;
 	// (default 0)
-	var shadowOffsetY : number/*unrestricted double*/;
+	var shadowOffsetY : number/*double*/;
 	// (default 0)
-	var shadowBlur : number/*unrestricted double*/;
+	var shadowBlur : number/*double*/;
 	// (default 0)
 	var shadowColor : string/*DOMString*/;
 	// (default transparent black)
@@ -5912,13 +6213,13 @@ native final class CanvasRenderingContext2D extends CanvasDrawingStyles {
 native __fake__ class CanvasDrawingStyles {
 
 	// line caps/joins
-	var lineWidth : number/*unrestricted double*/;
+	var lineWidth : number/*double*/;
 	// (default 1)
 	var lineCap : string/*DOMString*/;
 	// "butt", "round", "square" (default "butt")
 	var lineJoin : string/*DOMString*/;
 	// "round", "bevel", "miter" (default "miter")
-	var miterLimit : number/*unrestricted double*/;
+	var miterLimit : number/*double*/;
 	// (default 10)
 
 	// dashed lines
@@ -5926,7 +6227,7 @@ native __fake__ class CanvasDrawingStyles {
 	function setLineDash(segments : int[]/*sequence<unrestricted double>*/) : void;
 	// default empty
 	function getLineDash() : number[]/*sequence<unrestricted double>*/;
-	var lineDashOffset : number/*unrestricted double*/;
+	var lineDashOffset : number/*double*/;
 	// text
 	var font : string/*DOMString*/;
 	// (default 10px sans-serif)
@@ -7117,5 +7418,13 @@ native final __fake__ class CanvasPixelArray {
 	function __native_index_operator__(index : number/*unsigned long*/) : Nullable.<number>/*octet*/;
 
 } // end of CanvasPixelArray
+
+native final class DOMStringList {
+
+	function item(index : number/*unsigned long*/) : string/*DOMString*/;
+	__readonly__ var length : number/*unsigned long*/;
+	function contains(str : string/*DOMString*/) : boolean;
+
+} // end of DOMStringList
 
 

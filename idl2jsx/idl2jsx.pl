@@ -141,6 +141,8 @@ WebIDL::TypeMap->define(
     'MediaStreamConstraints' => 'Map.<variant>', # e.g. { video: true }
     'MediaConstraints'       => 'Map.<variant>',
 
+    'Elements' => 'Array.<Element>',
+
     # https://wiki.mozilla.org/GamepadAPI
     'nsIVariant'  => 'variant',
     'nsIDOMEvent' => 'Event',
@@ -353,6 +355,20 @@ foreach my $src(@files) {
             fake    => $fake{$class},
         };
 
+        if($class eq 'HTMLAllCollection' or $class eq 'HTMLFormControlsCollection') {
+            # HTMLAllCollection and HTMLFormControlsCollection are
+            # declared as a subclass of HTMLCollection,
+            # but it is not compatible with HTMLCollection in terms of JSX.
+            $base = "";
+            push @{$def->{members}}, {
+                id     => 'length',
+                decl   => 'var length : number;',
+                type   => 'number',
+                static => 0,
+                spec   => $spec_name,
+            };
+        }
+
         if($class_type !~ /\b partial \b/xms) {
             $has_definition{$class} = 1;
             $def->{spec} = $spec_name;
@@ -462,7 +478,9 @@ foreach my $src(@files) {
                     (?: \bstringifier\b \s+ )?
                     (?<static> \bstatic\b \s+ )?
                     (?<readonly> \breadonly\b \s+)?
+                    (?: \binherit\b \s+)?
                     (?: \battribute\b \s+)?
+                    (?: \bunrestricted\b \s+)?
                     (?: \[ [^\]]+ \])? # annotations
                     (?<type> $rx_type) \s+ (?<ident> \w+) # required
                     (?: \s+ setraises\( [^\)]+ \) )?

@@ -16,7 +16,7 @@
 
  <h1>CSSOM View Module</h1>
 
- <h2 class="no-num no-toc" id="w3c-doctype">Editor's Draft 27 June 2013</h2>
+ <h2 class="no-num no-toc" id="w3c-doctype">Editor's Draft 1 November 2013</h2>
 
  <dl>
 
@@ -83,7 +83,7 @@ current W3C publications and the latest revision of this technical report
 can be found in the <a href="http://www.w3.org/TR/">W3C technical reports
 index at http://www.w3.org/TR/.</a></em>
 
-<p>This is the 27 June 2013 Editor's Draft of CSSOM View. Please send
+<p>This is the 1 November 2013 Editor's Draft of CSSOM View. Please send
 comments to
 <a href="mailto:www-style@w3.org?subject=%5Bcssom-view%5D%20">www-style@w3.org</a>
 (<a href="http://lists.w3.org/Archives/Public/www-style/">archived</a>)
@@ -117,14 +117,16 @@ document as other than work in progress.
    <li><a href="#web-idl"><span class="secno">2.1 </span>Web IDL</a></ul></li>
  <li><a href="#terminology"><span class="secno">3 </span>Terminology</a>
   <ul class="toc">
-   <li><a href="#css-pixels"><span class="secno">3.1 </span>CSS pixels</a></ul></li>
+   <li><a href="#css-pixels"><span class="secno">3.1 </span>CSS pixels</a></li>
+   <li><a href="#zooming"><span class="secno">3.2 </span>Zooming</a></ul></li>
  <li><a href="#common-infrastructure"><span class="secno">4 </span>Common Infrastructure</a>
   <ul class="toc">
    <li><a href="#scrolling"><span class="secno">4.1 </span>Scrolling</a></ul></li>
  <li><a href="#extensions-to-the-window-interface"><span class="secno">5 </span>Extensions to the <code title="">Window</code> Interface</a>
   <ul class="toc">
-   <li><a href="#the-mediaquerylist-interface"><span class="secno">5.1 </span>The <code title="">MediaQueryList</code> Interface</a></li>
-   <li><a href="#the-screen-interface"><span class="secno">5.2 </span>The <code title="">Screen</code> Interface</a></ul></li>
+   <li><a href="#the-features-argument-to-the-open()-method"><span class="secno">5.1 </span>The <var>features</var> argument to the <code title="">open()</code> method</a></li>
+   <li><a href="#the-mediaquerylist-interface"><span class="secno">5.2 </span>The <code title="">MediaQueryList</code> Interface</a></li>
+   <li><a href="#the-screen-interface"><span class="secno">5.3 </span>The <code title="">Screen</code> Interface</a></ul></li>
  <li><a href="#extensions-to-the-document-interface"><span class="secno">6 </span>Extensions to the <code title="">Document</code> Interface</a>
   <ul class="toc">
    <li><a href="#the-caretposition-interface"><span class="secno">6.1 </span>The <code title="">CaretPosition</code> Interface</a></ul></li>
@@ -134,19 +136,19 @@ document as other than work in progress.
 <code title="">getBoundingClientRect()</code> methods</a></li>
    <li><a href="#element-scrolling-members"><span class="secno">7.2 </span><code title="">Element</code> Scrolling Members</a></ul></li>
  <li><a href="#extensions-to-the-htmlelement-interface"><span class="secno">8 </span>Extensions to the <code title="">HTMLElement</code> Interface</a></li>
- <li><a href="#extensions-to-the-range-interface"><span class="secno">9 </span>Extensions to the <code title="">Range</code> Interface</a></li>
- <li><a href="#extensions-to-the-mouseevent-interface"><span class="secno">10 </span>Extensions to the <code title="">MouseEvent</code> Interface</a></li>
- <li><a href="#rectangles"><span class="secno">11 </span>Rectangles</a>
+ <li><a href="#excensions-to-the-htmlimageelement-interface"><span class="secno">9 </span>Excensions to the <code title="">HTMLImageElement</code> Interface</a></li>
+ <li><a href="#extensions-to-the-range-interface"><span class="secno">10 </span>Extensions to the <code title="">Range</code> Interface</a></li>
+ <li><a href="#extensions-to-the-mouseevent-interface"><span class="secno">11 </span>Extensions to the <code title="">MouseEvent</code> Interface</a></li>
+ <li><a href="#geometry"><span class="secno">12 </span>Geometry</a>
   <ul class="toc">
-   <li><a href="#the-clientrectlist-interface"><span class="secno">11.1 </span>The <code title="">ClientRectList</code> Interface</a></li>
-   <li><a href="#the-clientrect-interface"><span class="secno">11.2 </span>The <code title="">ClientRect</code> Interface</a></ul></li>
- <li><a href="#events"><span class="secno">12 </span>Events</a>
+   <li><a class="atrisk" href="#the-geometryutils-interface"><span class="secno">12.1 </span>The <code title="">GeometryUtils</code> Interface</a></ul></li>
+ <li><a href="#events"><span class="secno">13 </span>Events</a>
   <ul class="toc">
-   <li><a href="#resizing-viewports"><span class="secno">12.1 </span>Resizing viewports</a></li>
-   <li><a href="#scrolling-0"><span class="secno">12.2 </span>Scrolling</a></ul></li>
- <li><a href="#css-properties"><span class="secno">13 </span>CSS properties</a>
+   <li><a href="#resizing-viewports"><span class="secno">13.1 </span>Resizing viewports</a></li>
+   <li><a href="#scrolling-0"><span class="secno">13.2 </span>Scrolling</a></ul></li>
+ <li><a href="#css-properties"><span class="secno">14 </span>CSS properties</a>
   <ul class="toc">
-   <li><a href="#smooth-scrolling:-the-'scroll-behavior'-property"><span class="secno">13.1 </span>Smooth Scrolling: The 'scroll-behavior' Property</a></ul></li>
+   <li><a href="#smooth-scrolling:-the-'scroll-behavior'-property"><span class="secno">14.1 </span>Smooth Scrolling: The 'scroll-behavior' Property</a></ul></li>
  <li><a class="no-num" href="#references">References</a></li>
  <li><a class="no-num" href="#acknowledgments">Acknowledgments</a></ul>
 <!--end-toc-->
@@ -219,6 +221,14 @@ HTML.
 
 <p class="issue"><dfn id="mouseevent"><code>MouseEvent</code></dfn> and <dfn id="mouseeventinit"><code>MouseEventInit</code></dfn> are defined in …
 
+<p><dfn id="dompoint"><code>DOMPoint</code></dfn>,
+<dfn id="dompointreadonly"><code>DOMPointReadOnly</code></dfn>,
+<dfn id="dompointinit"><code>DOMPointInit</code></dfn>,
+<dfn id="domrect"><code>DOMRect</code></dfn>,
+<dfn id="domrectreadonly"><code>DOMRectReadOnly</code></dfn>,
+<dfn id="domrectlist"><code>DOMRectList</code></dfn> and
+<dfn id="domquad"><code>DOMQuad</code></dfn> are defined in Geometry Interfaces Module. <a href="#refsGEOMETRY">[GEOMETRY]</a>
+
 <p><dfn id="the-html-body-element">The HTML <code title="">body</code> element</dfn> is the first
 <code title="">body</code>
 <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/infrastructure.html#html-elements" title="HTML elements">HTML element</a> child of the root
@@ -231,17 +241,15 @@ HTML.
 <dfn id="canvas">canvas</dfn> are defined by CSS.
 <!--<span data-anolis-ref>CSS</span>-->
 
-<p><dfn id="viewport">Viewport</dfn> and
-<dfn id="initial-containing-block">initial containing block</dfn> are
-defined by CSS 2.1 unless there is an ancestor <code title="">foreignObject</code>
-element in the <code title="">http://www.w3.org/2000/svg</code> namespace that has an associated <a href="#svg-layout-box">SVG layout box</a> in which
-case that element acts as viewport and initial containing block.
-<!--<span data-anolis-ref>CSS</span>-->
+<p><dfn id="viewport">Viewport</dfn> and <dfn id="initial-containing-block">initial containing block</dfn> are defined by CSS 2.1. <!--<span data-anolis-ref>CSS</span>-->
 
 <p><dfn id="block-flow-direction">Block flow direction</dfn> and <dfn id="inline-base-direction">inline base direction</dfn> are defined in CSS Writing Modes Module. <a href="#refsCSSWRITINGMODES">[CSSWRITINGMODES]</a>
 
-<p>A scrolling box of a <a href="#viewport">viewport</a> or element has two <dfn id="overflow-directions">overflow directions</dfn>, depending on the <a href="#viewport">viewport</a>'s or element's
-<a href="#block-flow-direction">block flow direction</a> and <a href="#inline-base-direction">inline base direction</a>, as follows:
+<p>Elements and <a href="#viewport" title="viewport">viewports</a> have an associated <dfn id="scrolling-box">scrolling box</dfn> if has a scrolling mechanism<!--XXX xref--> or it overflows
+its content area<!--XXX xref--> and the used value of the 'overflow-x' or 'overflow-y' property is 'hidden'. <a href="#refsCSSBOX">[CSSBOX]</a>
+
+<p>A <a href="#scrolling-box">scrolling box</a> of a <a href="#viewport">viewport</a> or element has two <dfn id="overflow-directions">overflow directions</dfn>, depending on the <a href="#viewport">viewport</a>'s or
+element's <a href="#block-flow-direction">block flow direction</a> and <a href="#inline-base-direction">inline base direction</a>, as follows:
 
 <dl class="switch">
  <dt>If the <a href="#block-flow-direction">block flow direction</a> is top-to-bottom and the <a href="#inline-base-direction">inline base direction</a> is left-to-right
@@ -257,7 +265,7 @@ case that element acts as viewport and initial containing block.
 </dl>
 
 <p>The term <dfn id="scrolling-area">scrolling area</dfn> refers to a box of a <a href="#viewport">viewport</a> or an element that has the following edges, depending on the
-<a href="#viewport">viewport</a>'s or element's scrolling box's <a href="#overflow-directions">overflow directions</a>.
+<a href="#viewport">viewport</a>'s or element's <a href="#scrolling-box">scrolling box</a>'s <a href="#overflow-directions">overflow directions</a>.
 
 <table class="complex data">
  <thead>
@@ -289,8 +297,8 @@ case that element acts as viewport and initial containing block.
      <dd><p>The right-most edge of the element's right <a href="#padding-edge">padding edge</a> and the right <a href="#margin-edge">margin edge</a> of the element's all descendant boxes,
      excluding boxes that have an ancestor of the element as their containing block.
      <dt>bottom edge
-     <dd><p>The bottom-most edge of the element's bottom <a href="#padding-edge">padding edge</a> and the bottom <a href="#margin-edge">margin edge</a> of the element's all descendant boxes,
-     excluding boxes that have an ancestor of the element as their containing block.
+     <dd><p>The bottom-most edge of the element's bottom <a href="#padding-edge">padding edge</a> and the bottom <a href="#margin-edge">margin edge</a> of the element's all descendant
+     boxes, excluding boxes that have an ancestor of the element as their containing block.
      <dt>left edge
      <dd><p>The element's left <a href="#padding-edge">padding edge</a>.
     </dl>
@@ -316,8 +324,8 @@ case that element acts as viewport and initial containing block.
      <dt>right edge
      <dd><p>The element's right <a href="#padding-edge">padding edge</a>.
      <dt>bottom edge
-     <dd><p>The bottom-most edge of the element's bottom <a href="#padding-edge">padding edge</a> and the bottom <a href="#margin-edge">margin edge</a> of the element's all descendant boxes,
-     excluding boxes that have an ancestor of the element as their containing block.
+     <dd><p>The bottom-most edge of the element's bottom <a href="#padding-edge">padding edge</a> and the bottom <a href="#margin-edge">margin edge</a> of the element's all descendant
+     boxes, excluding boxes that have an ancestor of the element as their containing block.
      <dt>left edge
      <dd><p>The left-most edge of the element's left <a href="#padding-edge">padding edge</a> and the left <a href="#margin-edge">margin edge</a> of the element's all descendant boxes,
      excluding boxes that have an ancestor of the element as their containing block.
@@ -418,22 +426,30 @@ layout box</a> (the column or column group, respectively).</p>
 
 <p>The term <dfn id="layout-box">layout box</dfn> refers to either a <a href="#css-layout-box">CSS layout box</a> or an <a href="#svg-layout-box">SVG layout box</a>.
 
+<p>The term <dfn id="transforms">transforms</dfn> refers to SVG transforms and CSS transforms. <a href="#refsSVG">[SVG]</a> <a href="#refsCSSTRANSFORMS">[CSSTRANSFORMS]</a>
+
+
 <h3 id="css-pixels"><span class="secno">3.1 </span>CSS pixels</h3>
 
 <p>All coordinates and dimensions for the APIs defined in this
-specification are in CSS pixels. <!--<span data-anolis-ref>CSS</span>-->
+specification are in CSS pixels, unless otherwise specified. <!--<span data-anolis-ref>CSS</span>-->
 
 <p class="note">This does not apply to e.g.
 <code title="dom-Window-matchMedia"><a href="#dom-window-matchmedia">matchMedia()</a></code> as the units
 are explicitly given there.</p>
 
 
+<h3 id="zooming"><span class="secno">3.2 </span>Zooming</h3>
+
+<p>There are two kinds of zoom, <dfn id="page-zoom">page zoom</dfn> which affects the size of the initial viewport<!-- XXX ref -->, and <dfn id="pinch-zoom">pinch zoom</dfn> which acts like
+a magnifying glass and does not affect the initial viewport<!-- XXX ref --> or actual viewport<!-- XXX ref -->. <a href="#refsCSSDEVICEADAPT">[CSSDEVICEADAPT]</a>
+
 
 <h2 id="common-infrastructure"><span class="secno">4 </span>Common Infrastructure</h2>
 
 <h3 id="scrolling"><span class="secno">4.1 </span>Scrolling</h3>
 
-<p>When a user agent is to <dfn id="perform-a-scroll">perform a scroll</dfn> of a scrolling box <var>box</var>, to a given position <var>position</var>, with a set of 
+<p>When a user agent is to <dfn id="perform-a-scroll">perform a scroll</dfn> of a <a href="#scrolling-box">scrolling box</a> <var>box</var>, to a given position <var>position</var>, with a set of 
 steps <var>task</var>, an associated element <var>element</var> and optionally a scroll behavior <var>behavior</var> (which is
 <code title="">auto</code> if omitted), the following steps must be run:
 
@@ -462,12 +478,12 @@ steps <var>task</var>, an associated element <var>element</var> and optionally a
   </ol>
 </ol>
 
-<p>When a user agent is to perform a <dfn id="concept-smooth-scroll" title="concept-smooth-scroll">smooth scroll</dfn> of a scrolling box <var>box</var> to <var>position</var>,
+<p>When a user agent is to perform a <dfn id="concept-smooth-scroll" title="concept-smooth-scroll">smooth scroll</dfn> of a <a href="#scrolling-box">scrolling box</a> <var>box</var> to <var>position</var>,
 it must update the scroll position of <var>box</var> in a user-agent-defined fashion over a user-agent-defined amount of time. When the scroll is
 <dfn id="concept-smooth-scroll-completed" title="concept-smooth-scroll-completed">completed</dfn>, the scroll position of <var>box</var> must be <var>position</var>. The scroll can also
 be <dfn id="concept-smooth-scroll-aborted" title="concept-smooth-scroll-aborted">aborted</dfn>, either by an algorithm or by the user. <!--fingerprint-->
 
-<p>When a user agent is to perform an <dfn id="concept-instant-scroll" title="concept-instant-scroll">instant scroll</dfn> of a scrolling box <var>box</var> to
+<p>When a user agent is to perform an <dfn id="concept-instant-scroll" title="concept-instant-scroll">instant scroll</dfn> of a <a href="#scrolling-box">scrolling box</a> <var>box</var> to
 <var>position</var>, it must update the scroll position of <var>box</var> to <var>position</var>.
 
 <p>To <dfn id="scroll-to-the-beginning-of-the-document">scroll to the beginning of the document</dfn> for a document <var>document</var>, follow these steps:
@@ -494,14 +510,18 @@ be <dfn id="concept-smooth-scroll-aborted" title="concept-smooth-scroll-aborted"
 <pre class="idl">enum <dfn id="scrollbehavior">ScrollBehavior</dfn> { "auto", "instant", "smooth" };
 
 dictionary <dfn id="scrolloptions">ScrollOptions</dfn> {
-  double x;
-  double y;
   <a href="#scrollbehavior">ScrollBehavior</a> behavior = "auto";
 };
 
 partial interface <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#window">Window</a> {
   <a href="#mediaquerylist">MediaQueryList</a> <a href="#dom-window-matchmedia" title="dom-Window-matchMedia">matchMedia</a>(DOMString query);
-  readonly attribute <a href="#screen">Screen</a> <a href="#dom-window-screen" title="dom-Window-screen">screen</a>;
+  [SameObject] readonly attribute <a href="#screen">Screen</a> <a href="#dom-window-screen" title="dom-Window-screen">screen</a>;
+
+  // browsing context
+  void <a href="#dom-window-moveto" title="dom-Window-moveTo">moveTo</a>(double x, double y);
+  void <a href="#dom-window-moveby" title="dom-Window-moveBy">moveBy</a>(double x, double y);
+  void <a href="#dom-window-resizeto" title="dom-Window-resizeTo">resizeTo</a>(double x, double y);
+  void <a href="#dom-window-resizeby" title="dom-Window-resizeBy">resizeBy</a>(double x, double y);
 
   // viewport
   readonly attribute double <a href="#dom-window-innerwidth" title="dom-Window-innerWidth">innerWidth</a>;
@@ -521,6 +541,7 @@ partial interface <a class="external" data-anolis-spec="html" href="http://www.w
   readonly attribute double <a href="#dom-window-screeny" title="dom-Window-screenY">screenY</a>;
   readonly attribute double <a href="#dom-window-outerwidth" title="dom-Window-outerWidth">outerWidth</a>;
   readonly attribute double <a href="#dom-window-outerheight" title="dom-Window-outerHeight">outerHeight</a>;
+  readonly attribute double <a href="#dom-window-devicepixelratio" title="dom-Window-devicePixelRatio">devicePixelRatio</a>;
 };</pre>
 
 <p>When the <dfn id="dom-window-matchmedia" title="dom-Window-matchMedia"><code>matchMedia(<var>query</var>)</code></dfn> method is invoked these steps must be run:</p>
@@ -535,10 +556,74 @@ partial interface <a class="external" data-anolis-spec="html" href="http://www.w
 </ol>
 
 <p>The <dfn id="dom-window-screen" title="dom-Window-screen"><code>screen</code></dfn> attribute must return the <code><a href="#screen">Screen</a></code> object
-associated with the <code class="external" data-anolis-spec="html"><a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#window">Window</a></code> object. It always returns the same
-object.</p>
+associated with the <code class="external" data-anolis-spec="html"><a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#window">Window</a></code> object.</p>
 <p class="note">Accessing <code title="dom-Window-screen"><a href="#dom-window-screen">screen</a></code> through a <code class="external" data-anolis-spec="html"><a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#windowproxy">WindowProxy</a></code> object might yield different
 results when the <code class="external" data-anolis-spec="dom"><a href="http://dom.spec.whatwg.org/#document">Document</a></code> is navigated.</p>
+
+<p>The <dfn id="dom-window-moveto" title="dom-Window-moveTo">moveTo(<var>x</var>, <var>y</var>)</dfn> method must follow these steps:
+
+<ol>
+ <li><p>Optionally, terminate these steps.
+ <li><p>Let <var>target</var> be the <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#browsing-context">browsing context</a> of the <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#context-object">context
+ object</a>.
+ <li><p>Let <var>source</var> be the <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#browsing-context">browsing context</a> of the <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#incumbent-script">incumbent script</a>.
+ <li><p>If <var>source</var> is not <a href="#allowed-to-resize-and-move">allowed to resize and move</a> <var>target</var>, terminate these steps.
+ <li><p>Optionally, clamp <var>x</var> and <var>y</var> in a user-agent-defined manner so that the window does not move outside the available space.
+ <li><p>Move <var>target</var>'s window such that the window's top left corner is at coordinates (<var>x</var>, <var>y</var>) relative to the top left corner of
+ the output device, measured in CSS pixels of <var>target</var>. The positive axes are rightward and downward.
+</ol>
+
+<p>The <dfn id="dom-window-moveby" title="dom-Window-moveBy">moveBy(<var>x</var>, <var>y</var>)</dfn> method must follow these steps:
+
+<ol>
+ <li><p>Optionally, terminate these steps.
+ <li><p>Let <var>target</var> be the <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#browsing-context">browsing context</a> of the <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#context-object">context
+ object</a>.
+ <li><p>Let <var>source</var> be the <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#browsing-context">browsing context</a> of the <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#incumbent-script">incumbent script</a>.
+ <li><p>If <var>source</var> is not <a href="#allowed-to-resize-and-move">allowed to resize and move</a> <var>target</var>, terminate these steps.
+ <li><p>Optionally, clamp <var>x</var> and <var>y</var> in a user-agent-defined manner so that the window does not move outside the available space.
+ <li><p>Move <var>target</var>'s window <var>x</var> CSS pixels of <var>target</var> righward and <var>y</var> CSS pixels of <var>target</var> downward.
+</ol>
+
+
+<p>The <dfn id="dom-window-resizeto" title="dom-Window-resizeTo">resizeTo(<var>x</var>, <var>y</var>)</dfn> method must follow these steps:
+
+<ol>
+ <li><p>Optionally, terminate these steps.
+ <li><p>Let <var>target</var> be the <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#browsing-context">browsing context</a> of the <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#context-object">context
+ object</a>.
+ <li><p>Let <var>source</var> be the <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#browsing-context">browsing context</a> of the <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#incumbent-script">incumbent script</a>.
+ <li><p>If <var>source</var> is not <a href="#allowed-to-resize-and-move">allowed to resize and move</a> <var>target</var>, terminate these steps.
+ <li><p>Optionally, clamp <var>x</var> and <var>y</var> in a user-agent-defined manner so that the window does not get too small or bigger than the available
+ space. 
+ <li><p>Resize <var>target</var>'s window by moving its right and bottom edges such that the distance between the left and right edges of the viewport are
+ <var>x</var> CSS pixels of <var>target</var> and the distance between the top and bottom edges of the viewport are <var>y</var> CSS pixels of
+ <var>target</var>.
+ <li><p>Optionally, move <var>target</var>'s window in a user-agent-defined manner so that it does not grow outside the available space.
+</ol>
+
+<p>The <dfn id="dom-window-resizeby" title="dom-Window-resizeBy">resizeBy(<var>x</var>, <var>y</var>)</dfn> method must follow these steps:
+
+<ol>
+ <li><p>Optionally, terminate these steps.
+ <li><p>Let <var>target</var> be the <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#browsing-context">browsing context</a> of the <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#context-object">context
+ object</a>.
+ <li><p>Let <var>source</var> be the <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#browsing-context">browsing context</a> of the <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#incumbent-script">incumbent script</a>.
+ <li><p>If <var>source</var> is not <a href="#allowed-to-resize-and-move">allowed to resize and move</a> <var>target</var>, terminate these steps.
+ <li><p>Optionally, clamp <var>x</var> and <var>y</var> in a user-agent-defined manner so that the window does not get too small or bigger than the available
+ space. 
+ <li><p>Resize <var>target</var>'s window by moving its right edge <var>x</var> CSS pixels of <var>target</var> righward and its bottom edge <var>y</var> CSS
+ pixels of <var>target</var> downward.
+ <li><p>Optionally, move <var>target</var>'s window in a user-agent-defined manner so that it does not grow outside the available space.
+</ol>
+
+<p>A <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#browsing-context">browsing context</a> <var>A</var> is <dfn id="allowed-to-resize-and-move">allowed to resize and move</dfn> a <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#browsing-context">browsing
+context</a> <var>B</var> if all the following conditions are met:
+
+<ul>
+ <li><p><var>B</var> is an <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#auxiliary-browsing-context">auxiliary browsing context</a> that was created by a script (as opposed to by an action of the user).
+ <li><p><var>A</var> is <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#familiar-with">familiar with</a> <var>B</var>.
+</ul>
 
 <p>The <dfn id="dom-window-innerwidth" title="dom-Window-innerWidth"><code>innerWidth</code></dfn> attribute must return the <a href="#viewport">viewport</a> width including the size of a rendered
 scroll bar (if any), or zero if there is no <a href="#viewport">viewport</a>. <!--fingerprint--></p>
@@ -632,8 +717,96 @@ attribute must return zero. <!--fingerprint--></p>
 client window. If there is no client window this
 attribute must return zero. <!--fingerprint--></p>
 
+<p>The <dfn id="dom-window-devicepixelratio" title="dom-Window-devicePixelRatio"><code>devicePixelRatio</code></dfn> attribute must return the result of the following algorithm:
 
-<h3 id="the-mediaquerylist-interface"><span class="secno">5.1 </span>The <code title="">MediaQueryList</code> Interface</h3>
+<ol>
+ <li><p>If there is no output device, return 1 and abort these steps.
+ <li><p>Let <var>CSS pixel size</var> be the size of a CSS pixel at the current <a href="#page-zoom">page zoom</a> scale factor and at a <a href="#pinch-zoom">pinch zoom</a> scale
+ factor of 1.0.
+ <li><p>Let <var>device pixel size</var> be the size of a device pixel of the output device, in one dimension (vertical or horizontal). If the device pixel is
+ not square, then use the smaller of the vertical or horizontal size of the smallest bounding box of the device pixel.
+ <li><p>Return the result of dividing <var>CSS pixel size</var> by <var>device pixel size</var>.
+</ol>
+
+
+<h4 id="the-features-argument-to-the-open()-method"><span class="secno">5.1 </span>The <var>features</var> argument to the <code title="">open()</code> method</h4>
+
+<p>HTML defines the <code class="external" data-anolis-spec="html" title="dom-open"><a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#dom-open">open()</a></code> method but has no defined effect for the third argument, <var>features</var>.
+<a href="#refsHTML">[HTML]</a>
+
+<p>This specification defines the effect of the <var>features</var> argument for user agents that do not opt to ignore it, as follows:
+
+<ol>
+ <li><p>If the method does not result in a new <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#auxiliary-browsing-context">auxiliary browsing context</a> being created, terminate these steps.
+ <li><p>Let <var>target</var> be the new <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#auxiliary-browsing-context">auxiliary browsing context</a>.
+ <li><p>Let <var>tokens</var> be the result of <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/common-microsyntaxes.html#split-a-string-on-commas" title="split a string on commas">splitting <var>features</var> on commas</a>.
+ <li><p>Let <var>parsed features</var> be a new empty dictionary.
+ <li><p><i>Token loop</i>: For each token <var>token</var> in <var>tokens</var>, follow these substeps:
+  <ol>
+   <li><p>Let <var>input</var> be <var>token</var>.
+   <li><p>Let <var>position</var> point at the first character of <var>input</var>.
+   <li><p><a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/common-microsyntaxes.html#skip-whitespace">Skip whitespace</a>.
+   <li><p><a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/common-microsyntaxes.html#collect-a-sequence-of-characters">Collect a sequence of characters</a> that are not <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/common-microsyntaxes.html#space-character" title="space character">space
+   characters</a> nor "<code title="">=</code>" (U+003D). Let <var>name</var> be the collected characters, <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#converted-to-ascii-lowercase">converted to ASCII
+   lowercase</a>.
+   <li><p>If <var>name</var> is in <var>parsed features</var> or if <var>name</var> is not a <a href="#supported-open()-feature-name">supported <code title="">open()</code> feature name</a>,
+   continue <i>token loop</i>.
+   <li><p><a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/common-microsyntaxes.html#skip-whitespace">Skip whitespace</a>.
+   <li><p>If the character at <var>position</var> is not "<code title="">=</code>" (U+003D), continue <i>token loop</i>.
+   <li><p>Advance <var>position</var> by one.
+   <li><p>If <var>position</var> is past the end of <var>input</var>, continue <i>token loop</i>.
+   <li><p><a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/common-microsyntaxes.html#collect-a-sequence-of-characters">Collect a sequence of characters</a> that are any characters. Let <var>raw value</var> be the collected characters.
+   <li><p>Let <var>value</var> be the result of invoking the <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/common-microsyntaxes.html#rules-for-parsing-integers">rules for parsing integers</a> on <var>raw value</var>.
+   <li><p>If <var>value</var> is an error, continue <i>token loop</i>.
+   <li><p>Set <var>name</var> in <var>parsed features</var> to <var>value</var>.
+  </ol>
+ <li><p>If <code title="dom-open-features-left"><a href="#dom-open-features-left">left</a></code> is present in <var>parsed features</var>, follow these substeps:
+  <ol>
+   <li><p>Let <var>x</var> be the value of <code title="dom-open-features-left"><a href="#dom-open-features-left">left</a></code>.
+   <li><p>Optionally, clamp <var>x</var> in a user-agent-defined manner so that the window does not move outside the available space.
+   <li><p>Optionally, move <var>target</var>'s window such that the window's left edge is at the horizontal coordinate <var>x</var> relative to the left edge of
+   the output device, measured in CSS pixels of <var>target</var>. The positive axis is rightward.
+  </ol>
+ <li><p>If <code title="dom-open-features-top"><a href="#dom-open-features-top">top</a></code> is present in <var>parsed features</var>, follow these substeps:
+  <ol>
+   <li><p>Let <var>y</var> be the value of <code title="dom-open-features-top"><a href="#dom-open-features-top">top</a></code>.
+   <li><p>Optionally, clamp <var>y</var> in a user-agent-defined manner so that the window does not move outside the available space.
+   <li><p>Optionally, move <var>target</var>'s window such that the window's top edge is at the vertical coordinate <var>y</var> relative to the top edge of
+   the output device, measured in CSS pixels of <var>target</var>. The positive axis is downward.
+  </ol>
+ <li><p>If <code title="dom-open-features-width"><a href="#dom-open-features-width">width</a></code> is present in <var>parsed features</var>, follow these substeps:
+  <ol>
+   <li><p>Let <var>x</var> be the value of <code title="dom-open-features-width"><a href="#dom-open-features-width">width</a></code>.
+   <li><p>Optionally, clamp <var>x</var> in a user-agent-defined manner so that the window does not get too small or bigger than the available space. 
+   <li><p>Optionally, size <var>target</var>'s window by moving its right edge such that the distance between the left and right edges of the viewport are
+   <var>x</var> CSS pixels of <var>target</var>.
+   <li><p>Optionally, move <var>target</var>'s window in a user-agent-defined manner so that it does not grow outside the available space.
+  </ol>
+ <li><p>If <code title="dom-open-features-height"><a href="#dom-open-features-height">height</a></code> is present in <var>parsed features</var>, follow these substeps:
+  <ol>
+   <li><p>Let <var>y</var> be the value of <code title="dom-open-features-height"><a href="#dom-open-features-height">height</a></code>.
+   <li><p>Optionally, clamp <var>y</var> in a user-agent-defined manner so that the window does not get too small or bigger than the available space. 
+   <li><p>Optionally, size <var>target</var>'s window by moving its bottom edge such that the distance between the top and bottom edges of the viewport are
+   <var>y</var> CSS pixels of <var>target</var>.
+   <li><p>Optionally, move <var>target</var>'s window in a user-agent-defined manner so that it does not grow outside the available space.
+  </ol>
+</ol>
+
+<p>A <dfn id="supported-open()-feature-name">supported <code title="">open()</code> feature name</dfn> is one of the following:
+
+<dl>
+ <dt><dfn id="dom-open-features-width" title="dom-open-features-width">width</dfn>
+ <dd><p>The width of the viewport.
+ <dt><dfn id="dom-open-features-height" title="dom-open-features-height">height</dfn>
+ <dd><p>The height of the viewport.
+ <dt><dfn id="dom-open-features-left" title="dom-open-features-left">left</dfn>
+ <dd><p>The left position of the window.
+ <dt><dfn id="dom-open-features-top" title="dom-open-features-top">top</dfn>
+ <dd><p>The top position of the window.
+</dl> 
+
+
+<h3 id="the-mediaquerylist-interface"><span class="secno">5.2 </span>The <code title="">MediaQueryList</code> Interface</h3>
 
 <p>A <code><a href="#mediaquerylist">MediaQueryList</a></code> object has an associated media query list set on creation and an associated
 <dfn id="list-of-media-query-list-listeners">list of media query list listeners</dfn>, which is initially empty.</p>
@@ -675,7 +848,7 @@ it is already in the <a href="#list-of-media-query-list-listeners">list of media
 <p>When the <dfn id="dom-mediaquerylist-removelistener" title="dom-MediaQueryList-removeListener"><code>removeListener(<var>listener</var>)</code></dfn> method is invoked
 <var>listener</var> must be removed from the <a href="#list-of-media-query-list-listeners">list of media query list listeners</a>.</p>
 
-<h3 id="the-screen-interface"><span class="secno">5.2 </span>The <code title="">Screen</code> Interface</h3>
+<h3 id="the-screen-interface"><span class="secno">5.3 </span>The <code title="">Screen</code> Interface</h3>
 
 <p>As its name suggests, the <code><a href="#screen">Screen</a></code> interface represents information about the screen of the output device.</p>
 
@@ -688,15 +861,15 @@ it is already in the <a href="#list-of-media-query-list-listeners">list of media
   readonly attribute unsigned long <a href="#dom-screen-pixeldepth" title="dom-Screen-pixelDepth">pixelDepth</a>;
 };</pre>
 
-<p>The <dfn id="dom-screen-availwidth" title="dom-Screen-availWidth"><code>availWidth</code></dfn> attribute must return the available width of the rendering surface of the output
-device. <!--fingerprint--></p>
+<p>The <dfn id="dom-screen-availwidth" title="dom-Screen-availWidth"><code>availWidth</code></dfn> attribute must return the available width of the rendering surface of the output device,
+in CSS pixels. <!--fingerprint--></p>
 
 <p>The <dfn id="dom-screen-availheight" title="dom-Screen-availHeight"><code>availHeight</code></dfn> attribute must return the available height of the rendering surface of the output
-device. <!--fingerprint--></p>
+device, in CSS pixels. <!--fingerprint--></p>
 
-<p>The <dfn id="dom-screen-width" title="dom-Screen-width"><code>width</code></dfn> attribute must return the width of the output device. <!--fingerprint--></p>
+<p>The <dfn id="dom-screen-width" title="dom-Screen-width"><code>width</code></dfn> attribute must return the width of the output device, in CSS pixels. <!--fingerprint--></p>
 
-<p>The <dfn id="dom-screen-height" title="dom-Screen-height"><code>height</code></dfn> attribute must return the height of the output device. <!--fingerprint--></p>
+<p>The <dfn id="dom-screen-height" title="dom-Screen-height"><code>height</code></dfn> attribute must return the height of the output device, in CSS pixels. <!--fingerprint--></p>
 
 <p>The <dfn id="dom-screen-colordepth" title="dom-Screen-colorDepth"><code>colorDepth</code></dfn> attribute must return 24.</p>
 
@@ -721,7 +894,7 @@ included for compatibility.
  <var>y</var> is greater than the <a href="#viewport">viewport</a> height excluding the size of a rendered scroll bar (if any), or there is no <a href="#viewport">viewport</a>
  associated with the document, return null and terminate these steps.
  <li><p>If there is a <a href="#layout-box">layout box</a> in the <a href="#viewport">viewport</a> that would be a target for hit testing at coordinates <var>x</var>,<var>y</var>,
- return the associated element and terminate these steps.
+ when applying the <a href="#transforms">transforms</a> that apply to the descendants of the <a href="#viewport">viewport</a>, return the associated element and terminate these steps.
  <li><p>If the document has a root element, return the root element and terminate these steps.
  <li><p>Return null.
 </ol>
@@ -737,7 +910,8 @@ instance, an element can be excluded from being a target for hit testing by usin
  <var>y</var> is greater than the <a href="#viewport">viewport</a> height excluding the size of a rendered scroll bar (if any), or there is no <a href="#viewport">viewport</a>
  associated with the document, return <var>sequence</var> and terminate these steps.
  <li><p>For each <a href="#layout-box">layout box</a> in the <a href="#viewport">viewport</a>, in paint order, starting with the topmost box, that would be a target for hit testing at
- coordinates <var>x</var>,<var>y</var> even if nothing would be overlapping it, append the associated element to <var>sequence</var>.
+ coordinates <var>x</var>,<var>y</var> even if nothing would be overlapping it, when applying the <a href="#transforms">transforms</a> that apply to the descendants of the
+ <a href="#viewport">viewport</a>, append the associated element to <var>sequence</var>.
  <li><p>If the document has a root element, and the last item in <var>sequence</var> is not the root element, append the root element to <var>sequence</var>.
  <li><p>Return <var>sequence</var>.
 </ol>
@@ -753,13 +927,12 @@ result of running these steps:</p>
  (if any) return null.</li>
  <li><p>If at the coordinates <var>x</var>,<var>y</var>
  in the <a href="#viewport">viewport</a> no text insertion point indicator would have
- been inserted return null.</li>
+ been inserted when applying the <a href="#transforms">transforms</a> that apply to the descendants of the <a href="#viewport">viewport</a>, return null.</li>
  <li>
   <p>If at the coordinates <var>x</var>,<var>y</var>
   in the <a href="#viewport">viewport</a> a text insertion point indicator would have
-  been inserted in a text entry widget which is also a replaced element
-  return a <a href="#caret-position">caret position</a> with its properties set as
-  follows:</p>
+  been inserted in a text entry widget which is also a replaced element, when applying the <a href="#transforms">transforms</a> that apply to the descendants of the
+  <a href="#viewport">viewport</a>, return a <a href="#caret-position">caret position</a> with its properties set as follows:</p>
   <dl>
    <dt><a href="#caret-node">caret node</a></dt>
    <dd><p>The node corresponding to the text entry widget.</dd>
@@ -774,8 +947,8 @@ result of running these steps:</p>
   <p>Otherwise, return a <a href="#caret-position">caret position</a> where the
   <a href="#caret-range">caret range</a> is a collapsed
   <code class="external" data-anolis-spec="dom"><a href="http://dom.spec.whatwg.org/#range">Range</a></code> object for the position
-  where the text insertion point indicator would have been inserted and
-  the other properties are set as follows:</p>
+  where the text insertion point indicator would have been inserted when applying the <a href="#transforms">transforms</a> that apply to the descendants of the
+  <a href="#viewport">viewport</a>, and the other properties are set as follows:</p>
   <dl>
    <dt><a href="#caret-node">caret node</a></dt>
    <dd><p>The <code class="external" data-anolis-spec="dom" title="dom-Range-startContainer"><a href="http://dom.spec.whatwg.org/#dom-range-startcontainer">startContainer</a></code>
@@ -801,7 +974,7 @@ revision of CSS or HTML.</p>
 <pre class="idl">interface <dfn id="caretposition">CaretPosition</dfn> {
   readonly attribute <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#node">Node</a> <a href="#dom-caretposition-offsetnode" title="dom-CaretPosition-offsetNode">offsetNode</a>;
   readonly attribute unsigned long <a href="#dom-caretposition-offset" title="dom-CaretPosition-offset">offset</a>;
-  <a href="#clientrect">ClientRect</a>? <a href="#dom-caretposition-getclientrect" title="dom-CaretPosition-getClientRect">getClientRect</a>();
+  <a href="#domrect">DOMRect</a>? <a href="#dom-caretposition-getclientrect" title="dom-CaretPosition-getClientRect">getClientRect</a>();
 };</pre>
 
 <p>The <dfn id="dom-caretposition-offsetnode" title="dom-CaretPosition-offsetNode"><code>offsetNode</code></dfn> attribute must return the <a href="#caret-node">caret node</a>.</p>
@@ -818,22 +991,31 @@ returns a value:</p>
    <code title="dom-Range-getClientRects"><a href="#dom-range-getclientrects">getClientRects()</a></code> method on the
    range.
    <li><p>If <var>list</var> is empty, return null.
-   <li><p>Return the <code><a href="#clientrect">ClientRect</a></code> object in <var>list</var> at index 0.
+   <li><p>Return the <code><a href="#domrect">DOMRect</a></code> object in <var>list</var> at index 0.
   </ol>
  <li><p>If <a href="#caret-node">caret node</a> is a text entry widget that is a replaced element,
- and that is in the document, return a <code><a href="#clientrect">ClientRect</a></code> object for the caret
- in the widget as represented by the <a href="#caret-offset">caret offset</a> value.
+ and that is in the document, return a <code><a href="#domrect">DOMRect</a></code> object for the caret
+ in the widget as represented by the <a href="#caret-offset">caret offset</a> value. The <a href="#transforms">transforms</a> that apply to the element and its ancestors are
+ applied.
  <li><p>Return null.
 </ol>
 
 <h2 id="extensions-to-the-element-interface"><span class="secno">7 </span>Extensions to the <code title="">Element</code> Interface</h2>
 
-<pre class="idl">partial interface <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#element">Element</a> {
-  <a href="#clientrectlist">ClientRectList</a> <a href="#dom-element-getclientrects" title="dom-Element-getClientRects">getClientRects</a>();
-  <a href="#clientrect">ClientRect</a> <a href="#dom-element-getboundingclientrect" title="dom-Element-getBoundingClientRect">getBoundingClientRect</a>();
-  void <a href="#dom-element-scrollintoview" title="dom-Element-scrollIntoView">scrollIntoView</a>(optional boolean top = true, optional <a href="#scrolloptions">ScrollOptions</a> options);
-  attribute (double or <a href="#scrolloptions">ScrollOptions</a>) <a href="#dom-element-scrolltop" title="dom-Element-scrollTop">scrollTop</a>;
-  attribute (double or <a href="#scrolloptions">ScrollOptions</a>) <a href="#dom-element-scrollleft" title="dom-Element-scrollLeft">scrollLeft</a>;
+<pre class="idl">dictionary <dfn id="scrolloptionshorizontal">ScrollOptionsHorizontal</dfn> : <a href="#scrolloptions">ScrollOptions</a> {
+  double x;
+};
+dictionary <dfn id="scrolloptionsvertical">ScrollOptionsVertical</dfn> : <a href="#scrolloptions">ScrollOptions</a>  {
+  double y;
+};
+
+partial interface <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#element">Element</a> {
+  <a href="#domrectlist">DOMRectList</a> <a href="#dom-element-getclientrects" title="dom-Element-getClientRects">getClientRects</a>();
+  <a href="#domrect">DOMRect</a> <a href="#dom-element-getboundingclientrect" title="dom-Element-getBoundingClientRect">getBoundingClientRect</a>();
+  void <a href="#dom-element-scrollintoview" title="dom-Element-scrollIntoView">scrollIntoView</a>();
+  void <a href="#dom-element-scrollintoview" title="dom-Element-scrollIntoView">scrollIntoView</a>(boolean top, optional <a href="#scrolloptions">ScrollOptions</a> options);
+  attribute (double or <a href="#scrolloptionsvertical">ScrollOptionsVertical</a>) <a href="#dom-element-scrolltop" title="dom-Element-scrollTop">scrollTop</a>;
+  attribute (double or <a href="#scrolloptionshorizontal">ScrollOptionsHorizontal</a>) <a href="#dom-element-scrollleft" title="dom-Element-scrollLeft">scrollLeft</a>;
   readonly attribute double <a href="#dom-element-scrollwidth" title="dom-Element-scrollWidth">scrollWidth</a>;
   readonly attribute double <a href="#dom-element-scrollheight" title="dom-Element-scrollHeight">scrollHeight</a>;
   readonly attribute double <a href="#dom-element-clienttop" title="dom-Element-clientTop">clientTop</a>;
@@ -845,19 +1027,19 @@ returns a value:</p>
 <p>The <dfn id="dom-element-getclientrects" title="dom-Element-getClientRects"><code>getClientRects()</code></dfn> method, when invoked, must return the result of the following algorithm:</p>
 <ol>
  <li><p>If the element on which it was invoked does not have an associated
- <a href="#layout-box">layout box</a> return an empty <code><a href="#clientrectlist">ClientRectList</a></code> object and stop
+ <a href="#layout-box">layout box</a> return an empty <code><a href="#domrectlist">DOMRectList</a></code> object and stop
  this algorithm.</li>
  <li><p>If the element has an associated <a href="#svg-layout-box">SVG layout box</a> return a
- <code><a href="#clientrectlist">ClientRectList</a></code> object containing a single
- <code><a href="#clientrect">ClientRect</a></code> object that describes the bounding box of the
- element as defined by the SVG specification.
- <a href="#refsSVG">[SVG]</a></li>
+ <code><a href="#domrectlist">DOMRectList</a></code> object containing a single
+ <code><a href="#domrect">DOMRect</a></code> object that describes the bounding box of the
+ element as defined by the SVG specification, applying the <a href="#transforms">transforms</a> that apply to the element and its ancestors.</li>
  <li>
-  <p>Return a <code><a href="#clientrectlist">ClientRectList</a></code> object containing a list of
-  <code><a href="#clientrect">ClientRect</a></code> objects in content order describing the border
+  <p>Return a <code><a href="#domrectlist">DOMRectList</a></code> object containing a list of
+  <code><a href="#domrect">DOMRect</a></code> objects in content order describing the bounding border
   boxes (including those with a height or width of zero) with the
   following constraints:</p>
   <ul>
+   <li><p>Apply the <a href="#transforms">transforms</a> that apply to the element and its ancestors.
    <li><p>If the element on which the method was invoked has a computed
    value for the 'display' property of 'table' or
    'inline-table' include both the table box and the caption
@@ -876,12 +1058,12 @@ algorithm:</p>
  <li><p>Let <var>list</var> be the result of invoking
  <code title="dom-Element-getClientRects"><a href="#dom-element-getclientrects">getClientRects()</a></code> on the
  same element this method was invoked on.</li>
- <li><p>If the <var>list</var> is empty return a <code><a href="#clientrect">ClientRect</a></code>
- object whose <code title="dom-ClientRect-top"><a href="#dom-clientrect-top">top</a></code>,
- <code title="dom-ClientRect-right"><a href="#dom-clientrect-right">right</a></code>,
- <code title="dom-ClientRect-bottom"><a href="#dom-clientrect-bottom">bottom</a></code> and
- <code title="dom-ClientRect-left"><a href="#dom-clientrect-left">left</a></code> members are zero.</li>
- <li><p>Otherwise, return a <code><a href="#clientrect">ClientRect</a></code> object describing the
+ <li><p>If the <var>list</var> is empty return a <code><a href="#domrect">DOMRect</a></code>
+ object whose <code title="">x</code>,
+ <code title="">y</code>,
+ <code title="">width</code> and
+ <code title="">height</code> members are zero.</li>
+ <li><p>Otherwise, return a <code><a href="#domrect">DOMRect</a></code> object describing the
  smallest rectangle that includes the first rectangle in <var>list</var>
  and all of the remaining rectangles of which the height or width is not
  zero.</li>
@@ -896,6 +1078,9 @@ var exampleHeight = example.height;</pre>
 
 <p>The <dfn id="dom-element-scrollintoview" title="dom-Element-scrollIntoView"><code>scrollIntoView(<var>top</var>, <var>options</var>)</code></dfn> method must run these steps:</p>
 <ol>
+ <li><p>If invoked with no arguments, let <var>top</var> be true and let <var>options</var> be a <code><a href="#scrolloptions">ScrollOptions</a></code> dictionary with its members not
+ present or present with the default value, as appropriate.
+ <!-- scrollIntoView() means top=true but scrollIntoView(undefined) means top=false, to align with impls. -->
  <li><p>If the element does not have any associated <a href="#layout-box">layout box</a> terminate these steps.</li>
  <li><p><a href="#scroll-an-element-into-view" title="scroll an element into view">Scroll the element into view</a> with the
  <i>align to top flag</i> set if <var>top</var> is true, and the scroll behavior being the value of the <code title="">behavior</code>
@@ -903,115 +1088,114 @@ var exampleHeight = example.height;</pre>
  <li><p>Optionally perform some other action that brings the element to the user's attention.
 </ol>
 
-<p>The <dfn id="dom-element-scrolltop" title="dom-Element-scrollTop"><code>scrollTop</code></dfn> attribute must return the result of running these steps:</p>
+<p>The <dfn id="dom-element-scrolltop" title="dom-Element-scrollTop"><code>scrollTop</code></dfn> attribute, on getting, must return the result of running these steps:</p>
 <ol>
- <li><p>If the element does not have any associated <a href="#css-layout-box">CSS layout box</a> or the
- element is the root element and the <code class="external" data-anolis-spec="dom"><a href="http://dom.spec.whatwg.org/#document">Document</a></code> is in
- <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-document-quirks" title="concept-document-quirks">quirks mode</a> return zero and terminate these steps.</li>
+ <li><p>If the element is the root element and the <code class="external" data-anolis-spec="dom"><a href="http://dom.spec.whatwg.org/#document">Document</a></code> is in
+ <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-document-quirks" title="concept-document-quirks">quirks mode</a>, return zero and terminate these steps.</li>
  <li><p>If the element is the root element return the value of
  <code title="dom-Window-scrollY"><a href="#dom-window-scrolly">scrollY</a></code>.</li>
  <li><p>If the element is <a href="#the-html-body-element">the HTML <code title="">body</code> element</a>,
- the <code class="external" data-anolis-spec="dom"><a href="http://dom.spec.whatwg.org/#document">Document</a></code> is in <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-document-quirks" title="concept-document-quirks">quirks mode</a>, and the element
- does not have any overflow, return the value of
+ the <code class="external" data-anolis-spec="dom"><a href="http://dom.spec.whatwg.org/#document">Document</a></code> is in <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-document-quirks" title="concept-document-quirks">quirks mode</a>, and the element does not have
+ an associated <a href="#scrolling-box">scrolling box</a>, return the value of
  <code title="dom-Window-scrollY"><a href="#dom-window-scrolly">scrollY</a></code>.</li>
+ <li><p>If the element does not have any associated <a href="#css-layout-box">CSS layout box</a>, return zero and terminate these steps.</li>
  <li><p>Return the y-coordinate of the <a href="#scrolling-area">scrolling area</a> at the
  alignment point with the top of the <a href="#padding-edge">padding edge</a> of the
  element.</li>
 </ol>
 <p>When setting the <code title="dom-Element-scrollTop"><a href="#dom-element-scrolltop">scrollTop</a></code> attribute these steps must be run:</p>
 <ol>
- <li><p>If the given value is a <code><a href="#scrolloptions">ScrollOptions</a></code> object, and the <code title="">y</code> dictionary member is not present, abort these steps.
- <li><p>If the given value is a <code><a href="#scrolloptions">ScrollOptions</a></code> object, let <var>y</var> be the value of the <code title="">y</code> dictionary member. Otherwise,
- let <var>y</var> be the given value.</li>
- <li><p>If the element does not have any associated <a href="#css-layout-box">CSS layout box</a>, the
- element is the root element and the <code class="external" data-anolis-spec="dom"><a href="http://dom.spec.whatwg.org/#document">Document</a></code> is in
- <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-document-quirks" title="concept-document-quirks">quirks mode</a>, or the element has no associated scrolling box, or the element has no overflow,
- terminate these steps.</li>
+ <li><p>If the given value is a <code><a href="#scrolloptionsvertical">ScrollOptionsVertical</a></code> object, and the <code title="">y</code> dictionary member is not present, abort these steps.
+ <li><p>If the given value is a <code><a href="#scrolloptionsvertical">ScrollOptionsVertical</a></code> object, let <var>y</var> be the value of the <code title="">y</code> dictionary member.
+ Otherwise, let <var>y</var> be the given value.</li>
+ <li><p>If the element is the root element and the <code class="external" data-anolis-spec="dom"><a href="http://dom.spec.whatwg.org/#document">Document</a></code> is in
+ <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-document-quirks" title="concept-document-quirks">quirks mode</a>, terminate these steps.</li>
  <li><p>If the element is the root element invoke
- <code title="dom-Window-scroll"><a href="#dom-window-scroll">scroll()</a></code> with zero as first
- argument and <var>y</var> as second, and, if the given value is a <code><a href="#scrolloptions">ScrollOptions</a></code> object, the given value as the third argument.</li>
+ <code title="dom-Window-scroll"><a href="#dom-window-scroll">scroll()</a></code> with <code title="dom-Window-scrollX"><a href="#dom-window-scrollx">scrollX</a></code> as first
+ argument and <var>y</var> as second, and, if the given value is a <code><a href="#scrolloptionsvertical">ScrollOptionsVertical</a></code> object, the given value as the third argument.</li>
  <li><p>If the element is <a href="#the-html-body-element">the HTML <code title="">body</code> element</a>,
  the <code class="external" data-anolis-spec="dom"><a href="http://dom.spec.whatwg.org/#document">Document</a></code> is in <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-document-quirks" title="concept-document-quirks">quirks mode</a>, and the element
- does not have any vertical overflow, invoke
+ does not have an associated <a href="#scrolling-box">scrolling box</a>, invoke
  <code title="dom-Window-scroll"><a href="#dom-window-scroll">scroll()</a></code> with
  <code title="dom-Window-scrollX"><a href="#dom-window-scrollx">scrollX</a></code> as first
- argument and <var>y</var> as second, and, if the given value is a <code><a href="#scrolloptions">ScrollOptions</a></code> object, the given value as the third argument.</li>
+ argument and <var>y</var> as second, and, if the given value is a <code><a href="#scrolloptionsvertical">ScrollOptionsVertical</a></code> object, the given value as the third argument, and
+ terminate these steps.</li>
+ <li><p>If the element does not have any associated <a href="#css-layout-box">CSS layout box</a>, the element has no associated <a href="#scrolling-box">scrolling box</a>, or the element has no
+ overflow, terminate these steps.</li>
  <li><p><a href="#scroll-an-element" title="scroll an element">Scroll the element</a> to
  <code title="dom-Element-scrollLeft"><a href="#dom-element-scrollleft">scrollLeft</a></code>,<var>y</var>, with the scroll behavior being the value of the <code title="">behavior</code> dictionary
- member if the given value is a <code><a href="#scrolloptions">ScrollOptions</a></code> object, or <code title="">auto</code> otherwise.
+ member if the given value is a <code><a href="#scrolloptionsvertical">ScrollOptionsVertical</a></code> object, or <code title="">auto</code> otherwise.
 </ol>
 
-<p>The <dfn id="dom-element-scrollleft" title="dom-Element-scrollLeft"><code>scrollLeft</code></dfn> attribute must return the result of running these steps:</p>
+<p>The <dfn id="dom-element-scrollleft" title="dom-Element-scrollLeft"><code>scrollLeft</code></dfn> attribute, on getting, must return the result of running these steps:</p>
 <ol>
- <li><p>If the element does not have any associated <a href="#css-layout-box">CSS layout box</a> or the
- element is the root element and the <code class="external" data-anolis-spec="dom"><a href="http://dom.spec.whatwg.org/#document">Document</a></code> is in
- <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-document-quirks" title="concept-document-quirks">quirks mode</a> return zero and terminate these steps.</li>
+ <li><p>If the element is the root element and the <code class="external" data-anolis-spec="dom"><a href="http://dom.spec.whatwg.org/#document">Document</a></code> is in
+ <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-document-quirks" title="concept-document-quirks">quirks mode</a>, return zero and terminate these steps.</li>
  <li><p>If the element is the root element return the value of
  <code title="dom-Window-scrollX"><a href="#dom-window-scrollx">scrollX</a></code>.</li>
  <li><p>If the element is <a href="#the-html-body-element">the HTML <code title="">body</code> element</a>,
- the <code class="external" data-anolis-spec="dom"><a href="http://dom.spec.whatwg.org/#document">Document</a></code> is in <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-document-quirks" title="concept-document-quirks">quirks mode</a>, and the element
- does not have any overflow, return the value of
+ the <code class="external" data-anolis-spec="dom"><a href="http://dom.spec.whatwg.org/#document">Document</a></code> is in <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-document-quirks" title="concept-document-quirks">quirks mode</a>, and the element does not have
+ an associated <a href="#scrolling-box">scrolling box</a>, return the value of
  <code title="dom-Window-scrollX"><a href="#dom-window-scrollx">scrollX</a></code>.</li>
+ <li><p>If the element does not have any associated <a href="#css-layout-box">CSS layout box</a>, return zero and terminate these steps.</li>
  <li><p>Return the x-coordinate of the <a href="#scrolling-area">scrolling area</a> at the
  alignment point with the left of the <a href="#padding-edge">padding edge</a> of the
  element.</li>
 </ol>
 <p>When setting the <code title="dom-Element-scrollLeft"><a href="#dom-element-scrollleft">scrollLeft</a></code> attribute these steps must be run:</p>
 <ol>
- <li><p>If the given value is a <code><a href="#scrolloptions">ScrollOptions</a></code> object, and the <code title="">x</code> dictionary member is not present, abort these steps.
- <li><p>If the given value is a <code><a href="#scrolloptions">ScrollOptions</a></code> object, let <var>x</var> be the value of the <code title="">x</code> dictionary member. Otherwise,
- let <var>x</var> be the given value.</li>
- <li><p>If the element does not have any associated <a href="#css-layout-box">CSS layout box</a>, the
- element is the root element and the <code class="external" data-anolis-spec="dom"><a href="http://dom.spec.whatwg.org/#document">Document</a></code> is in
- <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-document-quirks" title="concept-document-quirks">quirks mode</a>, or the element has no associated scrolling box, or the element has no overflow,
- terminate these steps.</li>
+ <li><p>If the given value is a <code><a href="#scrolloptionshorizontal">ScrollOptionsHorizontal</a></code> object, and the <code title="">x</code> dictionary member is not present, abort these steps.
+ <li><p>If the given value is a <code><a href="#scrolloptionshorizontal">ScrollOptionsHorizontal</a></code> object, let <var>x</var> be the value of the <code title="">x</code> dictionary member.
+ Otherwise, let <var>x</var> be the given value.</li>
+ <li><p>If the element is the root element and the <code class="external" data-anolis-spec="dom"><a href="http://dom.spec.whatwg.org/#document">Document</a></code> is in
+ <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-document-quirks" title="concept-document-quirks">quirks mode</a>, terminate these steps.</li>
  <li><p>If the element is the root element invoke
  <code title="dom-Window-scroll"><a href="#dom-window-scroll">scroll()</a></code> with
- <var>x</var> as first argument and zero as second, and, if the given value is a <code><a href="#scrolloptions">ScrollOptions</a></code> object, the given value as the third
- argument.</li>
+ <var>x</var> as first argument and <code title="dom-Window-scrollY"><a href="#dom-window-scrolly">scrollY</a></code> as second, and, if the given value is a <code><a href="#scrolloptionshorizontal">ScrollOptionsHorizontal</a></code>
+ object, the given value as the third argument.</li>
  <li><p>If the element is <a href="#the-html-body-element">the HTML <code title="">body</code> element</a>,
  the <code class="external" data-anolis-spec="dom"><a href="http://dom.spec.whatwg.org/#document">Document</a></code> is in <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-document-quirks" title="concept-document-quirks">quirks mode</a>, and the element
- does not have any vertical overflow, invoke
+ does not have an associated <a href="#scrolling-box">scrolling box</a>, invoke
  <code title="dom-Window-scroll"><a href="#dom-window-scroll">scroll()</a></code> with
  <var>x</var> as first argument and
- <code title="dom-Window-scrollY"><a href="#dom-window-scrolly">scrollY</a></code> as second, and, if the given value is a <code><a href="#scrolloptions">ScrollOptions</a></code> object, the given value as the third
- argument.</li>
+ <code title="dom-Window-scrollY"><a href="#dom-window-scrolly">scrollY</a></code> as second, and, if the given value is a <code><a href="#scrolloptionshorizontal">ScrollOptionsHorizontal</a></code> object, the given value as the third
+ argument, and terminate these steps.</li>
+ <li><p>If the element does not have any associated <a href="#css-layout-box">CSS layout box</a>, the element has no associated <a href="#scrolling-box">scrolling box</a>, or the element has no
+ overflow, terminate these steps.</li>
  <li><p><a href="#scroll-an-element" title="Scroll an element">Scroll the element</a> to
  <var>x</var>,<code title="dom-Element-scrollTop"><a href="#dom-element-scrolltop">scrollTop</a></code>, with the scroll behavior being the value of the <code title="">behavior</code> dictionary
- member if the given value is a <code><a href="#scrolloptions">ScrollOptions</a></code> object, or <code title="">auto</code> otherwise.
+ member if the given value is a <code><a href="#scrolloptionshorizontal">ScrollOptionsHorizontal</a></code> object, or <code title="">auto</code> otherwise.
 </ol>
 
 <p>The <dfn id="dom-element-scrollwidth" title="dom-Element-scrollWidth"><code>scrollWidth</code></dfn> attribute must return the result of running these steps:</p>
 <ol>
- <li><p>If the element does not have any associated <a href="#css-layout-box">CSS layout box</a> return
- zero and terminate these steps.</li>
  <li><p>Let <var>viewport width</var> be the width of the <a href="#viewport">viewport</a> excluding the width of the scroll bar, if any, or zero if there is no
  <a href="#viewport">viewport</a>.
  <li><p>If the element is the root element and the
  <code class="external" data-anolis-spec="dom"><a href="http://dom.spec.whatwg.org/#document">Document</a></code> is not in
  <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-document-quirks" title="concept-document-quirks">quirks mode</a>
  return max(<a href="#viewport">viewport</a> <a href="#scrolling-area">scrolling area</a> width, <var>viewport width</var>).</li>
- <li><p>If the element is <a href="#the-html-body-element">the HTML <code title="">body</code> element</a>
- and the <code class="external" data-anolis-spec="dom"><a href="http://dom.spec.whatwg.org/#document">Document</a></code> is in
- <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-document-quirks" title="concept-document-quirks">quirks mode</a>
+ <li><p>If the element is <a href="#the-html-body-element">the HTML <code title="">body</code> element</a>, the <code class="external" data-anolis-spec="dom"><a href="http://dom.spec.whatwg.org/#document">Document</a></code> is in
+ <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-document-quirks" title="concept-document-quirks">quirks mode</a> and the element has no associated <a href="#scrolling-box">scrolling box</a>,
  return max(<a href="#viewport">viewport</a> <a href="#scrolling-area">scrolling area</a> width, <var>viewport width</var>).</li>
+ <li><p>If the element does not have any associated <a href="#css-layout-box">CSS layout box</a> return
+ zero and terminate these steps.</li>
  <li><p>Return the width of the element's <a href="#scrolling-area">scrolling area</a>.</li>
 </ol>
 
 <p>The <dfn id="dom-element-scrollheight" title="dom-Element-scrollHeight"><code>scrollHeight</code></dfn> attribute must return the result of running these steps:</p>
 <ol>
- <li><p>If the element does not have any associated <a href="#css-layout-box">CSS layout box</a> return
- zero and terminate these steps.</li>
  <li><p>Let <var>viewport height</var> be the height of the <a href="#viewport">viewport</a> excluding the height of the scroll bar, if any, or zero if there is no
  <a href="#viewport">viewport</a>.
  <li><p>If the element is the root element and the
  <code class="external" data-anolis-spec="dom"><a href="http://dom.spec.whatwg.org/#document">Document</a></code> is not in
  <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-document-quirks" title="concept-document-quirks">quirks mode</a>
  return max(<a href="#viewport">viewport</a> <a href="#scrolling-area">scrolling area</a> height, <var>viewport height</var>).</li>
- <li><p>If the element is <a href="#the-html-body-element">the HTML <code title="">body</code> element</a>
- and the <code class="external" data-anolis-spec="dom"><a href="http://dom.spec.whatwg.org/#document">Document</a></code> is in
- <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-document-quirks" title="concept-document-quirks">quirks mode</a>
+ <li><p>If the element is <a href="#the-html-body-element">the HTML <code title="">body</code> element</a>, the <code class="external" data-anolis-spec="dom"><a href="http://dom.spec.whatwg.org/#document">Document</a></code> is in
+ <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-document-quirks" title="concept-document-quirks">quirks mode</a> and the element has no associated <a href="#scrolling-box">scrolling box</a>,
  return max(<a href="#viewport">viewport</a> <a href="#scrolling-area">scrolling area</a> height, <var>viewport height</var>).</li>
+ <li><p>If the element does not have any associated <a href="#css-layout-box">CSS layout box</a> return
+ zero and terminate these steps.</li>
  <li><p>Return the height of the element's <a href="#scrolling-area">scrolling area</a>.</li>
 </ol>
 
@@ -1019,33 +1203,36 @@ var exampleHeight = example.height;</pre>
 <ol>
  <li><p>If the element has no associated <a href="#css-layout-box">CSS layout box</a> or if the <a href="#css-layout-box">CSS layout box</a> is inline, return zero.
  <li><p>Return the computed value of the 'border-top-width' property plus the height of any scrollbar rendered between the top <a href="#padding-edge">padding
- edge</a> and the top <a href="#border-edge">border edge</a>.
+ edge</a> and the top <a href="#border-edge">border edge</a>, ignoring any <a href="#transforms">transforms</a> that apply to the element and its ancestors.
 </ol>
     
 <p>The <dfn id="dom-element-clientleft" title="dom-Element-clientLeft"><code>clientLeft</code></dfn> attribute must run these steps:
 <ol>
  <li><p>If the element has no associated <a href="#css-layout-box">CSS layout box</a> or if the <a href="#css-layout-box">CSS layout box</a> is inline, return zero.
  <li><p>Return the computed value of the 'border-left-width' property plus the width of any scrollbar rendered between the left <a href="#padding-edge">padding
- edge</a> and the left <a href="#border-edge">border edge</a>.
+ edge</a> and the left <a href="#border-edge">border edge</a>, ignoring any <a href="#transforms">transforms</a> that apply to the element and its ancestors.
 </ol>
 
 <p>The <dfn id="dom-element-clientwidth" title="dom-Element-clientWidth"><code>clientWidth</code></dfn> attribute must run these steps:
 <ol>
  <li><p>If the element has no associated <a href="#css-layout-box">CSS layout box</a> or if the <a href="#css-layout-box">CSS layout box</a> is inline, return zero.
- <li><p>If the element is the root element and the element's document's <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#browsing-context">browsing context</a> is a
- <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#top-level-browsing-context">top-level browsing context</a>, return the <a href="#viewport">viewport</a> width excluding the size of a rendered scroll bar (if
- any).
+ <li><p>If the element is the root element and the element's document is not in <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-document-quirks" title="concept-document-quirks">quirks mode</a>, or
+ if the element is <a href="#the-html-body-element">the HTML <code title="">body</code> element</a> and the element's document <em>is</em> in
+ <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-document-quirks" title="concept-document-quirks">quirks mode</a>, return the <a href="#viewport">viewport</a> width excluding the size of a rendered scroll bar
+ (if any).
  <li><p>Return the width of the <a href="#padding-edge">padding edge</a> excluding the width of any rendered scrollbar between the <a href="#padding-edge">padding edge</a> and the
- <a href="#border-edge">border edge</a>.
+ <a href="#border-edge">border edge</a>, ignoring any <a href="#transforms">transforms</a> that apply to the element and its ancestors.
 </ol>
 
 <p>The <dfn id="dom-element-clientheight" title="dom-Element-clientHeight"><code>clientHeight</code></dfn> attribute must run these steps:
 <ol>
  <li><p>If the element has no associated <a href="#css-layout-box">CSS layout box</a> or if the <a href="#css-layout-box">CSS layout box</a> is inline, return zero.
- <li><p>If the element is the root element and the element's document's <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#browsing-context">browsing context</a> is a
- <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#top-level-browsing-context">top-level browsing context</a>, return the <a href="#viewport">viewport</a> height excluding the size of a rendered scroll bar (if any).
+ <li><p>If the element is the root element and the element's document is not in <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-document-quirks" title="concept-document-quirks">quirks mode</a>, or
+ if the element is <a href="#the-html-body-element">the HTML <code title="">body</code> element</a> and the element's document <em>is</em> in
+ <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-document-quirks" title="concept-document-quirks">quirks mode</a>, return the <a href="#viewport">viewport</a> height excluding the size of a rendered scroll
+ bar (if any).
  <li><p>Return the height of the <a href="#padding-edge">padding edge</a> excluding the height of any rendered scrollbar between the <a href="#padding-edge">padding edge</a> and the
- <a href="#border-edge">border edge</a>.
+ <a href="#border-edge">border edge</a>, ignoring any <a href="#transforms">transforms</a> that apply to the element and its ancestors.
 </ol>
 
 <h3 id="the-getclientrects()-and-getboundingclientrect()-methods"><span class="secno">7.1 </span>The <code title="">getClientRects()</code> and
@@ -1061,7 +1248,7 @@ document are not reflected in the objects.</p>
 
 <p>To <dfn id="scroll-an-element-into-view">scroll an element into view</dfn> <var>element</var>, optionally with an <i>align to top flag</i> set, and optionally with a scroll behavior
 <var>behavior</var> (which is <code title="">auto</code> if omitted), means to run these steps for each ancestor element or <a href="#viewport">viewport</a> that establishes
-a scrolling box <var>scrolling box</var>, in order of innermost to outermost scrolling box:</p>
+a <a href="#scrolling-box">scrolling box</a> <var>scrolling box</var>, in order of innermost to outermost <a href="#scrolling-box">scrolling box</a>:</p>
 
 <ol>
  <li><p>If the <code class="external" data-anolis-spec="dom"><a href="http://dom.spec.whatwg.org/#document">Document</a></code> associated
@@ -1150,7 +1337,7 @@ a scrolling box <var>scrolling box</var>, in order of innermost to outermost scr
 <code title="">auto</code> if omitted) means to:</p>
 
 <ol>
- <li><p>Let <var>box</var> be <var>element</var>'s associated scrolling box.
+ <li><p>Let <var>box</var> be <var>element</var>'s associated <a href="#scrolling-box">scrolling box</a>.
  <li>
   <dl class="switch">
    <dt>If <var>box</var> has rightward <a href="#overflow-directions" title="overflow directions">overflow direction</a></dt>
@@ -1203,7 +1390,7 @@ a scrolling box <var>scrolling box</var>, in order of innermost to outermost scr
 <h2 id="extensions-to-the-htmlelement-interface"><span class="secno">8 </span>Extensions to the <code title="">HTMLElement</code> Interface</h2>
 
 <pre class="idl">partial interface <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/elements.html#htmlelement">HTMLElement</a> {
-  readonly attribute <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#element">Element</a> <a href="#dom-htmlelement-offsetparent" title="dom-HTMLElement-offsetParent">offsetParent</a>;
+  readonly attribute <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#element">Element</a>? <a href="#dom-htmlelement-offsetparent" title="dom-HTMLElement-offsetParent">offsetParent</a>;
   readonly attribute double <a href="#dom-htmlelement-offsettop" title="dom-HTMLElement-offsetTop">offsetTop</a>;
   readonly attribute double <a href="#dom-htmlelement-offsetleft" title="dom-HTMLElement-offsetLeft">offsetLeft</a>;
   readonly attribute double <a href="#dom-htmlelement-offsetwidth" title="dom-HTMLElement-offsetWidth">offsetWidth</a>;
@@ -1246,7 +1433,7 @@ a scrolling box <var>scrolling box</var>, in order of innermost to outermost scr
  <li><p>If the <code title="dom-HTMLElement-offsetParent"><a href="#dom-htmlelement-offsetparent">offsetParent</a></code> of the element is null return the
  y-coordinate of the top <a href="#border-edge">border edge</a> of the first
  <a href="#css-layout-box">CSS layout box</a> associated with the element, relative to the
- <a href="#initial-containing-block">initial containing block</a> origin, and terminate this
+ <a href="#initial-containing-block">initial containing block</a> origin, ignoring any <a href="#transforms">transforms</a> that apply to the element and its ancestors, and terminate this
  algorithm.</li>
  <li>
   <p>Return the result of subtracting the y-coordinate of the top
@@ -1254,7 +1441,7 @@ a scrolling box <var>scrolling box</var>, in order of innermost to outermost scr
   the <code title="dom-HTMLElement-offsetParent"><a href="#dom-htmlelement-offsetparent">offsetParent</a></code> of the element from the y-coordinate of
   the top <a href="#border-edge">border edge</a> of the first <a href="#css-layout-box">CSS layout box</a> associated
   with the element, relative to the <a href="#initial-containing-block">initial containing block</a>
-  origin.</p>
+  origin, ignoring any <a href="#transforms">transforms</a> that apply to the element and its ancestors.</p>
   <p class="note">An inline element that consists of multiple line boxes
   will only have its first <a href="#css-layout-box">CSS layout box</a> considered.</p>
  </li>
@@ -1268,7 +1455,7 @@ a scrolling box <var>scrolling box</var>, in order of innermost to outermost scr
  <li><p>If the <code title="dom-HTMLElement-offsetParent"><a href="#dom-htmlelement-offsetparent">offsetParent</a></code> of the element is null return the
  x-coordinate of the left <a href="#border-edge">border edge</a> of the first
  <a href="#css-layout-box">CSS layout box</a> associated with the element, relative to the
- <a href="#initial-containing-block">initial containing block</a> origin, and terminate this
+ <a href="#initial-containing-block">initial containing block</a> origin, , ignoring any <a href="#transforms">transforms</a> that apply to the element and its ancestors, and terminate this
  algorithm.</li>
  <li>
   <p>Return the result of subtracting the x-coordinate of the left
@@ -1276,36 +1463,55 @@ a scrolling box <var>scrolling box</var>, in order of innermost to outermost scr
   the <code title="dom-HTMLElement-offsetParent"><a href="#dom-htmlelement-offsetparent">offsetParent</a></code> of the element from the x-coordinate of
   the left <a href="#border-edge">border edge</a> of the first <a href="#css-layout-box">CSS layout box</a> associated
   with the element, relative to the <a href="#initial-containing-block">initial containing block</a>
-  origin.</p>
+  origin, ignoring any <a href="#transforms">transforms</a> that apply to the element and its ancestors.</p>
  </li>
 </ol>
 
 <p>The <dfn id="dom-htmlelement-offsetwidth" title="dom-HTMLElement-offsetWidth"><code>offsetWidth</code></dfn> attribute must return the result of running these steps:</p>
 <ol>
  <li><p>If the element does not have any associated <a href="#css-layout-box">CSS layout box</a> return zero and terminate this algorithm.</li>
- <li><p>Return the <a href="#border-edge">border edge</a> width of the first <a href="#css-layout-box">CSS layout box</a> associated with the element.</li>
+ <li><p>Return the <a href="#border-edge">border edge</a> width of the first <a href="#css-layout-box">CSS layout box</a> associated with the element, ignoring any <a href="#transforms">transforms</a>
+ that apply to the element and its ancestors.</li>
 </ol>
 
 <p>The <dfn id="dom-htmlelement-offsetheight" title="dom-HTMLElement-offsetHeight"><code>offsetHeight</code></dfn> attribute must return the result of running these steps:</p>
 <ol>
  <li><p>If the element does not have any associated <a href="#css-layout-box">CSS layout box</a> return zero and terminate this algorithm.</li>
- <li><p>Return the <a href="#border-edge">border edge</a> height of the first <a href="#css-layout-box">CSS layout box</a> associated with the element.</li>
+ <li><p>Return the <a href="#border-edge">border edge</a> height of the first <a href="#css-layout-box">CSS layout box</a> associated with the element, ignoring any <a href="#transforms">transforms</a>
+ that apply to the element and its ancestors.</li>
 </ol>
 
-<h2 id="extensions-to-the-range-interface"><span class="secno">9 </span>Extensions to the <code title="">Range</code> Interface</h2>
+
+<h2 id="excensions-to-the-htmlimageelement-interface"><span class="secno">9 </span>Excensions to the <code title="">HTMLImageElement</code> Interface</h2>
+
+<pre class="idl">partial interface <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/embedded-content-1.html#htmlimageelement">HTMLImageElement</a> {
+  readonly attribute double <a href="#dom-htmlimageelement-x" title="dom-HTMLImageElement-x">x</a>;
+  readonly attribute double <a href="#dom-htmlimageelement-y" title="dom-HTMLImageElement-y">y</a>;
+};</pre>
+
+<p>The <dfn id="dom-htmlimageelement-x" title="dom-HTMLImageElement-x"><code>x</code></dfn> attribute, on getting, must return the x-coordinate of the left <a href="#border-edge">border edge</a> of the
+first <a href="#css-layout-box">CSS layout box</a> associated with the element, relative to the <a href="#initial-containing-block">initial containing block</a> origin, ignoring any
+<a href="#transforms">transforms</a> that apply to the element and its ancestors, or zero if there is no <a href="#css-layout-box">CSS layout box</a>.
+
+<p>The <dfn id="dom-htmlimageelement-y" title="dom-HTMLImageElement-y"><code>y</code></dfn> attribute, on getting, must return the y-coordinate of the top <a href="#border-edge">border edge</a> of the
+first <a href="#css-layout-box">CSS layout box</a> associated with the element, relative to the <a href="#initial-containing-block">initial containing block</a> origin, ignoring any
+<a href="#transforms">transforms</a> that apply to the element and its ancestors, or zero if there is no <a href="#css-layout-box">CSS layout box</a>.
+
+
+<h2 id="extensions-to-the-range-interface"><span class="secno">10 </span>Extensions to the <code title="">Range</code> Interface</h2>
 
 <p>The objects the methods described below return must
 be static.</p>
 
 <pre class="idl">partial interface <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#range">Range</a> {
-  <a href="#clientrectlist">ClientRectList</a> <a href="#dom-range-getclientrects" title="dom-Range-getClientRects">getClientRects</a>();
-  <a href="#clientrect">ClientRect</a> <a href="#dom-range-getboundingclientrect" title="dom-Range-getBoundingClientRect">getBoundingClientRect</a>();
+  <a href="#domrectlist">DOMRectList</a> <a href="#dom-range-getclientrects" title="dom-Range-getClientRects">getClientRects</a>();
+  <a href="#domrect">DOMRect</a> <a href="#dom-range-getboundingclientrect" title="dom-Range-getBoundingClientRect">getBoundingClientRect</a>();
 };</pre>
 
 <p>The <dfn id="dom-range-getclientrects" title="dom-Range-getClientRects"><code>getClientRects()</code></dfn> method, when invoked, must return an empty
-<code><a href="#clientrectlist">ClientRectList</a></code> object if the range is not in the document and
-otherwise a <code><a href="#clientrectlist">ClientRectList</a></code> object containing a list of
-<code><a href="#clientrect">ClientRect</a></code> objects in content order that matches the
+<code><a href="#domrectlist">DOMRectList</a></code> object if the range is not in the document and
+otherwise a <code><a href="#domrectlist">DOMRectList</a></code> object containing a list of
+<code><a href="#domrect">DOMRect</a></code> objects in content order that matches the
 following constraints:</p>
 <ul>
  <li>For each element selected by the range, whose parent is not selected
@@ -1314,11 +1520,11 @@ following constraints:</p>
  element.</li>
  <li>For each <code class="external" data-anolis-spec="dom"><a href="http://dom.spec.whatwg.org/#text">Text</a></code> node selected or partially selected by the
  range (including when the boundary-points are identical), include a
- <code><a href="#clientrect">ClientRect</a></code> object (for the part that is selected, not the
- whole line box). The bounds of these <code><a href="#clientrect">ClientRect</a></code> objects are
+ <code><a href="#domrect">DOMRect</a></code> object (for the part that is selected, not the
+ whole line box). The bounds of these <code><a href="#domrect">DOMRect</a></code> objects are
  computed using font metrics; thus, for horizontal writing, the vertical
  dimension of each box is determined by the font ascent and descent, and
- the horizontal dimension by the text advance width.</li>
+ the horizontal dimension by the text advance width. The <a href="#transforms">transforms</a> that apply to the ancestors are applied.
 </ul>
 
 <p>The <dfn id="dom-range-getboundingclientrect" title="dom-Range-getBoundingClientRect"><code>getBoundingClientRect()</code></dfn> method, when invoked, must return the result of the following
@@ -1328,18 +1534,18 @@ algorithm:</p>
  <code title="dom-Range-getClientRects"><a href="#dom-range-getclientrects">getClientRects()</a></code> on the
  same range this method was invoked on.</li>
  <li><p>If <var>list</var> is empty return a
- <code><a href="#clientrect">ClientRect</a></code> object whose
- <code title="dom-ClientRect-top"><a href="#dom-clientrect-top">top</a></code>,
- <code title="dom-ClientRect-right"><a href="#dom-clientrect-right">right</a></code>,
- <code title="dom-ClientRect-bottom"><a href="#dom-clientrect-bottom">bottom</a></code> and
- <code title="dom-ClientRect-left"><a href="#dom-clientrect-left">left</a></code> members are zero.</li>
- <li><p>Otherwise, return a <code><a href="#clientrect">ClientRect</a></code> object describing the
+ <code><a href="#domrect">DOMRect</a></code> object whose
+ <code title="">x</code>,
+ <code title="">y</code>,
+ <code title="">width</code> and
+ <code title="">height</code> members are zero.</li>
+ <li><p>Otherwise, return a <code><a href="#domrect">DOMRect</a></code> object describing the
  smallest rectangle that includes the first rectangle in <var>list</var>
  and all of the remaining rectangles of which the height or width is not
  zero.</li>
 </ol>
 
-<h2 id="extensions-to-the-mouseevent-interface"><span class="secno">10 </span>Extensions to the <code title="">MouseEvent</code> Interface</h2>
+<h2 id="extensions-to-the-mouseevent-interface"><span class="secno">11 </span>Extensions to the <code title="">MouseEvent</code> Interface</h2>
 
 <p class="issue">The object IDL fragment redefines some members. Can we
 resolve this somehow?</p>
@@ -1361,10 +1567,10 @@ browsers -->
 };
 
 partial dictionary <a href="#mouseeventinit">MouseEventInit</a> {
-  double screenX = 0;
-  double screenY = 0;
-  double clientX = 0;
-  double clientY = 0;
+  double screenX = 0.0;
+  double screenY = 0.0;
+  double clientX = 0.0;
+  double clientY = 0.0;
 };</pre>
 
 <p>The <dfn id="dom-mouseevent-screenx" title="dom-MouseEvent-screenX"><code>screenX</code></dfn> attribute must return the x-coordinate of
@@ -1411,7 +1617,8 @@ the position where the event occurred relative to the origin of the
 
 <ol>
  <li><p>If the event's <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#dispatch-flag">dispatch flag</a> is set, return the x-coordinate of the position where the event occurred relative to the
- origin of the <a href="#padding-edge">padding edge</a> of the target node and terminate these steps.
+ origin of the <a href="#padding-edge">padding edge</a> of the target node, ignoring the <a href="#transforms">transforms</a> that apply to the element and its ancestors, and terminate
+ these steps.
  <li><p>Return the value of the event's <code title="dom-MouseEvent-pageX"><a href="#dom-mouseevent-pagex">pageX</a></code> attribute.
 </ol>
 
@@ -1419,76 +1626,86 @@ the position where the event occurred relative to the origin of the
 
 <ol>
  <li><p>If the event's <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#dispatch-flag">dispatch flag</a> is set, return the y-coordinate of the position where the event occurred relative to the
- origin of the <a href="#padding-edge">padding edge</a> of the target node and terminate these steps.
+ origin of the <a href="#padding-edge">padding edge</a> of the target node, ignoring the <a href="#transforms">transforms</a> that apply to the element and its ancestors, and terminate
+ these steps.
  <li><p>Return the value of the event's <code title="dom-MouseEvent-pageY"><a href="#dom-mouseevent-pagey">pageY</a></code> attribute.
 </ol>
 
 
-<h2 id="rectangles"><span class="secno">11 </span>Rectangles</h2>
+<h2 id="geometry"><span class="secno">12 </span>Geometry</h2>
+
+<h3 class="atrisk" id="the-geometryutils-interface"><span class="secno">12.1 </span>The <code title="">GeometryUtils</code> Interface</h3>
+
+<pre class="idl">enum <dfn id="cssboxtype">CSSBoxType</dfn> { "margin", "border", "padding", "content" };
+dictionary <dfn id="boxquadoptions">BoxQuadOptions</dfn> {
+  <a href="#cssboxtype">CSSBoxType</a> box = "border";
+  <a href="#geometrynode">GeometryNode</a> relativeTo;
+};
+
+dictionary <dfn id="convertcoordinateoptions">ConvertCoordinateOptions</dfn> {
+  <a href="#cssboxtype">CSSBoxType</a> fromBox = "border";
+  <a href="#cssboxtype">CSSBoxType</a> toBox = "border";
+};
+
+[NoInterfaceObject]
+interface <dfn id="geometryutils">GeometryUtils</dfn> {
+  sequence&lt;<a href="#domquad">DOMQuad</a>&gt; <a href="#dom-geometryutils-getboxquads" title="dom-GeometryUtils-getBoxQuads">getBoxQuads</a>(optional <a href="#boxquadoptions">BoxQuadOptions</a> options);
+  <a href="#domquad">DOMQuad</a> <a href="#dom-geometryutils-convertquadfromnode" title="dom-GeometryUtils-convertQuadFromNode">convertQuadFromNode</a>(<a href="#domquad">DOMQuad</a> quad, <!--
+  --><a href="#geometrynode">GeometryNode</a> from, optional <a href="#convertcoordinateoptions">ConvertCoordinateOptions</a> options);
+  <a href="#domquad">DOMQuad</a> <a href="#dom-geometryutils-convertrectfromnode" title="dom-GeometryUtils-convertRectFromNode">convertRectFromNode</a>(<a href="#domrectreadonly">DOMRectReadOnly</a> rect, <!--
+  --><a href="#geometrynode">GeometryNode</a> from, optional <a href="#convertcoordinateoptions">ConvertCoordinateOptions</a> options);
+  <a href="#dompoint">DOMPoint</a> <a href="#dom-geometryutils-convertpointfromnode" title="dom-GeometryUtils-convertPointFromNode">convertPointFromNode</a>(<a href="#dompointinit">DOMPointInit</a> point, <!--
+  --><a href="#geometrynode">GeometryNode</a> from, optional <a href="#convertcoordinateoptions">ConvertCoordinateOptions</a> options);
+};
+ 
+<a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#text">Text</a> implements <a href="#geometryutils">GeometryUtils</a>;
+<a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#element">Element</a> implements <a href="#geometryutils">GeometryUtils</a>;
+<a class="external" data-anolis-spec="cssom" href="http://dev.w3.org/csswg/cssom/#pseudoelement">PseudoElement</a> implements <a href="#geometryutils">GeometryUtils</a>;
+<a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#document">Document</a> implements <a href="#geometryutils">GeometryUtils</a>;
+ 
+typedef (<a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#text">Text</a> or <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#element">Element</a> or <a class="external" data-anolis-spec="cssom" href="http://dev.w3.org/csswg/cssom/#pseudoelement">PseudoElement</a> or <!--
+--><a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#document">Document</a>) <dfn id="geometrynode">GeometryNode</dfn>;</pre>
+
+<p>The <dfn id="dom-geometryutils-getboxquads" title="dom-GeometryUtils-getBoxQuads"><code>getBoxQuads(<var>options</var>)</code></dfn> method must run the following steps:
+
+<ol>
+ <li><p class="issue">...
+</ol>
+
+<p>The <dfn id="dom-geometryutils-convertquadfromnode" title="dom-GeometryUtils-convertQuadFromNode"><code>convertQuadFromNode(<var>quad</var>, <var>from</var>, <var>options</var>)</code></dfn> method
+must run the following steps:
+
+<ol>
+ <li><p class="issue">...
+</ol>
+
+<p>The <dfn id="dom-geometryutils-convertrectfromnode" title="dom-GeometryUtils-convertRectFromNode"><code>convertRectFromNode(<var>rect</var>, <var>from</var>, <var>options</var>)</code></dfn> method
+must run the following steps:
+
+<ol>
+ <li><p class="issue">...
+</ol>
+
+<p>The <dfn id="dom-geometryutils-convertpointfromnode" title="dom-GeometryUtils-convertPointFromNode"><code>convertPointFromNode(<var>point</var>, <var>from</var>, <var>options</var>)</code></dfn>
+method must run the following steps:
+
+<ol>
+ <li><p class="issue">...
+</ol>
 
 
-<h3 id="the-clientrectlist-interface"><span class="secno">11.1 </span>The <code title="">ClientRectList</code> Interface</h3>
+<h2 id="events"><span class="secno">13 </span>Events</h2>
 
-<p>The <code><a href="#clientrectlist">ClientRectList</a></code> interface consists of an ordered list of <code><a href="#clientrect">ClientRect</a></code> objects.</p>
+<h3 id="resizing-viewports"><span class="secno">13.1 </span>Resizing viewports</h3>
 
-<pre class="idl">interface <dfn id="clientrectlist">ClientRectList</dfn> {
-  readonly attribute unsigned long <a href="#dom-clientrectlist-length" title="dom-ClientRectList-length">length</a>;
-  getter <a href="#clientrect">ClientRect</a> <a href="#dom-clientrectlist-item" title="dom-ClientRectList-item">item</a>(unsigned long index);
-};</pre>
-
-<p>The <dfn id="dom-clientrectlist-length" title="dom-ClientRectList-length"><code>length</code></dfn> attribute must return the total number of <code><a href="#clientrect">ClientRect</a></code> objects associated with
-the object.</p>
-
-<p>The <dfn id="dom-clientrectlist-item" title="dom-ClientRectList-item"><code>item(<var>index</var>)</code></dfn> method, when invoked, must throw an
-<code class="external" data-anolis-spec="dom"><a href="http://dom.spec.whatwg.org/#indexsizeerror">IndexSizeError</a></code> exception when <var>index</var> is
-greater than the number of <code><a href="#clientrect">ClientRect</a></code> objects associated with the object. Otherwise, the <code><a href="#clientrect">ClientRect</a></code> object at
-<var>index</var> must be returned.</p>
-
-<h3 id="the-clientrect-interface"><span class="secno">11.2 </span>The <code title="">ClientRect</code> Interface</h3>
-
-<p>Objects implementing the <code><a href="#clientrect">ClientRect</a></code> interface represent a rectangular box. The type of box is specified by the method that returns a
-<code><a href="#clientrect">ClientRect</a></code> object.</p>
-
-<pre class="idl">interface <dfn id="clientrect">ClientRect</dfn> {
-  readonly attribute double <a href="#dom-clientrect-top" title="dom-ClientRect-top">top</a>;
-  readonly attribute double <a href="#dom-clientrect-top" title="dom-ClientRect-top">right</a>;
-  readonly attribute double <a href="#dom-clientrect-top" title="dom-ClientRect-top">bottom</a>;
-  readonly attribute double <a href="#dom-clientrect-top" title="dom-ClientRect-top">left</a>;
-  readonly attribute double <a href="#dom-clientrect-top" title="dom-ClientRect-top">width</a>;
-  readonly attribute double <a href="#dom-clientrect-top" title="dom-ClientRect-top">height</a>;
-};</pre>
-
-<p>The <dfn id="dom-clientrect-top" title="dom-ClientRect-top"><code>top</code></dfn> attribute must return the y-coordinate, relative to the <a href="#viewport">viewport</a> origin, of the top of
-the rectangle box.</p>
-
-<p>The <dfn id="dom-clientrect-right" title="dom-ClientRect-right"><code>right</code></dfn> attribute must return the x-coordinate, relative to the <a href="#viewport">viewport</a> origin, of the
-right of the rectangle box.</p>
-
-<p>The <dfn id="dom-clientrect-bottom" title="dom-ClientRect-bottom"><code>bottom</code></dfn> attribute must return the y-coordinate, relative to the <a href="#viewport">viewport</a> origin, of the
-bottom of the rectangle box.</p>
-
-<p>The <dfn id="dom-clientrect-left" title="dom-ClientRect-left"><code>left</code></dfn> attribute must return the x-coordinate, relative to the <a href="#viewport">viewport</a> origin, of the left
-of the rectangle box.</p>
-
-<p>The <dfn id="dom-clientrect-width" title="dom-ClientRect-width"><code>width</code></dfn> attribute must return the width of the rectangle box.</p>
-<p class="note">This is identical to <code title="dom-ClientRect-right"><a href="#dom-clientrect-right">right</a></code> minus <code title="dom-ClientRect-left"><a href="#dom-clientrect-left">left</a></code>.</p>
-
-<p>The <dfn id="dom-clientrect-height" title="dom-ClientRect-height"><code>height</code></dfn> attribute must return the height of the rectangle box.</p>
-<p class="note">This is identical to <code title="dom-ClientRect-bottom"><a href="#dom-clientrect-bottom">bottom</a></code> minus <code title="dom-ClientRect-top"><a href="#dom-clientrect-top">top</a></code>.</p>
-
-  
-<h2 id="events"><span class="secno">12 </span>Events</h2>
-
-<h3 id="resizing-viewports"><span class="secno">12.1 </span>Resizing viewports</h3>
-
-<p>Whenever a <a href="#viewport">viewport</a> has its width or height changed (e.g. as a result of the user resizing the browser window, or zooming in, or an
-<code title="">iframe</code> element's dimensions are changed), the user agent must <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#queue-a-task">queue a task</a> to
-<a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-event-fire" title="concept-event-fire">fire an event</a> event named
+<p>Whenever a <a href="#viewport">viewport</a> has its width or height changed (e.g. as a result of the user resizing the browser window, or changing the <a href="#page-zoom">page
+zoom</a> scale factor, or an <code title="">iframe</code> element's dimensions are changed), the user agent must <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#queue-a-task">queue a task</a>
+to <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-event-fire" title="concept-event-fire">fire an event</a> event named
 <code title="">resize</code> at the <code class="external" data-anolis-spec="html"><a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#window">Window</a></code> object associated with that
 <a href="#viewport">viewport</a>. If such a resize is ongoing over a period of time, the user agent must <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#queue-a-task" title="queue a task">queue</a> that
 task at a user-agent-defined interval while the resize is ongoing. <!--fingerprint--> <!-- e.g. if you change the width of an iframe with a transition -->
 
-<h3 id="scrolling-0"><span class="secno">12.2 </span>Scrolling</h3>
+<h3 id="scrolling-0"><span class="secno">13.2 </span>Scrolling</h3>
 
 <p>Whenever a <a href="#viewport">viewport</a> gets scrolled in response to user interaction, the user agent must <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#queue-a-task">queue a task</a> to
 <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/infrastructure.html#concept-event-fire" title="concept-event-fire">fire an event</a> named
@@ -1502,16 +1719,16 @@ while the scroll is ongoing. <!--fingerprint-->
 <a class="external" data-anolis-spec="html" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/webappapis.html#queue-a-task" title="queue a task">queue</a> that task at a user-agent-defined interval while the scroll is ongoing. <!--fingerprint-->
 
 
-<h2 id="css-properties"><span class="secno">13 </span>CSS properties</h2>
+<h2 id="css-properties"><span class="secno">14 </span>CSS properties</h2>
 
 <p class="issue">The features in this section should be moved to some other specification.
 
-<h3 id="smooth-scrolling:-the-'scroll-behavior'-property"><span class="secno">13.1 </span>Smooth Scrolling: The 'scroll-behavior' Property</h3>
+<h3 id="smooth-scrolling:-the-'scroll-behavior'-property"><span class="secno">14.1 </span>Smooth Scrolling: The 'scroll-behavior' Property</h3>
 
 <pre class="propdef">Name: <dfn id="scroll-behavior">scroll-behavior</dfn>
 Value: instant | smooth
 Initial: instant
-Applies to: scrolling boxes
+Applies to: <a href="#scrolling-box" title="scrolling box">scrolling boxes</a>
 Inherited: no
 Computed value:	specified value 
 Media: visual
@@ -1519,32 +1736,44 @@ Animatable: no
 Canonical Order: per grammar
 </pre>
 
-<p>The '<a href="#scroll-behavior">scroll-behavior</a>' property specifies the scrolling behavior for a scrolling box, when scrolling happens due to navigation or CSSOM scrolling
-APIs. Scrolls that are performed by the user are not affected by this property. When this property is specified on the root element, it applies to the
-<a href="#viewport">viewport</a> instead.
+<p>The '<a href="#scroll-behavior">scroll-behavior</a>' property specifies the scrolling behavior for a <a href="#scrolling-box">scrolling box</a>, when scrolling happens due to navigation or
+CSSOM scrolling APIs. Scrolls that are performed by the user are not affected by this property. When this property is specified on the root element, it applies
+to the <a href="#viewport">viewport</a> instead.
 
 <p class="note">The '<a href="#scroll-behavior">scroll-behavior</a>' property of the HTML <code title="">body</code> element is <em>not</em> propagated to the viewport.
 
 <dl>
  <dt>'<dfn id="scroll-behavior-instant" title="scroll-behavior-instant">instant</dfn>'
- <dd><p>The scrolling box is scrolled in an instant fashion.
+ <dd><p>The <a href="#scrolling-box">scrolling box</a> is scrolled in an instant fashion.
 
  <dt>'<dfn id="scroll-behavior-smooth" title="scroll-behavior-smooth">smooth</dfn>'
- <dd><p>The scrolling box is scrolled in a smooth fashion using a user-agent-defined timing function over a user-agent-defined period of time. User agents
- should follow platform convensions, if any. <!--fingerprint-->
+ <dd><p>The <a href="#scrolling-box">scrolling box</a> is scrolled in a smooth fashion using a user-agent-defined timing function over a user-agent-defined period of time. User
+ agents should follow platform convensions, if any. <!--fingerprint-->
 </dl>
 
 <p>User agents may ignore this property. <!--fingerprint-->
 
 <h2 class="no-num" id="references">References</h2>
-<div id="anolis-references"><dl><dt id="refsCSSOM">[CSSOM]
+<div id="anolis-references"><dl><dt id="refsCSSBOX">[CSSBOX]
+<dd><cite><a href="http://dev.w3.org/csswg/css-box/">CSS basic box model</a></cite>, Bert Bos and Anton Prowse. W3C.
+
+<dt id="refsCSSDEVICEADAPT">[CSSDEVICEADAPT]
+<dd><cite><a href="http://dev.w3.org/csswg/css-device-adapt/">CSS Device Adaptation</a></cite>, Rune Lillesveen, Øyvind Stenhaug and Florian Rivoal.
+
+<dt id="refsCSSOM">[CSSOM]
 <dd><cite><a href="http://dev.w3.org/csswg/cssom/">CSS Object Model (CSSOM)</a></cite>, Simon Pieters and Glenn Adams. W3C.
+
+<dt id="refsCSSTRANSFORMS">[CSSTRANSFORMS]
+<dd><cite><a href="http://dev.w3.org/csswg/css-transforms/">CSS Transforms</a></cite>, Simon Fraser, Dean Jackson, Edward O'Connor et al.. W3C.
 
 <dt id="refsCSSWRITINGMODES">[CSSWRITINGMODES]
 <dd><cite><a href="http://dev.w3.org/csswg/css-writing-modes/">CSS Writing Modes Module</a></cite>, Elika J. Etemad and Koji Ishii. W3C.
 
 <dt id="refsDOM">[DOM]
 <dd><cite><a href="http://dom.spec.whatwg.org/">DOM</a></cite>, Anne van Kesteren, Aryeh Gregor and Ms2ger. WHATWG.
+
+<dt id="refsGEOMETRY">[GEOMETRY]
+<dd><cite><a href="http://dev.w3.org/fxtf/geometry/">Geometry Interfaces Module</a></cite>, Simon Pieters, Dirk Schulze and Rik Cabanier. W3C.
 
 <dt id="refsHTML">[HTML]
 <dd><cite><a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/">HTML</a></cite>, Ian Hickson. WHATWG.
@@ -1566,28 +1795,35 @@ APIs. Scrolls that are performed by the user are not affected by this property. 
 
 Alan Stearns,
 Alexey Feldgendler,
+Antonio Gomes,
 Björn Höhrmann,
 Dan Bates,
 David Vest,
 Elliott Sprehn,
 Garrett Smith,
+Henrik Andersson,
 Hallvord R. M. Steen,
+Kang-Hao Lu,
 Leif Arne Storset,
 Luiz Agostini,
 Maciej Stachowiak,
 Michael Dyck,
 Mike Wilson,
 Morten Stenshorne,
+Olli Pettay,
+Pavel Curtis,
 Peter-Paul Koch,
 Rachel Kmetz,
 Robert O'Callahan,
 Sam Weinig,
 Scott Johnson,
 Sebastian Zartner,
+Stewart Brodie,
 Sylvain Galineau,
+Tab Atkins,
 Tarquin Wilton-Jones,
 Thomas Moore, and
-Xiaomei Ji<!-- should actually use real name here -->
+Xiaomei Ji
 
 for their contributions to this document.</p>
 

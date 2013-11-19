@@ -7,7 +7,7 @@
 
 <p><a class="logo" href="//www.whatwg.org/"><img alt="WHATWG" height="100" src="//resources.whatwg.org/logo-url.svg" width="100"></a></p>
 <h1>URL</h1>
-<h2 class="no-num no-toc" id="living-standard-—-last-updated-23-july-2013">Living Standard — Last Updated 23 July 2013</h2>
+<h2 class="no-num no-toc" id="living-standard-—-last-updated-1-november-2013">Living Standard — Last Updated 1 November 2013</h2>
 
 <dl>
  <dt>This Version:
@@ -35,7 +35,7 @@
 <p class="copyright"><a href="http://creativecommons.org/publicdomain/zero/1.0/" rel="license"><img alt="CC0" src="http://i.creativecommons.org/p/zero/1.0/80x15.png"></a>
 To the extent possible under law, the editors have waived all copyright and
 related or neighboring rights to this work. In addition, as of
-23 July 2013, the editors have made this specification available
+1 November 2013, the editors have made this specification available
 under the
 <a href="http://www.openwebfoundation.org/legal/the-owf-1-0-agreements/owfa-1-0" rel="license">Open Web Foundation Agreement Version 1.0</a>,
 which is available at
@@ -55,11 +55,12 @@ http://www.openwebfoundation.org/legal/the-owf-1-0-agreements/owfa-1-0.
   <ol>
    <li><a href="#parsers"><span class="secno">2.1 </span>Parsers</a></ol></li>
  <li><a href="#percent-encoded-bytes"><span class="secno">3 </span>Percent-encoded bytes</a></li>
- <li><a href="#hosts-and-ip-addresses"><span class="secno">4 </span>Hosts and IP addresses</a>
+ <li><a href="#hosts-(domains-and-ip-addresses)"><span class="secno">4 </span>Hosts (domains and IP addresses)</a>
   <ol>
-   <li><a href="#host-writing"><span class="secno">4.1 </span>Writing</a></li>
-   <li><a href="#host-parsing"><span class="secno">4.2 </span>Parsing</a></li>
-   <li><a href="#host-serializing"><span class="secno">4.3 </span>Serializing</a></ol></li>
+   <li><a href="#idna"><span class="secno">4.1 </span>IDNA</a></li>
+   <li><a href="#host-writing"><span class="secno">4.2 </span>Writing</a></li>
+   <li><a href="#host-parsing"><span class="secno">4.3 </span>Parsing</a></li>
+   <li><a href="#host-serializing"><span class="secno">4.4 </span>Serializing</a></ol></li>
  <li><a href="#urls"><span class="secno">5 </span>URLs</a>
   <ol>
    <li><a href="#writing"><span class="secno">5.1 </span>Writing</a></li>
@@ -69,8 +70,9 @@ http://www.openwebfoundation.org/legal/the-owf-1-0-agreements/owfa-1-0.
  <li><a href="#api"><span class="secno">7 </span>API</a>
   <ol>
    <li><a href="#constructors"><span class="secno">7.1 </span>Constructors</a></li>
-   <li><a href="#urlutils-and-urlutilsreadonly-members"><span class="secno">7.2 </span><code>URLUtils</code> and <code>URLUtilsReadOnly</code> members</a></li>
-   <li><a href="#interface-urlquery"><span class="secno">7.3 </span>Interface <code>URLQuery</code></a></ol></li>
+   <li><a href="#url-statics"><span class="secno">7.2 </span><code>URL</code> statics</a></li>
+   <li><a href="#urlutils-and-urlutilsreadonly-members"><span class="secno">7.3 </span><code>URLUtils</code> and <code>URLUtilsReadOnly</code> members</a></li>
+   <li><a href="#interface-urlsearchparams"><span class="secno">7.4 </span>Interface <code>URLSearchParams</code></a></ol></li>
  <li><a class="no-num" href="#references">References</a></li>
  <li><a class="no-num" href="#acknowledgments">Acknowledgments</a></ol>
 <!--end-toc-->
@@ -126,6 +128,7 @@ not appear in all uppercase letters in this specification.
 Encoding Standard. <a href="#refsENCODING">[ENCODING]</a>
 
 <p>The <dfn id="ascii-digits">ASCII digits</dfn> are code points in the range U+0030 to U+0039.
+<!-- XXX ref Encoding? -->
 
 <p>The <dfn id="ascii-hex-digits">ASCII hex digits</dfn> are <a href="#ascii-digits">ASCII digits</a> or are
 code points in the range U+0041 to U+0046 or in the range U+0061 to U+0066.
@@ -170,8 +173,8 @@ processed and <var title="">pointer</var> points to "<code title="">@</code>",
 two <a href="#ascii-hex-digits">ASCII hex digits</a>. Sequences of
 <a href="#percent-encoded-byte" title="percent-encoded byte">percent-encoded bytes</a>, after
 conversion to bytes, should not cause
-<a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#utf-8-decode">utf-8 decode</a> to emit any
-<a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#decoder-error" title="decoder error">decoder errors</a>.
+<a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#utf-8-decode">utf-8 decode</a> to run into any
+<a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#error" title="error">errors</a>.
 
 <p>To <dfn id="percent-encode">percent encode</dfn> a <var title="">byte</var> into a
 <a href="#percent-encoded-byte">percent-encoded byte</a>, return a string consisting of
@@ -261,7 +264,7 @@ an <var title="">encode set</var>, run these steps:
 
 
 
-<h2 id="hosts-and-ip-addresses"><span class="secno">4 </span>Hosts and IP addresses</h2>
+<h2 id="hosts-(domains-and-ip-addresses)"><span class="secno">4 </span>Hosts (domains and IP addresses)</h2>
 
 <!-- Punycode:
      http://tools.ietf.org/html/rfc3492
@@ -286,7 +289,60 @@ eight <dfn id="concept-ipv6-piece" title="concept-ipv6-piece">16-bit pieces</dfn
 <a class="informative" href="#refsIPV6">[IPV6]</a>
 
 
-<h3 id="host-writing"><span class="secno">4.1 </span>Writing</h3>
+<h3 id="idna"><span class="secno">4.1 </span>IDNA</h3>
+
+<p>The <dfn id="concept-domain-label-to-ascii" title="concept-domain-label-to-ascii">domain label to ASCII</dfn> algorithm is
+the <a class="external" data-anolis-spec="idna" href="http://tools.ietf.org/html/rfc3490#section-4.1" title="ToASCII">IDNA2003 ToASCII algorithm</a> with the
+AllowUnassigned flag set and the version of Unicode used being the most recent version
+rather than Unicode 3.2.
+
+<p>The <dfn id="concept-domain-label-to-unicode" title="concept-domain-label-to-unicode">domain label to Unicode</dfn> algorithm
+is the <a class="external" data-anolis-spec="idna" href="http://tools.ietf.org/html/rfc3490#section-4.2" title="ToUnicode">IDNA2003 ToUnicode algorithm</a>
+with the AllowUnassigned flag set and the version of Unicode used being the most recent
+version rather than Unicode 3.2.
+<a href="#refsIDNA">[IDNA]</a>
+<a href="#refsUNICODE">[UNICODE]</a>
+
+<p class="note">Using the latest version of Unicode as well as IDNA2003 rather than IDNA2008
+are willful violations, to be compatible with widely deployed clients.
+
+<p>The <dfn id="concept-domain-to-ascii" title="concept-domain-to-ascii">domain to ASCII</dfn> algorithm takes a
+<a href="#concept-domain" title="concept-domain">domain</a> <var title="">input</var> and then runs these steps:
+
+<ol>
+ <li><p>Let <var title="">asciiLabels</var> be an empty list.
+
+ <li><p>On each <a href="#concept-domain-label" title="concept-domain-label">domain label</a> in
+ <var title="">input</var>, in order, run the
+ <a href="#concept-domain-label-to-ascii" title="concept-domain-label-to-ascii">domain label to ASCII</a> algorithm.
+ If that operation failed, return failure.
+ Otherwise, append the result to <var title="">asciiLabels</var>.
+
+ <li><p>Return <var title="">asciiLabels</var>.
+</ol>
+
+<p>The <dfn id="concept-domain-to-unicode" title="concept-domain-to-unicode">domain to Unicode</dfn> algorithm takes a
+<a href="#concept-domain" title="concept-domain">domain</a> <var title="">input</var> and then runs these steps:
+
+<ol>
+ <li><p>Let <var title="">unicodeLabels</var> be an empty list.
+
+ <li>
+  <p>On each <a href="#concept-domain-label" title="concept-domain-label">domain label</a> in
+  <var title="">input</var>, in order, run the
+  <a href="#concept-domain-label-to-unicode" title="concept-domain-label-to-unicode">domain label to Unicode</a> algorithm and
+  append the result to <var title="">unicodeLabels</var>.
+
+  <p class="note">Note that the
+  <a href="#concept-domain-label-to-unicode" title="concept-domain-label-to-unicode">domain label to Unicode</a> algorithm
+  cannot fail.
+
+ <li><p>Return <var title="">unicodeLabels</var>.
+</ol>
+
+
+
+<h3 id="host-writing"><span class="secno">4.2 </span>Writing</h3>
 
 <p>A <a href="#concept-host" title="concept-host">host</a> must be either a
 <a href="#concept-domain" title="concept-domain">domain</a> or "<code title="">[</code>", followed
@@ -318,7 +374,7 @@ signifies an empty <a href="#concept-domain-label" title="concept-domain-label">
      XXX should we define the format inline instead just like STD 66? -->
 
 
-<h3 id="host-parsing"><span class="secno">4.2 </span>Parsing</h3>
+<h3 id="host-parsing"><span class="secno">4.3 </span>Parsing</h3>
 
 <p>The <dfn id="concept-host-parser" title="concept-host-parser">host parser</dfn> takes a string
 <var title="">input</var> and then runs these steps:
@@ -351,7 +407,16 @@ signifies an empty <a href="#concept-domain-label" title="concept-domain-label">
  <a href="#percent-decode" title="percent decode">percent decoding</a> of
  <var title="">input</var>.
 
- <li><p class="XXX"><a href="http://wiki.whatwg.org/wiki/URL#IDNA">IDNA hell</a>
+ <li><p>Let <var title="">domain</var> be the result of splitting <var title="">host</var> on
+ any <a href="#domain-label-separators">domain label separators</a>.
+
+ <li>
+  <p>Return the result of running
+  <a href="#concept-domain-to-ascii" title="concept-domain-to-ascii">domain to ASCII</a> on <var title="">domain</var>.
+
+  <p class="note"><a href="#concept-domain-to-ascii" title="concept-domain-to-ascii">Domain to ASCII</a> can return
+  failure in which case the <a href="#concept-host-parser" title="concept-host-parser">host parser</a> would
+  return failure here.
 </ol>
 
 <p>The <dfn id="concept-ipv6-parser" title="concept-ipv6-parser">IPv6 parser</dfn> takes a string
@@ -461,6 +526,9 @@ signifies an empty <a href="#concept-domain-label" title="concept-domain-label">
   <ol>
    <li><p>Let <var title="">value</var> be 0.
 
+   <li><p>If <a href="#c">c</a> is not an <a href="#ascii-digits" title="ASCII digits">ASCII digit</a>,
+   <a href="#parse-error">parse error</a>, return failure. <!-- prevent the empty string -->
+
    <li><p>While <a href="#c">c</a> is an
    <a href="#ascii-digits" title="ASCII digits">ASCII digit</a>, set <var title="">value</var> to
    <var title="">value</var> × 10 + <a href="#c">c</a> interpreted as decimal number
@@ -473,15 +541,17 @@ signifies an empty <a href="#concept-domain-label" title="concept-domain-label">
    <a href="#c">c</a> is not a "<code title="">.</code>",
    <a href="#parse-error">parse error</a>, return failure.
 
-   <li><p>If <var title="">dots seen</var> is 3 and <a href="#c">c</a> is not
-   the <a href="#eof-code-point">EOF code point</a>,
-   <a href="#parse-error">parse error</a>, return failure.
-
    <li><p>Set <var title="">piece</var> to
    <var title="">piece</var> × 0x100 + <var title="">value</var>.
 
    <li><p>If <var title="">dots seen</var> is 0 or 2, increase
    <var title="">piece pointer</var> by one.
+
+   <li><p>Increase <var title="">pointer</var> by one.
+
+   <li><p>If <var title="">dots seen</var> is 3 and <a href="#c">c</a> is not
+   the <a href="#eof-code-point">EOF code point</a>,
+   <a href="#parse-error">parse error</a>, return failure.
 
    <li><p>Increase <var title="">dots seen</var> by one.
   </ol>
@@ -512,7 +582,7 @@ signifies an empty <a href="#concept-domain-label" title="concept-domain-label">
 </ol>
 
 
-<h3 id="host-serializing"><span class="secno">4.3 </span>Serializing</h3>
+<h3 id="host-serializing"><span class="secno">4.4 </span>Serializing</h3>
 
 <p>The <dfn id="concept-host-serializer" title="concept-host-serializer">host serializer</dfn> takes a
 <a href="#concept-host" title="concept-host">host</a> <var title="">host</var> and then runs
@@ -528,8 +598,9 @@ these steps:
  <a href="#concept-ipv6-serializer" title="concept-ipv6-serializer">IPv6 serializer</a> on <var title="">host</var>,
  followed by "<code title="">]</code>".
 
- <li class="XXX"><p>If <var title="">host</var> is a
- <a href="#concept-domain" title="concept-domain">domain</a> ...
+ <li><p>Otherwise, <var title="">host</var> is a <a href="#concept-domain" title="concept-domain">domain</a>,
+ return its <span title="concept-domain-labels">labels</span> separated from each other by
+ U+002E.
 </ol>
 
 <p>The <dfn id="concept-ipv6-serializer" title="concept-ipv6-serializer">IPv6 serializer</dfn> takes an
@@ -815,7 +886,7 @@ optionally with an <a class="external" data-anolis-spec="encoding" href="http://
 
 <p class="note">The <var title="">encoding override</var> argument is a legacy concept only
 relevant for HTML. The <var title="">url</var> and <var title="">state override</var> arguments
-can be used for API manipulation of a <a href="#concept-parsed-url" title="concept-parsed-url">parsed URL</a>.
+are only for use by methods of objects implementing the <a href="#urlutils"><code>URLUtils</code></a> interface.
 <a class="informative" href="#refsHTML">[HTML]</a>
 
 <ol>
@@ -1465,10 +1536,9 @@ can be used for API manipulation of a <a href="#concept-parsed-url" title="conce
        <li><p>Set <var title="">buffer</var> to the result of running
        <var title="">encoding override</var>'s
        <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#encoder">encoder</a> on
-       <var title="">buffer</var>. Whenever the
-       <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#encoder">encoder</a> algorithm emits an
-       <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#encoder-error">encoder error</a>, emit a 0x3F
-       byte instead and do not terminate the algorithm.
+       <var title="">buffer</var>, with <var title="">encoding override</var>'s
+       <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#encoder">encoder</a>'s
+       <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#error-handling-mode">error handling mode</a> set to <i title="">URL</i>.
 
        <li>
         <p>For each <var title="">byte</var> in <var title="">buffer</var> run
@@ -1693,8 +1763,7 @@ optionally with an <a class="external" data-anolis-spec="encoding" href="http://
 
 <p>The
 <dfn id="concept-urlencoded-byte-serializer" title="concept-urlencoded-byte-serializer"><code>application/x-www-form-urlencoded</code> byte serializer</dfn>
-takes a byte sequence <var title="">input</var>, an
-<var title="">encoding override</var>, and then runs these steps:
+takes a byte sequence <var title="">input</var> and then runs these steps:
 
 <ol>
  <li><p>Let <var title="">output</var> be the empty string.
@@ -1753,14 +1822,10 @@ takes a list of name-value pairs <var title="">pairs</var>, optionally with an
   <ol>
    <li><p>Replace <var title="">pair</var>'s name and value with the result of
    running <var title="">encoding override</var>'s
-   <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#encoder">encoder</a> on them, respectively.
-   Whenever the <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#encoder">encoder</a> algorithm
-   emits an <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#encoder-error">encoder error</a>, emit the
-   result of running <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#utf-8-encode">utf-8 encode</a> on
-   U+0026, U+0023, followed by one or more <a href="#ascii-digits">ASCII digits</a>
-   representing the code point that caused the
-   <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#encoder-error">encoder error</a> in base ten,
-   followed by U+003B.
+   <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#encoder">encoder</a> on them, with
+   <var title="">encoding override</var>'s <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#encoder">encoder</a>'s
+   <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#error-handling-mode">error handling mode</a> set to
+   <i title="">&lt;form&gt;</i>, respectively.
 
    <li><p>Replace <var title="">pair</var>'s name and value with their
    <a href="#concept-urlencoded-byte-serializer" title="concept-urlencoded-byte-serializer">serialization</a>.
@@ -1784,6 +1849,8 @@ takes a list of name-value pairs <var title="">pairs</var>, optionally with an
 
 <pre class="idl">[<a href="#dom-url" title="dom-URL">Constructor</a>(DOMString <var title="">url</var>, optional (<a href="#url">URL</a> or DOMString) <var title="">base</var> = "about:blank")]
 interface <dfn id="url">URL</dfn> {
+  static DOMString <a href="#dom-url-domaintoascii" title="dom-URL-domainToASCII">domainToASCII</a>([EnsureUTF16] DOMString <var title="">domain</var>);
+  static DOMString <a href="#dom-url-domaintounicode" title="dom-URL-domainToUnicode">domainToUnicode</a>([EnsureUTF16] DOMString <var title="">domain</var>);
 };
 <a href="#url">URL</a> implements <a href="#urlutils">URLUtils</a>;
 
@@ -1800,7 +1867,7 @@ interface <dfn id="urlutils">URLUtils</dfn> {
            attribute [EnsureUTF16] DOMString <a href="#dom-url-port" title="dom-URL-port">port</a>;
            attribute [EnsureUTF16] DOMString <a href="#dom-url-pathname" title="dom-URL-pathname">pathname</a>;
            attribute [EnsureUTF16] DOMString <a href="#dom-url-search" title="dom-URL-search">search</a>;
-           attribute <a href="#urlquery">URLQuery</a>? <a href="#dom-url-query" title="dom-URL-query">query</a>;
+           attribute <a href="#urlsearchparams">URLSearchParams</a>? <a href="#dom-url-searchparams" title="dom-URL-searchParams">searchParams</a>;
            attribute [EnsureUTF16] DOMString <a href="#dom-url-hash" title="dom-URL-hash">hash</a>;
 };
 
@@ -1817,7 +1884,7 @@ interface <dfn id="urlutilsreadonly">URLUtilsReadOnly</dfn> {
   readonly attribute DOMString <a href="#dom-url-port" title="dom-URL-port">port</a>;
   readonly attribute DOMString <a href="#dom-url-pathname" title="dom-URL-pathname">pathname</a>;
   readonly attribute DOMString <a href="#dom-url-search" title="dom-URL-search">search</a>;<!--
-  readonly attribute <span>URLQuery</span>? <span title=dom-URL-query>query</span>;-->
+  readonly attribute <span>URLSearchParams</span>? <span title=dom-URL-searchParams>searchParams</span>;-->
   readonly attribute DOMString <a href="#dom-url-hash" title="dom-URL-hash">hash</a>;
 };</pre>
 
@@ -1859,7 +1926,7 @@ associated <dfn id="concept-uu-input" title="concept-UU-input">input</dfn> (a st
 <dfn id="concept-uu-query-encoding" title="concept-UU-query-encoding">query encoding</dfn>
 (an <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#encoding">encoding</a>),
 <dfn id="concept-uu-query-object" title="concept-UU-query-object">query object</dfn>
-(a <a href="#urlquery"><code>URLQuery</code></a> object or null), and a
+(a <a href="#urlsearchparams"><code>URLSearchParams</code></a> object or null), and a
 <dfn id="concept-uu-url" title="concept-UU-url">url</dfn> (a
 <a href="#concept-parsed-url" title="concept-parsed-url">parsed URL</a> or null).
 
@@ -1902,7 +1969,7 @@ concept only relevant for HTML.
   <ol>
    <li><p>If <a href="#concept-uu-query-object" title="concept-UU-query-object">query object</a> is null, set
    <a href="#concept-uu-query-object" title="concept-UU-query-object">query object</a> to a
-   <a href="#concept-uq-new" title="concept-UQ-new">new <code>URLQuery</code> object</a> using
+   <a href="#concept-uq-new" title="concept-UQ-new">new <code>URLSearchParams</code> object</a> using
    <a href="#concept-uu-url" title="concept-UU-url">url</a>'s <a href="#concept-url-query" title="concept-URL-query">query</a>.
 
    <li><p>Otherwise, set <a href="#concept-uu-query-object" title="concept-UU-query-object">query object</a>'s
@@ -1942,9 +2009,8 @@ constructor must run these steps:
  <a href="#concept-url-parser" title="concept-url-parser">parse</a> <var title="">base</var> and set
  <var title="">base</var> to the result of that algorithm.
 
- <li><p>If <var title="">base</var> is failure,
- <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-throw" title="concept-throw">throw</a> an
- "<a href="http://dom.spec.whatwg.org/#syntaxerror"><code class="external" data-anolis-spec="dom">SyntaxError</code></a>" exception.
+ <li><p>If <var title="">base</var> is failure, <a class="external" data-anolis-spec="webidl" href="http://dev.w3.org/2006/webapi/WebIDL/#dfn-throw">throw</a> a
+ <code title="">TypeError</code> exception.
 
  <li><p>Let <var title="">result</var> be a new <a href="#url"><code>URL</code></a> object.
 
@@ -1955,8 +2021,7 @@ constructor must run these steps:
  <a href="#concept-uu-set-the-input" title="concept-UU-set-the-input">set the input</a> for <var title="">url</var>.
 
  <li><p>If <var title="">result</var>'s <a href="#concept-uu-url" title="concept-UU-url">url</a> is null,
- <a class="external" data-anolis-spec="dom" href="http://dom.spec.whatwg.org/#concept-throw" title="concept-throw">throw</a> an
- "<a href="http://dom.spec.whatwg.org/#syntaxerror"><code class="external" data-anolis-spec="dom">SyntaxError</code></a>" exception.
+ <a class="external" data-anolis-spec="webidl" href="http://dev.w3.org/2006/webapi/WebIDL/#dfn-throw">throw</a> a <code title="">TypeError</code> exception.
 
  <li><p>Return <var title="">result</var>.
 </ol>
@@ -1980,7 +2045,44 @@ url.href // "http://url.spec.whatwg.org/%F0%9F%92%A9"</pre>
 </div>
 
 
-<h3 id="urlutils-and-urlutilsreadonly-members"><span class="secno">7.2 </span><a href="#urlutils"><code>URLUtils</code></a> and <a href="#urlutilsreadonly"><code>URLUtilsReadOnly</code></a> members</h3>
+<h3 id="url-statics"><span class="secno">7.2 </span><a href="#url"><code>URL</code></a> statics</h3>
+
+<p>The
+<dfn id="dom-url-domaintoascii" title="dom-URL-domainToASCII"><code>domainToASCII(<var>domain</var>)</code></dfn>
+static method must run these steps:
+
+<ol>
+ <li><p>Let <var title="">internalDomain</var> be the result of splitting
+ <var title="">domain</var> on any <a href="#domain-label-separators">domain label separators</a>.
+
+ <li><p>Let <var title="">asciiDomain</var> be the result of running
+ <a href="#concept-domain-to-ascii" title="concept-domain-to-ascii">domain to ASCII</a> on
+ <var title="">internalDomain</var>.
+
+ <li><p>If <var title="">asciiDomain</var> is failure, return <var title="">domain</var>.
+
+ <li><p>Return <var title="">asciiDomain</var>,
+ <a href="#concept-host-serializer" title="concept-host-serializer">serialized</a>.
+</ol>
+
+<p>The
+<dfn id="dom-url-domaintounicode" title="dom-URL-domainToUnicode"><code>domainToUnicode(<var>domain</var>)</code></dfn>
+static method must run these steps:
+
+<ol>
+ <li><p>Let <var title="">internalDomain</var> be the result of splitting
+ <var title="">domain</var> on any <a href="#domain-label-separators">domain label separators</a>.
+
+ <li><p>Let <var title="">unicodeDomain</var> be the result of running
+ <a href="#concept-domain-to-unicode" title="concept-domain-to-unicode">domain to Unicode</a> on
+ <var title="">internalDomain</var>.
+
+ <li><p>Return <var title="">unicodeDomain</var>,
+ <a href="#concept-host-serializer" title="concept-host-serializer">serialized</a>.
+</ol>
+
+
+<h3 id="urlutils-and-urlutilsreadonly-members"><span class="secno">7.3 </span><a href="#urlutils"><code>URLUtils</code></a> and <a href="#urlutilsreadonly"><code>URLUtilsReadOnly</code></a> members</h3>
 
 <p class="note">The <a href="#urlutils"><code>URLUtils</code></a> and <a href="#urlutilsreadonly"><code>URLUtilsReadOnly</code></a> interfaces are
 not exposed on the global object. They are meant to augment other interfaces, such as
@@ -2003,6 +2105,10 @@ run these steps:
 <ol>
  <li><p>Run the <a href="#concept-uu-set-the-input" title="concept-UU-set-the-input">set the input</a> algorithm for
  the given value.
+
+ <li><p>If the <span>context object</span> is a <a href="#url"><code>URL</code></a> object and its
+ <a href="#concept-uu-url" title="concept-UU-url">url</a> is null,
+ <a class="external" data-anolis-spec="webidl" href="http://dev.w3.org/2006/webapi/WebIDL/#dfn-throw">throw</a> a <code title="">TypeError</code> exception.
 
  <li><p>Run the <a href="#pre-update-steps">pre-update steps</a> with the given value.
 </ol>
@@ -2194,7 +2300,12 @@ steps:
  <a href="#concept-url-scheme" title="concept-url-scheme">scheme</a> is "<code title="">file</code>",
  terminate these steps.
 
- <li><p><a href="#concept-url-parser" title="concept-url-parser">Parse</a> the given value with
+ <li><p>If the given value is the empty string, set
+ <a href="#concept-uu-url" title="concept-UU-url">url</a>'s <a href="#concept-url-port" title="concept-URL-port">port</a> to
+ "<code title="">0</code>".
+ <!-- Rationale: https://www.w3.org/Bugs/Public/show_bug.cgi?id=23535 -->
+
+ <li><p>Otherwise, <a href="#concept-url-parser" title="concept-url-parser">parse</a> the given value with
  <a href="#concept-uu-url" title="concept-UU-url">url</a> as <var title="">url</var> and
  <a href="#port-state">port state</a> as <var title="">state override</var>.
 
@@ -2276,10 +2387,10 @@ these steps:
  <li><p>Run the <a href="#pre-update-steps">pre-update steps</a>.
 </ol>
 
-<p>The <dfn id="dom-url-query" title="dom-URL-query"><code>query</code></dfn> attribute must
+<p>The <dfn id="dom-url-searchparams" title="dom-URL-searchParams"><code>searchParams</code></dfn> attribute must
 return the <a href="#concept-uu-query-object" title="concept-UU-query-object">query object</a>.
 
-<p>Setting the <a href="#dom-url-query"><code title="dom-URL-query">query</code></a> attribute must run
+<p>Setting the <a href="#dom-url-searchparams"><code title="dom-URL-searchParams">searchParams</code></a> attribute must run
 these steps:
 
 <ol>
@@ -2291,7 +2402,7 @@ these steps:
  <li><p>If <var title="">object</var>'s
  <a href="#concept-uq-url-object" title="concept-UQ-url-object">url object</a> is not null, set
  <var title="">object</var> to a
- <a href="#concept-uq-new" title="concept-UQ-new">new <code>URLQuery</code> object</a> using
+ <a href="#concept-uq-new" title="concept-UQ-new">new <code>URLSearchParams</code> object</a> using
  <var title="">object</var>.
 
  <li><p>Set <a href="#concept-uu-query-object" title="concept-UU-query-object">query object</a> to
@@ -2339,29 +2450,28 @@ steps:
 </ol>
 
 
-<h3 id="interface-urlquery"><span class="secno">7.3 </span>Interface <a href="#urlquery"><code>URLQuery</code></a></h3>
+<h3 id="interface-urlsearchparams"><span class="secno">7.4 </span>Interface <a href="#urlsearchparams"><code>URLSearchParams</code></a></h3>
 
-<pre class="idl">[<span title="dom-URLQuery">Constructor(optional ([EnsureUTF16] DOMString or <a href="#urlquery">URLQuery</a>) <var title="">init</var> = "")]
-interface <dfn id="urlquery">URLQuery</dfn> {
-  DOMString? <a href="#dom-urlquery-get" title="dom-URLQuery-get">get</a>([EnsureUTF16] DOMString <var title="">name</var>);
-  sequence&lt;DOMString&gt; <a href="#dom-urlquery-getall" title="dom-URLQuery-getAll">getAll</a>([EnsureUTF16] DOMString <var title="">name</var>);
-  void <a href="#dom-urlquery-set" title="dom-URLQuery-set">set</a>([EnsureUTF16] DOMString <var title="">name</var>, [EnsureUTF16] DOMString <var title="">value</var>);
-  void <a href="#dom-urlquery-append" title="dom-URLQuery-append">append</a>([EnsureUTF16] DOMString <var title="">name</var>, [EnsureUTF16] DOMString <var title="">value</var>);
-  boolean <a href="#dom-urlquery-has" title="dom-URLQuery-has">has</a>([EnsureUTF16] DOMString <var title="">name</var>);
-  void <a href="#dom-urlquery-delete" title="dom-URLQuery-delete">delete</a>([EnsureUTF16] DOMString <var title="">name</var>);
-  readonly attribute unsigned long <a href="#dom-urlquery-size" title="dom-URLQuery-size">size</a>;
+<pre class="idl">[<span title="dom-URLSearchParams">Constructor(optional ([EnsureUTF16] DOMString or <a href="#urlsearchparams">URLSearchParams</a>) <var title="">init</var> = "")]
+interface <dfn id="urlsearchparams">URLSearchParams</dfn> {
+  void <a href="#dom-urlsearchparams-append" title="dom-URLSearchParams-append">append</a>([EnsureUTF16] DOMString <var title="">name</var>, [EnsureUTF16] DOMString <var title="">value</var>);
+  void <a href="#dom-urlsearchparams-delete" title="dom-URLSearchParams-delete">delete</a>([EnsureUTF16] DOMString <var title="">name</var>);
+  DOMString? <a href="#dom-urlsearchparams-get" title="dom-URLSearchParams-get">get</a>([EnsureUTF16] DOMString <var title="">name</var>);
+  sequence&lt;DOMString&gt; <a href="#dom-urlsearchparams-getall" title="dom-URLSearchParams-getAll">getAll</a>([EnsureUTF16] DOMString <var title="">name</var>);
+  boolean <a href="#dom-urlsearchparams-has" title="dom-URLSearchParams-has">has</a>([EnsureUTF16] DOMString <var title="">name</var>);
+  void <a href="#dom-urlsearchparams-set" title="dom-URLSearchParams-set">set</a>([EnsureUTF16] DOMString <var title="">name</var>, [EnsureUTF16] DOMString <var title="">value</var>);
 };</span></pre>
 
-<p>A <a href="#urlquery"><code>URLQuery</code></a> object has an associated list of name-value
+<p>A <a href="#urlsearchparams"><code>URLSearchParams</code></a> object has an associated list of name-value
 pairs, which is initially empty.
 
-<p>A <a href="#urlquery"><code>URLQuery</code></a> object has an associated
+<p>A <a href="#urlsearchparams"><code>URLSearchParams</code></a> object has an associated
 <dfn id="concept-uq-url-object" title="concept-UQ-url-object">url object</dfn> which is an object
 implementing <a href="#urlutils"><code>URLUtils</code></a> whose
 <a href="#concept-uu-query-object" title="concept-UU-query-object">query object</a> is the
-<a href="#urlquery"><code>URLQuery</code></a> object, and null if there is no such object.
+<a href="#urlsearchparams"><code>URLSearchParams</code></a> object, and null if there is no such object.
 
-<p class="note"><a href="#urlquery"><code>URLQuery</code></a> objects always use
+<p class="note"><a href="#urlsearchparams"><code>URLSearchParams</code></a> objects always use
 <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#utf-8">utf-8</a> as
 <a class="external" data-anolis-spec="encoding" href="http://encoding.spec.whatwg.org/#encoding">encoding</a>, despite the existence of
 concepts such as
@@ -2371,29 +2481,29 @@ encourage developers to migrate towards
 have done a long time ago now.
 
 <p>To create a
-<dfn id="concept-uq-new" title="concept-UQ-new">new <code>URLQuery</code> object</dfn>, optionally
+<dfn id="concept-uq-new" title="concept-UQ-new">new <code>URLSearchParams</code> object</dfn>, optionally
 using <var title="">init</var>, run these steps:
 
 <ol>
- <li><p>Let <var title="">query</var> be a new <a href="#urlquery"><code>URLQuery</code></a> object.
+ <li><p>Let <var title="">query</var> be a new <a href="#urlsearchparams"><code>URLSearchParams</code></a> object.
 
  <li><p>If <var title="">init</var> is the empty string or null, return
  <var title="">query</var>.
- <!-- Beware: new URLQuery(null) is equivalent to new URLQuery("null") -->
+ <!-- Beware: new URLSearchParams(null) is equivalent to new URLSearchParams("null") -->
 
  <li><p>If <var title="">init</var> is a string,
  set <var title="">query</var>'s associated list of name-value pairs to the
  result of <a href="#concept-urlencoded-parser" title="concept-urlencoded-parser">parsing</a>
  <var title="">input</var>.
 
- <li><p>If <var title="">init</var> is a <a href="#urlquery"><code>URLQuery</code></a> object, set
+ <li><p>If <var title="">init</var> is a <a href="#urlsearchparams"><code>URLSearchParams</code></a> object, set
  <var title="">query</var>'s associated list of name-value pairs to a copy of
  <var title="">init</var> associated list of name-value pairs.
 
  <li><p>Return <var title="">query</var>.
 </ol>
 
-<p>A <a href="#urlquery"><code>URLQuery</code></a> object's
+<p>A <a href="#urlsearchparams"><code>URLSearchParams</code></a> object's
 <dfn id="concept-uq-update" title="concept-UQ-update">update steps</dfn> are:
 
 <ol>
@@ -2404,45 +2514,20 @@ using <var title="">init</var>, run these steps:
  <a href="#concept-uu-url" title="concept-UU-url">url</a>'s
  <a href="#concept-url-query" title="concept-URL-query">query</a> to the
  <a href="#concept-urlencoded-serializer" title="concept-urlencoded-serializer">serialization</a> of the
- <a href="#urlquery"><code>URLQuery</code></a> object's associated list of name-value pairs.
+ <a href="#urlsearchparams"><code>URLSearchParams</code></a> object's associated list of name-value pairs.
 
  <li><p>Run <a href="#concept-uq-url-object" title="concept-UQ-url-object">url object</a>'s
  <a href="#pre-update-steps">pre-update steps</a>.
 </ol>
 
 <p>The
-<dfn id="dom-urlquery" title="dom-URLQuery"><code>URLQuery(<var title="">init</var>)</code></dfn>
+<dfn id="dom-urlsearchparams" title="dom-URLSearchParams"><code>URLSearchParams(<var title="">init</var>)</code></dfn>
 constructor must return a
-<a href="#concept-uq-new" title="concept-UQ-new">new <code>URLQuery</code> object</a> using
+<a href="#concept-uq-new" title="concept-UQ-new">new <code>URLSearchParams</code> object</a> using
 <var title="">init</var> if given.
 
 <p>The
-<dfn id="dom-urlquery-get" title="dom-URLQuery-get"><code>get(<var title="">name</var>)</code></dfn>
-method must return the value of the first name-value pair whose name is
-<var title="">name</var>, and null if there is no such pair.
-
-<p>The
-<dfn id="dom-urlquery-getall" title="dom-URLQuery-getAll"><code>getAll(<var title="">name</var>)</code></dfn>
-method must return the values of all name-value pairs whose name is
-<var title="">name</var>, in list order, and the empty sequence otherwise.
-
-<p>The
-<dfn id="dom-urlquery-set" title="dom-URLQuery-set"><code>set(<var title="">name</var>, <var title="">value</var>)</code></dfn>
-method must run these steps:
-
-<ol>
- <li><p>If there is a name-value pair whose name is <var title="">name</var>,
- set the value of the first such name-value pair to <var title="">value</var>.
-
- <li><p>Otherwise, append a new name-value pair whose name is
- <var title="">name</var> and value is <var title="">value</var>, to the list of
- name-value pairs.
-
- <li><p>Run the <a href="#concept-uq-update" title="concept-UQ-update">update steps</a>.
-</ol>
-
-<p>The
-<dfn id="dom-urlquery-append" title="dom-URLQuery-append"><code>append(<var title="">name</var>, <var title="">value</var>)</code></dfn>
+<dfn id="dom-urlsearchparams-append" title="dom-URLSearchParams-append"><code>append(<var title="">name</var>, <var title="">value</var>)</code></dfn>
 method must run these steps:
 
 <ol>
@@ -2453,12 +2538,7 @@ method must run these steps:
 </ol>
 
 <p>The
-<dfn id="dom-urlquery-has" title="dom-URLQuery-has"><code>has(<var title="">name</var>)</code></dfn>
-method must return true if there is a name-value pair whose name is
-<var title="">name</var>, and false otherwise.
-
-<p>The
-<dfn id="dom-urlquery-delete" title="dom-URLQuery-delete"><code>delete(<var title="">name</var>)</code></dfn>
+<dfn id="dom-urlsearchparams-delete" title="dom-URLSearchParams-delete"><code>delete(<var title="">name</var>)</code></dfn>
 method must run these steps:
 
 <ol>
@@ -2467,8 +2547,37 @@ method must run these steps:
  <li><p>Run the <a href="#concept-uq-update" title="concept-UQ-update">update steps</a>.
 </ol>
 
-<p>The <dfn id="dom-urlquery-size" title="dom-URLQuery-size"><code>size</code></dfn> attribute must
-return the number of name-value pairs.
+<p>The
+<dfn id="dom-urlsearchparams-get" title="dom-URLSearchParams-get"><code>get(<var title="">name</var>)</code></dfn>
+method must return the value of the first name-value pair whose name is
+<var title="">name</var>, and null if there is no such pair.
+
+<p>The
+<dfn id="dom-urlsearchparams-getall" title="dom-URLSearchParams-getAll"><code>getAll(<var title="">name</var>)</code></dfn>
+method must return the values of all name-value pairs whose name is
+<var title="">name</var>, in list order, and the empty sequence otherwise.
+
+<p>The
+<dfn id="dom-urlsearchparams-set" title="dom-URLSearchParams-set"><code>set(<var title="">name</var>, <var title="">value</var>)</code></dfn>
+method must run these steps:
+
+<ol>
+ <li><p>If there are any name-value pairs whose name is <var title="">name</var>,
+ set the value of the first such name-value pair to <var title="">value</var> and remove the
+ others.
+
+ <li><p>Otherwise, append a new name-value pair whose name is
+ <var title="">name</var> and value is <var title="">value</var>, to the list of
+ name-value pairs.
+
+ <li><p>Run the <a href="#concept-uq-update" title="concept-UQ-update">update steps</a>.
+</ol>
+
+<p>The
+<dfn id="dom-urlsearchparams-has" title="dom-URLSearchParams-has"><code>has(<var title="">name</var>)</code></dfn>
+method must return true if there is a name-value pair whose name is
+<var title="">name</var>, and false otherwise.
+
 
 
 
@@ -2478,6 +2587,9 @@ return the number of name-value pairs.
 
 <dt id="refsHTML">[HTML]
 <dd>(Non-normative) <cite><a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/">HTML</a></cite>, Ian Hickson. WHATWG.
+
+<dt id="refsIDNA">[IDNA]
+<dd><cite><a href="http://tools.ietf.org/html/rfc3490">Internationalizing Domain Names in Applications (IDNA)</a></cite>, P. Faltstrom, Paul Hoffman and A. Costello. IETF.
 
 <dt id="refsIPV6">[IPV6]
 <dd><cite><a href="http://tools.ietf.org/html/rfc4291">IP Version 6 Addressing Architecture</a></cite>, R. Hinden and Steve Deering. IETF.
@@ -2493,6 +2605,9 @@ return the number of name-value pairs.
 
 <dt id="refsRFC2119">[RFC2119]
 <dd><cite><a href="http://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a></cite>, Scott Bradner. IETF.
+
+<dt id="refsUNICODE">[UNICODE]
+<dd><cite><a href="http://www.unicode.org/versions/latest/">Unicode Standard</a></cite>. Unicode Consortium.
 
 <dt id="refsURI">[URI]
 <dd>(Non-normative) <cite><a href="http://tools.ietf.org/html/rfc3986">Uniform Resource Identifier (URI): Generic Syntax</a></cite>, Tim Berners-Lee, Roy Fielding and Larry Masinter. IETF.
@@ -2521,6 +2636,7 @@ James Ross,
 Marcos Cáceres,
 Martin Dürst,
 Mathias Bynens,
+Michael Peick,
 Michael™ Smith,
 Peter Occil,
 Rodney Rehm,

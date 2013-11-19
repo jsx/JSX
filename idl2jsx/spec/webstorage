@@ -215,7 +215,7 @@
    <p><a href="http://www.w3.org/"><img width="72" src="http://www.w3.org/Icons/w3c_home" alt="W3C" height="48"></a></p>
 
    <h1>Web Storage</h1>
-   <h2 class="no-num no-toc" id="editor-s-draft-3-august-2013">Editor's Draft 3 August 2013</h2>
+   <h2 class="no-num no-toc" id="editor-s-draft-23-october-2013">Editor's Draft 23 October 2013</h2>
    <dl><dt>Latest Published Version:</dt>
     <dd><a href="http://www.w3.org/TR/webstorage/">http://www.w3.org/TR/webstorage/</a></dd>
     <dt>Latest Editor's Draft:</dt>
@@ -351,7 +351,7 @@
   </dl><p>The W3C <a href="http://www.w3.org/2008/webapps/">Web Applications
   Working Group</a> is the W3C working group responsible for this
   specification's progress along the W3C Recommendation track.
-  This specification is the 3 August 2013 Editor's Draft.
+  This specification is the 23 October 2013 Editor's Draft.
   </p>
 
   
@@ -418,21 +418,17 @@
   <p>This specification introduces two related mechanisms, similar to HTTP session cookies, for
   storing name-value pairs on the client side. <a href="#refsCOOKIES">[COOKIES]</a></p>
 
-  <p>The first is designed for scenarios where the user is carrying
-  out a single transaction, but could be carrying out multiple
-  transactions in different windows at the same time.</p>
+  <p>The first is designed for scenarios where the user is carrying out a single transaction, but
+  could be carrying out multiple transactions in different windows at the same time.</p>
 
-  <p>Cookies don't really handle this case well. For example, a user
-  could be buying plane tickets in two different windows, using the
-  same site. If the site used cookies to keep track of which ticket
-  the user was buying, then as the user clicked from page to page in
-  both windows, the ticket currently being purchased would "leak" from
-  one window to the other, potentially causing the user to buy two
-  tickets for the same flight without really noticing.</p>
+  <p>Cookies don't really handle this case well. For example, a user could be buying plane tickets
+  in two different windows, using the same site. If the site used cookies to keep track of which
+  ticket the user was buying, then as the user clicked from page to page in both windows, the ticket
+  currently being purchased would "leak" from one window to the other, potentially causing the user
+  to buy two tickets for the same flight without really noticing.</p>
 
-  <p>To address this, this specification introduces the <code title="dom-sessionStorage"><a href="#dom-sessionstorage">sessionStorage</a></code> IDL attribute.
-  Sites can add data to the session storage, and it will be accessible
-  to any page from the same site opened in that window.</p> 
+  <p>To address this, this specification introduces the <code title="dom-sessionStorage"><a href="#dom-sessionstorage">sessionStorage</a></code> IDL attribute. Sites can add data to the session
+  storage, and it will be accessible to any page from the same site opened in that window.</p> 
 
   <div class="example">
 
@@ -441,38 +437,36 @@
 
    <pre>&lt;label&gt;
  &lt;input type="checkbox" onchange="sessionStorage.insurance = checked ? 'true' : ''"&gt;
- I want insurance on this trip.
+  I want insurance on this trip.
 &lt;/label&gt;</pre>
 
-   <p>A later page could then check, from script, whether the user had
-   checked the checkbox or not:</p>
+   <p>A later page could then check, from script, whether the user had checked the checkbox or
+   not:</p>
 
    <pre>if (sessionStorage.insurance) { ... }</pre>
 
-   <p>If the user had multiple windows opened on the site, each one
-   would have its own individual copy of the session storage object.</p>
+   <p>If the user had multiple windows opened on the site, each one would have its own individual
+   copy of the session storage object.</p>
 
   </div>
 
   
 
-  <p>The second storage mechanism is designed for storage that spans
-  multiple windows, and lasts beyond the current session. In
-  particular, Web applications may wish to store megabytes of user
-  data, such as entire user-authored documents or a user's mailbox, on
-  the client side for performance reasons.</p>
+  <p>The second storage mechanism is designed for storage that spans multiple windows, and lasts
+  beyond the current session. In particular, Web applications may wish to store megabytes of user
+  data, such as entire user-authored documents or a user's mailbox, on the client side for
+  performance reasons.</p>
 
-  <p>Again, cookies do not handle this case well, because they are
-  transmitted with every request.</p>
+  <p>Again, cookies do not handle this case well, because they are transmitted with every
+  request.</p>
 
-  <p>The <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> IDL
-  attribute is used to access a page's local storage area.</p>
+  <p>The <code title="dom-localStorage"><a href="#dom-localstorage">localStorage</a></code> IDL attribute is used to access a page's
+  local storage area.</p>
 
   <div class="example">
 
-   <p>The site at example.com can display a count of how many times
-   the user has loaded its page by putting the following at the bottom
-   of its page:</p>
+   <p>The site at example.com can display a count of how many times the user has loaded its page by
+   putting the following at the bottom of its page:</p>
 
    <pre>&lt;p&gt;
   You have viewed this page
@@ -881,6 +875,9 @@ dictionary <dfn id="storageeventinit">StorageEventInit</dfn> : <span>EventInit</
 
   <p>A mostly arbitrary limit of five megabytes per <span>origin</span> is suggested. Implementation
   feedback is welcome and will be used to update this suggestion in the future.</p>
+
+  <p>For predictability, quotas should be based on the uncompressed size of data stored.</p>
+  
 
 
   <h2 id="privacy"><span class="secno">6 </span>Privacy</h2>

@@ -86,7 +86,7 @@ server: web
 web.jsx:
 	idl2jsx/build.pl
 	idl2jsx/maketest.pl > t/lib/010.web.jsx
-	bin/jsx --test t/lib/010.web.jsx
+	bin/jsx --warn none --test t/lib/010.web.jsx
 
 
 show-todo:

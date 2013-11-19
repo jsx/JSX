@@ -25,7 +25,7 @@ my @specs = (
     ['web.jsx' =>
         # DOM spec
         #'http://www.w3.org/TR/DOM-Level-3-Core/idl/dom.idl',
-        'dom; http://www.w3.org/TR/dom/',
+        'dom; http://www.w3.org/TR/2013/WD-dom-20131107/',
         'DOM-Level-2-Views; http://www.w3.org/TR/DOM-Level-2-Views/idl/views.idl',
         'DOM-Level-3-Events; http://www.w3.org/TR/DOM-Level-3-Events/',
         'progress-events; http://www.w3.org/TR/progress-events/',
@@ -37,6 +37,7 @@ my @specs = (
         #'http://html5labs.interoperabilitybridges.com/dom4events/', # no correct IDL
 
         # CSS
+        'css-conditional; http://dev.w3.org/csswg/css-conditional/',
         'cssom; http://dev.w3.org/csswg/cssom/',
         'cssom-view; http://dev.w3.org/csswg/cssom-view/',
         "$root/extra/chrome.idl",
@@ -62,6 +63,8 @@ my @specs = (
         "url; http://www.w3.org/TR/2012/WD-url-20120524/",
         "IndexedDB; http://www.w3.org/TR/2013/WD-IndexedDB-20130516/",
         "notifications; http://www.w3.org/TR/2012/WD-notifications-20120614/",
+        "matrix; http://dev.w3.org/fxtf/matrix/",
+        "metry; http://dev.w3.org/fxtf/geometry/",
 
         "webrtc; http://dev.w3.org/2011/webrtc/editor/webrtc.html",
         #"http://dev.w3.org/2011/webrtc/editor/getusermedia.html",
