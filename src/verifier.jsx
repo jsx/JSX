@@ -45,16 +45,17 @@ class Verifier {
 	static function perform(classDefs : ClassDefinition[], platform : Platform = null) : boolean {
 		var verifier = new Verifier;
 
-		var success = true;
-		if (success && ! (success = verifier.checkTypes(classDefs))) {
+		if (! verifier.checkTypes(classDefs)) {
 			if (platform != null)
 				verifier.dumpLogs(platform);
+			return false;
 		}
-		if (success && ! (success = verifier.checkClosureLinks(classDefs))) {
+		if (! verifier.checkClosureLinks(classDefs)) {
 			if (platform != null)
 				verifier.dumpLogs(platform);
+			return false;
 		}
-		return success;
+		return true;
 	}
 
 	function checkTypes (classDefs : ClassDefinition[]) : boolean {
