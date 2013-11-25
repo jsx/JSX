@@ -981,45 +981,22 @@ native class TypeError extends Error {
 	function constructor(message : string);
 }
 
-/**
- * Provides classes and interfaces related to generator.
- * @private EXPERIMENTAL
- */
-class StopIteration extends Error {
-	function constructor() { }
+interface IteratorResult.<T> {
+
+	var done : boolean;
+	var value : Nullable.<T>;
+
 }
 
-/**
- * @private EXPERIMENTAL
- */
-interface Enumerable.<T> {
-	function next () : T;
+native final class GeneratorFunction {
+
+	delete function constructor ();
+
 }
 
-// only used by JSX compiler
-class __jsx_generator.<T> implements Enumerable.<T> {
+native class GeneratorObject.<T> {
 
-	var __next : () -> void;
-	var __value : T;
-	var __end : boolean = false;
-
-	function constructor () { }
-
-	override function next () : T {
-		// FIXME: wasabiz
-		// stop propagation of StopIteration from inner generator to outer one
-		if (! this.__end) {
-			try {
-				this.__next();
-			} catch (e : StopIteration) {
-				this.__end = true;
-				throw e;
-			}
-			return this.__value;
-		} else {
-			throw new StopIteration;
-		}
-	}
+	function next () : IteratorResult.<T>;
 
 }
 

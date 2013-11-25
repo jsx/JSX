@@ -1871,10 +1871,6 @@ class Parser {
 				var lastToken = this._initializeBlock();
 			else
 				lastToken = this._block();
-			// done
-			if (this._isGenerator) {
-				flags |= ClassDefinition.IS_GENERATOR;
-			}
 			var funcDef = createDefinition(this._locals, this._statements, this._closures, lastToken);
 			return funcDef;
 		} finally {
@@ -2332,6 +2328,9 @@ class Parser {
 	}
 
 	function _functionStatement (token : Token) : boolean {
+		var isGenerator = false;
+		if (this._expectOpt("*") != null)
+			isGenerator = true;
 		var name = this._expectIdentifier();
 		if (name == null)
 			return false;
@@ -2351,7 +2350,7 @@ class Parser {
 
 		var funcLocal = this._registerLocal(name, new StaticFunctionType(token, returnType, args.map.<Type>((arg) -> arg.getType()), false), true);
 
-		var funcDef = this._functionBody(token, name, funcLocal, args, returnType, true);
+		var funcDef = this._functionBody(token, name, funcLocal, args, returnType, true, isGenerator);
 		if (funcDef == null) {
 			return false;
 		}
@@ -2518,13 +2517,16 @@ class Parser {
 
 	function _yieldStatement (token : Token) : boolean {
 		this._newExperimentalWarning(token);
+		if (! this._isGenerator) {
+			this._newError("invalid use of 'yield' keyword in non-generator function");
+			return false;
+		}
 		var expr = this._expr(false);
 		if (expr == null)
 			return false;
 		this._statements.push(new YieldStatement(token, expr));
 		if (this._expect(";") == null)
 			return false;
-		this._isGenerator = true;
 		return true;
 	}
 
@@ -3095,18 +3097,22 @@ class Parser {
 		}
 		if (this._expect("->") == null)
 			return null;
-		var funcDef = this._functionBody(token, null, null, args, returnType, this._expectOpt("{") != null);
+		var funcDef = this._functionBody(token, null, null, args, returnType, this._expectOpt("{") != null, false);
 		if (funcDef == null)
 			return null;
 		this._closures.push(funcDef);
 		return new FunctionExpression(token, funcDef);
 	}
 
-	function _functionBody(token : Token, name : Token, funcLocal : LocalVariable, args : ArgumentDeclaration[], returnType : Type, withBlock : boolean) : MemberFunctionDefinition {
+	function _functionBody(token : Token, name : Token, funcLocal : LocalVariable, args : ArgumentDeclaration[], returnType : Type, withBlock : boolean, isGenerator : boolean) : MemberFunctionDefinition {
 		this._pushScope(funcLocal, args);
 		try {
 			// parse lambda body
 			var flags = ClassDefinition.IS_STATIC;
+			if (isGenerator) {
+				this._isGenerator = isGenerator;
+				flags |= ClassDefinition.IS_GENERATOR;
+			}
 			var lastToken : Token;
 			if (! withBlock) {
 				lastToken = null;
@@ -3116,9 +3122,6 @@ class Parser {
 				var lastToken = this._block();
 				if (lastToken == null)
 					return null;
-				if (this._isGenerator) {
-					flags |= ClassDefinition.IS_GENERATOR;
-				}
 			}
 			var funcDef = new MemberFunctionDefinition(
 				token, name , flags, returnType, args, this._locals, this._statements, this._closures, lastToken, null);
@@ -3159,7 +3162,7 @@ class Parser {
 			funcLocal = new LocalVariable(name, type);
 		}
 
-		var funcDef = this._functionBody(token, name, funcLocal, args, returnType, true);
+		var funcDef = this._functionBody(token, name, funcLocal, args, returnType, true, false);
 		if (funcDef == null) {
 			return null;
 		}
