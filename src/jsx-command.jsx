@@ -33,7 +33,6 @@ import "./emitter.jsx";
 import "./jsemitter.jsx";
 import "./optimizer.jsx";
 import "./analysis.jsx";
-import "./instruments.jsx";
 
 class JSXCommand {
 
@@ -99,7 +98,6 @@ class JSXCommand {
 		var tasks = new Array.<() -> void>;
 
 		var optimizer : Optimizer = null;
-		var transformer : CodeTransformer = null;
 		var completionRequest : CompletionRequest = null;
 		var emitter : Emitter = null;
 		var outputFile : Nullable.<string> = null;
@@ -340,13 +338,6 @@ class JSXCommand {
 							};
 						}(mode));
 						break NEXTOPT;
-					case "cps-transform":
-						tasks.push(function (mode : boolean) : () -> void {
-							return function () {
-								transformer.setForceTransform(mode);
-							};
-						}(mode));
-						break NEXTOPT;
 					default:
 						break;
 					}
@@ -421,8 +412,6 @@ class JSXCommand {
 
 		optimizer = new Optimizer();
 
-		transformer = new CodeTransformer();
-
 		tasks.forEach(function(proc) { proc(); });
 
 		if (emitter.getEnableMinifier() && emitter.getEnableSourceMap()) {
@@ -436,10 +425,7 @@ class JSXCommand {
 			return 1;
 		}
 
-
 		compiler.setOptimizer(optimizer);
-
-		compiler.setTransformer(transformer);
 
 		var result = compiler.compile();
 
