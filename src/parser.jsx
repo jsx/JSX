@@ -2175,6 +2175,12 @@ class Parser {
 		return arrayType;
 	}
 
+	function _registerGenObjTypeOf (elementType : Type) : ParsedObjectType {
+		var genObjType = new ParsedObjectType(new QualifiedName(new Token("GeneratorObject", true)), [ elementType ]);
+		this._objectTypesUsed.push(genObjType);
+		return genObjType;
+	}
+
 	function _initializeBlock () : Token {
 		var token;
 		while ((token = this._expectOpt("}")) == null) {
@@ -2344,6 +2350,9 @@ class Parser {
 		var returnType = this._typeDeclaration(true);
 		if (returnType == null) {
 			return false;
+		}
+		if (isGenerator) {
+			returnType = this._registerGenObjTypeOf(returnType);
 		}
 		if (this._expect("{") == null)
 			return false;
