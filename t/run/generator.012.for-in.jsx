@@ -1,5 +1,4 @@
 /*EXPECTED
-0
 1
 2
 3
@@ -8,15 +7,13 @@ end
 class _Main {
 	static function main (args : string[]) : void {
 
-		function * iota (n : number) : number {
-			var i = 0;
-			do {
+		function * foo (ary : Map.<string>) : string {
+			for (var i in ary) {
 				yield i;
-				i++;
-			} while (i < n);
+			}
 		}
 
-		var g = iota(4);
+		var g = foo({ 1:"a", 2:"b", 3:"c" });
 		while (true) {
 			var v = g.next();
 			if (v.done)

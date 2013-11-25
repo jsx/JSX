@@ -11,7 +11,7 @@ c 3
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function g(prefix : string) : Enumerable.<string> {
+		function * g(prefix : string) : string {
 			yield prefix + "1";
 			yield prefix + "2";
 			yield prefix + "3";
@@ -21,9 +21,9 @@ class _Main {
 		var f1 = g("b ");
 		var f2 = g("c ");
 		for (var i = 0; i < 3; ++i) {
-			log f0.next();
-			log f1.next();
-			log f2.next();
+			log f0.next().value;
+			log f1.next().value;
+			log f2.next().value;
 		}
 	}
 }
