@@ -1,5 +1,9 @@
 Revision history for the JSX software development kit
 
+0.9.71 2013-11-27 14:26:00+0900
+    [FEATURES]
+    - introduce local "const"
+
 0.9.70 2013-11-20 08:30:53+0900
     [FEATURES]
     - Update web.jsx (797 insertions, 488 deletions)
