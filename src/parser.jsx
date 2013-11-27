@@ -135,6 +135,7 @@ class _Lexer {
 		"break",    "do",       "instanceof", "typeof",
 		"case",     "else",     "new",        "var",
 		"catch",    "finally",  "return",     "void",
+		"const",
 		/*"continue",*/ // contextual
 		"for",      "switch",     "while",
 		"function", "this",
@@ -155,7 +156,7 @@ class _Lexer {
 		// literals of ECMA 262 but not used by JSX
 		"debugger", "with",
 		// future reserved words of ECMA 262
-		"const", "export",
+		"export",
 		// future reserved words within strict mode of ECMA 262
 		"let",   "private",   "public", "yield",
 		"protected",
@@ -890,11 +891,13 @@ class Parser {
 		this._prevScope = this._prevScope.prev;
 	}
 
-	function _registerLocal (identifierToken : Token, type : Type, isFunctionStmt : boolean = false) : LocalVariable {
+	function _registerLocal (identifierToken : Token, type : Type, isConst : boolean, isFunctionStmt : boolean = false) : LocalVariable {
 		function isEqualTo (local : LocalVariable) : boolean {
 			if (local.getName().getValue() == identifierToken.getValue()) {
 				if ((type != null && local.getType() != null && ! local.getType().equals(type)) || isFunctionStmt)
 					this._newError("conflicting types for variable " + identifierToken.getValue(), identifierToken);
+				if (local.isConstant() != isConst)
+					this._newError("const attribute conflict for variable " + identifierToken.getValue(), identifierToken);
 				return true;
 			}
 			return false;
@@ -920,7 +923,7 @@ class Parser {
 				return this._locals[i];
 			}
 		}
-		var newLocal = new LocalVariable(identifierToken, type);
+		var newLocal = new LocalVariable(identifierToken, type, isConst);
 		this._locals.push(newLocal);
 		return newLocal;
 	}
@@ -2214,7 +2217,7 @@ class Parser {
 		}
 		// parse the statement
 		var token = this._expectOpt([
-			"{", "var", ";", "if", "do", "while", "for", "continue", "break", "return", "yield", "switch", "throw", "try", "assert", "log", "delete", "debugger", "function", "void"
+			"{", "var", ";", "if", "do", "while", "for", "continue", "break", "return", "yield", "switch", "throw", "try", "assert", "log", "delete", "debugger", "function", "void", "const"
 		]);
 		if (label != null) {
 			if (! (token != null && token.getValue().match(/^(?:do|while|for|switch)$/) != null)) {
@@ -2227,7 +2230,9 @@ class Parser {
 			case "{":
 				return this._block() != null;
 			case "var":
-				return this._variableStatement();
+				return this._variableStatement(false);
+			case "const":
+				return this._variableStatement(true);
 			case ";":
 				return true;
 			case "if":
@@ -2319,9 +2324,9 @@ class Parser {
 		return true;
 	}
 
-	function _variableStatement () : boolean {
+	function _variableStatement (isConst : boolean) : boolean {
 		var succeeded = [ false ];
-		var expr = this._variableDeclarations(false, succeeded);
+		var expr = this._variableDeclarations(false, isConst, succeeded);
 		if (! succeeded[0])
 			return false;
 		if (this._expect(";") == null)
@@ -2349,7 +2354,7 @@ class Parser {
 		if (this._expect("{") == null)
 			return false;
 
-		var funcLocal = this._registerLocal(name, new StaticFunctionType(token, returnType, args.map.<Type>((arg) -> arg.getType()), false), true);
+		var funcLocal = this._registerLocal(name, new StaticFunctionType(token, returnType, args.map.<Type>((arg) -> arg.getType()), false), false, true);
 
 		var funcDef = this._functionBody(token, name, funcLocal, args, returnType, true);
 		if (funcDef == null) {
@@ -2426,7 +2431,7 @@ class Parser {
 			// empty expression
 		} else if (this._expectOpt("var") != null) {
 			var succeeded = [ false ];
-			initExpr = this._variableDeclarations(true, succeeded);
+			initExpr = this._variableDeclarations(true, false, succeeded);
 			if (! succeeded[0])
 				return false;
 			if (this._expect(";") == null)
@@ -2468,7 +2473,7 @@ class Parser {
 			return 0; // failure
 		var lhsExpr;
 		if (this._expectOpt("var") != null) {
-			if ((lhsExpr = this._variableDeclaration(true)) == null)
+			if ((lhsExpr = this._variableDeclaration(true, false)) == null)
 				return -1; // retry the other
 		} else {
 			if ((lhsExpr = this._lhsExpr()) == null)
@@ -2704,12 +2709,12 @@ class Parser {
 		return this._statements.splice(statementIndex, this._statements.length - statementIndex);
 	}
 
-	function _variableDeclarations (noIn : boolean, isSuccess : boolean[]) : Expression {
+	function _variableDeclarations (noIn : boolean, isConst : boolean, isSuccess : boolean[]) : Expression {
 		isSuccess[0] = false;
 		var expr = null : Expression;
 		var commaToken = null : Token;
 		do {
-			var declExpr = this._variableDeclaration(noIn);
+			var declExpr = this._variableDeclaration(noIn, isConst);
 			if (declExpr == null)
 				return null;
 			// do not push variable declarations wo. assignment
@@ -2720,7 +2725,7 @@ class Parser {
 		return expr;
 	}
 
-	function _variableDeclaration (noIn : boolean) : Expression {
+	function _variableDeclaration (noIn : boolean, isConst : boolean) : Expression {
 		var identifier = this._expectIdentifier();
 		if (identifier == null)
 			return null;
@@ -2729,13 +2734,19 @@ class Parser {
 			if ((type = this._typeDeclaration(false)) == null)
 				return null;
 		// FIXME value should be registered after parsing the initialization expression, but that prevents: var f = function () : void { f(); };
-		var local = this._registerLocal(identifier, type);
+		var local = this._registerLocal(identifier, type, isConst);
 		// parse initial value (optional)
 		var initialValue = null : Expression;
 		var assignToken;
-		if ((assignToken = this._expectOpt("=")) != null)
+		if ((assignToken = this._expectOpt("=")) == null) {
+			if (isConst) {
+				this._newError("initializer expression is mandatory for constant declaration");
+				return null;
+			}
+		} else {
 			if ((initialValue = this._assignExpr(noIn)) == null)
 				return null;
+		}
 		var expr : Expression = new LocalExpression(identifier, local);
 		if (initialValue != null)
 			expr = new AssignmentExpression(assignToken, expr, initialValue);

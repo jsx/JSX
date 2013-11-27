@@ -171,10 +171,12 @@ class LocalVariable implements Stashable {
 	var _instantiated = new LocalVariable[];
 	var isInstantiated = false;
 	var _isUsedAsRHS = false;
+	var _isConstant : boolean;
 
-	function constructor (name : Token, type : Type) {
+	function constructor (name : Token, type : Type, isConst : boolean = false) {
 		this._name = name;
 		this._type = type;
+		this._isConstant = isConst;
 	}
 
 	function serialize () : variant {
@@ -194,6 +196,10 @@ class LocalVariable implements Stashable {
 
 	function isUsedAsRHS() : boolean {
 		return this._isUsedAsRHS;
+	}
+
+	function isConstant () : boolean {
+		return this._isConstant;
 	}
 
 	function setType (type : Type) : void {
@@ -223,6 +229,10 @@ class LocalVariable implements Stashable {
 
 	function touchVariable (context : AnalysisContext, token : Token, isAssignment : boolean) : boolean {
 		if (isAssignment) {
+			if (this._isConstant && context.getTopBlock().localVariableStatuses.getStatus(this) != LocalVariableStatuses.UNSET) {
+				context.errors.push(new CompileError(token, "assignment of read-only variable"));
+				return false;
+			}
 			context.getTopBlock().localVariableStatuses.setStatus(this);
 		} else {
 			switch (context.getTopBlock().localVariableStatuses.getStatus(this)) {
