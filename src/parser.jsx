@@ -3001,22 +3001,12 @@ class Parser {
 	}
 
 	function _lhsExpr () : Expression {
-		var state = this._preserveState();
 		var expr;
-		var token = this._expectOpt([ "new", "super", "(", "function" ]);
+		var token = this._expectOpt([ "new", "super", "function" ]);
 		if (token != null) {
 			switch (token.getValue()) {
 			case "super":
 				return this._superExpr();
-			case "(":
-				expr = this._lambdaExpr(token);
-				if (expr == null) {
-					this._restoreState(state);
-					expr = this._primaryExpr();
-					if (expr == null)
-						return null;
-				}
-				break;
 			case "function":
 				expr = this._functionExpr(token);
 				break;
@@ -3027,7 +3017,9 @@ class Parser {
 				throw new Error("logic flaw");
 			}
 		} else {
-			expr = this._primaryExpr();
+			expr = this._arrowFunctionOpt();
+			if (expr == null)
+				expr = this._primaryExpr();
 		}
 		if (expr == null)
 			return null;
@@ -3111,16 +3103,40 @@ class Parser {
 		return new SuperExpression(token, identifier, args);
 	}
 
-	function _lambdaExpr (token : Token) : Expression {
-		var args = this._functionArgumentsExpr(false, false, false);
-		if (args == null)
+	function _arrowFunctionOpt () : FunctionExpression {
+		var state = this._preserveState();
+		var expr;
+		if ((expr = this._arrowFunction()) == null) {
+			this._restoreState(state);
 			return null;
+		}
+		return expr;
+	}
+
+	function _arrowFunction () : FunctionExpression {
+		if (this._expectOpt("(") != null) {
+			var args = this._functionArgumentsExpr(false, false, false);
+			if (args == null)
+				return null;
+		}
+		else {
+			var argName = this._expectIdentifier();
+			if (argName == null)
+				return null;
+			var argType : Type = null;
+			if (this._expectOpt(":") != null) {
+				if ((argType = this._typeDeclaration(false)) == null)
+					return null;
+			}
+			args = [ new ArgumentDeclaration(argName, argType, null) ];
+		}
 		var returnType = null : Type;
 		if (this._expectOpt(":") != null) {
 			if ((returnType = this._typeDeclaration(true)) == null)
 				return null;
 		}
-		if (this._expect(["->", "=>"]) == null)
+		var token = this._expect(["->", "=>"]);
+		if (token == null)
 			return null;
 		var funcDef = this._functionBody(token, null, null, args, returnType, this._expectOpt("{") != null, false);
 		if (funcDef == null)
