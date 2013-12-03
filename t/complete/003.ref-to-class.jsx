@@ -10,10 +10,10 @@ class A {
       "word" : "super"
    },
    {
-      "word" : "("
+      "word" : "function"
    },
    {
-      "word" : "function"
+      "word" : "("
    },
    {
       "word" : "this"
