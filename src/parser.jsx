@@ -1956,16 +1956,7 @@ class Parser {
 			}
 			typeDecl = this._registerArrayTypeOf(token, typeDecl);
 		}
-		var state = this._preserveState();
-		if (this._expectOpt([ "->", "=>" ]) == null) {
-			return typeDecl;
-		}
-		var returnType = this._typeDeclaration(true);
-		if (returnType == null) {
-			this._restoreState(state);
-			return typeDecl;
-		}
-		return new StaticFunctionType(null, returnType, [ typeDecl ], true);
+		return typeDecl;
 	}
 
 	function _typeDeclarationNoArrayNoVoid () : Type {
