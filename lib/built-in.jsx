@@ -275,7 +275,13 @@ native final class Array.<T> {
 	function reduce.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>, currentIndex : number) : U) : U;
 	function reduce.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : U) : U;
 	/* with initial value; won't throw exception. */
-	function reduce.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>) : U, initialValue : U) : U;
+	function reduce.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>) : U, initialValue : U) : U {
+		var value = initialValue;
+		for (var i = 0; i < this.length; ++i) {
+			value = callbackfn(value, this[i]);
+		}
+		return value;
+	}
 	function reduce.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>, currentIndex : number) : U, initialValue : U) : U;
 	function reduce.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : U, initialValue : U) : U;
 
