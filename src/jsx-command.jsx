@@ -31,6 +31,7 @@ import "./doc.jsx";
 import "./platform.jsx";
 import "./emitter.jsx";
 import "./jsemitter.jsx";
+import "./cxxemitter.jsx";
 import "./optimizer.jsx";
 import "./analysis.jsx";
 import "./instruments.jsx";
@@ -172,7 +173,8 @@ class JSXCommand {
 					emitter = new JavaScriptEmitter(platform);
 					break;
 				case "c++":
-					throw new Error("FIXME");
+					emitter = new CplusplusEmitter(platform);
+					break;
 				default:
 					platform.error("unknown target: " + optarg);
 					return 1;
@@ -473,7 +475,23 @@ class JSXCommand {
 			}
 		}
 		else {
-			throw new Error("FIXME: C++ emitter");
+			if (! runImmediately || outputFile != null) { // compile and save
+
+				platform.save(outputFile, output);
+				if (outputFile != null) {
+					var map = emitter.getSourceMappingFiles();
+					for (var filename in map) {
+						platform.save(filename, map[filename]);
+					}
+					if (executable != null) {
+						platform.makeFileExecutable(outputFile, executable);
+					}
+				}
+
+			}
+			else { // compile and run immediately
+				platform.error("C++ emitter not supporting immediate run");
+			}
 		}
 		return 0;
 	}
