@@ -5,6 +5,9 @@
 
 namespace JSX {
 
+  class Error;
+  class NotImplementedError;
+
   typedef double number;
   typedef bool boolean;
 
@@ -95,6 +98,29 @@ namespace JSX {
   private:
     number length_;
     std::vector<T> ary_;
+  };
+
+  class Error : public Object {
+  public:
+    Error ()
+      : name()
+      , message()
+      , stack() {
+    }
+
+    explicit Error (string message)
+      : name()
+      , message(message)
+      , stack() {
+    }
+
+    string name;
+    string message;
+
+    string stack;
+  };
+
+  class NotImplementedError : public Error {
   };
 
 }
