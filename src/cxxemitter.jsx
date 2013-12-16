@@ -86,6 +86,9 @@ class CplusplusEmitter implements Emitter {
 
 	override function emit (classDefs : ClassDefinition[]) : void {
 		this._emitBootstrap();
+
+		this._emit("namespace JSX {\n");
+		this._advanceIndent();
 		for (var i = 0; i < classDefs.length; ++i) {
 			if ((classDefs[i].flags() & ClassDefinition.IS_NATIVE) != 0) {
 				continue;
@@ -93,10 +96,10 @@ class CplusplusEmitter implements Emitter {
 			if (classDefs[i] instanceof TemplateClassDefinition || classDefs[i] instanceof InstantiatedClassDefinition) {
 				continue;
 			}
-			this._output += "class " + classDefs[i].className() + " : public " + classDefs[i].extendType().toString() + " {\n";
+			this._emit("class " + classDefs[i].className() + " : public " + this.getNameOfType(classDefs[i].extendType()) + " {");
 			this._emittingClass = classDefs[i];
 			try {
-				this._output += "public:\n";
+				this._emit("public:");
 				this._advanceIndent();
 				classDefs[i].forEachMemberFunction(function (funcDef) {
 					this._emitMemberFunction(funcDef);
@@ -104,7 +107,7 @@ class CplusplusEmitter implements Emitter {
 				});
 				this._reduceIndent();
 
-				this._output += "private:\n";
+				this._emit("private:");
 				this._advanceIndent();
 				classDefs[i].forEachMemberVariable(function (varDef) {
 					this._emitMemberVariable(varDef);
@@ -112,10 +115,12 @@ class CplusplusEmitter implements Emitter {
 				});
 				this._reduceIndent();
 			} finally {
-				this._output += "};\n\n";
 				this._emittingClass = null;
+				this._emit("};\n");
 			}
 		}
+		this._reduceIndent();
+		this._emit("}");
 	}
 
 	function _emitMemberFunction (funcDef : MemberFunctionDefinition) : void {
