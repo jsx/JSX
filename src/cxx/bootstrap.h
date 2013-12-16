@@ -58,7 +58,7 @@ namespace JSX {
       string str;
       boolean b;
       Object *obj;
-    };
+    } u;
   };
 
   class Object {
