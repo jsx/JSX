@@ -2,6 +2,7 @@ import "./emitter.jsx";
 import "./platform.jsx";
 import "./classdef.jsx";
 import "./expression.jsx";
+import "./type.jsx";
 
 class CplusplusEmitter implements Emitter {
 
@@ -132,11 +133,11 @@ class CplusplusEmitter implements Emitter {
 			output += funcDef.getClassDef().className() + " (";
 		}
 		else {
-			output += funcDef.getReturnType().toString() + " " + funcDef.name() + " (";
+			output += this.getNameOfType(funcDef.getReturnType()) + " " + funcDef.name() + " (";
 		}
 		for (var i = 0; i < funcDef.getArguments().length; ++i) {
 			var arg = funcDef.getArguments()[i];
-			output += arg.getType().toString();
+			output += this.getNameOfType(arg.getType());
 			output += " ";
 			output += arg.getName().getValue();
 			if (i + 1 < funcDef.getArguments().length) {
@@ -155,4 +156,24 @@ class CplusplusEmitter implements Emitter {
 		this._output += this._platform.load(this._platform.getRoot() + "/src/cxx/bootstrap.h");
 		this._output += "\n";
 	}
+
+	function getNameOfType (type : Type) : string {
+		if (type instanceof FunctionType) {
+			return "void"; // FIXME
+		}
+		if (! (type instanceof ParsedObjectType)) {
+			return type.toString();
+		}
+		var objectType = type as ParsedObjectType;
+		if (objectType.getTypeArguments().length == 0) {
+			return type.toString();
+		}
+		var s = objectType.getQualifiedName().getToken().getValue() + "<";
+		for (var i = 0; i < objectType.getTypeArguments().length; ++i) {
+			s += this.getNameOfType(objectType.getTypeArguments()[i]);
+		}
+		s += ">";
+		return s;
+	}
+
 }
