@@ -10,7 +10,11 @@ namespace JSX {
 
   class string {
   public:
-    string(const char *data)
+    string ()
+      : length_(0)
+      , data_("") {
+    }
+    string (const char *data)
       : data_(data)
       , length_(strlen(data)) {
     }
