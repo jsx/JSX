@@ -85,8 +85,7 @@ class CplusplusEmitter implements Emitter {
 	var _emittingClass : ClassDefinition = null;
 
 	override function emit (classDefs : ClassDefinition[]) : void {
-		this._output += "#include <gc_cpp.h>\n";
-
+		this._emitBootstrap();
 		for (var i = 0; i < classDefs.length; ++i) {
 			if ((classDefs[i].flags() & ClassDefinition.IS_NATIVE) != 0) {
 				continue;
@@ -147,4 +146,8 @@ class CplusplusEmitter implements Emitter {
 		// TODO
 	}
 
+	function _emitBootstrap () : void {
+		this._output += this._platform.load(this._platform.getRoot() + "/src/cxx/bootstrap.h");
+		this._output += "\n";
+	}
 }
