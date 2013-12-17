@@ -118,6 +118,23 @@ class _ReturnStatementEmitter extends _StatementEmitter {
 
 }
 
+class _ThrowStatementEmitter extends _StatementEmitter {
+
+	var _statement : ThrowStatement;
+
+	function constructor (emitter : CplusplusEmitter, statement : ThrowStatement) {
+		super(emitter);
+		this._statement = statement;
+	}
+
+	override function emit () : void {
+		this._emitter._emit("throw ", this._statement.getToken());
+		this._emitter._getExpressionEmitterFor(this._statement.getExpr()).emit(0);
+		this._emitter._emit(";\n", null);
+	}
+
+}
+
 class _LogStatementEmitter extends _StatementEmitter {
 
 	var _statement : LogStatement;
@@ -775,8 +792,8 @@ int main() {
 		// 	return new _TryStatementEmitter(this, statement as TryStatement);
 		// else if (statement instanceof CatchStatement)
 		// 	return new _CatchStatementEmitter(this, statement as CatchStatement);
-		// else if (statement instanceof ThrowStatement)
-		// 	return new _ThrowStatementEmitter(this, statement as ThrowStatement);
+		else if (statement instanceof ThrowStatement)
+			return new _ThrowStatementEmitter(this, statement as ThrowStatement);
 		// else if (statement instanceof AssertStatement)
 		// 	return new _AssertStatementEmitter(this, statement as AssertStatement);
 		else if (statement instanceof LogStatement)
