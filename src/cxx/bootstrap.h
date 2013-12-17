@@ -2,46 +2,29 @@
 
 #include <gc_cpp.h>
 #include <vector>
+#include <iostream>
 
 namespace JSX {
-
-  class Error;
-  class NotImplementedError;
 
   typedef double number;
   typedef bool boolean;
 
   class string {
   public:
-    string ()
-      : length_(0)
-      , data_("") {
-    }
-    string (const char *data)
-      : data_(data)
-      , length_(strlen(data)) {
-    }
+    string () : length_(0), data_("") {}
+    string (const char* data) : length_(strlen(data)), data_(data) {}
+    operator const char* () const { return data_; }
   private:
     int length_;
-    const char *data_;
+    const char* data_;
   };
 
   template<typename T>
   class Nullable {
   public:
-    Nullable (T value)
-      : isNull_(false)
-      , value_(value) {
-    }
-    Nullable ()
-      : isNull_(true) {
-    }
-    operator T () const {
-      if (isNull_) {
-	throw new Error("null access");
-      }
-      return value_;
-    }
+    Nullable () : isNull_(true) {}
+    Nullable (T value) : isNull_(false), value_(value) {}
+    operator T& () const;
   private:
     boolean isNull_;
     T value_;
@@ -65,7 +48,8 @@ namespace JSX {
   class Array : public Object {
   public:
     Array ()
-      : Array(0) {
+      : length_(0)
+      , ary_(0) {
     }
     Array (number length)
       : length_(length)
@@ -85,7 +69,7 @@ namespace JSX {
       , stack() {
     }
 
-    explicit Error (string message)
+    explicit Error (const string& message)
       : name()
       , message(message)
       , stack() {
@@ -97,7 +81,19 @@ namespace JSX {
     string stack;
   };
 
-  class NotImplementedError : public Error {
+  template<typename T>
+  Nullable<T>::operator T& () const {
+    if (isNull_) {
+      throw new Error("null access");
+    }
+    return value_;
+  }
+
+  class console : public Object {
+  public:
+    static void log (string str) {
+      std::cout << (const char *)str << std::endl;
+    }
   };
 
 }
