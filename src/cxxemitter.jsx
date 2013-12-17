@@ -284,6 +284,12 @@ class _BinaryNumberExpressionEmitter extends _OperatorExpressionEmitter {
 
 	override function _emit () : void {
 		var op = this._expr.getToken().getValue();
+		if (op == "%" && (Type.numberType.equals(this._expr.getFirstExpr().getType()) || Type.numberType.equals(this._expr.getSecondExpr().getType()))) {
+			var lhs = this._expr.getFirstExpr();
+			var rhs = this._expr.getSecondExpr();
+			this._emitter._emitCallArguments("fmod(", [ lhs, rhs ]);
+			return;
+		}
 		this._emitter._getExpressionEmitterFor(this._expr.getFirstExpr()).emit(_BinaryNumberExpressionEmitter._operatorPrecedence[op]);
 		this._emitter._emit(" " + op + " ", this._expr.getToken());
 		this._emitter._getExpressionEmitterFor(this._expr.getSecondExpr()).emit(_BinaryNumberExpressionEmitter._operatorPrecedence[op] - 1);
