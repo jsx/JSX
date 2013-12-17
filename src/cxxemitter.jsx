@@ -571,7 +571,9 @@ class CplusplusEmitter implements Emitter {
 			for (i = 0; i < locals.length; ++i) {
 				this._emit(this.getNameOfType(locals[i].getType()) + " " + locals[i].getName().getValue() + ";\n");
 			}
-			this._emit("\n");
+			if (i != 0)
+				this._emit("\n");
+
 			// emit statements
 			for (i = 0; i < statements.length; ++i) {
 				this._emitStatement(statements[i]);
