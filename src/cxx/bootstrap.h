@@ -3,6 +3,7 @@
 #include <gc_cpp.h>
 #include <vector>
 #include <iostream>
+#include <sstream>
 
 namespace JSX {
 
@@ -13,11 +14,15 @@ namespace JSX {
   public:
     string () : length_(0), data_("") {}
     string (const char* data) : length_(strlen(data)), data_(data) {}
+    string (number n);
     operator const char* () const { return data_; }
+    string operator + (const string& rhs) const;
   private:
     int length_;
     const char* data_;
   };
+
+  string operator + (const char *lhs, const string& rhs);
 
   template<typename T>
   class Nullable {
@@ -80,6 +85,25 @@ namespace JSX {
 
     string stack;
   };
+
+  string::string(number n) {
+    std::stringstream ss;
+    ss << n;
+    const char *data = ss.str().c_str();
+    length_ = strlen(data);
+    data_ = data;
+  }
+
+  string string::operator +(const string& rhs) const {
+    char *data = new char[length_ + rhs.length_];
+    strcpy(data, data_);
+    strcpy(data + length_, rhs.data_);
+    return string(data);
+  }
+
+  string operator + (const char *lhs, const string& rhs) {
+    return string(lhs) + rhs;
+  }
 
   template<typename T>
   Nullable<T>::operator T& () const {
