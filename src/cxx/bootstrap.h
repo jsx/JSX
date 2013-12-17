@@ -72,14 +72,6 @@ namespace JSX {
       , ary_(length) {
     }
 
-    string toString () const {
-      throw new NotImplementedError();
-    }
-
-    string toLocaleString () const {
-      throw new NotImplementedError();
-    }
-
   private:
     number length_;
     std::vector<T> ary_;
