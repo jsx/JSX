@@ -35,6 +35,67 @@ class _ConstructorInvocationStatementEmitter extends _StatementEmitter {
 
 }
 
+class _ForStatementEmitter extends _StatementEmitter {
+
+	var _statement : ForStatement;
+
+	function constructor (emitter : CplusplusEmitter, statement : ForStatement) {
+		super(emitter);
+		this._statement = statement;
+	}
+
+	override function emit () : void {
+		this._emitter._emit("for (", this._statement.getToken());
+		var initExpr = this._statement.getInitExpr();
+		if (initExpr != null)
+			this._emitter._getExpressionEmitterFor(initExpr).emit(0);
+		this._emitter._emit("; ", null);
+		var condExpr = this._statement.getCondExpr();
+		if (condExpr != null)
+			this._emitter._getExpressionEmitterFor(condExpr).emit(0);
+		this._emitter._emit("; ", null);
+		var postExpr = this._statement.getPostExpr();
+		if (postExpr != null)
+			this._emitter._getExpressionEmitterFor(postExpr).emit(0);
+		this._emitter._emit(") {\n", null);
+		this._emitter._emitStatements(this._statement.getStatements());
+		this._emitter._emit("}\n", null);
+	}
+
+}
+
+class _IfStatementEmitter extends _StatementEmitter {
+
+	var _statement : IfStatement;
+
+	function constructor (emitter : CplusplusEmitter, statement : IfStatement) {
+		super(emitter);
+		this._statement = statement;
+	}
+
+	override function emit () : void {
+		this._emitter._emit("if (", this._statement.getToken());
+		this._emitter._getExpressionEmitterFor(this._statement.getExpr()).emit(0);
+		this._emitter._emit(") {\n", null);
+		this._emitter._emitStatements(this._statement.getOnTrueStatements());
+		var ifFalseStatements = this._statement.getOnFalseStatements();
+
+		if (ifFalseStatements.length == 1 && ifFalseStatements[0] instanceof IfStatement) {
+			this._emitter._emit("} else ", null);
+			this._emitter._emitStatement(ifFalseStatements[0]);
+			ifFalseStatements = (ifFalseStatements[0] as IfStatement).getOnTrueStatements();
+		}
+		else {
+			if (ifFalseStatements.length != 0) {
+				this._emitter._emit("} else {\n", null);
+				this._emitter._emitStatements(ifFalseStatements);
+			}
+			this._emitter._emit("}\n", null);
+		}
+	}
+
+}
+
 class _ReturnStatementEmitter extends _StatementEmitter {
 
 	var _statement : ReturnStatement;
@@ -209,6 +270,73 @@ abstract class _OperatorExpressionEmitter extends _ExpressionEmitter {
 	}
 
 	abstract function _getPrecedence () : number;
+
+}
+
+class _BinaryNumberExpressionEmitter extends _OperatorExpressionEmitter {
+
+	var _expr : BinaryNumberExpression;
+
+	function constructor (emitter : CplusplusEmitter, expr : BinaryNumberExpression) {
+		super(emitter);
+		this._expr = expr;
+	}
+
+	override function _emit () : void {
+		var op = this._expr.getToken().getValue();
+		this._emitter._getExpressionEmitterFor(this._expr.getFirstExpr()).emit(_BinaryNumberExpressionEmitter._operatorPrecedence[op]);
+		this._emitter._emit(" " + op + " ", this._expr.getToken());
+		this._emitter._getExpressionEmitterFor(this._expr.getSecondExpr()).emit(_BinaryNumberExpressionEmitter._operatorPrecedence[op] - 1);
+	}
+
+	override function _getPrecedence () : number {
+		return _BinaryNumberExpressionEmitter._operatorPrecedence[this._expr.getToken().getValue()];
+	}
+
+	static const _operatorPrecedence = new Map.<number>;
+
+	static function _setOperatorPrecedence (op : string, precedence : number) : void {
+		_BinaryNumberExpressionEmitter._operatorPrecedence[op] = precedence;
+	}
+
+}
+
+class _EqualityExpressionEmitter extends _OperatorExpressionEmitter {
+
+	var _expr : EqualityExpression;
+
+	function constructor (emitter : CplusplusEmitter, expr : EqualityExpression) {
+		super(emitter);
+		this._expr = expr;
+	}
+
+	override function _emit () : void {
+		var op = this._expr.getToken().getValue();
+		var emitOp = op;
+		// NOTE: works for cases where one side is an object and the other is the primitive counterpart
+		var lhs = this._expr.getFirstExpr();
+		var rhs = this._expr.getSecondExpr();
+		if (lhs.getType() instanceof PrimitiveType && rhs.getType() instanceof PrimitiveType) {
+			emitOp += "=";
+		}
+		else if (lhs.getType().resolveIfNullable() instanceof PrimitiveType && lhs.getType().resolveIfNullable().equals(rhs.getType().resolveIfNullable())) {
+			// both are primitive types but either lhs or rhs is nullable
+			emitOp += "=";
+		}
+		this._emitter._getExpressionEmitterFor(lhs).emit(_EqualityExpressionEmitter._operatorPrecedence[op] - 1);
+		this._emitter._emit(" " + emitOp + " ", this._expr.getToken());
+		this._emitter._getExpressionEmitterFor(rhs).emit(_EqualityExpressionEmitter._operatorPrecedence[op] - 1);
+	}
+
+	override function _getPrecedence () : number {
+		return _EqualityExpressionEmitter._operatorPrecedence[this._expr.getToken().getValue()];
+	}
+
+	static const _operatorPrecedence = new Map.<number>;
+
+	static function _setOperatorPrecedence (op : string, precedence : number) : void {
+		_EqualityExpressionEmitter._operatorPrecedence[op] = precedence;
+	}
 
 }
 
@@ -601,6 +729,17 @@ int main() {
 """;
 	}
 
+	function _emitStatements (statements : Statement[]) : void {
+		this._advanceIndent();
+		try {
+			for (var i = 0; i < statements.length; ++i) {
+				this._emitStatement(statements[i]);
+			}
+		} finally {
+			this._reduceIndent();
+		}
+	}
+
 	function _emitStatement (statement : Statement) : void {
 		var emitter = this._getStatementEmitterFor(statement);
 		emitter.emit();
@@ -625,10 +764,10 @@ int main() {
 		// 	return new _DoWhileStatementEmitter(this, statement as DoWhileStatement);
 		// else if (statement instanceof ForInStatement)
 		// 	return new _ForInStatementEmitter(this, statement as ForInStatement);
-		// else if (statement instanceof ForStatement)
-		// 	return new _ForStatementEmitter(this, statement as ForStatement);
-		// else if (statement instanceof IfStatement)
-		// 	return new _IfStatementEmitter(this, statement as IfStatement);
+		else if (statement instanceof ForStatement)
+			return new _ForStatementEmitter(this, statement as ForStatement);
+		else if (statement instanceof IfStatement)
+			return new _IfStatementEmitter(this, statement as IfStatement);
 		// else if (statement instanceof SwitchStatement)
 		// 	return new _SwitchStatementEmitter(this, statement as SwitchStatement);
 		// else if (statement instanceof CaseStatement)
@@ -703,10 +842,10 @@ int main() {
 			return new _AssignmentExpressionEmitter(this, expr as AssignmentExpression);
 		// else if (expr instanceof FusedAssignmentExpression)
 		// 	return new _FusedAssignmentExpressionEmitter(this, expr as FusedAssignmentExpression);
-		// else if (expr instanceof BinaryNumberExpression)
-		// 	return new _BinaryNumberExpressionEmitter(this, expr as BinaryNumberExpression);
-		// else if (expr instanceof EqualityExpression)
-		// 	return new _EqualityExpressionEmitter(this, expr as EqualityExpression);
+		else if (expr instanceof BinaryNumberExpression)
+			return new _BinaryNumberExpressionEmitter(this, expr as BinaryNumberExpression);
+		else if (expr instanceof EqualityExpression)
+			return new _EqualityExpressionEmitter(this, expr as EqualityExpression);
 		// else if (expr instanceof InExpression)
 		// 	return new _InExpressionEmitter(this, expr as InExpression);
 		// else if (expr instanceof LogicalExpression)
@@ -791,33 +930,33 @@ int main() {
 				{ "~":          _UnaryExpressionEmitter._setOperatorPrecedence },
 				{ "!":          _UnaryExpressionEmitter._setOperatorPrecedence }
 			], [
-			// 	{ "*":          _BinaryNumberExpressionEmitter._setOperatorPrecedence },
-			// 	{ "/":          _BinaryNumberExpressionEmitter._setOperatorPrecedence },
-			// 	{ "%":          _BinaryNumberExpressionEmitter._setOperatorPrecedence }
-			// ], [
+				{ "*":          _BinaryNumberExpressionEmitter._setOperatorPrecedence },
+				{ "/":          _BinaryNumberExpressionEmitter._setOperatorPrecedence },
+				{ "%":          _BinaryNumberExpressionEmitter._setOperatorPrecedence }
+			], [
 				{ "+":          _AdditiveExpressionEmitter._setOperatorPrecedence },
-			// 	{ "-":          _BinaryNumberExpressionEmitter._setOperatorPrecedence }
+				{ "-":          _BinaryNumberExpressionEmitter._setOperatorPrecedence }
 			], [
 			// 	{ "<<":         _ShiftExpressionEmitter._setOperatorPrecedence },
 			// 	{ ">>":         _ShiftExpressionEmitter._setOperatorPrecedence },
 			// 	{ ">>>":        _ShiftExpressionEmitter._setOperatorPrecedence }
 			// ], [
-			// 	{ "<":          _BinaryNumberExpressionEmitter._setOperatorPrecedence },
-			// 	{ ">":          _BinaryNumberExpressionEmitter._setOperatorPrecedence },
-			// 	{ "<=":         _BinaryNumberExpressionEmitter._setOperatorPrecedence },
-			// 	{ ">=":         _BinaryNumberExpressionEmitter._setOperatorPrecedence },
+				{ "<":          _BinaryNumberExpressionEmitter._setOperatorPrecedence },
+				{ ">":          _BinaryNumberExpressionEmitter._setOperatorPrecedence },
+				{ "<=":         _BinaryNumberExpressionEmitter._setOperatorPrecedence },
+				{ ">=":         _BinaryNumberExpressionEmitter._setOperatorPrecedence },
 			// 	{ "instanceof": _InstanceofExpressionEmitter._setOperatorPrecedence },
 			// 	{ "in":         _InExpressionEmitter._setOperatorPrecedence }
-			// ], [
-			// 	{ "==":         _EqualityExpressionEmitter._setOperatorPrecedence },
-			// 	{ "!=":         _EqualityExpressionEmitter._setOperatorPrecedence }
-			// ], [
-			// 	{ "&":          _BinaryNumberExpressionEmitter._setOperatorPrecedence }
-			// ], [
-			// 	{ "^":          _BinaryNumberExpressionEmitter._setOperatorPrecedence }
-			// ], [
-			// 	{ "|":          _BinaryNumberExpressionEmitter._setOperatorPrecedence }
-			// ], [
+			], [
+				{ "==":         _EqualityExpressionEmitter._setOperatorPrecedence },
+				{ "!=":         _EqualityExpressionEmitter._setOperatorPrecedence }
+			], [
+				{ "&":          _BinaryNumberExpressionEmitter._setOperatorPrecedence }
+			], [
+				{ "^":          _BinaryNumberExpressionEmitter._setOperatorPrecedence }
+			], [
+				{ "|":          _BinaryNumberExpressionEmitter._setOperatorPrecedence }
+			], [
 			// 	{ "&&":         _LogicalExpressionEmitter._setOperatorPrecedence }
 			// ], [
 			// 	{ "||":         _LogicalExpressionEmitter._setOperatorPrecedence }
