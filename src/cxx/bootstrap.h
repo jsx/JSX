@@ -47,22 +47,7 @@ namespace JSX {
     T value_;
   };
 
-  class variant {
-  public:
-    enum jsx_tt {
-      JSX_STRING_T,
-      JSX_NUMBER_T,
-      JSX_BOOLEAN_T,
-      JSX_OBJECT_T,
-      JSX_FUNCTION_T,
-    } tt;
-    union {
-      number num;
-      string str;
-      boolean b;
-      Object *obj;
-    } u;
-  };
+  class variant;
 
   class Object {
   public:
