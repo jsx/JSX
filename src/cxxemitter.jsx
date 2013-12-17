@@ -318,20 +318,9 @@ class _EqualityExpressionEmitter extends _OperatorExpressionEmitter {
 
 	override function _emit () : void {
 		var op = this._expr.getToken().getValue();
-		var emitOp = op;
-		// NOTE: works for cases where one side is an object and the other is the primitive counterpart
-		var lhs = this._expr.getFirstExpr();
-		var rhs = this._expr.getSecondExpr();
-		if (lhs.getType() instanceof PrimitiveType && rhs.getType() instanceof PrimitiveType) {
-			emitOp += "=";
-		}
-		else if (lhs.getType().resolveIfNullable() instanceof PrimitiveType && lhs.getType().resolveIfNullable().equals(rhs.getType().resolveIfNullable())) {
-			// both are primitive types but either lhs or rhs is nullable
-			emitOp += "=";
-		}
-		this._emitter._getExpressionEmitterFor(lhs).emit(_EqualityExpressionEmitter._operatorPrecedence[op] - 1);
-		this._emitter._emit(" " + emitOp + " ", this._expr.getToken());
-		this._emitter._getExpressionEmitterFor(rhs).emit(_EqualityExpressionEmitter._operatorPrecedence[op] - 1);
+		this._emitter._getExpressionEmitterFor(this._expr.getFirstExpr()).emit(_EqualityExpressionEmitter._operatorPrecedence[op] - 1);
+		this._emitter._emit(" " + op + " ", this._expr.getToken());
+		this._emitter._getExpressionEmitterFor(this._expr.getSecondExpr()).emit(_EqualityExpressionEmitter._operatorPrecedence[op] - 1);
 	}
 
 	override function _getPrecedence () : number {
