@@ -14,9 +14,9 @@ class _Test extends TestCase {
 		this.expect(a.splice(1, 1), "splice").toEqual([3]);
 		this.expect(a, "splice").toEqual([1, 2]);
 
-        a = [1, 2, 3];
-        a.splice(1, 1, 4);
-        this.expect(a, "splice with an item").toEqual([1, 4, 3]);
+		a = [1, 2, 3];
+		a.splice(1, 1, 4);
+		this.expect(a, "splice with an item").toEqual([1, 4, 3]);
 	}
 
 	function testArrayES5() : void {

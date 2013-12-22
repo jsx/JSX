@@ -1,6 +1,6 @@
 // to fix the result of test failure
 /*EXPECTED
-1..12
+1..16
 	ok 1 - boolean v.s. boolean
 	ok 2
 	ok 3
@@ -10,35 +10,35 @@
 ok 1 - testShouldBeOK
 	not ok 1 - boolean v.s. boolean
 # comparing with == for boolean v.s. boolean
-# got:      false
+# got     : false
 # expected: true
 	not ok 2 - boolean v.s. boolean
 	1..2
 not ok 2 - testShouldNotBeOK_toBe
 	not ok 1
 # comparing with <
-# got:      10
+# got     : 10
 # expected: 10
 	not ok 2
 	1..2
 not ok 3 - testShouldNotBeOK_toBeLT
 	not ok 1
 # comparing with <=
-# got:      10
+# got     : 10
 # expected: 9
 	not ok 2
 	1..2
 not ok 4 - testShouldNotBeOK_toBeLE
 	not ok 1
 # comparing with >
-# got:      10
+# got     : 10
 # expected: 10
 	not ok 2
 	1..2
 not ok 5 - testShouldNotBeOK_toBeGT
 	not ok 1
 # comparing with >=
-# got:      10
+# got     : 10
 # expected: 11
 	not ok 2
 	1..2
@@ -47,22 +47,48 @@ not ok 6 - testShouldNotBeOK_toBeGE
 	ok 2
 	1..2
 ok 7 - testExpectToMatch
+	ok 1
+	ok 2
+	1..2
+ok 8 - testExpectToEqual_forArray
+	not ok 1
+# comparing with TestCase#equals()
+# got     :
+[ 1, 2, 3 ]
+# expected:
+[ 1, 2, 3, 4 ]
+	not ok 2
+	1..2
+not ok 9 - testExpectToEqual_forArray_failed
+	ok 1
+	ok 2
+	1..2
+ok 10 - testExpectToEqual_forMap
+	not ok 1
+# comparing with TestCase#equals()
+# got     :
+{ foo: 1, bar: 2, baz: 3 }
+# expected:
+{ bar: 2, baz: 3, foo: 1, xxx: 42 }
+	not ok 2
+	1..2
+not ok 11 - testExpectToEqual_forMap_failed
 	ok 1 - just pass
 	1..1
-ok 8 - testPass
+ok 12 - testPass
 	not ok 2 - just fail
 	1..2
-not ok 9 - testFail
+not ok 13 - testFail
 	not ok 1 - failed with exception: stop
 	1..1
-not ok 10 - testStopWithException
+not ok 14 - testStopWithException
 # this is diag
 	1..0
-ok 11 - testDiag
+ok 15 - testDiag
 # this is note
 	1..0
-ok 12 - testNote
-# tests failed 7 of 12
+ok 16 - testNote
+# tests failed 9 of 16
 */
 
 import "test-case.jsx";
@@ -82,19 +108,22 @@ class _Main {
 		var t = new _Test();
 
 		var tests = [
-			new T("testShouldBeOK", () -> { t.testShouldBeOK(); }),
-			new T("testShouldNotBeOK_toBe", () -> { t.testShouldNotBeOK_toBe(); }),
-			new T("testShouldNotBeOK_toBeLT", () -> { t.testShouldNotBeOK_toBeLT(); }),
-			new T("testShouldNotBeOK_toBeLE", () -> { t.testShouldNotBeOK_toBeLE(); }),
-			new T("testShouldNotBeOK_toBeGT", () -> { t.testShouldNotBeOK_toBeGT(); }),
-			new T("testShouldNotBeOK_toBeGE", () -> { t.testShouldNotBeOK_toBeGE(); }),
-			new T("testExpectToMatch", () -> { t.testExpectToMatch(); }),
-			new T("testPass", () -> { t.testPass(); }),
-			new T("testFail", () -> { t.testFail(); }),
-			new T("testStopWithException", () -> { t.testStopWithException(); }),
-			new T("testDiag", () -> { t.testDiag(); }),
-			new T("testNote", () -> { t.testNote(); })
-
+			new T("testShouldBeOK", () -> t.testShouldBeOK()),
+			new T("testShouldNotBeOK_toBe", () -> t.testShouldNotBeOK_toBe()),
+			new T("testShouldNotBeOK_toBeLT", () -> t.testShouldNotBeOK_toBeLT()),
+			new T("testShouldNotBeOK_toBeLE", () -> t.testShouldNotBeOK_toBeLE()),
+			new T("testShouldNotBeOK_toBeGT", () -> t.testShouldNotBeOK_toBeGT()),
+			new T("testShouldNotBeOK_toBeGE", () -> t.testShouldNotBeOK_toBeGE()),
+			new T("testExpectToMatch", () -> t.testExpectToMatch()),
+			new T("testExpectToEqual_forArray", () -> t.testExpectToEqual_forArray()),
+			new T("testExpectToEqual_forArray_failed", () -> t.testExpectToEqual_forArray_failed()),
+			new T("testExpectToEqual_forMap", () -> t.testExpectToEqual_forMap()),
+			new T("testExpectToEqual_forMap_failed", () -> t.testExpectToEqual_forMap_failed()),
+			new T("testPass", () -> t.testPass()),
+			new T("testFail", () -> t.testFail()),
+			new T("testStopWithException", () -> t.testStopWithException()),
+			new T("testDiag", () -> t.testDiag()),
+			new T("testNote", () -> t.testNote()),
 		];
 		t.beforeClass(tests.map.<string>((item) -> item.name));
 
@@ -148,6 +177,24 @@ class _Test extends TestCase {
 	function testExpectToMatch() : void {
 		this.expect("hoge").toMatch(/.og./);
 		this.expect("hoge").notToMatch(/.xg./);
+	}
+
+	function testExpectToEqual_forArray() : void {
+		this.expect([1, 2, 3]).toEqual([1, 2, 3]);
+		this.expect(["foo", "bar", "baz"]).toEqual(["foo", "bar", "baz"]);
+	}
+
+	function testExpectToEqual_forArray_failed() : void {
+		this.expect([1, 2, 3]).toEqual([1, 2, 3, 4]);
+	}
+
+	function testExpectToEqual_forMap() : void {
+		this.expect({foo: 1, bar: 2, baz: 3}).toEqual({bar: 2, baz: 3, foo: 1});
+		this.expect({foo: "foo", bar: "bar", baz: "baz"}).toEqual({bar: "bar", baz: "baz", foo: "foo"});
+	}
+
+	function testExpectToEqual_forMap_failed() : void {
+		this.expect({foo: 1, bar: 2, baz: 3}).toEqual({bar: 2, baz: 3, foo: 1, xxx: 42});
 	}
 
 	function testPass() : void {

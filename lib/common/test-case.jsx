@@ -202,16 +202,15 @@ class TestCase {
 
 	/* matcher factory */
 
-	// want to delcare expect.<T>(value : T) : TestCase.Matcher.<T>
 	/**
 	 * <p>Creates a test matcher for a value.</p>
 	 * <p>Usage: <code>this.expect(testingValue).toBe(expectedValue)</code></p>
 	 */
-	function expect(value : variant) : TestCase.Matcher {
+	function expect.<T>(value : T) : TestCase.Matcher {
 		++this._count;
 		return new TestCase.Matcher(this, value);
 	}
-	function expect(value : variant, message : string) : TestCase.Matcher {
+	function expect.<T>(value : T, message : string) : TestCase.Matcher {
 		++this._count;
 		return new TestCase.Matcher(this, value, message);
 	}
@@ -239,8 +238,8 @@ class TestCase {
 
 		if (op != null) {
 			this.diag("comparing with " + op + s.replace(" - ", " for "));
-			this._dump("got:      ", got);
-			this._dump("expected: ", expected);
+			this._dump("got     :", got);
+			this._dump("expected:", expected);
 		}
 		throw new TestCase.Failure(name != null ? name : "");
 	}
@@ -269,7 +268,7 @@ class TestCase {
 			console.dir(value);
 		}
 		else { // primitive value
-			this.diag(tag + value as string);
+			this.diag(tag + " " + value as string);
 		}
 	}
 
@@ -454,45 +453,32 @@ class TestCase {
 
 		function toMatch(x : RegExp) : void {
 			this._match(x.test(this._got as string),
-					this._got, x, "match");
+					this._got, x, "RegExp.test()");
 		}
 		function notToMatch(x : RegExp) : void {
 			this._match(! x.test(this._got as string),
-					this._got, x, "not match");
+					this._got, x, "! RegExp.test()");
 		}
 
 		/**
 		 * Tests whether the given array equals to the expected.
 		 */
-		function toEqual(x : Array.<variant>) : void {
+		function toEqual.<Collection>(x : Collection) : void {
 			assert x != null;
 
-			if (! (this._got instanceof Array.<variant>)) {
-				this._test._nok(this._name, "equals", this._got, x);
+			if (! (this._got instanceof Collection)) {
+				this._test._nok(this._name, "TestCase#equals()", this._got, x);
 				return;
 			}
 
-			var got = this._got as Array.<variant>;
+			var got = this._got as Collection;
 			if (this._test.equals(got, x)) {
 				this._test._ok(this._name);
 			}
 			else {
-				this._test._nok(this._name, "equals", got, x);
+				this._test._nok(this._name, "TestCase#equals()", got, x);
 				this._test.note(this._test.difflet(got, x));
 			}
-		}
-
-		function toEqual(x : Array.<string>) : void {
-			this.toEqual(x as __noconvert__ Array.<variant>);
-		}
-		function toEqual(x : Array.<number>) : void {
-			this.toEqual(x as __noconvert__ Array.<variant>);
-		}
-		function toEqual(x : Array.<int>) : void {
-			this.toEqual(x as __noconvert__ Array.<variant>);
-		}
-		function toEqual(x : Array.<boolean>) : void {
-			this.toEqual(x as __noconvert__ Array.<variant>);
 		}
 
 		function _match(value : boolean, got : variant, expected : variant, op : string) : void {
