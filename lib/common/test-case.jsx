@@ -187,7 +187,7 @@ class TestCase {
 	/* async test stuff */
 
 	/**
-	 * Prepares an asynchronous test with a timeout handler.
+	 * Prepares an asynchronous test block with a timeout handler.
 	 */
 	function async(testBody : function(:AsyncContext):void, timeoutHandler : function(:AsyncContext):void, timeoutMS : int) : void {
 
@@ -200,7 +200,7 @@ class TestCase {
 	}
 
 	/**
-	 * Prepares an asynchronous test.
+	 * Prepares an asynchronous test block.
 	 * Automatically call <code>this.fail()</code> on timeout.
 	 */
 	function async(testBody : function(:AsyncContext):void, timeoutMS : int) : void {
@@ -419,7 +419,7 @@ class TestCase {
 	}
 
 	/**
-	 * Executes Assertion Executor, created by <code>TestCase#expect()</code>
+	 * Assertion Matcher, created by <code>TestCase#expect()</code>
 	 */
 	class Matcher {
 
@@ -471,7 +471,7 @@ class TestCase {
 		}
 
 		/**
-		 * Tests whether the given array equals to the expected.
+		 * Tests whether the given collection equals to the expected.
 		 */
 		function toEqual.<Collection>(x : Collection) : void {
 			assert x != null;
@@ -534,7 +534,7 @@ class AsyncContext {
 	function name() : string { return this._name; }
 
 	/*
-	 * Tells the test case that the asynchronous test is finished.
+	 * Tells that the asynchronous test is finished.
 	 */
 	function done() : void {
 		Timer.clearTimeout(this._timerId);
