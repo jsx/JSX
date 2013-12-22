@@ -513,12 +513,9 @@ class TestCase {
 }
 
 class AsyncContext {
-	static var _id = 0;
-
 	var _test : TestCase;
 	var _name : string;
 	var _timerId : TimerHandle;
-	var _id : number;
 
 	function constructor(test : TestCase, name : string, timeoutHandler : function(:AsyncContext):void, timeoutMS : int) {
 		this._test = test;
@@ -529,16 +526,12 @@ class AsyncContext {
 		}, timeoutMS);
 
 		this._timerId = id;
-
-		this._id = ++AsyncContext._id;
 	}
 
-	function name() : string { return this._name; }
-
 	/**
-	 * A unique ID for the AsyncContext instance.
+	 * The name of the running test method, e.g. <code>"testAsyncFoo"</code>.
 	 */
-	function id() : number { return this._id; }
+	function name() : string { return this._name; }
 
 	/*
 	 * Tells the test case that the asynchronous test is finished.
