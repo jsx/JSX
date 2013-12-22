@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// generatedy by JSX compiler 0.9.63 (2013-09-05 17:02:24 +0900; e66c4bf3cd46e94387279762e0e414f3b821a25d)
+// generatedy by JSX compiler 0.9.71 (2013-12-15 21:44:17 +0900; f396503f3f30a75c49db445e88abc2cfec392d76)
 var JSX = {};
 (function (JSX) {
 /**
@@ -593,7 +593,7 @@ function Util$analyzeArgs$LAnalysisContext$ALExpression$LExpression$ALUtil$x2EAr
 					return null;
 				}
 			}
-		} else if (args[i] instanceof ArrayLiteralExpression && args[i].getExprs$().length === 0 && args[i].getType$() == null) {
+		} else if (args[i] instanceof ArrayLiteralExpression && args[i].getType$() == null) {
 			arrayExpr = args[i];
 			expectedArrayType = null;
 			for (j = 0; j < expectedTypes.length; ++ j) {
@@ -610,7 +610,7 @@ function Util$analyzeArgs$LAnalysisContext$ALExpression$LExpression$ALUtil$x2EAr
 			} else if (expectedArrayType != null) {
 				arrayExpr.setType$LType$(expectedArrayType);
 			}
-		} else if (args[i] instanceof MapLiteralExpression && args[i].getElements$().length === 0 && args[i].getType$() == null) {
+		} else if (args[i] instanceof MapLiteralExpression && args[i].getType$() == null) {
 			mapExpr = args[i];
 			expectedMapType = null;
 			for (j = 0; j < expectedTypes.length; ++ j) {
@@ -4627,7 +4627,7 @@ function JSXCommand() {
 
 $__jsx_extend([JSXCommand], Object);
 function JSXCommand$help$() {
-	return "JSX compiler version " + Meta.VERSION_STRING + "\n" + "\n" + "Usage: jsx [options] source-file\n" + "\n" + "Options:\n" + "  --add-search-path path     adds a path to library search paths\n" + "  --executable RUNENV        adds launcher to call _Main.main(:string[]):void\n" + "                             supported RUNENV is node, commonjs and web.\n" + "  --run                      runs _Main.main(:string[]):void after compiling\n" + "  --test                     runs _Test#test*():void after compiling\n" + "  --output file              output file (default:stdout)\n" + "  --input-filename file      names input filename\n" + "  --mode (compile|parse|doc) specifies compilation mode (default:compile)\n" + "  --target (javascript|c++)  specifies target language (default:javascript)\n" + "  --release                  disables run-time type checking and enables optimizations (" + Optimizer$getReleaseOptimizationCommands$().join(",") + ")\n" + "  --profile                  enables the profiler (experimental)\n" + "  --optimize cmd1,cmd2,...   enables optimization commands\n" + "  --warn type1,type2,...     enables warnings (all, unused, experimental, deprecated, none)\n" + "  --disable-type-check       disables run-time type checking\n" + "  --minify                   compresses the target JavaScript code\n" + "  --enable-source-map        enables source map debugging info\n" + "  --complete line:column     shows code completion at line:column\n" + "  --version                  displays the version and compiler identifier and exits\n" + "  --version-number           displays the version as number and exits\n" + "  --help                     displays this help and exits\n" + "\n" + "Env:\n" + "  JSX_OPTS   options of jsx(1)\n" + "  JSX_RUNJS  JavaScript engine used by --run and --test\n" + "";
+	return "JSX compiler version " + Meta.VERSION_STRING + "\n" + "\n" + "Usage: jsx [options] source-file\n" + "\n" + "Options:\n" + "  --add-search-path path     adds a path to library search paths\n" + "  --executable RUNENV        adds launcher to call _Main.main(:string[]):void\n" + "                             supported RUNENV is node, commonjs and web.\n" + "  --run                      runs _Main.main(:string[]):void after compiling\n" + "  --test                     runs _Test#test*():void after compiling\n" + "  --output file              output file (default:stdout)\n" + "  --input-filename file      specifies the root path for searching imports (used when the source-file is \"-\" (stdin))\n" + "  --mode (compile|parse|doc) specifies compilation mode (default:compile)\n" + "  --target (javascript|c++)  specifies target language (default:javascript)\n" + "  --release                  disables run-time type checking and enables optimizations (" + Optimizer$getReleaseOptimizationCommands$().join(",") + ")\n" + "  --profile                  enables the profiler (experimental)\n" + "  --optimize cmd1,cmd2,...   enables optimization commands\n" + "  --warn type1,type2,...     enables warnings (all, unused, experimental, deprecated, none)\n" + "  --disable-type-check       disables run-time type checking\n" + "  --minify                   compresses the target JavaScript code\n" + "  --enable-source-map        enables source map debugging info\n" + "  --complete line:column     shows code completion at line:column\n" + "  --version                  displays the version and compiler identifier and exits\n" + "  --version-number           displays the version as number and exits\n" + "  --help                     displays this help and exits\n" + "\n" + "Env:\n" + "  JSX_OPTS   options of jsx(1)\n" + "  JSX_RUNJS  JavaScript engine used by --run and --test\n" + "";
 };
 
 JSXCommand.help$ = JSXCommand$help$;
@@ -10443,16 +10443,21 @@ function JavaScriptEmitter$_initialize$() {
 
 JavaScriptEmitter._initialize$ = JavaScriptEmitter$_initialize$;
 
-function LocalVariable(name, type) {
+function LocalVariable(name, type, isConst) {
 	Stashable.call(this);
 	this._instantiated = [];
 	this.isInstantiated = false;
 	this._isUsedAsRHS = false;
 	this._name = name;
 	this._type = type;
+	this._isConstant = isConst;
 };
 
-$__jsx_extend([LocalVariable], Object);
+function LocalVariable$0(name, type) {
+	LocalVariable.call(this, name, type, false);
+};
+
+$__jsx_extend([LocalVariable, LocalVariable$0], Object);
 $__jsx_merge_interface(LocalVariable, Stashable);
 
 LocalVariable.prototype.serialize$ = function () {
@@ -10472,6 +10477,11 @@ LocalVariable.prototype.getType$ = function () {
 
 LocalVariable.prototype.isUsedAsRHS$ = function () {
 	return this._isUsedAsRHS;
+};
+
+
+LocalVariable.prototype.isConstant$ = function () {
+	return this._isConstant;
 };
 
 
@@ -10507,6 +10517,10 @@ LocalVariable.prototype._findVarTokenFromFuncDef$LAnalysisContext$ = function (c
 LocalVariable.prototype.touchVariable$LAnalysisContext$LToken$B = function (context, token, isAssignment) {
 	var error;
 	if (isAssignment) {
+		if (this._isConstant && context.getTopBlock$().localVariableStatuses.getStatus$LLocalVariable$(this) !== LocalVariableStatuses.UNSET) {
+			context.errors.push(new CompileError(token, "assignment of read-only variable"));
+			return false;
+		}
 		context.getTopBlock$().localVariableStatuses.setStatus$LLocalVariable$(this);
 	} else {
 		switch (context.getTopBlock$().localVariableStatuses.getStatus$LLocalVariable$(this)) {
@@ -10564,12 +10578,12 @@ LocalVariable.prototype.instantiateAndPush$LInstantiationContext$ = function (in
 LocalVariable.prototype._instantiate$LInstantiationContext$ = function (instantiationContext) {
 	var type;
 	type = (this._type != null ? this._type.instantiate$LInstantiationContext$(instantiationContext) : null);
-	return new LocalVariable(this._name, type);
+	return new LocalVariable$0(this._name, type);
 };
 
 
 function CaughtVariable(name, type) {
-	LocalVariable.call(this, name, type);
+	LocalVariable$0.call(this, name, type);
 };
 
 $__jsx_extend([CaughtVariable], LocalVariable);
@@ -10594,12 +10608,12 @@ CaughtVariable.prototype.instantiateAndPush$LInstantiationContext$ = function (i
 
 
 function ArgumentDeclaration(name, type) {
-	LocalVariable.call(this, name, type);
+	LocalVariable$0.call(this, name, type);
 	this._defaultValue = null;
 };
 
 function ArgumentDeclaration$0(name, type, defaultValue) {
-	LocalVariable.call(this, name, type);
+	LocalVariable$0.call(this, name, type);
 	this._defaultValue = defaultValue;
 };
 
@@ -11801,7 +11815,7 @@ ClassDefinition.prototype._assertMemberFunctionIsDefinable$LAnalysisContext$LMem
 		if (! Util$typesAreEqual$ALType$ALType$(this._members[i].getArgumentTypes$(), member.getArgumentTypes$())) {
 			continue;
 		}
-		if (! isCheckingInterface && (member.flags$() & ClassDefinition.IS_OVERRIDE) === 0) {
+		if (! isCheckingInterface && ((member.flags$() | this._members[i].flags$()) & ClassDefinition.IS_STATIC) === 0 && (member.flags$() & ClassDefinition.IS_OVERRIDE) === 0) {
 			error = new CompileError(member.getNameToken$(), "overriding functions must have 'override' attribute set");
 			error.addCompileNote$LCompileNote$(new CompileNote(this._members[i].getNameToken$(), Util$format$SAS("defined in base class '%1'", [ this.classFullName$() ])));
 			context.errors.push(error);
@@ -12297,7 +12311,7 @@ MemberFunctionDefinition.prototype.clone$ = function () {
 		if (funcLocal != null) {
 			if ((newFuncLocal = getStash(funcLocal).newLocal) != null) {
 			} else {
-				newFuncLocal = new LocalVariable(funcLocal.getName$(), funcLocal.getType$());
+				newFuncLocal = new LocalVariable$0(funcLocal.getName$(), funcLocal.getType$());
 				getStash(funcLocal).newLocal = newFuncLocal;
 			}
 			funcLocal = newFuncLocal;
@@ -12313,7 +12327,7 @@ MemberFunctionDefinition.prototype.clone$ = function () {
 			if ((newLocal = getStash(local).newLocal) != null) {
 				return newLocal;
 			}
-			newLocal = new LocalVariable(local.getName$(), local.getType$());
+			newLocal = new LocalVariable$0(local.getName$(), local.getType$());
 			getStash(local).newLocal = newLocal;
 			return newLocal;
 		}));
@@ -12704,10 +12718,18 @@ MemberFunctionDefinition.prototype._fixupConstructor$LAnalysisContext$ = functio
 			break;
 		}
 		function onExpr(expr) {
+			var assignExpr;
 			var lhsExpr;
-			if (expr instanceof AssignmentExpression && (lhsExpr = expr.getFirstExpr$()) instanceof PropertyExpression && lhsExpr.getExpr$() instanceof ThisExpression) {
-				initProperties[lhsExpr.getIdentifierToken$().getValue$()] = false;
-				return true;
+			if (expr instanceof AssignmentExpression) {
+				assignExpr = expr;
+				if (! onExpr(assignExpr.getSecondExpr$())) {
+					return false;
+				}
+				lhsExpr = assignExpr.getFirstExpr$();
+				if (lhsExpr instanceof PropertyExpression && lhsExpr.getExpr$() instanceof ThisExpression) {
+					initProperties[lhsExpr.getIdentifierToken$().getValue$()] = false;
+					return true;
+				}
 			} else if (expr instanceof ThisExpression || expr instanceof FunctionExpression) {
 				return false;
 			}
@@ -12893,6 +12915,8 @@ function TemplateFunctionDefinition(token, name, flags, typeArgs, returnType, ar
 	var $this = this;
 	MemberFunctionDefinition.call(this, token, name, flags, returnType, args, locals, statements, closures, lastTokenOfBody, docComment);
 	TemplateDefinition.call(this);
+	this._resolvedTypemap = null;
+	this._instantiatedDefs = null;
 	this._typeArgs = typeArgs.concat([]);
 	this._instantiatedDefs = new TypedMap$x2E$x3CArray$x2E$x3CType$x3E$x2CMemberFunctionDefinition$x3E$0((function (x, y) {
 		var i;
@@ -15256,7 +15280,7 @@ Parser.prototype._popScope$ = function () {
 };
 
 
-Parser.prototype._registerLocal$LToken$LType$B = function (identifierToken, type, isFunctionStmt) {
+Parser.prototype._registerLocal$LToken$LType$BB = function (identifierToken, type, isConst, isFunctionStmt) {
 	var $this = this;
 	var isEqualTo;
 	var i;
@@ -15265,6 +15289,9 @@ Parser.prototype._registerLocal$LToken$LType$B = function (identifierToken, type
 		if (local.getName$().getValue$() === identifierToken.getValue$()) {
 			if (type != null && local.getType$() != null && ! local.getType$().equals$LType$(type) || isFunctionStmt) {
 				$this._newError$SLToken$("conflicting types for variable " + identifierToken.getValue$(), identifierToken);
+			}
+			if (local.isConstant$() !== isConst) {
+				$this._newError$SLToken$("const attribute conflict for variable " + identifierToken.getValue$(), identifierToken);
 			}
 			return true;
 		}
@@ -15289,15 +15316,15 @@ Parser.prototype._registerLocal$LToken$LType$B = function (identifierToken, type
 			return this._locals[i];
 		}
 	}
-	newLocal = new LocalVariable(identifierToken, type);
+	newLocal = new LocalVariable(identifierToken, type, isConst);
 	this._locals.push(newLocal);
 	return newLocal;
 };
 
 
-Parser.prototype._registerLocal$LToken$LType$ = function (identifierToken, type) {
+Parser.prototype._registerLocal$LToken$LType$B = function (identifierToken, type, isConst) {
 	var $this = this;
-	return this._registerLocal$LToken$LType$B(identifierToken, type, false);
+	return this._registerLocal$LToken$LType$BB(identifierToken, type, isConst, false);
 };
 
 
@@ -16756,7 +16783,7 @@ Parser.prototype._statement$ = function () {
 		this._restoreState$LParserState$(state);
 		label = null;
 	}
-	token = this._expectOpt$AS([ "{", "var", ";", "if", "do", "while", "for", "continue", "break", "return", "yield", "switch", "throw", "try", "assert", "log", "delete", "debugger", "function", "void" ]);
+	token = this._expectOpt$AS([ "{", "var", ";", "if", "do", "while", "for", "continue", "break", "return", "yield", "switch", "throw", "try", "assert", "log", "delete", "debugger", "function", "void", "const" ]);
 	if (label != null) {
 		if (! (token != null && token.getValue$().match(/^(?:do|while|for|switch)$/) != null)) {
 			this._newError$S("only blocks, iteration statements, and switch statements are allowed after a label");
@@ -16768,7 +16795,9 @@ Parser.prototype._statement$ = function () {
 		case "{":
 			return this._block$() != null;
 		case "var":
-			return this._variableStatement$();
+			return this._variableStatement$B(false);
+		case "const":
+			return this._variableStatement$B(true);
 		case ";":
 			return true;
 		case "if":
@@ -16863,11 +16892,11 @@ Parser.prototype._constructorInvocationStatement$ = function () {
 };
 
 
-Parser.prototype._variableStatement$ = function () {
+Parser.prototype._variableStatement$B = function (isConst) {
 	var succeeded;
 	var expr;
 	succeeded = [ false ];
-	expr = this._variableDeclarations$BAB(false, succeeded);
+	expr = this._variableDeclarations$BBAB(false, isConst, succeeded);
 	if (! succeeded[0]) {
 		return false;
 	}
@@ -16909,9 +16938,9 @@ Parser.prototype._functionStatement$LToken$ = function (token) {
 	if (this._expect$S("{") == null) {
 		return false;
 	}
-	funcLocal = this._registerLocal$LToken$LType$B(name, new StaticFunctionType(token, returnType, args.map((function (arg) {
+	funcLocal = this._registerLocal$LToken$LType$BB(name, new StaticFunctionType(token, returnType, args.map((function (arg) {
 		return arg.getType$();
-	})), false), true);
+	})), false), false, true);
 	funcDef = this._functionBody$LToken$LToken$LLocalVariable$ALArgumentDeclaration$LType$B(token, name, funcLocal, args, returnType, true);
 	if (funcDef == null) {
 		return false;
@@ -17012,7 +17041,7 @@ Parser.prototype._forStatement$LToken$LToken$ = function (token, label) {
 	if (this._expectOpt$S(";") != null) {
 	} else if (this._expectOpt$S("var") != null) {
 		succeeded = [ false ];
-		initExpr = this._variableDeclarations$BAB(true, succeeded);
+		initExpr = this._variableDeclarations$BBAB(true, false, succeeded);
 		if (! succeeded[0]) {
 			return false;
 		}
@@ -17061,7 +17090,7 @@ Parser.prototype._forInStatement$LToken$LToken$ = function (token, label) {
 		return 0;
 	}
 	if (this._expectOpt$S("var") != null) {
-		if ((lhsExpr = this._variableDeclaration$B(true)) == null) {
+		if ((lhsExpr = this._variableDeclaration$BB(true, false)) == null) {
 			return - 1;
 		}
 	} else if ((lhsExpr = this._lhsExpr$()) == null) {
@@ -17348,7 +17377,7 @@ Parser.prototype._subStatements$ = function () {
 };
 
 
-Parser.prototype._variableDeclarations$BAB = function (noIn, isSuccess) {
+Parser.prototype._variableDeclarations$BBAB = function (noIn, isConst, isSuccess) {
 	var expr;
 	var commaToken;
 	var declExpr;
@@ -17356,7 +17385,7 @@ Parser.prototype._variableDeclarations$BAB = function (noIn, isSuccess) {
 	expr = null;
 	commaToken = null;
 	do {
-		declExpr = this._variableDeclaration$B(noIn);
+		declExpr = this._variableDeclaration$BB(noIn, isConst);
 		if (declExpr == null) {
 			return null;
 		}
@@ -17369,7 +17398,7 @@ Parser.prototype._variableDeclarations$BAB = function (noIn, isSuccess) {
 };
 
 
-Parser.prototype._variableDeclaration$B = function (noIn) {
+Parser.prototype._variableDeclaration$BB = function (noIn, isConst) {
 	var identifier;
 	var type;
 	var local;
@@ -17386,12 +17415,15 @@ Parser.prototype._variableDeclaration$B = function (noIn) {
 			return null;
 		}
 	}
-	local = this._registerLocal$LToken$LType$(identifier, type);
+	local = this._registerLocal$LToken$LType$B(identifier, type, isConst);
 	initialValue = null;
-	if ((assignToken = this._expectOpt$S("=")) != null) {
-		if ((initialValue = this._assignExpr$B(noIn)) == null) {
+	if ((assignToken = this._expectOpt$S("=")) == null) {
+		if (isConst) {
+			this._newError$S("initializer expression is mandatory for constant declaration");
 			return null;
 		}
+	} else if ((initialValue = this._assignExpr$B(noIn)) == null) {
+		return null;
 	}
 	expr = new LocalExpression(identifier, local);
 	if (initialValue != null) {
@@ -17934,7 +17966,7 @@ Parser.prototype._functionExpr$LToken$ = function (token) {
 	}
 	funcLocal = null;
 	if (name != null) {
-		funcLocal = new LocalVariable(name, type);
+		funcLocal = new LocalVariable$0(name, type);
 	}
 	funcDef = this._functionBody$LToken$LToken$LLocalVariable$ALArgumentDeclaration$LType$B(token, name, funcLocal, args, returnType, true);
 	if (funcDef == null) {
@@ -18258,6 +18290,7 @@ Parser.prototype._getCompletionCandidatesOfProperty$LExpression$ = function (exp
 var SourceMapGenerator$0 = require('source-map').SourceMapGenerator;
 var SourceMapConsumer$0 = require('source-map').SourceMapConsumer;
 function SourceMapper(rootDir, outputFile, runenv) {
+	this._impl = null;
 	this._header = "";
 	this._sourceFiles = {};
 	this._outputLength = 0;
@@ -18752,7 +18785,7 @@ _OptimizeCommand.prototype.createVar$LMemberFunctionDefinition$LType$S = functio
 	}
 	for (i = 0; nameExists(baseName + "$" + (i + "")); ++ i) {
 	}
-	newLocal = new LocalVariable(new Token$2(baseName + "$" + (i + ""), false), type);
+	newLocal = new LocalVariable$0(new Token$2(baseName + "$" + (i + ""), false), type);
 	locals.push(newLocal);
 	this.log$S("rewriting " + baseName + " to " + newLocal.getName$().getValue$());
 	return newLocal;
@@ -18952,6 +18985,12 @@ _StripOptimizeCommand.prototype._touchInstance$LClassDefinition$ = function (cla
 			}
 		}
 	}
+	classDef.forEachMemberVariable$F$LMemberVariableDefinition$B$((function (varDef) {
+		if ((varDef.flags$() & ClassDefinition.IS_STATIC) === 0) {
+			$this._membersToWalk.push(varDef);
+		}
+		return true;
+	}));
 	if (classDef.extendType$() != null) {
 		this._touchInstance$LClassDefinition$(classDef.extendType$().getClassDef$());
 	}
@@ -19357,11 +19396,11 @@ _DetermineCalleeCommand.prototype.optimizeFunction$LMemberFunctionDefinition$ = 
 				newExpr = expr;
 				if (! (newExpr.getType$().getClassDef$() != null)) {
 					debugger;
-					throw new Error("[src/optimizer.jsx:1074:59] assertion failure\n                    assert newExpr.getType().getClassDef() != null;\n                                                           ^^\n");
+					throw new Error("[src/optimizer.jsx:1082:59] assertion failure\n                    assert newExpr.getType().getClassDef() != null;\n                                                           ^^\n");
 				}
 				if (! (newExpr.getConstructor$() != null)) {
 					debugger;
-					throw new Error("[src/optimizer.jsx:1075:52] assertion failure\n                    assert newExpr.getConstructor() != null;\n                                                    ^^\n");
+					throw new Error("[src/optimizer.jsx:1083:52] assertion failure\n                    assert newExpr.getConstructor() != null;\n                                                    ^^\n");
 				}
 				callingFuncDef = _DetermineCalleeCommand$findCallingFunctionInClass$LClassDefinition$SALType$B(newExpr.getType$().getClassDef$(), "constructor", newExpr.getConstructor$().getArgumentTypes$(), false);
 				if (callingFuncDef == null) {
@@ -19438,7 +19477,30 @@ _StaticizeOptimizeCommand.prototype.performOptimization$ = function () {
 	var $this = this;
 	var memberCanBeStaticized;
 	function memberCanBeStaticized(funcDef) {
-		return (funcDef.flags$() & (ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_STATIC | ClassDefinition.IS_NATIVE)) === ClassDefinition.IS_FINAL && funcDef.name$() !== "constructor";
+		var onStatement;
+		if ((funcDef.flags$() & (ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_STATIC | ClassDefinition.IS_NATIVE)) !== ClassDefinition.IS_FINAL) {
+			return false;
+		}
+		if (funcDef.name$() === "constructor") {
+			return false;
+		}
+		function onStatement(statement) {
+			if (statement instanceof FunctionStatement) {
+				return statement.getFuncDef$().forEachStatement$F$LStatement$B$(onStatement);
+			}
+			return statement.forEachExpression$F$LExpression$B$((function onExpression(expr) {
+				if (expr instanceof FunctionExpression) {
+					return expr.getFuncDef$().forEachStatement$F$LStatement$B$(onStatement);
+				} else if (expr instanceof SuperExpression) {
+					return false;
+				}
+				return expr.forEachExpression$F$LExpression$B$(onExpression);
+			})) && statement.forEachStatement$F$LStatement$B$(onStatement);
+		}
+		if (! funcDef.forEachStatement$F$LStatement$B$(onStatement)) {
+			return false;
+		}
+		return true;
 	}
 	this.getCompiler$().forEachClassDef$F$LParser$LClassDefinition$B$((function (parser, classDef) {
 		if ((classDef.flags$() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) !== 0) {
@@ -19669,7 +19731,7 @@ _UnclassifyOptimizationCommand.prototype._getClassesToUnclassify$ = function () 
 			var foundClassDefIndex;
 			if (! (expr != null)) {
 				debugger;
-				throw new Error("[src/optimizer.jsx:1438:28] assertion failure\n                assert expr != null;\n                            ^^\n");
+				throw new Error("[src/optimizer.jsx:1471:28] assertion failure\n                assert expr != null;\n                            ^^\n");
 			}
 			if (expr instanceof InstanceofExpression) {
 				foundClassDefIndex = candidates.indexOf(expr.getExpectedType$().getClassDef$());
@@ -21185,7 +21247,7 @@ _InlineOptimizeCommand.prototype._expandCallingFunction$LMemberFunctionDefinitio
 			statement = calleeStatements[i].clone$();
 		}
 		function onExpr(expr, replaceCb) {
-			return $this._rewriteExpression$LExpression$F$LExpression$V$ALExpression$LMemberFunctionDefinition$(expr, replaceCb, argsAndThisAndLocals, calleeFuncDef);
+			return $this._rewriteExpression$LExpression$LExpression$F$LExpression$V$ALExpression$LMemberFunctionDefinition$(expr, null, replaceCb, argsAndThisAndLocals, calleeFuncDef);
 		}
 		statement.forEachExpression$F$LExpression$F$LExpression$V$B$(onExpr);
 		statement.forEachStatement$F$LStatement$B$((function onStatement(statement) {
@@ -21255,7 +21317,7 @@ _InlineOptimizeCommand.prototype._expandCallAsExpression$LMemberFunctionDefiniti
 		}
 	}));
 	clonedExpr = expr.clone$();
-	this._rewriteExpression$LExpression$F$LExpression$V$ALExpression$LMemberFunctionDefinition$(clonedExpr, (function (expr) {
+	this._rewriteExpression$LExpression$LExpression$F$LExpression$V$ALExpression$LMemberFunctionDefinition$(clonedExpr, null, (function (expr) {
 		clonedExpr = expr;
 	}), argsAndThisAndLocals, callingFuncDef);
 	if (setupArgs != null) {
@@ -21306,7 +21368,7 @@ _InlineOptimizeCommand.prototype._createVarsAndInit$LMemberFunctionDefinition$LM
 };
 
 
-_InlineOptimizeCommand.prototype._rewriteExpression$LExpression$F$LExpression$V$ALExpression$LMemberFunctionDefinition$ = function (expr, replaceCb, argsAndThisAndLocals, calleeFuncDef) {
+_InlineOptimizeCommand.prototype._rewriteExpression$LExpression$LExpression$F$LExpression$V$ALExpression$LMemberFunctionDefinition$ = function (expr, parentExpr, replaceCb, argsAndThisAndLocals, calleeFuncDef) {
 	var $this = this;
 	var formalArgs;
 	var localExpr;
@@ -21335,14 +21397,17 @@ _InlineOptimizeCommand.prototype._rewriteExpression$LExpression$F$LExpression$V$
 				replaceCb(argsAndThisAndLocals[j]);
 				argsAndThisAndLocals[j] = null;
 			} else {
+				if (parentExpr != null && parentExpr instanceof AssignmentExpression && parentExpr.getFirstExpr$() == expr && ! (argsAndThisAndLocals[j] instanceof LocalExpression)) {
+					return true;
+				}
 				replaceCb(argsAndThisAndLocals[j].clone$());
 			}
 		}
 	} else if (expr instanceof ThisExpression) {
 		replaceCb(argsAndThisAndLocals[formalArgs.length].clone$());
 	}
-	expr.forEachExpression$F$LExpression$F$LExpression$V$B$((function (expr, replaceCb) {
-		return $this._rewriteExpression$LExpression$F$LExpression$V$ALExpression$LMemberFunctionDefinition$(expr, replaceCb, argsAndThisAndLocals, calleeFuncDef);
+	expr.forEachExpression$F$LExpression$F$LExpression$V$B$((function (childExpr, replaceCb) {
+		return $this._rewriteExpression$LExpression$LExpression$F$LExpression$V$ALExpression$LMemberFunctionDefinition$(childExpr, expr, replaceCb, argsAndThisAndLocals, calleeFuncDef);
 	}));
 	return true;
 };
@@ -22140,6 +22205,7 @@ _TailRecursionOptimizeCommand.prototype._replaceTailCallStatement$LMemberFunctio
 
 
 function Compiler(platform) {
+	this._searchPaths = null;
 	this._builtinParsers = null;
 	this._emitter = null;
 	this._platform = platform;
@@ -24380,7 +24446,7 @@ CodeTransformer.prototype._doCPSTransform$LMemberFunctionDefinition$F$SALStateme
 	returnLocal = null;
 	if (! Type.voidType.equals$LType$(funcDef.getReturnType$())) {
 		returnLocalName = "$return" + (CodeTransformer$_getFunctionNestDepth$LMemberFunctionDefinition$(funcDef) + "");
-		returnLocal = new LocalVariable(new Token$2(returnLocalName, false), funcDef.getReturnType$());
+		returnLocal = new LocalVariable$0(new Token$2(returnLocalName, false), funcDef.getReturnType$());
 		funcDef.getLocals$().push(returnLocal);
 		this._enterFunction$LLocalVariable$(returnLocal);
 	}
@@ -24421,7 +24487,7 @@ CodeTransformer.prototype._eliminateGotos$LMemberFunctionDefinition$F$SALStateme
 	for (i = 0; i < statements.length; ++ i) {
 		if (statements[i] instanceof LabelStatement && labels[statements[i].getName$()] == null) {
 			name = statements[i].getName$();
-			labels[name] = new LocalVariable(new Token$2(name, true), new StaticFunctionType(null, Type.voidType, [  ], true));
+			labels[name] = new LocalVariable$0(new Token$2(name, true), new StaticFunctionType(null, Type.voidType, [  ], true));
 			funcDef.getLocals$().push(labels[name]);
 		}
 	}
@@ -24485,7 +24551,7 @@ CodeTransformer.prototype._compileYields$LMemberFunctionDefinition$ = function (
 	yieldingType = funcDef.getReturnType$().getClassDef$().getTypeArguments$()[0];
 	genType = this._instantiateGeneratorType$LType$(yieldingType);
 	genLocalName = "$generator" + (CodeTransformer$_getGeneratorNestDepth$LMemberFunctionDefinition$(funcDef) + "");
-	genLocal = new LocalVariable(new Token$2(genLocalName, false), genType);
+	genLocal = new LocalVariable$0(new Token$2(genLocalName, false), genType);
 	funcDef.getLocals$().push(genLocal);
 	newExpr = new NewExpression(new Token$2("new", false), new ObjectType(this._stopIterationClassDef), [  ]);
 	newExpr.analyze$LAnalysisContext$LExpression$(new AnalysisContext([  ], null, null), null);
@@ -24629,7 +24695,7 @@ CodeTransformer.prototype._createFreshArgumentDeclaration$LType$ = function (typ
 CodeTransformer.prototype._createFreshLocalVariable$LType$ = function (type) {
 	var id;
 	id = this._numUniqVar++;
-	return new LocalVariable(new Token$2("$a" + (id + ""), true), type);
+	return new LocalVariable$0(new Token$2("$a" + (id + ""), true), type);
 };
 
 
@@ -25215,10 +25281,10 @@ $__jsx_lazy_init(NodePlatform, "_isColorSupported", function () {
 		return false;
 	})();
 });
-Meta.VERSION_STRING = "0.9.63";
-Meta.VERSION_NUMBER = 0.009063;
-Meta.LAST_COMMIT_HASH = "e66c4bf3cd46e94387279762e0e414f3b821a25d";
-Meta.LAST_COMMIT_DATE = "2013-09-05 17:02:24 +0900";
+Meta.VERSION_STRING = "0.9.71";
+Meta.VERSION_NUMBER = 0.009071;
+Meta.LAST_COMMIT_HASH = "f396503f3f30a75c49db445e88abc2cfec392d76";
+Meta.LAST_COMMIT_DATE = "2013-12-15 21:44:17 +0900";
 $__jsx_lazy_init(Meta, "IDENTIFIER", function () {
 	return Meta.VERSION_STRING + " (" + Meta.LAST_COMMIT_DATE + "; " + Meta.LAST_COMMIT_HASH + ")";
 });
@@ -25332,10 +25398,10 @@ $__jsx_lazy_init(_Lexer, "rxHeredocEndSingleQuoted", function () {
 });
 _Lexer.rxNewline = /(?:\r\n?|\n)/;
 $__jsx_lazy_init(_Lexer, "keywords", function () {
-	return Util$asSet$AS([ "null", "true", "false", "NaN", "Infinity", "break", "do", "instanceof", "typeof", "case", "else", "new", "var", "catch", "finally", "return", "void", "for", "switch", "while", "function", "this", "if", "throw", "in", "try", "class", "extends", "super", "import", "implements", "static", "__FILE__", "__LINE__", "undefined" ]);
+	return Util$asSet$AS([ "null", "true", "false", "NaN", "Infinity", "break", "do", "instanceof", "typeof", "case", "else", "new", "var", "catch", "finally", "return", "void", "const", "for", "switch", "while", "function", "this", "if", "throw", "in", "try", "class", "extends", "super", "import", "implements", "static", "__FILE__", "__LINE__", "undefined" ]);
 });
 $__jsx_lazy_init(_Lexer, "reserved", function () {
-	return Util$asSet$AS([ "debugger", "with", "const", "export", "let", "private", "public", "yield", "protected", "extern", "native", "as", "operator" ]);
+	return Util$asSet$AS([ "debugger", "with", "export", "let", "private", "public", "yield", "protected", "extern", "native", "as", "operator" ]);
 });
 SourceMapper.NODE_SOURCE_MAP_HEADER = "require('source-map-support').install();\n\n";
 SourceMapper.WEB_SOURCE_MAP_HEADER = "";
@@ -25670,7 +25736,8 @@ var $__jsx_classMap = {
 		Stashable: Stashable,
 		Stashable$: Stashable,
 		LocalVariable: LocalVariable,
-		LocalVariable$LToken$LType$: LocalVariable,
+		LocalVariable$LToken$LType$B: LocalVariable,
+		LocalVariable$LToken$LType$: LocalVariable$0,
 		CaughtVariable: CaughtVariable,
 		CaughtVariable$LToken$LType$: CaughtVariable,
 		ArgumentDeclaration: ArgumentDeclaration,

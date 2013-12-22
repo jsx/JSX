@@ -30,7 +30,7 @@ import "timer.jsx";
 
 class _Test extends TestCase {
 
-	// synchrounous tests
+	// synchrounous tests which run in serial
 
 	function testClearTimeout() : void {
 		var id = Timer.setTimeout(() -> {
@@ -41,7 +41,7 @@ class _Test extends TestCase {
 		this.expect(id, "clearTimeout").toBe(id);
 	}
 
-	// asynchronous tests
+	// asynchronous tests which start in parallel but run in serial
 
 	function testSetTimeout() : void {
 		this.async((async) -> {
@@ -58,8 +58,8 @@ class _Test extends TestCase {
 	}
 }</code></pre>
 
- * @author DeNA., Co., Ltd.
- * @version 1.0.0
+ * @author DeNA., Co., Ltd. et. al.
+ * @version 1.1.0
  */
 
 import "timer.jsx";
@@ -93,6 +93,15 @@ class TestCase {
 	 */
 	function tearDown() : void { }
 
+	/**
+	 * Set up for each asynchronous test method.
+	 */
+	function setUp(async : AsyncContext) : void { }
+
+	/**
+	 * Tear down for each asynchronous test method.
+	 */
+	function tearDown(async : AsyncContext) : void { }
 
 	/* low-level hooks called by src/js/runtests.js */
 
@@ -106,7 +115,7 @@ class TestCase {
 			this.finish();
 		}
 		else { // asynchronous
-			var next = this._tasks.shift() as function():void;
+			var next = this._tasks.shift();
 			next();
 		}
 	}
@@ -178,13 +187,14 @@ class TestCase {
 	/* async test stuff */
 
 	/**
-	 * Prepares an asynchronous test with timeout handler.
+	 * Prepares an asynchronous test with a timeout handler.
 	 */
 	function async(testBody : function(:AsyncContext):void, timeoutHandler : function(:AsyncContext):void, timeoutMS : int) : void {
 
 		var async = new AsyncContext(this, this._currentName, timeoutHandler, timeoutMS);
 
 		this._tasks.push(function() : void {
+			this.setUp(async);
 			testBody(async);
 		});
 	}
@@ -390,7 +400,7 @@ class TestCase {
 	}
 
 	/**
-	 * Shows notes.
+	 * Shows notes on verbose mode.
 	 */
 	function note(message : string) : void {
 		if(this.verbose) {
@@ -503,10 +513,12 @@ class TestCase {
 }
 
 class AsyncContext {
+	static var _id = 0;
 
 	var _test : TestCase;
 	var _name : string;
 	var _timerId : TimerHandle;
+	var _id : number;
 
 	function constructor(test : TestCase, name : string, timeoutHandler : function(:AsyncContext):void, timeoutMS : int) {
 		this._test = test;
@@ -517,9 +529,16 @@ class AsyncContext {
 		}, timeoutMS);
 
 		this._timerId = id;
+
+		this._id = ++AsyncContext._id;
 	}
 
 	function name() : string { return this._name; }
+
+	/**
+	 * A unique ID for the AsyncContext instance.
+	 */
+	function id() : number { return this._id; }
 
 	/*
 	 * Tells the test case that the asynchronous test is finished.
@@ -527,10 +546,11 @@ class AsyncContext {
 	function done() : void {
 		Timer.clearTimeout(this._timerId);
 
+		this._test.tearDown(this);
 		this._test.after(this._name);
 
 		if(this._test._tasks.length != 0) {
-			var next = this._test._tasks.shift() as function():void;
+			var next = this._test._tasks.shift();
 			next();
 		}
 		else {
