@@ -1,5 +1,10 @@
 Revision history for the JSX software development kit
 
+0.9.72 2013-12-22 14:00:58+0900
+    [FEATURES]
+    - Introduce TestCase#setUp(:AsyncContext):void and #tearDown(:AsyncContext):void to set up / tear down asynchronous tests (suggested by @yosuke_furukawa)
+    - Now TestCase#toEqual() are able to test Map.<T> (suggested by @yosuke_furukawa)
+
 0.9.71 2013-11-27 14:26:00+0900
     [FEATURES]
     - introduce local "const"
