@@ -783,6 +783,8 @@ class CplusplusEmitter implements Emitter {
 		if (varDef.getType() != null)
 			this._emit(this.getNameOfType(varDef.getType()));
 		else {
+			/* variables in template classes may not explicitly typed,
+			 * so we need infer the type of them */
 			this._emit("decltype(");
 			this._getExpressionEmitterFor(varDef.getInitialValue()).emit(0);
 			this._emit(")");
