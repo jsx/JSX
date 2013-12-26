@@ -643,13 +643,8 @@ class CplusplusEmitter implements Emitter {
 				_typedMap.set(instance, true);
 
 				var template = instance.getTemplateClass();
-				this._emit("template<");
-				for (var i = 0; i < template.getTypeArguments().length; ++i) {
-					if (i != 0)
-						this._emit(", ");
-					this._emit("typename " + template.getTypeArguments()[i].getValue());
-				}
-				this._emit("> class " + template.className() + ";\n");
+				this._emitTemplateSignature(template.getTypeArguments());
+				this._emit(" class " + template.className() + ";\n");
 			} else {
 				this._emit("class " + classDef.className() + ";\n");
 			}
@@ -672,6 +667,16 @@ class CplusplusEmitter implements Emitter {
 		this._emit("}\n");
 
 		this._emitMain();
+	}
+
+	function _emitTemplateSignature (typeArgs : Token[]) : void {
+		this._emit("template<");
+		for (var i = 0; i < typeArgs.length; ++i) {
+			if (i != 0)
+				this._emit(", ");
+			this._emit("typename " + typeArgs[i].getValue());
+		}
+		this._emit(">");
 	}
 
 	function _emitClass (classDef : ClassDefinition) : void {
@@ -711,16 +716,8 @@ class CplusplusEmitter implements Emitter {
 		this._typedMap.set(instance, true);
 
 		var template = instance.getTemplateClass();
-		this._emit("template<");
-		for (var i = 0; i < template.getTypeArguments().length; ++i) {
-			var typeArg = template.getTypeArguments()[i];
-			if (i != 0) {
-				this._emit(", ");
-			}
-			this._emit("typename " + typeArg.getValue());
-		}
-		this._emit(">\n");
-
+		this._emitTemplateSignature(template.getTypeArguments());
+		this._emit("\n");
 		this._emitClass(template);
 	}
 
