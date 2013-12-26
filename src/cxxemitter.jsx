@@ -809,6 +809,20 @@ class CplusplusEmitter implements Emitter {
 			}
 			this._emitStatement(statements[i]);
 		}
+		this._emittingClass.forEachMemberVariable((varDef) -> {
+			if (varDef.getInitialValue() != null) {
+				if (i == 0) {
+					this._emit(" : ");
+					i++;
+				} else {
+					this._emit(", ");
+				}
+				this._emit(varDef.name() + "(");
+				this._getExpressionEmitterFor(varDef.getInitialValue()).emit(0);
+				this._emit(")\n");
+			}
+			return true;
+		});
 		statements.splice(0, i);
 		// emit body
 		this._emit(" {\n");
