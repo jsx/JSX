@@ -682,7 +682,10 @@ class CplusplusEmitter implements Emitter {
 					if (funcDef instanceof InstantiatedMemberFunctionDefinition) {
 						return true;
 					}
-					this._emitMemberFunction(funcDef);
+					if (funcDef.name() == "constructor")
+						this._emitConstructor(funcDef);
+					else
+						this._emitMemberFunction(funcDef);
 					return true;
 				});
 			} finally {
@@ -769,27 +772,10 @@ class CplusplusEmitter implements Emitter {
 		this._emitClass(template);
 	}
 
-	function _emitMemberFunction (funcDef : MemberFunctionDefinition) : void {
-		if (funcDef instanceof TemplateFunctionDefinition) {
-			return;
-		}
-		if (this._emittingClass instanceof TemplateClassDefinition) {
-			this._emitTemplateSignature((this._emittingClass as TemplateClassDefinition).getTypeArguments());
-			this._emit("\n");
-			var typeName = this.getNameOfTemplateClassDef(this._emittingClass as TemplateClassDefinition);
-		} else {
-			typeName = this._emittingClass.className();
-		}
-
-		if (funcDef.name() == "constructor") {
-			this._emit(typeName + "::" + funcDef.getClassDef().className() + " (");
-		}
-		else {
-			this._emit(this.getNameOfType(funcDef.getReturnType()) + " ");
-			this._emit(typeName + "::" + funcDef.name() + " (");
-		}
-		for (var i = 0; i < funcDef.getArguments().length; ++i) {
-			var arg = funcDef.getArguments()[i];
+	function _emitArguments (args : ArgumentDeclaration[]) : void {
+		this._emit("(");
+		for (var i = 0; i < args.length; ++i) {
+			var arg = args[i];
 			if (i != 0) {
 				this._emit(", ");
 			}
@@ -798,9 +784,22 @@ class CplusplusEmitter implements Emitter {
 			this._emit(arg.getName().getValue());
 		}
 		this._emit(")");
+	}
+
+	function _emitConstructor (ctor : MemberFunctionDefinition) : void {
+		if (this._emittingClass instanceof TemplateClassDefinition) {
+			this._emitTemplateSignature((this._emittingClass as TemplateClassDefinition).getTypeArguments());
+			this._emit("\n");
+			var typeName = this.getNameOfTemplateClassDef(this._emittingClass as TemplateClassDefinition);
+		} else {
+			typeName = this._emittingClass.className();
+		}
+
+		this._emit(typeName + "::" + ctor.getClassDef().className() + " ");
+		this._emitArguments(ctor.getArguments());
 		// emit constructor delegations
-		var statements = funcDef.getStatements().concat([]);
-		for (i = 0; i < statements.length; ++i) {
+		var statements = ctor.getStatements().concat([]);
+		for (var i = 0; i < statements.length; ++i) {
 			if (! (statements[i] instanceof ConstructorInvocationStatement))
 				break;
 			if (i != 0) {
@@ -816,8 +815,46 @@ class CplusplusEmitter implements Emitter {
 		this._advanceIndent();
 		try {
 			// emit variable declarations
-			var locals = funcDef.getLocals();
+			var locals = ctor.getLocals();
 			for (i = 0; i < locals.length; ++i) {
+				this._emit(this.getNameOfType(locals[i].getType()) + " " + locals[i].getName().getValue() + ";\n");
+			}
+			if (i != 0)
+				this._emit("\n");
+
+			// emit statements
+			for (i = 0; i < statements.length; ++i) {
+				this._emitStatement(statements[i]);
+			}
+		} finally {
+			this._reduceIndent();
+			this._emit("}\n\n");
+		}
+	}
+
+	function _emitMemberFunction (funcDef : MemberFunctionDefinition) : void {
+		if (funcDef instanceof TemplateFunctionDefinition) {
+			return;
+		}
+		if (this._emittingClass instanceof TemplateClassDefinition) {
+			this._emitTemplateSignature((this._emittingClass as TemplateClassDefinition).getTypeArguments());
+			this._emit("\n");
+			var typeName = this.getNameOfTemplateClassDef(this._emittingClass as TemplateClassDefinition);
+		} else {
+			typeName = this._emittingClass.className();
+		}
+
+		this._emit(this.getNameOfType(funcDef.getReturnType()) + " ");
+		this._emit(typeName + "::" + funcDef.name() + " ");
+		this._emitArguments(funcDef.getArguments());
+		var statements = funcDef.getStatements().concat([]);
+		// emit body
+		this._emit(" {\n");
+		this._advanceIndent();
+		try {
+			// emit variable declarations
+			var locals = funcDef.getLocals();
+			for (var i = 0; i < locals.length; ++i) {
 				this._emit(this.getNameOfType(locals[i].getType()) + " " + locals[i].getName().getValue() + ";\n");
 			}
 			if (i != 0)
