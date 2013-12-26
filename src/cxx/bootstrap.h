@@ -13,7 +13,7 @@ namespace JSX {
 
   class string {
   public:
-    string () : length_(0), data_("") {}
+    string () : string("") {}
     string (const char* data) : length_(strlen(data)), data_(data) {}
     string (number n);
     operator const char* () const { return data_; }
@@ -53,10 +53,7 @@ namespace JSX {
   template<typename T>
   class Array : public Object {
   public:
-    Array ()
-      : length_(0)
-      , ary_(0) {
-    }
+    Array () : Array(10) {}
     Array (number length)
       : length_(length)
       , ary_(length) {
