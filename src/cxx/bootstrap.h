@@ -30,7 +30,7 @@ namespace JSX {
   public:
     Nullable () : isNull_(true) {}
     Nullable (T value) : isNull_(false), value_(value) {}
-    operator T& () const;
+    operator T& ();
   private:
     boolean isNull_;
     T value_;
@@ -55,13 +55,15 @@ namespace JSX {
   public:
     Array () : Array(10) {}
     Array (number length)
-      : length_(length)
+      : length(length)
       , ary_(length) {
     }
+    void push(T t);
+    Nullable<T> shift();
+    number length;
 
   private:
-    number length_;
-    std::vector<T> ary_;
+    std::vector<Nullable<T>> ary_;
   };
 
   class Error : public Object {
@@ -104,11 +106,24 @@ namespace JSX {
   }
 
   template<typename T>
-  Nullable<T>::operator T& () const {
+  Nullable<T>::operator T& () {
     if (isNull_) {
       throw new Error("null access");
     }
     return value_;
+  }
+
+  template<typename T>
+  void Array<T>::push(T t) {
+    ary_.push_back(t);
+  }
+
+  template<typename T>
+  Nullable<T> Array<T>::shift() {
+    Nullable<T> first = ary_[0];
+    ary_ = std::vector<Nullable<T>>(ary_.begin() + 1, ary_.end());
+    length--;
+    return first;
   }
 
   class console : public Object {
