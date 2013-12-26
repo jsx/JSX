@@ -629,18 +629,18 @@ class CplusplusEmitter implements Emitter {
 		this._emit("namespace JSX {\n\n");
 		this._advanceIndent();
 
-		// declarations
-		var _typedMap = new TypedMap.<InstantiatedClassDefinition, boolean>;
+		// class declarations
+		var typedMap = new TypedMap.<ClassDefinition, boolean>;
 		classDefs.forEach((classDef) -> {
 			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
 				return;
 			}
 			if (classDef instanceof InstantiatedClassDefinition) {
 				var instance = classDef as InstantiatedClassDefinition;
-				if (_typedMap.has(instance)) {
+				if (typedMap.has(instance)) {
 					return;
 				}
-				_typedMap.set(instance, true);
+				typedMap.set(instance, true);
 
 				var template = instance.getTemplateClass();
 				this._emitTemplateSignature(template.getTypeArguments());
@@ -651,7 +651,7 @@ class CplusplusEmitter implements Emitter {
 		});
 		this._emit("\n");
 
-		// definitions
+		// class definitions
 		classDefs.forEach((classDef) -> {
 			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
 				return;
@@ -660,6 +660,33 @@ class CplusplusEmitter implements Emitter {
 				this._emitTemplateClass(classDef as InstantiatedClassDefinition);
 			} else {
 				this._emitClass(classDef);
+			}
+		});
+
+		// method definitions
+		typedMap.clear();
+		classDefs.forEach((classDef) -> {
+			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+				return;
+			}
+			if (classDef instanceof InstantiatedClassDefinition) {
+				if (typedMap.has(classDef)) {
+					return;
+				}
+				typedMap.set(classDef, true);
+				classDef = (classDef as InstantiatedClassDefinition).getTemplateClass();
+			}
+			this._emittingClass = classDef;
+			try {
+				classDef.forEachMemberFunction(function (funcDef) {
+					if (funcDef instanceof InstantiatedMemberFunctionDefinition) {
+						return true;
+					}
+					this._emitMemberFunction(funcDef);
+					return true;
+				});
+			} finally {
+				this._emittingClass = null;
 			}
 		});
 
@@ -681,28 +708,49 @@ class CplusplusEmitter implements Emitter {
 
 	function _emitClass (classDef : ClassDefinition) : void {
 		this._emit("class " + classDef.className() + " : public " + this.getNameOfClassDef(classDef.extendType()) + " {\n");
-		this._emittingClass = classDef;
 		try {
 			this._emit("public:\n");
 			this._advanceIndent();
+			// methods
 			classDef.forEachMemberFunction(function (funcDef) {
 				if (funcDef instanceof InstantiatedMemberFunctionDefinition) {
 					return true;
 				}
-				this._emitMemberFunction(funcDef);
+				if (funcDef instanceof TemplateFunctionDefinition) {
+					return true; // TODO
+				}
+
+				if (funcDef.name() == "constructor") {
+					this._emit(funcDef.getClassDef().className() + " (");
+				}
+				else {
+					if ((funcDef.flags() & ClassDefinition.IS_STATIC) != 0)
+						this._emit("static ");
+					this._emit(this.getNameOfType(funcDef.getReturnType()) + " " + funcDef.name() + " (");
+				}
+				for (var i = 0; i < funcDef.getArguments().length; ++i) {
+					var arg = funcDef.getArguments()[i];
+					if (i != 0) {
+						this._emit(", ");
+					}
+					this._emit(this.getNameOfType(arg.getType()));
+					this._emit(" ");
+					this._emit(arg.getName().getValue());
+				}
+				this._emit(");\n");
 				return true;
 			});
 			this._reduceIndent();
 
 			this._emit("private:\n");
 			this._advanceIndent();
+			// variables
 			classDef.forEachMemberVariable(function (varDef) {
 				this._emitMemberVariable(varDef);
 				return true;
 			});
 			this._reduceIndent();
 		} finally {
-			this._emittingClass = null;
 			this._emit("};\n\n");
 		}
 	}
@@ -725,13 +773,20 @@ class CplusplusEmitter implements Emitter {
 		if (funcDef instanceof TemplateFunctionDefinition) {
 			return;
 		}
+		if (this._emittingClass instanceof TemplateClassDefinition) {
+			this._emitTemplateSignature((this._emittingClass as TemplateClassDefinition).getTypeArguments());
+			this._emit("\n");
+			var typeName = this.getNameOfTemplateClassDef(this._emittingClass as TemplateClassDefinition);
+		} else {
+			typeName = this._emittingClass.className();
+		}
+
 		if (funcDef.name() == "constructor") {
-			this._emit(funcDef.getClassDef().className() + " (");
+			this._emit(typeName + "::" + funcDef.getClassDef().className() + " (");
 		}
 		else {
-			if ((funcDef.flags() & ClassDefinition.IS_STATIC) != 0)
-				this._emit("static ");
-			this._emit(this.getNameOfType(funcDef.getReturnType()) + " " + funcDef.name() + " (");
+			this._emit(this.getNameOfType(funcDef.getReturnType()) + " ");
+			this._emit(typeName + "::" + funcDef.name() + " (");
 		}
 		for (var i = 0; i < funcDef.getArguments().length; ++i) {
 			var arg = funcDef.getArguments()[i];
@@ -987,6 +1042,18 @@ int main() {
 		var s = name + "<";
 		for (var i = 0; i < typeArgs.length; ++i) {
 			s += this.getNameOfType(typeArgs[i]);
+		}
+		s += ">";
+		return s;
+	}
+
+	function getNameOfTemplateClassDef (template : TemplateClassDefinition) : string {
+		var s = template.className();
+		s += "<";
+		for (var i = 0; i < template.getTypeArguments().length; ++i) {
+			if (i != 0)
+				s += ", ";
+			s += template.getTypeArguments()[i].getValue();
 		}
 		s += ">";
 		return s;
