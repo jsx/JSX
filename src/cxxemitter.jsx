@@ -790,15 +790,7 @@ class CplusplusEmitter implements Emitter {
 			this._getExpressionEmitterFor(varDef.getInitialValue()).emit(0);
 			this._emit(")");
 		}
-		this._emit(" " + varDef.name());
-
-		if (varDef.getInitialValue() == null)
-			this._emit(";\n");
-		else {
-			this._emit(" = ");
-			this._getExpressionEmitterFor(varDef.getInitialValue()).emit(0);
-			this._emit(";\n");
-		}
+		this._emit(" " + varDef.name() + ";\n");
 	}
 
 	function _emitBootstrap () : void {
