@@ -6,6 +6,7 @@ import "./expression.jsx";
 import "./type.jsx";
 import "./util.jsx";
 import "./parser.jsx";
+import "./analysis.jsx";
 
 abstract class _StatementEmitter {
 
@@ -391,7 +392,6 @@ class _PropertyExpressionEmitter extends _UnaryExpressionEmitter {
 		var identifierToken = expr.getIdentifierToken();
 
 		// emit, depending on the type
-		var classDef = expr.getHolderType().getClassDef();
 		if (expr.getExpr().isClassSpecifier()) {
 			var name = identifierToken.getValue();
 			this._emitter._getExpressionEmitterFor(expr.getExpr()).emit(0);
@@ -507,10 +507,7 @@ class _NewExpressionEmitter extends _OperatorExpressionEmitter {
 	}
 
 	override function emit (outerOpPrecedence : number) : void {
-		var classDef = this._expr.getType().getClassDef();
-		var ctor = this._expr.getConstructor();
-		var argTypes = ctor.getArgumentTypes();
-		this._emitter._emitCallArguments("new " + this._emitter.getNameOfClassDef(classDef) + "(", this._expr.getArguments());
+		this._emitter._emitCallArguments("new " + this._emitter.getNameOfClassDef(this._expr.getType() as ObjectType) + "(", this._expr.getArguments());
 	}
 
 	override function _getPrecedence () : number {
@@ -631,40 +628,100 @@ class CplusplusEmitter implements Emitter {
 
 		this._emit("namespace JSX {\n\n");
 		this._advanceIndent();
-		for (var i = 0; i < classDefs.length; ++i) {
-			if ((classDefs[i].flags() & ClassDefinition.IS_NATIVE) != 0) {
-				continue;
-			}
-			if (classDefs[i] instanceof TemplateClassDefinition || classDefs[i] instanceof InstantiatedClassDefinition) {
-				continue;
-			}
-			this._emit("class " + classDefs[i].className() + " : public " + this.getNameOfClassDef(classDefs[i].extendType().getClassDef()) + " {\n");
-			this._emittingClass = classDefs[i];
-			try {
-				this._emit("public:\n");
-				this._advanceIndent();
-				classDefs[i].forEachMemberFunction(function (funcDef) {
-					this._emitMemberFunction(funcDef);
-					return true;
-				});
-				this._reduceIndent();
 
-				this._emit("private:\n");
-				this._advanceIndent();
-				classDefs[i].forEachMemberVariable(function (varDef) {
-					this._emitMemberVariable(varDef);
-					return true;
-				});
-				this._reduceIndent();
-			} finally {
-				this._emittingClass = null;
-				this._emit("};\n\n");
+		// declarations
+		var _typedMap = new TypedMap.<InstantiatedClassDefinition, boolean>;
+		classDefs.forEach((classDef) -> {
+			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+				return;
 			}
-		}
+			if (classDef instanceof InstantiatedClassDefinition) {
+				var instance = classDef as InstantiatedClassDefinition;
+				if (_typedMap.has(instance)) {
+					return;
+				}
+				_typedMap.set(instance, true);
+
+				var template = instance.getTemplateClass();
+				this._emit("template<");
+				for (var i = 0; i < template.getTypeArguments().length; ++i) {
+					if (i != 0)
+						this._emit(", ");
+					this._emit("typename " + template.getTypeArguments()[i].getValue());
+				}
+				this._emit("> class " + template.className() + ";\n");
+			} else {
+				this._emit("class " + classDef.className() + ";\n");
+			}
+		});
+		this._emit("\n");
+
+		// definitions
+		classDefs.forEach((classDef) -> {
+			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+				return;
+			}
+			if (classDef instanceof InstantiatedClassDefinition) {
+				this._emitTemplateClass(classDef as InstantiatedClassDefinition);
+			} else {
+				this._emitClass(classDef);
+			}
+		});
+
 		this._reduceIndent();
 		this._emit("}\n");
 
 		this._emitMain();
+	}
+
+	function _emitClass (classDef : ClassDefinition) : void {
+		this._emit("class " + classDef.className() + " : public " + this.getNameOfClassDef(classDef.extendType()) + " {\n");
+		this._emittingClass = classDef;
+		try {
+			this._emit("public:\n");
+			this._advanceIndent();
+			classDef.forEachMemberFunction(function (funcDef) {
+				if (funcDef instanceof InstantiatedMemberFunctionDefinition) {
+					return true;
+				}
+				this._emitMemberFunction(funcDef);
+				return true;
+			});
+			this._reduceIndent();
+
+			this._emit("private:\n");
+			this._advanceIndent();
+			classDef.forEachMemberVariable(function (varDef) {
+				this._emitMemberVariable(varDef);
+				return true;
+			});
+			this._reduceIndent();
+		} finally {
+			this._emittingClass = null;
+			this._emit("};\n\n");
+		}
+	}
+
+	var _typedMap = new TypedMap.<InstantiatedClassDefinition, boolean>;
+
+	function _emitTemplateClass (instance : InstantiatedClassDefinition) : void {
+		if (this._typedMap.has(instance)) {
+			return;
+		}
+		this._typedMap.set(instance, true);
+
+		var template = instance.getTemplateClass();
+		this._emit("template<");
+		for (var i = 0; i < template.getTypeArguments().length; ++i) {
+			var typeArg = template.getTypeArguments()[i];
+			if (i != 0) {
+				this._emit(", ");
+			}
+			this._emit("typename " + typeArg.getValue());
+		}
+		this._emit(">\n");
+
+		this._emitClass(template);
 	}
 
 	function _emitMemberFunction (funcDef : MemberFunctionDefinition) : void {
@@ -725,7 +782,23 @@ class CplusplusEmitter implements Emitter {
 	}
 
 	function _emitMemberVariable (varDef : MemberVariableDefinition) : void {
-		this._emit(this.getNameOfType(varDef.getType()) + " " + varDef.name() + ";\n");
+		var type;
+		if (varDef.getType() != null)
+			this._emit(this.getNameOfType(varDef.getType()));
+		else {
+			this._emit("decltype(");
+			this._getExpressionEmitterFor(varDef.getInitialValue()).emit(0);
+			this._emit(")");
+		}
+		this._emit(" " + varDef.name());
+
+		if (varDef.getInitialValue() == null)
+			this._emit(";\n");
+		else {
+			this._emit(" = ");
+			this._getExpressionEmitterFor(varDef.getInitialValue()).emit(0);
+			this._emit(";\n");
+		}
 	}
 
 	function _emitBootstrap () : void {
@@ -890,23 +963,39 @@ int main() {
 	}
 
 	function getNameOfType (type : Type) : string {
+		assert type != null;
+
 		if (type instanceof FunctionType) {
 			return "void"; // FIXME
 		}
 		if (! (type instanceof ObjectType)) {
 			return type.toString();
 		}
-		return this.getNameOfClassDef((type as ObjectType).getClassDef()) + "*";
+		var objectType = type as ObjectType;
+		if (objectType.getClassDef() == null) {
+			return type.toString();
+		}
+		return this.getNameOfClassDef(type as ObjectType) + "*";
 	}
 
-	function getNameOfClassDef (classDef : ClassDefinition) : string {
-		if (! (classDef instanceof InstantiatedClassDefinition)) {
+	function getNameOfClassDef (objectType : ObjectType) : string {
+		assert objectType != null;
+
+		var classDef = objectType.getClassDef(); // maybe null
+		if (classDef != null && ! (classDef instanceof InstantiatedClassDefinition)) {
 			return classDef.className();
 		}
 		var instantiated = classDef as InstantiatedClassDefinition;
-		var s = instantiated.getTemplateClassName() + "<";
-		for (var i = 0; i < instantiated.getTypeArguments().length; ++i) {
-			s += this.getNameOfType(instantiated.getTypeArguments()[i]);
+		if (classDef == null) {
+			var name = (objectType as ParsedObjectType).getQualifiedName().getToken().getValue();
+			var typeArgs = (objectType as ParsedObjectType).getTypeArguments();
+		} else {
+			name = instantiated.getTemplateClassName();
+			typeArgs = instantiated.getTypeArguments();
+		}
+		var s = name + "<";
+		for (var i = 0; i < typeArgs.length; ++i) {
+			s += this.getNameOfType(typeArgs[i]);
 		}
 		s += ">";
 		return s;
