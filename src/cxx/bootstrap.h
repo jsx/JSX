@@ -11,6 +11,7 @@ namespace JSX {
 
   typedef double number;
   typedef bool boolean;
+  using std::function;
 
   class string;
   class Object;
@@ -243,7 +244,7 @@ namespace JSX {
      *
      * @param comparefn Specifies a function that defines the sort order.
      */
-    Array<T> sort(std::function<number(Nullable<T>, Nullable<T>)> comparefn);
+    Array<T> sort(function<number(Nullable<T>, Nullable<T>)> comparefn);
 
     /**
      * Changes the content of an array, adding new elements while removing old elements.
@@ -283,17 +284,17 @@ namespace JSX {
      *
      * @callbackfn A function to test for each element.
      */
-    boolean every(std::function<boolean(Nullable<T>)> callbackfn);
-    boolean every(std::function<boolean(Nullable<T>, number)> callbackfn);
-    boolean every(std::function<boolean(Nullable<T>, number, Array<T>)> callbackfn);
+    boolean every(function<boolean(Nullable<T>)> callbackfn);
+    boolean every(function<boolean(Nullable<T>, number)> callbackfn);
+    boolean every(function<boolean(Nullable<T>, number, Array<T>)> callbackfn);
 
     /**
      * Tests whether some element in the array passes the test implemented
      * by the provided function.
      */
-    boolean some(std::function<boolean(Nullable<T>)> callbackfn);
-    boolean some(std::function<boolean(Nullable<T>, number)> callbackfn);
-    boolean some(std::function<boolean(Nullable<T>, number, Array<T>)> callbackfn);
+    boolean some(function<boolean(Nullable<T>)> callbackfn);
+    boolean some(function<boolean(Nullable<T>, number)> callbackfn);
+    boolean some(function<boolean(Nullable<T>, number, Array<T>)> callbackfn);
 
     /**
      * Calls callbackfn once for each element in the array, in ascending
@@ -301,9 +302,9 @@ namespace JSX {
      *
      * @param callbackfn A function to call for each element.
      */
-    void forEach(std::function<void(Nullable<T>)> callbackfn);
-    void forEach(std::function<void(Nullable<T>, number)> callbackfn);
-    void forEach(std::function<void(Nullable<T>, number, Array<T>)> callbackfn);
+    void forEach(function<void(Nullable<T>)> callbackfn);
+    void forEach(function<void(Nullable<T>, number)> callbackfn);
+    void forEach(function<void(Nullable<T>, number, Array<T>)> callbackfn);
 
     /**
      * Creates a new array with the results of calling a provided function
@@ -312,9 +313,9 @@ namespace JSX {
      * @param callbackfn A function that produces an element of the new
      *        <code>Array.&lt;U&gt;</code> from an element of the current one.
      */
-    template<typename U> Array<U> map(std::function<Nullable<U>(Nullable<T>)> callbackfn);
-    template<typename U> Array<U> map(std::function<Nullable<U>(Nullable<T>, number)> callbackfn);
-    template<typename U> Array<U> map(std::function<Nullable<U>(Nullable<T>, number, Array<T>)> callbackfn);
+    template<typename U> Array<U> map(function<Nullable<U>(Nullable<T>)> callbackfn);
+    template<typename U> Array<U> map(function<Nullable<U>(Nullable<T>, number)> callbackfn);
+    template<typename U> Array<U> map(function<Nullable<U>(Nullable<T>, number, Array<T>)> callbackfn);
 
     /**
      * Creates a new array with all elements that pass the test implemented
@@ -322,9 +323,9 @@ namespace JSX {
      *
      * @param callbackfn A function to test each elements of the array.
      */
-    Array<T> filter(std::function<boolean(Nullable<T>)> callbackfn);
-    Array<T> filter(std::function<boolean(Nullable<T>, number)> callbackfn);
-    Array<T> filter(std::function<boolean(Nullable<T>, number, Array<T>)> callbackfn);
+    Array<T> filter(function<boolean(Nullable<T>)> callbackfn);
+    Array<T> filter(function<boolean(Nullable<T>, number)> callbackfn);
+    Array<T> filter(function<boolean(Nullable<T>, number, Array<T>)> callbackfn);
 
     /**
      * Apply a function against an accumulator and each value of the array
@@ -339,23 +340,23 @@ namespace JSX {
      *        currentValue (the current element being processed in the array),
      *        the currentIndex and the array.
      */
-    template<typename U> U reduce(std::function<U(Nullable<U>, Nullable<T>)> callbackfn);
-    template<typename U> U reduce(std::function<U(Nullable<U>, Nullable<T>, number)> callbackfn);
-    template<typename U> U reduce(std::function<U(Nullable<U>, Nullable<T>, number, Array<T>)> callbackfn);
-    template<typename U> U reduce(std::function<U(Nullable<U>, Nullable<T>)> callbackfn, U initialValue);
-    template<typename U> U reduce(std::function<U(Nullable<U>, Nullable<T>, number)> callbackfn, U initialValue);
-    template<typename U> U reduce(std::function<U(Nullable<U>, Nullable<T>, number, Array<T>)> callbackfn, U initialValue);
+    template<typename U> U reduce(function<U(Nullable<U>, Nullable<T>)> callbackfn);
+    template<typename U> U reduce(function<U(Nullable<U>, Nullable<T>, number)> callbackfn);
+    template<typename U> U reduce(function<U(Nullable<U>, Nullable<T>, number, Array<T>)> callbackfn);
+    template<typename U> U reduce(function<U(Nullable<U>, Nullable<T>)> callbackfn, U initialValue);
+    template<typename U> U reduce(function<U(Nullable<U>, Nullable<T>, number)> callbackfn, U initialValue);
+    template<typename U> U reduce(function<U(Nullable<U>, Nullable<T>, number, Array<T>)> callbackfn, U initialValue);
 
     /**
      * Apply a function simultaneously against two values of the array
      * (from right-to-left) as to reduce it to a single value.
      */
-    template<typename U> U reduceRight(std::function<U(Nullable<U>, Nullable<T>)> callbackfn);
-    template<typename U> U reduceRight(std::function<U(Nullable<U>, Nullable<T>, number)> callbackfn);
-    template<typename U> U reduceRight(std::function<U(Nullable<U>, Nullable<T>, number, Array<T>)> callbackfn);
-    template<typename U> U reduceRight(std::function<U(Nullable<U>, Nullable<T>)> callbackfn, U initialValue);
-    template<typename U> U reduceRight(std::function<U(Nullable<U>, Nullable<T>, number)> callbackfn, U initialValue);
-    template<typename U> U reduceRight(std::function<U(Nullable<U>, Nullable<T>, number, Array<T>)> callbackfn, U initialValue);
+    template<typename U> U reduceRight(function<U(Nullable<U>, Nullable<T>)> callbackfn);
+    template<typename U> U reduceRight(function<U(Nullable<U>, Nullable<T>, number)> callbackfn);
+    template<typename U> U reduceRight(function<U(Nullable<U>, Nullable<T>, number, Array<T>)> callbackfn);
+    template<typename U> U reduceRight(function<U(Nullable<U>, Nullable<T>)> callbackfn, U initialValue);
+    template<typename U> U reduceRight(function<U(Nullable<U>, Nullable<T>, number)> callbackfn, U initialValue);
+    template<typename U> U reduceRight(function<U(Nullable<U>, Nullable<T>, number, Array<T>)> callbackfn, U initialValue);
 
     /**
      * <p>A positive integer between 0 and a value less than 2<sup>32</sup> that specifies the number of elements in an array.</p>
