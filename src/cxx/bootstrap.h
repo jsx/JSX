@@ -129,9 +129,21 @@ namespace JSX {
 
   class console : public Object {
   public:
-    static void log (string str) {
-      std::cout << (const char *)str << std::endl;
-    }
+    static void log (const string& str);
+    static void log (const number& num);
+    static void log (Object *obj);
   };
+
+  void console::log (const string& str) {
+    std::cout << str << std::endl;
+  }
+
+  void console::log (const number& num) {
+    std::cout << num << std::endl;
+  }
+
+  void console::log (Object* obj) {
+    std::cout << obj->toString() << std::endl;
+  }
 
 }
