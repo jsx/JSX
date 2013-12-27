@@ -751,10 +751,10 @@ class CplusplusEmitter implements Emitter {
 					this._emit(funcDef.getClassDef().className() + " (");
 				}
 				else {
-					if (funcDef.getStatements() == null)
-						this._emit("virtual ");
 					if ((funcDef.flags() & ClassDefinition.IS_STATIC) != 0)
 						this._emit("static ");
+					else if (! (funcDef instanceof TemplateFunctionDefinition))
+						this._emit("virtual ");
 					this._emit(this.getNameOfType(funcDef.getReturnType()) + " " + funcDef.name() + " (");
 				}
 				for (var i = 0; i < funcDef.getArguments().length; ++i) {
@@ -766,7 +766,7 @@ class CplusplusEmitter implements Emitter {
 					this._emit(" ");
 					this._emit(arg.getName().getValue());
 				}
-				if (funcDef.getStatements() == null) {
+				if ((funcDef.flags() & ClassDefinition.IS_ABSTRACT) != 0) {
 					this._emit(") = 0;\n");
 				} else {
 					this._emit(");\n");
