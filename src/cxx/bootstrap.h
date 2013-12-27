@@ -11,6 +11,13 @@ namespace JSX {
   typedef double number;
   typedef bool boolean;
 
+  class string;
+  class Object;
+
+  string toString(Object* obj);
+  string toString(const string& str);
+  string toString(number num);
+
   class string {
   public:
 
@@ -161,6 +168,18 @@ namespace JSX {
     static void log (Object *obj);
 
   };
+
+  string toString(Object *obj) {
+    return obj->toString();
+  }
+
+  string toString(const string& str) {
+    return str;
+  }
+
+  string toString(number num) {
+    return string(num);
+  }
 
   string::string(number n) {
     std::stringstream ss;
