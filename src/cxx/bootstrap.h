@@ -39,27 +39,6 @@ namespace JSX {
 
   string operator+ (const char *lhs, const string& rhs);
 
-  template<typename T> class Nullable {
-  public:
-
-    Nullable () :
-      isNull_(true) {
-    }
-
-    Nullable (const T& value) :
-      isNull_(false),
-      value_(value) {
-    }
-
-    operator T& ();
-
-  private:
-
-    boolean isNull_;
-    T value_;
-
-  };
-
   class variant;
 
   class Object {
@@ -76,6 +55,77 @@ namespace JSX {
 
     Function() {
     }
+
+  };
+
+  class Error : public Object {
+  public:
+
+    string name;
+    string message;
+    string stack;
+
+    Error () :
+      name(),
+      message(),
+      stack() {
+    }
+
+    explicit Error (const string& message) :
+      name(),
+      message(message),
+      stack() {
+    }
+
+  };
+
+  template<typename T> class Nullable {
+  public:
+
+    Nullable () :
+      isNull_(true) {
+    }
+
+    Nullable (const T& value) :
+      isNull_(false),
+      value_(value) {
+    }
+
+    operator T& () {
+      if (isNull_) {
+	throw new Error("null access");
+      }
+      return value_;
+    }
+
+  private:
+
+    boolean isNull_;
+    T value_;
+
+  };
+
+  template<typename T> class Nullable<T*> {
+  public:
+
+    Nullable () :
+      value_(nullptr) {
+    }
+
+    Nullable (T* value) :
+      value_(value) {
+    }
+
+    operator T& () {
+      if (value_ == nullptr) {
+	throw new Error("null access");
+      }
+      return *value_;
+    }
+
+  private:
+
+    T* value_;
 
   };
 
@@ -103,24 +153,12 @@ namespace JSX {
 
   };
 
-  class Error : public Object {
+  class console : public Object {
   public:
 
-    string name;
-    string message;
-    string stack;
-
-    Error () :
-      name(),
-      message(),
-      stack() {
-    }
-
-    explicit Error (const string& message) :
-      name(),
-      message(message),
-      stack() {
-    }
+    static void log (const string& str);
+    static void log (const number& num);
+    static void log (Object *obj);
 
   };
 
@@ -143,13 +181,6 @@ namespace JSX {
     return string(lhs) + rhs;
   }
 
-  template<typename T> Nullable<T>::operator T& () {
-    if (isNull_) {
-      throw new Error("null access");
-    }
-    return value_;
-  }
-
   template<typename T> void Array<T>::push(const T& t) {
     ary_.push_back(t);
     length++;
@@ -161,15 +192,6 @@ namespace JSX {
     length--;
     return first;
   }
-
-  class console : public Object {
-  public:
-
-    static void log (const string& str);
-    static void log (const number& num);
-    static void log (Object *obj);
-
-  };
 
   void console::log (const string& str) {
     std::cout << str << std::endl;
