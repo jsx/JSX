@@ -697,6 +697,9 @@ class CplusplusEmitter implements Emitter {
 					if (funcDef instanceof InstantiatedMemberFunctionDefinition) {
 						return true;
 					}
+					if (funcDef.getStatements() == null) {
+						return true;
+					}
 					if (funcDef.name() == "constructor")
 						this._emitConstructor(funcDef);
 					else
@@ -742,6 +745,8 @@ class CplusplusEmitter implements Emitter {
 					this._emit(funcDef.getClassDef().className() + " (");
 				}
 				else {
+					if (funcDef.getStatements() == null)
+						this._emit("virtual ");
 					if ((funcDef.flags() & ClassDefinition.IS_STATIC) != 0)
 						this._emit("static ");
 					this._emit(this.getNameOfType(funcDef.getReturnType()) + " " + funcDef.name() + " (");
@@ -755,7 +760,11 @@ class CplusplusEmitter implements Emitter {
 					this._emit(" ");
 					this._emit(arg.getName().getValue());
 				}
-				this._emit(");\n");
+				if (funcDef.getStatements() == null) {
+					this._emit(") = 0;\n");
+				} else {
+					this._emit(");\n");
+				}
 				return true;
 			});
 			this._reduceIndent();
