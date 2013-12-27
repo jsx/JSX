@@ -29,7 +29,7 @@ namespace JSX {
   class Nullable {
   public:
     Nullable () : isNull_(true) {}
-    Nullable (T value) : isNull_(false), value_(value) {}
+    Nullable (const T& value) : isNull_(false), value_(value) {}
     operator T& ();
   private:
     boolean isNull_;
@@ -53,12 +53,12 @@ namespace JSX {
   template<typename T>
   class Array : public Object {
   public:
-    Array () : Array(10) {}
+    Array () : Array(0) {}
     Array (number length)
       : length(length)
       , ary_(length) {
     }
-    void push(T t);
+    void push(const T& t);
     Nullable<T> shift();
     number length;
 
@@ -114,7 +114,7 @@ namespace JSX {
   }
 
   template<typename T>
-  void Array<T>::push(T t) {
+  void Array<T>::push(const T& t) {
     ary_.push_back(t);
     length++;
   }
