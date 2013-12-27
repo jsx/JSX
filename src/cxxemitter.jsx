@@ -394,11 +394,11 @@ class _PropertyExpressionEmitter extends _UnaryExpressionEmitter {
 		// emit, depending on the type
 		if (expr.getExpr().isClassSpecifier()) {
 			var name = identifierToken.getValue();
-			this._emitter._getExpressionEmitterFor(expr.getExpr()).emit(0);
+			this._emitter._getExpressionEmitterFor(expr.getExpr()).emit(_PropertyExpressionEmitter._operatorPrecedence - 1);
 			this._emitter._emit("::" + name);
 		} else {
 			var name = identifierToken.getValue();
-			this._emitter._getExpressionEmitterFor(expr.getExpr()).emit(0);
+			this._emitter._getExpressionEmitterFor(expr.getExpr()).emit(_PropertyExpressionEmitter._operatorPrecedence - 1);
 			this._emitter._emit("->" + name);
 		}
 	}
@@ -506,7 +506,7 @@ class _NewExpressionEmitter extends _OperatorExpressionEmitter {
 		this._expr = expr;
 	}
 
-	override function emit (outerOpPrecedence : number) : void {
+	override function _emit () : void {
 		this._emitter._emitCallArguments("new " + this._emitter.getNameOfClassDef(this._expr.getType() as ObjectType) + "(", this._expr.getArguments());
 	}
 
@@ -1119,16 +1119,16 @@ int main() {
 
 		var precedence = [
 			[
-				{ "new":        _NewExpressionEmitter._setOperatorPrecedence },
 			// 	{ "[":          _ArrayExpressionEmitter._setOperatorPrecedence },
 				{ ".":          _PropertyExpressionEmitter._setOperatorPrecedence },
 				{ "(":          _CallExpressionEmitter._setOperatorPrecedence },
 			// 	{ "super":      _SuperExpressionEmitter._setOperatorPrecedence },
 			// 	{ "function":   _FunctionExpressionEmitter._setOperatorPrecedence }
 			], [
+				{ "new":        _NewExpressionEmitter._setOperatorPrecedence },
 			// 	{ "++":         _PostfixExpressionEmitter._setOperatorPrecedence },
 			// 	{ "--":         _PostfixExpressionEmitter._setOperatorPrecedence }
-			// ], [
+			], [
 				// delete is not used by JSX
 				{ "void":       _UnaryExpressionEmitter._setOperatorPrecedence },
 				{ "typeof":     _UnaryExpressionEmitter._setOperatorPrecedence },
