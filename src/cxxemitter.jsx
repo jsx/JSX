@@ -745,7 +745,6 @@ class CplusplusEmitter implements Emitter {
 			});
 			this._reduceIndent();
 
-			this._emit("private:\n");
 			this._advanceIndent();
 			// variables
 			classDef.forEachMemberVariable(function (varDef) {
