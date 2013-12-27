@@ -213,6 +213,21 @@ class _LocalExpressionEmitter extends _ExpressionEmitter {
 
 }
 
+class _NullExpressionEmitter extends _ExpressionEmitter {
+
+	var _expr : NullExpression;
+
+	function constructor (emitter : CplusplusEmitter, expr : NullExpression) {
+		super(emitter);
+		this._expr = expr;
+	}
+
+	override function emit (outerOpPrecedence : number) : void {
+		this._emitter._emit("nullptr");
+	}
+
+}
+
 class _NumberLiteralExpressionEmitter extends _ExpressionEmitter {
 
 	var _expr : NumberLiteralExpression;
@@ -977,8 +992,8 @@ int main() {
 			return new _LocalExpressionEmitter(this, expr as LocalExpression);
 		// else if (expr instanceof ClassExpression)
 		// 	return new _ClassExpressionEmitter(this, expr as ClassExpression);
-		// else if (expr instanceof NullExpression)
-		// 	return new _NullExpressionEmitter(this, expr as NullExpression);
+		else if (expr instanceof NullExpression)
+			return new _NullExpressionEmitter(this, expr as NullExpression);
 		// else if (expr instanceof BooleanLiteralExpression)
 		// 	return new _BooleanLiteralExpressionEmitter(this, expr as BooleanLiteralExpression);
 		// else if (expr instanceof IntegerLiteralExpression)
