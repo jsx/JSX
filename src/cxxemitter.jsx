@@ -283,8 +283,9 @@ class _AsExpressionEmitter extends _ExpressionEmitter {
 	}
 
 	override function emit (outerOpPrecedence : number) : void {
-		this._emitter._emit("(" + this._emitter.getNameOfType(this._expr.getType()) + ")");
+		this._emitter._emit("((" + this._emitter.getNameOfType(this._expr.getType()) + ")");
 		this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(outerOpPrecedence);
+		this._emitter._emit(")");
 	}
 
 }
