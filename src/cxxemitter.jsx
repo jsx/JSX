@@ -644,20 +644,30 @@ class CplusplusEmitter implements Emitter {
 		this._emit("namespace JSX {\n\n");
 		this._advanceIndent();
 
+		// pick out all template classes and replace instansiated classDefs with them
+		var typedMap = new TypedMap.<TemplateClassDefinition, boolean>;
+		for (var i = 0; i < classDefs.length; ) {
+			if (classDefs[i] instanceof InstantiatedClassDefinition) {
+				var template = (classDefs[i] as InstantiatedClassDefinition).getTemplateClass();
+				if (typedMap.has(template)) {
+					classDefs.splice(i, 1);
+				} else {
+					classDefs.splice(i, 1, template);
+					typedMap.set(template, true);
+					++i;
+				}
+			} else {
+				++i;
+			}
+		}
+
 		// class declarations
-		var typedMap = new TypedMap.<ClassDefinition, boolean>;
 		classDefs.forEach((classDef) -> {
 			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
 				return;
 			}
-			if (classDef instanceof InstantiatedClassDefinition) {
-				var instance = classDef as InstantiatedClassDefinition;
-				if (typedMap.has(instance)) {
-					return;
-				}
-				typedMap.set(instance, true);
-
-				var template = instance.getTemplateClass();
+			if (classDef instanceof TemplateClassDefinition) {
+				var template = classDef as TemplateClassDefinition;
 				this._emitTemplateSignature(template.getTypeArguments());
 				this._emit(" class " + template.className() + ";\n");
 			} else {
@@ -671,25 +681,17 @@ class CplusplusEmitter implements Emitter {
 			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
 				return;
 			}
-			if (classDef instanceof InstantiatedClassDefinition) {
-				this._emitTemplateClass(classDef as InstantiatedClassDefinition);
+			if (classDef instanceof TemplateClassDefinition) {
+				this._emitTemplateClass(classDef as TemplateClassDefinition);
 			} else {
 				this._emitClass(classDef);
 			}
 		});
 
 		// method definitions
-		typedMap.clear();
 		classDefs.forEach((classDef) -> {
 			if ((classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
 				return;
-			}
-			if (classDef instanceof InstantiatedClassDefinition) {
-				if (typedMap.has(classDef)) {
-					return;
-				}
-				typedMap.set(classDef, true);
-				classDef = (classDef as InstantiatedClassDefinition).getTemplateClass();
 			}
 			this._emittingClass = classDef;
 			try {
@@ -781,18 +783,10 @@ class CplusplusEmitter implements Emitter {
 		}
 	}
 
-	var _typedMap = new TypedMap.<InstantiatedClassDefinition, boolean>;
-
-	function _emitTemplateClass (instance : InstantiatedClassDefinition) : void {
-		if (this._typedMap.has(instance)) {
-			return;
-		}
-		this._typedMap.set(instance, true);
-
-		var template = instance.getTemplateClass();
-		this._emitTemplateSignature(template.getTypeArguments());
+	function _emitTemplateClass (classDef : TemplateClassDefinition) : void {
+		this._emitTemplateSignature(classDef.getTypeArguments());
 		this._emit("\n");
-		this._emitClass(template);
+		this._emitClass(classDef);
 	}
 
 	function _emitArguments (args : ArgumentDeclaration[]) : void {
