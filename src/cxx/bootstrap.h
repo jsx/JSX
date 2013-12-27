@@ -116,6 +116,7 @@ namespace JSX {
   template<typename T>
   void Array<T>::push(T t) {
     ary_.push_back(t);
+    length++;
   }
 
   template<typename T>
