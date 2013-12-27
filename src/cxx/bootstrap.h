@@ -1,7 +1,7 @@
 /* -*- mode: c++ -*- */
 
 #include <gc_cpp.h>
-#include <vector>
+#include <deque>
 #include <iostream>
 #include <sstream>
 #include <cmath>
@@ -63,7 +63,7 @@ namespace JSX {
     number length;
 
   private:
-    std::vector<Nullable<T>> ary_;
+    std::deque<Nullable<T>> ary_;
   };
 
   class Error : public Object {
@@ -121,7 +121,7 @@ namespace JSX {
   template<typename T>
   Nullable<T> Array<T>::shift() {
     Nullable<T> first = ary_[0];
-    ary_ = std::vector<Nullable<T>>(ary_.begin() + 1, ary_.end());
+    ary_.pop_front();
     length--;
     return first;
   }
