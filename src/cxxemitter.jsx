@@ -695,7 +695,7 @@ class CplusplusEmitter implements Emitter {
 			}
 			this._emittingClass = classDef;
 			try {
-				classDef.forEachMemberFunction(function (funcDef) {
+				function onFuncDef (funcDef : MemberFunctionDefinition) : boolean {
 					if (funcDef instanceof InstantiatedMemberFunctionDefinition) {
 						return true;
 					}
@@ -707,7 +707,9 @@ class CplusplusEmitter implements Emitter {
 					else
 						this._emitMemberFunction(funcDef);
 					return true;
-				});
+				}
+				classDef.forEachMemberFunction(onFuncDef);
+				classDef.forEachTemplateFunction((funcDef) -> onFuncDef(funcDef));
 			} finally {
 				this._emittingClass = null;
 			}
@@ -734,13 +736,14 @@ class CplusplusEmitter implements Emitter {
 		try {
 			this._emit("public:\n");
 			this._advanceIndent();
-			// methods
-			classDef.forEachMemberFunction(function (funcDef) {
+
+			function onFuncDef (funcDef : MemberFunctionDefinition) : boolean {
 				if (funcDef instanceof InstantiatedMemberFunctionDefinition) {
 					return true;
 				}
 				if (funcDef instanceof TemplateFunctionDefinition) {
-					return true; // TODO
+					this._emitTemplateSignature((funcDef as TemplateFunctionDefinition).getTypeArguments());
+					this._emit(" ");
 				}
 
 				if (funcDef.name() == "constructor") {
@@ -768,7 +771,11 @@ class CplusplusEmitter implements Emitter {
 					this._emit(");\n");
 				}
 				return true;
-			});
+			}
+
+			// methods
+			classDef.forEachMemberFunction(onFuncDef);
+			classDef.forEachTemplateFunction((funcDef) -> onFuncDef(funcDef));
 			this._reduceIndent();
 
 			this._advanceIndent();
