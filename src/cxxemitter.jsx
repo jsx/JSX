@@ -396,6 +396,30 @@ class _UnaryExpressionEmitter extends _OperatorExpressionEmitter {
 
 }
 
+class _PostfixExpressionEmitter extends _UnaryExpressionEmitter {
+
+	function constructor (emitter : CplusplusEmitter, expr : UnaryExpression) {
+		super(emitter, expr);
+	}
+
+	override function _emit () : void {
+		var opToken = this._expr.getToken();
+		this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(this._getPrecedence());
+		this._emitter._emit(opToken.getValue(), opToken);
+	}
+
+	override function _getPrecedence () : number {
+		return _PostfixExpressionEmitter._operatorPrecedence[this._expr.getToken().getValue()];
+	}
+
+	static const _operatorPrecedence = new Map.<number>;
+
+	static function _setOperatorPrecedence (op : string, precedence : number) : void {
+		_PostfixExpressionEmitter._operatorPrecedence[op] = precedence;
+	}
+
+}
+
 class _PropertyExpressionEmitter extends _UnaryExpressionEmitter {
 
 	function constructor (emitter : CplusplusEmitter, expr : PropertyExpression) {
@@ -1025,8 +1049,8 @@ int main() {
 			return new _UnaryExpressionEmitter(this, expr as LogicalNotExpression);
 		else if (expr instanceof TypeofExpression)
 			return new _UnaryExpressionEmitter(this, expr as TypeofExpression);
-		// else if (expr instanceof PostIncrementExpression)
-		// 	return new _PostfixExpressionEmitter(this, expr as PostIncrementExpression);
+		else if (expr instanceof PostIncrementExpression)
+			return new _PostfixExpressionEmitter(this, expr as PostIncrementExpression);
 		else if (expr instanceof PreIncrementExpression)
 			return new _UnaryExpressionEmitter(this, expr as PreIncrementExpression);
 		else if (expr instanceof PropertyExpression)
@@ -1142,11 +1166,10 @@ int main() {
 				{ "(":          _CallExpressionEmitter._setOperatorPrecedence },
 			// 	{ "super":      _SuperExpressionEmitter._setOperatorPrecedence },
 			// 	{ "function":   _FunctionExpressionEmitter._setOperatorPrecedence }
+				{ "++":         _PostfixExpressionEmitter._setOperatorPrecedence },
+				{ "--":         _PostfixExpressionEmitter._setOperatorPrecedence }
 			], [
 				{ "new":        _NewExpressionEmitter._setOperatorPrecedence },
-			// 	{ "++":         _PostfixExpressionEmitter._setOperatorPrecedence },
-			// 	{ "--":         _PostfixExpressionEmitter._setOperatorPrecedence }
-			], [
 				// delete is not used by JSX
 				{ "void":       _UnaryExpressionEmitter._setOperatorPrecedence },
 				{ "typeof":     _UnaryExpressionEmitter._setOperatorPrecedence },
