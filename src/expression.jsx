@@ -678,7 +678,7 @@ class MapLiteralExpression extends Expression {
 				context.errors.push(new CompileError(this._token, "specified type is not a map type"));
 				return false;
 			}
-			var expectedType = (this._type as ParsedObjectType).getTypeArguments()[0];
+			var expectedType = (this._type as ParsedObjectType).getTypeArguments()[0].toNullableType();
 			// check type of the elements (expect when expectedType == null, meaning that it is a variant)
 			for (var i = 0; i < this._elements.length; ++i) {
 				var elementType = this._elements[i].getExpr().getType();
