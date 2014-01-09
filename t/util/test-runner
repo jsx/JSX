@@ -74,7 +74,34 @@ sub get_shebang {
     return grep { defined } $first =~ /\A \#\! \s* (\S+) (?: \s+ (\S+) )* /xmsg;
 }
 
-sub run_compiled {
+sub run_compiled_cpp {
+    my ($filename, $src) = @_;
+
+    require File::Temp;
+
+    my $temp = File::Temp->new(SUFFIX => ".cpp");
+    print $temp $src;
+    close $temp;
+
+    my $bin = File::Temp->new();
+
+    open my $out, "cc -std=c++11 -stdlib=libc++ -o $bin $temp -lc++ |"
+        or die "failed to compile generated c++ code";
+
+    while (<$out>) { diag; }
+
+    open my $fh, "$bin |"
+        or die "failed to invoke a binary";
+    local $/;
+    my $output = <$fh>;
+    close $fh;
+
+    return if $? != 0;
+
+    return $output;
+}
+
+sub run_compiled_js {
     my ($filename, $src) = @_;
 
     require File::Temp;
@@ -110,6 +137,16 @@ EOT
     return $output;
 }
 
+sub run_compiled {
+    my ($filename, $opts, $src) = @_;
+
+    if ($opts =~ m/--target c\+\+/) {
+        return run_compiled_cpp($filename, $src);
+    } else {
+        return run_compiled_js($filename, $src);
+    }
+}
+
 sub compile_and_run {
     my($file) = @_;
 
@@ -127,7 +164,7 @@ sub compile_and_run {
 
     my $jssetup = get_section($file, "JS_SETUP") || "";
 
-    $opts ||= "";
+    $opts ||= $ENV{JSX_OPTS} || "";
 
     # compile (FIXME support C++)
     my($ok, $src, $logs) = jsx("$opts $file");
@@ -137,7 +174,7 @@ sub compile_and_run {
         return;
     };
     # run
-    defined (my $output = run_compiled($file, $jssetup . $src)) or do {
+    defined (my $output = run_compiled($file, $opts, $jssetup . $src)) or do {
         fail "failed to execute compiled script";
         return;
     };
@@ -178,7 +215,7 @@ sub optimize_and_compare {
     my($ok, $src, $logs) = jsx("--warn", "none", $file);
     ok $ok, "compile '$file' (wo. optimization)" or return diag($logs);
     is $logs, '', "... with no logs";
-    my ($output, $elapsed) = bench(sub { run_compiled($file, $src) });
+    my ($output, $elapsed) = bench(sub { run_compiled($file, $opts, $src) });
 
     is $output, $expected,
         "output of '$file' (wo. optimization)" or return;
@@ -191,7 +228,7 @@ sub optimize_and_compare {
     }
 
 
-    ($output, my $elapsed_optimized) = bench(sub { run_compiled($file, $src_optimized) });
+    ($output, my $elapsed_optimized) = bench(sub { run_compiled($file, $opts, $src_optimized) });
 
     is $output, $expected,
         "output of '$file' (w. $opts)" or return;
