@@ -852,25 +852,7 @@ class CplusplusEmitter implements Emitter {
 		this._reduceIndent();
 		statements.splice(0, i);
 		// emit body
-		this._emit(" {\n");
-		this._advanceIndent();
-		try {
-			// emit variable declarations
-			var locals = ctor.getLocals();
-			for (i = 0; i < locals.length; ++i) {
-				this._emit(this.getNameOfType(locals[i].getType()) + " " + locals[i].getName().getValue() + ";\n");
-			}
-			if (i != 0)
-				this._emit("\n");
-
-			// emit statements
-			for (i = 0; i < statements.length; ++i) {
-				this._emitStatement(statements[i]);
-			}
-		} finally {
-			this._reduceIndent();
-			this._emit("}\n\n");
-		}
+		this._emitBody(ctor.getLocals(), statements);
 	}
 
 	function _emitMemberFunction (funcDef : MemberFunctionDefinition) : void {
@@ -889,15 +871,22 @@ class CplusplusEmitter implements Emitter {
 		this._emit(this.getNameOfType(funcDef.getReturnType()) + " ");
 		this._emit(typeName + "::" + funcDef.name() + " ");
 		this._emitArguments(funcDef.getArguments());
-		var statements = funcDef.getStatements().concat([]);
 		// emit body
+		this._emitBody(funcDef.getLocals(), funcDef.getStatements().concat([]));
+	}
+
+	function _emitBody (locals : LocalVariable[], statements : Statement[]) : void {
 		this._emit(" {\n");
 		this._advanceIndent();
 		try {
 			// emit variable declarations
-			var locals = funcDef.getLocals();
 			for (var i = 0; i < locals.length; ++i) {
-				this._emit(this.getNameOfType(locals[i].getType()) + " " + locals[i].getName().getValue() + ";\n");
+				if (locals[i].getType() == null) {
+					this._emit("auto");
+				} else {
+					this._emit(this.getNameOfType(locals[i].getType()));
+				}
+				this._emit(" " + locals[i].getName().getValue() + ";\n");
 			}
 			if (i != 0)
 				this._emit("\n");
