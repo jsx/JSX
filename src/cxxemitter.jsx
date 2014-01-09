@@ -824,30 +824,32 @@ class CplusplusEmitter implements Emitter {
 		this._emitArguments(ctor.getArguments());
 		// emit constructor delegations
 		var statements = ctor.getStatements().concat([]);
+		this._advanceIndent();
 		for (var i = 0; i < statements.length; ++i) {
 			if (! (statements[i] instanceof ConstructorInvocationStatement))
 				break;
 			if (i != 0) {
-				this._emit(", ");
+				this._emit(",\n");
 			} else {
-				this._emit(" : ");
+				this._emit(" :\n");
 			}
 			this._emitStatement(statements[i]);
 		}
 		this._emittingClass.forEachMemberVariable((varDef) -> {
 			if (varDef.getInitialValue() != null) {
 				if (i == 0) {
-					this._emit(" : ");
+					this._emit(" :\n");
 					i++;
 				} else {
-					this._emit(", ");
+					this._emit(",\n");
 				}
 				this._emit(varDef.name() + "(");
 				this._getExpressionEmitterFor(varDef.getInitialValue()).emit(0);
-				this._emit(")\n");
+				this._emit(")");
 			}
 			return true;
 		});
+		this._reduceIndent();
 		statements.splice(0, i);
 		// emit body
 		this._emit(" {\n");
