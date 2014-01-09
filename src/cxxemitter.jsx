@@ -238,7 +238,10 @@ class _NumberLiteralExpressionEmitter extends _ExpressionEmitter {
 	}
 
 	override function emit (outerOpPrecedence : number) : void {
-		this._emitter._emit(this._expr.getToken().getValue());
+		var lit = this._expr.getToken().getValue();
+		if (! lit.match(/\./))
+			lit += ".0";
+		this._emitter._emit(lit);
 	}
 
 }
