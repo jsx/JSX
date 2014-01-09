@@ -875,7 +875,8 @@ class CplusplusEmitter implements Emitter {
 
 	function _emitMemberFunction (funcDef : MemberFunctionDefinition) : void {
 		if (funcDef instanceof TemplateFunctionDefinition) {
-			return;
+			this._emitTemplateSignature((funcDef as TemplateFunctionDefinition).getTypeArguments());
+			this._emit("\n");
 		}
 		if (this._emittingClass instanceof TemplateClassDefinition) {
 			this._emitTemplateSignature((this._emittingClass as TemplateClassDefinition).getTypeArguments());
