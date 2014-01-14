@@ -167,30 +167,30 @@ class Util {
 		return false;
 	}
 
-	static function lhsHasNoSideEffects (lhsExpr : Expression) : boolean {
+	static function lhsHasSideEffects (lhsExpr : Expression) : boolean {
 		if (lhsExpr instanceof LocalExpression)
-			return true;
+			return false;
 		if (lhsExpr instanceof PropertyExpression) {
 			var holderExpr = (lhsExpr as PropertyExpression).getExpr();
 			if (Util.isNativeClass(holderExpr.getType()) && !Util.isBuiltInClass(holderExpr.getType())) {
-				return false;
+				return true;
 			}
 			if (holderExpr instanceof ThisExpression
 				|| holderExpr instanceof LocalExpression
 				|| holderExpr.isClassSpecifier()) {
-				return true;
+				return false;
 			}
 		} else if (lhsExpr instanceof ArrayExpression) {
 			var arrayExpr = lhsExpr as ArrayExpression;
 			if (Util.isNativeClass(arrayExpr.getFirstExpr().getType()) && !Util.isBuiltInClass(arrayExpr.getFirstExpr().getType())) {
-				return false;
+				return true;
 			}
 			if (arrayExpr.getFirstExpr() instanceof LocalExpression
 				&& arrayExpr.getSecondExpr() instanceof LeafExpression) {
-				return true;
+				return false;
 			}
 		}
-		return false;
+		return true;
 	}
 
 	static function instantiateTemplate (context : AnalysisContext, token : Token, className : string, typeArguments : Type[]) : ClassDefinition {

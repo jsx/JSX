@@ -2201,7 +2201,7 @@ class _FusedAssignmentExpressionEmitter extends _OperatorExpressionEmitter {
 	function _emitDivAssignToInt (outerOpPrecedence : number) : void {
 		var firstExpr = this._expr.getFirstExpr();
 		var secondExpr = this._expr.getSecondExpr();
-		if (! Util.lhsHasNoSideEffects(firstExpr)) {
+		if (Util.lhsHasSideEffects(firstExpr)) {
 			this._emitter._emit("$__jsx_div_assign(", this._expr.getToken());
 			if (firstExpr instanceof PropertyExpression) {
 				var propertyExpr = firstExpr as PropertyExpression;

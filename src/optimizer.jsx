@@ -2824,7 +2824,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			}
 
 		} else if (expr instanceof AssignmentExpression
-			   && Util.lhsHasNoSideEffects((expr as AssignmentExpression).getFirstExpr())
+			   && ! Util.lhsHasSideEffects((expr as AssignmentExpression).getFirstExpr())
 			&& (expr as AssignmentExpression).getSecondExpr() instanceof CallExpression) {
 
 			// inline if the statement is an assignment of a single call expression into a local variable
