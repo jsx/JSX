@@ -1954,7 +1954,7 @@ class _UnaryExpressionEmitter extends _OperatorExpressionEmitter {
 
 }
 
-class _PrefixExpressionEmitter extends _UnaryExpressionEmitter {
+class _PreIncrementExpressionEmitter extends _UnaryExpressionEmitter {
 
 	function constructor(emitter : JavaScriptEmitter, expr : PreIncrementExpression) {
 		super(emitter, expr);
@@ -1984,18 +1984,18 @@ class _PrefixExpressionEmitter extends _UnaryExpressionEmitter {
 	}
 
 	override function _getPrecedence() : number {
-		return _PrefixExpressionEmitter._operatorPrecedence[this._expr.getToken().getValue()];
+		return _PreIncrementExpressionEmitter._operatorPrecedence[this._expr.getToken().getValue()];
 	}
 
 	static const _operatorPrecedence = new Map.<number>;
 
 	static function _setOperatorPrecedence(op : string, precedence : number) : void {
-		_PrefixExpressionEmitter._operatorPrecedence[op] = precedence;
+		_PreIncrementExpressionEmitter._operatorPrecedence[op] = precedence;
 	}
 
 }
 
-class _PostfixExpressionEmitter extends _UnaryExpressionEmitter {
+class _PostIncrementExpressionEmitter extends _UnaryExpressionEmitter {
 
 	function constructor (emitter : JavaScriptEmitter, expr : PostIncrementExpression) {
 		super(emitter, expr);
@@ -2009,11 +2009,11 @@ class _PostfixExpressionEmitter extends _UnaryExpressionEmitter {
 					this._emitter._emit("1", opToken);
 				}, 0);
 			} else {
-				this._emitter._emit("(" + _PostfixExpressionEmitter.TEMP_VAR_NAME + " = ", this._expr.getToken());
+				this._emitter._emit("(" + _PostIncrementExpressionEmitter.TEMP_VAR_NAME + " = ", this._expr.getToken());
 				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(_AssignmentExpressionEmitter._operatorPrecedence["="]);
 				this._emitter._emit(", ", this._expr.getToken());
 				this._emitter._getExpressionEmitterFor(this._expr.getExpr()).emit(_AssignmentExpressionEmitter._operatorPrecedence["="]);
-				this._emitter._emit(" = (" + _PostfixExpressionEmitter.TEMP_VAR_NAME + " " + opToken.getValue().charAt(0) + " 1) | 0, " + _PostfixExpressionEmitter.TEMP_VAR_NAME + ")", this._expr.getToken());
+				this._emitter._emit(" = (" + _PostIncrementExpressionEmitter.TEMP_VAR_NAME + " " + opToken.getValue().charAt(0) + " 1) | 0, " + _PostIncrementExpressionEmitter.TEMP_VAR_NAME + ")", this._expr.getToken());
 			}
 		} else {
 			this.emitWithPrecedence(outerOpPrecedence, this._getPrecedence(), function () {
@@ -2024,13 +2024,13 @@ class _PostfixExpressionEmitter extends _UnaryExpressionEmitter {
 	}
 
 	override function _getPrecedence () : number {
-		return _PostfixExpressionEmitter._operatorPrecedence[this._expr.getToken().getValue()];
+		return _PostIncrementExpressionEmitter._operatorPrecedence[this._expr.getToken().getValue()];
 	}
 
 	static const _operatorPrecedence = new Map.<number>;
 
 	static function _setOperatorPrecedence (op : string, precedence : number) : void {
-		_PostfixExpressionEmitter._operatorPrecedence[op] = precedence;
+		_PostIncrementExpressionEmitter._operatorPrecedence[op] = precedence;
 	}
 
 	static const TEMP_VAR_NAME = "$__jsx_postinc_t";
@@ -3614,9 +3614,9 @@ class JavaScriptEmitter implements Emitter {
 		function onExpr(expr : Expression) : boolean {
 			expr.forEachExpression(onExpr);
 			if (expr instanceof PostIncrementExpression) {
-				if (varNameMap[_PostfixExpressionEmitter.TEMP_VAR_NAME] == null
-					&& _PostfixExpressionEmitter.needsTempVarFor(expr as PostIncrementExpression)) {
-					varNameMap[_PostfixExpressionEmitter.TEMP_VAR_NAME] = true;
+				if (varNameMap[_PostIncrementExpressionEmitter.TEMP_VAR_NAME] == null
+					&& _PostIncrementExpressionEmitter.needsTempVarFor(expr as PostIncrementExpression)) {
+					varNameMap[_PostIncrementExpressionEmitter.TEMP_VAR_NAME] = true;
 				}
 			}
 			return true;
@@ -3794,9 +3794,9 @@ class JavaScriptEmitter implements Emitter {
 		else if (expr instanceof TypeofExpression)
 			return new _UnaryExpressionEmitter(this, expr as TypeofExpression);
 		else if (expr instanceof PostIncrementExpression)
-			return new _PostfixExpressionEmitter(this, expr as PostIncrementExpression);
+			return new _PostIncrementExpressionEmitter(this, expr as PostIncrementExpression);
 		else if (expr instanceof PreIncrementExpression)
-			return new _PrefixExpressionEmitter(this, expr as PreIncrementExpression);
+			return new _PreIncrementExpressionEmitter(this, expr as PreIncrementExpression);
 		else if (expr instanceof PropertyExpression)
 			return new _PropertyExpressionEmitter(this, expr as PropertyExpression);
 		else if (expr instanceof SignExpression)
@@ -3959,14 +3959,14 @@ class JavaScriptEmitter implements Emitter {
 				{ "super":      _SuperExpressionEmitter._setOperatorPrecedence },
 				{ "function":   _FunctionExpressionEmitter._setOperatorPrecedence }
 			], [
-				{ "++":         _PostfixExpressionEmitter._setOperatorPrecedence },
-				{ "--":         _PostfixExpressionEmitter._setOperatorPrecedence }
+				{ "++":         _PostIncrementExpressionEmitter._setOperatorPrecedence },
+				{ "--":         _PostIncrementExpressionEmitter._setOperatorPrecedence }
 			], [
 				// delete is not used by JSX
 				{ "void":       _UnaryExpressionEmitter._setOperatorPrecedence },
 				{ "typeof":     _UnaryExpressionEmitter._setOperatorPrecedence },
-				{ "++":         _PrefixExpressionEmitter._setOperatorPrecedence },
-				{ "--":         _PrefixExpressionEmitter._setOperatorPrecedence },
+				{ "++":         _PreIncrementExpressionEmitter._setOperatorPrecedence },
+				{ "--":         _PreIncrementExpressionEmitter._setOperatorPrecedence },
 				{ "+":          _UnaryExpressionEmitter._setOperatorPrecedence },
 				{ "-":          _UnaryExpressionEmitter._setOperatorPrecedence },
 				{ "~":          _UnaryExpressionEmitter._setOperatorPrecedence },
