@@ -262,6 +262,48 @@ class _Util {
 
 }
 
+class _TempVarLister {
+
+	var _varNameMap = new Map.<boolean>;
+
+	function finalize() : Array.<string> {
+		var varNames = new string[];
+		for (var k in this._varNameMap) {
+			varNames.push(k);
+		}
+		return varNames;
+	}
+
+	function update(funcDef : MemberFunctionDefinition) : _TempVarLister {
+		function onStmt(stmt : Statement) : boolean {
+			stmt.forEachExpression(function (expr) {
+				this.update(expr);
+				return true;
+			});
+			stmt.forEachStatement(onStmt);
+			return true;
+		}
+		Util.forEachStatement(onStmt, funcDef.getStatements());
+		return this;
+	}
+
+	function update(expr : Expression) : _TempVarLister {
+		function onExpr(expr : Expression) : boolean {
+			expr.forEachExpression(onExpr);
+			if (expr instanceof PostIncrementExpression) {
+				if (this._varNameMap[_PostIncrementExpressionEmitter.TEMP_VAR_NAME] == null
+					&& _PostIncrementExpressionEmitter.needsTempVarFor(expr as PostIncrementExpression)) {
+					this._varNameMap[_PostIncrementExpressionEmitter.TEMP_VAR_NAME] = true;
+				}
+			}
+			return true;
+		}
+		onExpr(expr);
+		return this;
+	}
+
+}
+
 class _Mangler {
 
 	function mangleFunctionName (name : string, argTypes : Type[]) : string {
@@ -3587,9 +3629,9 @@ class JavaScriptEmitter implements Emitter {
 			}
 
 			// emit definition of $__jsx_t if it is to be used
-			var tempLocals = this._createListOfTemporaryLocals(funcDef);
-			for (var i = 0; i != tempLocals.length; ++i) {
-				this._emit("var " + tempLocals[i] + ";\n", null);
+			var tempVars = new _TempVarLister().update(funcDef).finalize();
+			for (var i = 0; i != tempVars.length; ++i) {
+				this._emit("var " + tempVars[i] + ";\n", null);
 			}
 
 			// emit code
@@ -3608,33 +3650,6 @@ class JavaScriptEmitter implements Emitter {
 		}
 	}
 
-	function _createListOfTemporaryLocals(funcDef : MemberFunctionDefinition) : string[] {
-		// build list of temporary varnames
-		var varNameMap = new Map.<boolean>;
-		function onExpr(expr : Expression) : boolean {
-			expr.forEachExpression(onExpr);
-			if (expr instanceof PostIncrementExpression) {
-				if (varNameMap[_PostIncrementExpressionEmitter.TEMP_VAR_NAME] == null
-					&& _PostIncrementExpressionEmitter.needsTempVarFor(expr as PostIncrementExpression)) {
-					varNameMap[_PostIncrementExpressionEmitter.TEMP_VAR_NAME] = true;
-				}
-			}
-			return true;
-		}
-		function onStmt(stmt : Statement) : boolean {
-			stmt.forEachExpression(onExpr);
-			stmt.forEachStatement(onStmt);
-			return true;
-		}
-		Util.forEachStatement(onStmt, funcDef.getStatements());
-		// flatten the list
-		var varNameList = new string[];
-		for (var k in varNameMap) {
-			varNameList.push(k);
-		}
-		return varNameList;
-	}
-
 	function _emitStaticMemberVariable (variable : MemberVariableDefinition) : void {
 		var initialValue = variable.getInitialValue();
 		if (initialValue != null
@@ -3648,6 +3663,10 @@ class JavaScriptEmitter implements Emitter {
 			this._emit("$__jsx_lazy_init(", variable.getNameToken());
 			this._emit(this._namer.getNameOfClass(variable.getClassDef()) + ", \"" + this._namer.getNameOfStaticVariable(variable.getClassDef(), variable.name()) + "\", function () {\n", variable.getNameToken());
 			this._advanceIndent();
+			var tempVars = new _TempVarLister().update(initialValue).finalize();
+			for (var i = 0; i != tempVars.length; ++i) {
+				this._emit("var " + tempVars[i] + ";\n", variable.getNameToken());
+			}
 			this._emit("return ", variable.getNameToken());
 			this._emitRHSOfAssignment(initialValue, variable.getType());
 			this._emit(";\n", variable.getNameToken());
