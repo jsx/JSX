@@ -1797,6 +1797,8 @@ class BinaryNumberExpression extends BinaryExpression {
 		assert this._expr2.getType() != null, this._token.getNotation();
 
 		switch (this._token.getValue()) {
+
+			// these ops may return int or number, depending on the operands
 		case "+":
 		case "-":
 		case "*":
@@ -1804,18 +1806,25 @@ class BinaryNumberExpression extends BinaryExpression {
 				return Type.numberType;
 			else
 				return Type.integerType;
+
+			// these ops returns a number even if both the arguments are int, since the result might include fractional part or become NaN  (note: even ```int % int``` may return NaN which is out of the bounds of ```int``` in case rhs is 0)
 		case "/":
 		case "%":
 			return Type.numberType;
+
+			// these ops always return a boolean
 		case "<":
 		case "<=":
 		case ">":
 		case ">=":
 			return Type.booleanType;
+
+			// these ops always return an int
 		case "&":
 		case "|":
 		case "^":
 			return Type.integerType;
+
 		default:
 			throw new Error("unexpected operator:" + this._token.getValue());
 		}
