@@ -1397,6 +1397,10 @@ class SignExpression extends UnaryExpression {
 	}
 
 	override function getType () : Type {
+		if (this._token.getValue() == "-") {
+			// -(0x80000000 as int) should return 0x80000000
+			return Type.numberType;
+		}
 		var type = this._expr.getType();
 		if (type.resolveIfNullable().equals(Type.numberType))
 			return Type.numberType;
