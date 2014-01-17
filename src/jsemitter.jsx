@@ -2522,6 +2522,12 @@ class _ShiftExpressionEmitter extends _OperatorExpressionEmitter {
 
 class _BinaryNumberExpressionEmitter extends _OperatorExpressionEmitter {
 
+	static const _OPS_RETURNING_INT = {
+		'&' : true,
+		'|' : true,
+		'^' : true
+	};
+
 	var _expr : BinaryNumberExpression;
 
 	function constructor (emitter : JavaScriptEmitter, expr : BinaryNumberExpression) {
@@ -2542,13 +2548,14 @@ class _BinaryNumberExpressionEmitter extends _OperatorExpressionEmitter {
 			return;
 		}
 		// normal handling
-		if (isInt) {
+		var needsBitOr = isInt && ! _BinaryNumberExpressionEmitter._OPS_RETURNING_INT[op];
+		if (needsBitOr) {
 			this._emitter._emit("((", this._expr.getToken());
 		}
 		this._emitter._emitWithNullableGuard(this._expr.getFirstExpr(), _BinaryNumberExpressionEmitter._operatorPrecedence[op]);
 		this._emitter._emit(" " + op + " ", this._expr.getToken());
 		this._emitter._emitWithNullableGuard(this._expr.getSecondExpr(), _BinaryNumberExpressionEmitter._operatorPrecedence[op] - 1);
-		if (isInt) {
+		if (needsBitOr) {
 			this._emitter._emit(") | 0)", this._expr.getToken());
 		}
 	}
