@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// generatedy by JSX compiler 0.9.72 (2014-01-16 18:56:32 +0900; f82369af9e74eb683e78096905a5795cdb8c8615)
+// generatedy by JSX compiler 0.9.72 (2014-01-17 10:58:41 +0900; 868dbae0e68730a8d02f4226fe2685b7a4a365dd)
 var JSX = {};
 (function (JSX) {
 /**
@@ -527,7 +527,7 @@ function Util$isNativeClass$LType$(type) {
 	if (type instanceof ObjectType) {
 		classDef = type.getClassDef$();
 		return ! classDef.forEachClassToBase$F$LClassDefinition$B$((function (classDef) {
-			if (classDef.className$() === "Object" || (((classDef.flags$() & ClassDefinition.IS_NATIVE) | 0)) === 0) {
+			if (classDef.className$() === "Object" || (classDef.flags$() & ClassDefinition.IS_NATIVE) === 0) {
 				return true;
 			}
 			return false;
@@ -733,7 +733,7 @@ function Util$findFunctionInClass$LClassDefinition$SALType$B(classDef, funcName,
 	var found;
 	found = null;
 	classDef.forEachMemberFunction$F$LMemberFunctionDefinition$B$((function (funcDef) {
-		if (isStatic === ((((funcDef.flags$() & ClassDefinition.IS_STATIC) | 0)) !== 0) && funcDef.name$() === funcName && Util$typesAreEqual$ALType$ALType$(funcDef.getArgumentTypes$(), argTypes)) {
+		if (isStatic === ((funcDef.flags$() & ClassDefinition.IS_STATIC) !== 0) && funcDef.name$() === funcName && Util$typesAreEqual$ALType$ALType$(funcDef.getArgumentTypes$(), argTypes)) {
 			found = funcDef;
 			return false;
 		}
@@ -748,7 +748,7 @@ function Util$findVariableInClass$LClassDefinition$SB(classDef, name, isStatic) 
 	var found;
 	found = null;
 	classDef.forEachMemberVariable$F$LMemberVariableDefinition$B$((function (def) {
-		if (isStatic === ((((def.flags$() & ClassDefinition.IS_STATIC) | 0)) !== 0) && def.name$() === name) {
+		if (isStatic === ((def.flags$() & ClassDefinition.IS_STATIC) !== 0) && def.name$() === name) {
 			found = def;
 			return false;
 		}
@@ -772,13 +772,13 @@ Util.findMemberInClass$LClassDefinition$SALType$B = Util$findMemberInClass$LClas
 function Util$memberRootIsNative$LClassDefinition$SALType$B(classDef, name, argTypes, isStatic) {
 	var rootIsNativeNonStatic;
 	if (isStatic) {
-		return (((classDef.flags$() & (((ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE) | 0))) | 0)) !== 0;
+		return (classDef.flags$() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE)) !== 0;
 	}
 	function rootIsNativeNonStatic(classDef, name, argTypes) {
 		var found;
 		found = Util$findMemberInClass$LClassDefinition$SALType$B(classDef, name, argTypes, false);
-		if (found != null && (((found.flags$() & ClassDefinition.IS_OVERRIDE) | 0)) === 0) {
-			return (((classDef.flags$() & (((ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE) | 0))) | 0)) !== 0;
+		if (found != null && (found.flags$() & ClassDefinition.IS_OVERRIDE) === 0) {
+			return (classDef.flags$() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE)) !== 0;
 		}
 		if (classDef.extendType$() == null) {
 			return false;
@@ -803,16 +803,16 @@ function Util$memberIsExported$LClassDefinition$SALType$B(classDef, name, argTyp
 	var check;
 	if (isStatic) {
 		found = Util$findMemberInClass$LClassDefinition$SALType$B(classDef, name, argTypes, true);
-		return (((found.flags$() & ClassDefinition.IS_EXPORT) | 0)) !== 0;
+		return (found.flags$() & ClassDefinition.IS_EXPORT) !== 0;
 	}
 	function check(classDef) {
 		var found;
 		var isExportedInImpl;
-		if ((((classDef.flags$() & ClassDefinition.IS_NATIVE) | 0)) !== 0) {
+		if ((classDef.flags$() & ClassDefinition.IS_NATIVE) !== 0) {
 			return false;
 		}
 		found = Util$findMemberInClass$LClassDefinition$SALType$B(classDef, name, argTypes, false);
-		if (found != null && (((found.flags$() & ClassDefinition.IS_EXPORT) | 0)) !== 0) {
+		if (found != null && (found.flags$() & ClassDefinition.IS_EXPORT) !== 0) {
 			return true;
 		}
 		if (classDef.extendType$() != null) {
@@ -1927,7 +1927,7 @@ _Util.getOutputClassName$LClassDefinition$ = _Util$getOutputClassName$LClassDefi
 function _Util$getOutputConstructorName$LClassDefinition$ALType$(classDef, argTypes) {
 	var ctor;
 	var stash;
-	if ((((classDef.flags$() & ClassDefinition.IS_NATIVE) | 0)) !== 0) {
+	if ((classDef.flags$() & ClassDefinition.IS_NATIVE) !== 0) {
 		return _Util$getNameOfNativeConstructor$LClassDefinition$(classDef);
 	}
 	ctor = Util$findFunctionInClass$LClassDefinition$SALType$B(classDef, "constructor", argTypes, false);
@@ -1991,7 +1991,7 @@ function _Util$setOutputClassNames$ALClassDefinition$(classDefs) {
 	}
 	for (i = 0; i < classDefs.length; ++i) {
 		classDef = classDefs[i];
-		if ((((classDef.flags$() & ClassDefinition.IS_NATIVE) | 0)) !== 0) {
+		if ((classDef.flags$() & ClassDefinition.IS_NATIVE) !== 0) {
 			className = classDef.className$();
 			if (! $__jsx_ObjectHasOwnProperty.call(countByName, className)) {
 				setOutputName(classDef, escapeClassName(className));
@@ -2001,12 +2001,12 @@ function _Util$setOutputClassNames$ALClassDefinition$(classDefs) {
 	}
 	for (i = 0; i < classDefs.length; ++i) {
 		classDef = classDefs[i];
-		if ((((classDef.flags$() & ClassDefinition.IS_NATIVE) | 0)) === 0) {
+		if ((classDef.flags$() & ClassDefinition.IS_NATIVE) === 0) {
 			className = classDef.classFullName$();
 			ctors = _Util$findFunctions$LClassDefinition$SB(classDef, "constructor", false);
 			if (ctors.length !== 0) {
 				for (j = 0; j < ctors.length; ++j) {
-					if ((((ctors[j].flags$() & ClassDefinition.IS_EXPORT) | 0)) !== 0) {
+					if ((ctors[j].flags$() & ClassDefinition.IS_EXPORT) !== 0) {
 						exportedCtor = ctors[j];
 						ctors.splice(j, 1);
 						ctors.unshift(exportedCtor);
@@ -2059,7 +2059,7 @@ function _Util$findFunctions$LClassDefinition$SB(classDef, name, isStatic) {
 	members = classDef.members$();
 	for (i = 0; i < members.length; ++i) {
 		member = members[i];
-		if (member instanceof MemberFunctionDefinition && member.name$() === name && (((member.flags$() & ClassDefinition.IS_STATIC) | 0)) === (isStatic ? ClassDefinition.IS_STATIC : 0)) {
+		if (member instanceof MemberFunctionDefinition && member.name$() === name && (member.flags$() & ClassDefinition.IS_STATIC) === (isStatic ? ClassDefinition.IS_STATIC : 0)) {
 			functions.push(member);
 		}
 	}
@@ -2260,7 +2260,7 @@ _Mangler.prototype.requiresMangling$LPropertyExpression$ = function (expr) {
 
 
 _Mangler.prototype.requiresMangling$LMemberFunctionDefinition$ = function (member) {
-	return this.requiresMangling$LClassDefinition$SALType$B(member.getClassDef$(), member.name$(), member.getArgumentTypes$(), (((member.flags$() & ClassDefinition.IS_STATIC) | 0)) !== 0);
+	return this.requiresMangling$LClassDefinition$SALType$B(member.getClassDef$(), member.name$(), member.getArgumentTypes$(), (member.flags$() & ClassDefinition.IS_STATIC) !== 0);
 };
 
 
@@ -2469,7 +2469,7 @@ _Minifier.prototype._minifyProperties$ = function () {
 		nativePropertyNames = {};
 		$this._classDefs.forEach((function (classDef) {
 			classDef.forEachMember$F$LMemberDefinition$B$((function (member) {
-				if ((((member.flags$() & ClassDefinition.IS_STATIC) | 0)) === 0 && ((((((member.flags$() | classDef.flags$()) | 0)) & ClassDefinition.IS_NATIVE) | 0)) !== 0) {
+				if ((member.flags$() & ClassDefinition.IS_STATIC) === 0 && ((member.flags$() | classDef.flags$()) & ClassDefinition.IS_NATIVE) !== 0) {
 					nativePropertyNames[member.name$()] = true;
 				}
 				return true;
@@ -2489,10 +2489,10 @@ _Minifier.prototype._minifyStaticVariables$ = function () {
 	this._classDefs.forEach((function (classDef) {
 		var exportedStaticVarNames;
 		var stash;
-		if ((((classDef.flags$() & (((ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE) | 0))) | 0)) === 0) {
+		if ((classDef.flags$() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE)) === 0) {
 			exportedStaticVarNames = [];
 			classDef.forEachMemberVariable$F$LMemberVariableDefinition$B$((function (member) {
-				if ((((member.flags$() & (((ClassDefinition.IS_STATIC | ClassDefinition.IS_EXPORT) | 0))) | 0)) === (((ClassDefinition.IS_STATIC | ClassDefinition.IS_EXPORT) | 0))) {
+				if ((member.flags$() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_EXPORT)) === (ClassDefinition.IS_STATIC | ClassDefinition.IS_EXPORT)) {
 					exportedStaticVarNames.push(member.name$());
 				}
 				return true;
@@ -2514,7 +2514,7 @@ _Minifier.prototype._minifyGlobals$ = function () {
 		useCount[k] = this._globalUseCount[k];
 	}
 	this._classDefs.forEach((function (classDef) {
-		if ((((classDef.flags$() & (((ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE) | 0))) | 0)) !== 0) {
+		if ((classDef.flags$() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE)) !== 0) {
 			delete useCount[classDef.className$()];
 		}
 	}));
@@ -2522,7 +2522,7 @@ _Minifier.prototype._minifyGlobals$ = function () {
 		var nativeClassNames;
 		nativeClassNames = [];
 		$this._classDefs.forEach((function (classDef) {
-			if ((((classDef.flags$() & ClassDefinition.IS_NATIVE) | 0)) !== 0) {
+			if ((classDef.flags$() & ClassDefinition.IS_NATIVE) !== 0) {
 				nativeClassNames.push(classDef.className$());
 			}
 		}));
@@ -3506,7 +3506,7 @@ _AsNoConvertExpressionEmitter.prototype.emit$N = function (outerOpPrecedence) {
 			return;
 		} else if (destType instanceof ObjectType) {
 			destClassDef = destType.getClassDef$();
-			if ((((destClassDef.flags$() & ClassDefinition.IS_FAKE) | 0)) !== 0) {
+			if ((destClassDef.flags$() & ClassDefinition.IS_FAKE) !== 0) {
 			} else if (_Util$isArrayType$LType$(destType)) {
 				emitWithAssertion((function () {
 					$this._emitter._emit$SLToken$("$v == null || $v instanceof Array", $this._expr.getToken$());
@@ -3523,7 +3523,7 @@ _AsNoConvertExpressionEmitter.prototype.emit$N = function (outerOpPrecedence) {
 					}), "detected invalid cast, value is not a Map or null");
 				}
 				return;
-			} else if ((((destClassDef.flags$() & (((ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN) | 0))) | 0)) === 0) {
+			} else if ((destClassDef.flags$() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) === 0) {
 				emitWithAssertion((function () {
 					$this._emitter._emit$SLToken$("$v == null || $v instanceof " + $this._emitter.getNamer$().getNameOfClass$LClassDefinition$(destClassDef), $this._expr.getToken$());
 				}), "detected invalid cast, value is not an instance of the designated type or null");
@@ -3695,7 +3695,7 @@ _InstanceofExpressionEmitter.prototype.emit$N = function (outerOpPrecedence) {
 			$this._emitter._getExpressionEmitterFor$LExpression$($this._expr.getExpr$()).emit$N(_InstanceofExpressionEmitter._operatorPrecedence);
 			$this._emitter._emit$SLToken$(") === \"object\")", $this._expr.getToken$());
 		}));
-	} else if ((((expectedType.getClassDef$().flags$() & (((ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN) | 0))) | 0)) === 0) {
+	} else if ((expectedType.getClassDef$().flags$() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) === 0) {
 		this.emitWithPrecedence$NNF$V$(outerOpPrecedence, _InstanceofExpressionEmitter._operatorPrecedence, (function () {
 			$this._emitter._getExpressionEmitterFor$LExpression$($this._expr.getExpr$()).emit$N(_InstanceofExpressionEmitter._operatorPrecedence);
 			$this._emitter._emit$SLToken$(" instanceof " + $this.getInstanceofNameFromClassDef$LClassDefinition$(expectedType.getClassDef$()), $this._expr.getToken$());
@@ -4095,6 +4095,7 @@ $__jsx_extend([_BinaryNumberExpressionEmitter], _OperatorExpressionEmitter);
 _BinaryNumberExpressionEmitter.prototype._emit$ = function () {
 	var op;
 	var isInt;
+	var needsBitOr;
 	op = this._expr.getToken$().getValue$();
 	isInt = this._expr.getType$().resolveIfNullable$().equals$LType$(Type.integerType);
 	if (isInt && op === "*") {
@@ -4105,13 +4106,14 @@ _BinaryNumberExpressionEmitter.prototype._emit$ = function () {
 		this._emitter._emit$SLToken$(")", this._expr.getToken$());
 		return;
 	}
-	if (isInt) {
+	needsBitOr = isInt && ! _BinaryNumberExpressionEmitter._OPS_RETURNING_INT[op];
+	if (needsBitOr) {
 		this._emitter._emit$SLToken$("((", this._expr.getToken$());
 	}
 	this._emitter._emitWithNullableGuard$LExpression$N(this._expr.getFirstExpr$(), _BinaryNumberExpressionEmitter._operatorPrecedence[op]);
 	this._emitter._emit$SLToken$(" " + op + " ", this._expr.getToken$());
 	this._emitter._emitWithNullableGuard$LExpression$N(this._expr.getSecondExpr$(), _BinaryNumberExpressionEmitter._operatorPrecedence[op] - 1);
-	if (isInt) {
+	if (needsBitOr) {
 		this._emitter._emit$SLToken$(") | 0)", this._expr.getToken$());
 	}
 };
@@ -4424,7 +4426,7 @@ _NewExpressionEmitter.prototype._emitAsObjectLiteral$LClassDefinition$ALExpressi
 	this._emitter._emit$SLToken$("({", this._expr.getToken$());
 	propertyIndex = 0;
 	classDef.forEachMemberVariable$F$LMemberVariableDefinition$B$((function (member) {
-		if ((((member.flags$() & ClassDefinition.IS_STATIC) | 0)) === 0) {
+		if ((member.flags$() & ClassDefinition.IS_STATIC) === 0) {
 			if (propertyIndex !== 0) {
 				$this._emitter._emit$SLToken$(", ", $this._expr.getToken$());
 			}
@@ -5847,7 +5849,7 @@ TryStatement.prototype.doAnalyze$LAnalysisContext$ = function (context) {
 	var j;
 	var precCatchType;
 	var lvStatusesAfterFinally;
-	if ((((context.funcDef.flags$() & ClassDefinition.IS_GENERATOR) | 0)) !== 0) {
+	if ((context.funcDef.flags$() & ClassDefinition.IS_GENERATOR) !== 0) {
 		context.errors.push(new CompileError(this._token, "invalid use of try block inside generator"));
 		return false;
 	}
@@ -7831,11 +7833,11 @@ NewExpression.prototype.analyze$LAnalysisContext$LExpression$ = function (contex
 	if (classDef == null) {
 		return false;
 	}
-	if ((((classDef.flags$() & (((ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN) | 0))) | 0)) !== 0) {
+	if ((classDef.flags$() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) !== 0) {
 		context.errors.push(new CompileError(this._token, "cannot instantiate an interface or a mixin"));
 		return false;
 	}
-	if ((((classDef.flags$() & ClassDefinition.IS_ABSTRACT) | 0)) !== 0) {
+	if ((classDef.flags$() & ClassDefinition.IS_ABSTRACT) !== 0) {
 		context.errors.push(new CompileError(this._token, "cannot instantiate an abstract class"));
 		return false;
 	}
@@ -7923,7 +7925,7 @@ SuperExpression.prototype.analyze$LAnalysisContext$LExpression$ = function (cont
 	var classDef;
 	var funcType;
 	var argTypes;
-	if ((((context.funcDef.flags$() & ClassDefinition.IS_STATIC) | 0)) !== 0) {
+	if ((context.funcDef.flags$() & ClassDefinition.IS_STATIC) !== 0) {
 		context.errors.push(new CompileError(this._token, "cannot use 'super' keyword in a static function"));
 		return false;
 	}
@@ -8970,10 +8972,10 @@ PropertyExpression.prototype.assertIsAssignable$LAnalysisContext$LToken$LType$ =
 			throw new Error("logic flaw, could not find definition for " + holderType.getClassDef$().className$() + "#" + this._identifierToken.getValue$());
 		}
 	}
-	if ((((varFlags & ClassDefinition.IS_CONST) | 0)) !== 0) {
+	if ((varFlags & ClassDefinition.IS_CONST) !== 0) {
 		context.errors.push(new CompileError(token, "cannot modify a constant"));
 		return false;
-	} else if ((((varFlags & ClassDefinition.IS_READONLY) | 0)) !== 0) {
+	} else if ((varFlags & ClassDefinition.IS_READONLY) !== 0) {
 		context.errors.push(new CompileError(token, "cannot modify a readonly variable"));
 		return false;
 	}
@@ -9240,7 +9242,7 @@ InstanceofExpression.prototype.analyze$LAnalysisContext$LExpression$ = function 
 		context.errors.push(new CompileError(this._token, "operator 'instanceof' is only applicable to an object or a variant"));
 		return false;
 	}
-	if (((this._expectedType.getClassDef$().flags$() & ClassDefinition.IS_FAKE) | 0)) {
+	if (this._expectedType.getClassDef$().flags$() & ClassDefinition.IS_FAKE) {
 		context.errors.push(new CompileError(this._token, "operator 'instanceof' is not applicable to a fake class " + this._expectedType.toString()));
 		return false;
 	}
@@ -9313,7 +9315,7 @@ ThisExpression.prototype.analyze$LAnalysisContext$LExpression$ = function (conte
 			rootFuncDef = rootFuncDef.getParent$();
 		}
 	}
-	if (rootFuncDef == null || (((rootFuncDef.flags$() & ClassDefinition.IS_STATIC) | 0)) !== 0) {
+	if (rootFuncDef == null || (rootFuncDef.flags$() & ClassDefinition.IS_STATIC) !== 0) {
 		context.errors.push(new CompileError(this._token, "cannot use 'this' outside of a member function"));
 		return false;
 	}
@@ -9839,7 +9841,7 @@ JavaScriptEmitter.prototype._emitCore$ALClassDefinition$ = function (classDefs) 
 			return true;
 		}));
 		classDefs[i].forEachMemberVariable$F$LMemberVariableDefinition$B$((function (varDef) {
-			if ((((varDef.flags$() & ClassDefinition.IS_STATIC) | 0)) !== 0 && varDef.getInitialValue$() != null) {
+			if ((varDef.flags$() & ClassDefinition.IS_STATIC) !== 0 && varDef.getInitialValue$() != null) {
 				$this._setupBooleanizeFlags$LExpression$(varDef.getInitialValue$());
 			}
 			return true;
@@ -9949,7 +9951,7 @@ JavaScriptEmitter.prototype._emitClassDefinition$LClassDefinition$ = function (c
 	var i;
 	var members;
 	var member;
-	if ((((classDef.flags$() & ClassDefinition.IS_NATIVE) | 0)) !== 0) {
+	if ((classDef.flags$() & ClassDefinition.IS_NATIVE) !== 0) {
 		if (classDef.getNativeSource$() != null) {
 			this._emit$SLToken$("var " + this._namer.getNameOfClass$LClassDefinition$(classDef) + " = " + Util$decodeStringLiteral$S(classDef.getNativeSource$().getValue$()) + ";\n", classDef.getNativeSource$());
 		}
@@ -9966,7 +9968,7 @@ JavaScriptEmitter.prototype._emitClassDefinition$LClassDefinition$ = function (c
 		for (i = 0; i < members.length; ++i) {
 			member = members[i];
 			if (member instanceof MemberFunctionDefinition) {
-				if (! (member.name$() === "constructor" && (((member.flags$() & ClassDefinition.IS_STATIC) | 0)) === 0) && member.getStatements$() != null) {
+				if (! (member.name$() === "constructor" && (member.flags$() & ClassDefinition.IS_STATIC) === 0) && member.getStatements$() != null) {
 					if (member instanceof TemplateFunctionDefinition) {
 					} else {
 						this._emitFunction$LMemberFunctionDefinition$(member);
@@ -9984,13 +9986,13 @@ JavaScriptEmitter.prototype._emitStaticInitializationCode$LClassDefinition$ = fu
 	var members;
 	var i;
 	var member;
-	if ((((classDef.flags$() & ClassDefinition.IS_NATIVE) | 0)) !== 0) {
+	if ((classDef.flags$() & ClassDefinition.IS_NATIVE) !== 0) {
 		return;
 	}
 	members = classDef.members$();
 	for (i = 0; i < members.length; ++i) {
 		member = members[i];
-		if (member instanceof MemberVariableDefinition && (((member.flags$() & (((ClassDefinition.IS_STATIC | ClassDefinition.IS_NATIVE) | 0))) | 0)) === ClassDefinition.IS_STATIC) {
+		if (member instanceof MemberVariableDefinition && (member.flags$() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_NATIVE)) === ClassDefinition.IS_STATIC) {
 			this._emitStaticMemberVariable$LMemberVariableDefinition$(member);
 		}
 	}
@@ -10007,7 +10009,7 @@ JavaScriptEmitter.prototype._emitClassMap$ALClassDefinition$ = function (classDe
 	var escapedFilename;
 	classDefs = classDefs.concat([]);
 	for (i = 0; i < classDefs.length; ) {
-		if (classDefs[i].getToken$() == null || (((classDefs[i].flags$() & ClassDefinition.IS_NATIVE) | 0)) !== 0) {
+		if (classDefs[i].getToken$() == null || (classDefs[i].flags$() & ClassDefinition.IS_NATIVE) !== 0) {
 			classDefs.splice(i, 1);
 		} else {
 			++i;
@@ -10023,11 +10025,11 @@ JavaScriptEmitter.prototype._emitClassMap$ALClassDefinition$ = function (classDe
 			var i;
 			var push;
 			ctors = _Util$findFunctions$LClassDefinition$SB(classDef, "constructor", false);
-			if ((((classDef.flags$() & ClassDefinition.IS_EXPORT) | 0)) !== 0) {
+			if ((classDef.flags$() & ClassDefinition.IS_EXPORT) !== 0) {
 				if (ctors.length !== 0) {
 					exportedCtor = null;
 					for (i = 0; i < ctors.length; ++i) {
-						if ((((ctors[i].flags$() & ClassDefinition.IS_EXPORT) | 0)) !== 0) {
+						if ((ctors[i].flags$() & ClassDefinition.IS_EXPORT) !== 0) {
 							exportedCtor = ctors[i];
 						}
 					}
@@ -10040,7 +10042,7 @@ JavaScriptEmitter.prototype._emitClassMap$ALClassDefinition$ = function (classDe
 				}
 			}
 			if (! $this._enableMinifier) {
-				if ((((classDef.flags$() & ClassDefinition.IS_EXPORT) | 0)) === 0) {
+				if ((classDef.flags$() & ClassDefinition.IS_EXPORT) === 0) {
 					list.push([ classDef.classFullName$(), $this._namer.getNameOfClass$LClassDefinition$(classDef) ]);
 				}
 				push = (function (argTypes) {
@@ -10154,7 +10156,7 @@ JavaScriptEmitter.prototype._emitClassObjectAmendments$LClassDefinition$ALMember
 				buildUnresolvedExports(implType.getClassDef$());
 			}));
 			baseClassDef.forEachMemberFunction$F$LMemberFunctionDefinition$B$((function (funcDef) {
-				if ((((funcDef.flags$() & (((ClassDefinition.IS_STATIC | ClassDefinition.IS_EXPORT) | 0))) | 0)) === ClassDefinition.IS_EXPORT && funcDef.name$() !== "constructor") {
+				if ((funcDef.flags$() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_EXPORT)) === ClassDefinition.IS_EXPORT && funcDef.name$() !== "constructor") {
 					if (classDef == baseClassDef && funcDef.getStatements$() != null) {
 						delete unresolvedExports[funcDef.name$()];
 					} else {
@@ -10179,7 +10181,7 @@ JavaScriptEmitter.prototype._emitClassObjectAmendments$LClassDefinition$ALMember
 		}
 		this._emit$SLToken$("\n", null);
 	}
-	if ((((classDef.flags$() & (((ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN) | 0))) | 0)) !== 0) {
+	if ((classDef.flags$() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) !== 0) {
 		this._emit$SLToken$(this._namer.getNameOfClass$LClassDefinition$(classDef) + ".prototype.$__jsx_implements_" + this._namer.getNameOfClass$LClassDefinition$(classDef) + " = true;\n\n", null);
 	}
 };
@@ -10205,7 +10207,7 @@ JavaScriptEmitter.prototype._emitConstructor$LMemberFunctionDefinition$ = functi
 JavaScriptEmitter.prototype._emitFunction$LMemberFunctionDefinition$ = function (funcDef) {
 	var $this = this;
 	var isStatic;
-	isStatic = (((funcDef.flags$() & ClassDefinition.IS_STATIC) | 0)) !== 0;
+	isStatic = (funcDef.flags$() & ClassDefinition.IS_STATIC) !== 0;
 	if (isStatic) {
 		this._emit$SLToken$("function " + this._namer.getNameOfStaticFunction$LClassDefinition$SALType$(funcDef.getClassDef$(), funcDef.name$(), funcDef.getArgumentTypes$()) + "(", funcDef.getNameToken$());
 	} else {
@@ -10259,7 +10261,7 @@ JavaScriptEmitter.prototype._emitFunctionBody$LMemberFunctionDefinition$ = funct
 		if (this._enableProfiler) {
 			this._emit$SLToken$("var $__jsx_profiler_ctx = $__jsx_profiler.enter(" + Util$encodeStringLiteral$S(funcDef.getNotation$()) + ");\n", null);
 		}
-		if (funcDef.getParent$() == null && (((funcDef.flags$() & ClassDefinition.IS_STATIC) | 0)) === 0 && funcDef.getClosures$().length !== 0) {
+		if (funcDef.getParent$() == null && (funcDef.flags$() & ClassDefinition.IS_STATIC) === 0 && funcDef.getClosures$().length !== 0) {
 			this._emit$SLToken$("var $this = this;\n", null);
 		}
 		locals = funcDef.getLocals$();
@@ -11397,10 +11399,10 @@ ClassDefinition.prototype.getMemberTypeByName$ALCompileError$LToken$SBALType$N =
 		if (mode !== ClassDefinition.GET_MEMBER_MODE_SUPER) {
 			for (i = 0; i < classDef._members.length; ++i) {
 				member = classDef._members[i];
-				if ((((member.flags$() & ClassDefinition.IS_DELETE) | 0)) !== 0) {
-				} else if (((((member.flags$() & ClassDefinition.IS_STATIC) | 0)) !== 0) === isStatic && name === member.name$()) {
+				if ((member.flags$() & ClassDefinition.IS_DELETE) !== 0) {
+				} else if (((member.flags$() & ClassDefinition.IS_STATIC) !== 0) === isStatic && name === member.name$()) {
 					if (member instanceof MemberVariableDefinition) {
-						if ((((member.flags$() & ClassDefinition.IS_OVERRIDE) | 0)) === 0) {
+						if ((member.flags$() & ClassDefinition.IS_OVERRIDE) === 0) {
 							type = member.getType$();
 							if (type != null && types.length === 0) {
 								types[0] = type;
@@ -11414,7 +11416,7 @@ ClassDefinition.prototype.getMemberTypeByName$ALCompileError$LToken$SBALType$N =
 									return;
 								}
 							}
-							if (member.getStatements$() != null || mode !== ClassDefinition.GET_MEMBER_MODE_FUNCTION_WITH_BODY || (((member.flags$() & (((ClassDefinition.IS_NATIVE | ClassDefinition.IS_ABSTRACT) | 0))) | 0)) === ClassDefinition.IS_NATIVE) {
+							if (member.getStatements$() != null || mode !== ClassDefinition.GET_MEMBER_MODE_FUNCTION_WITH_BODY || (member.flags$() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_ABSTRACT)) === ClassDefinition.IS_NATIVE) {
 								for (j = 0; j < types.length; ++j) {
 									if (Util$typesAreEqual$ALType$ALType$(member.getArgumentTypes$(), types[j].getArgumentTypes$())) {
 										break;
@@ -11584,11 +11586,11 @@ ClassDefinition.prototype.normalizeClassDefs$ALCompileError$ = function (errors)
 	var error;
 	for (x = 0; x < this._members.length; ++x) {
 		for (y = 0; y < x; ++y) {
-			if (this._members[x].name$() === this._members[y].name$() && (((this._members[x].flags$() & ClassDefinition.IS_STATIC) | 0)) === (((this._members[y].flags$() & ClassDefinition.IS_STATIC) | 0))) {
+			if (this._members[x].name$() === this._members[y].name$() && (this._members[x].flags$() & ClassDefinition.IS_STATIC) === (this._members[y].flags$() & ClassDefinition.IS_STATIC)) {
 				errorMsg = null;
 				if (this._members[x] instanceof MemberFunctionDefinition && this._members[y] instanceof MemberFunctionDefinition) {
 					if (Util$typesAreEqual$ALType$ALType$(this._members[x].getArgumentTypes$(), this._members[y].getArgumentTypes$())) {
-						errorMsg = "a " + ((((this._members[x].flags$() & ClassDefinition.IS_STATIC) | 0)) !== 0 ? "static" : "member") + " function with same name and arguments is already defined";
+						errorMsg = "a " + ((this._members[x].flags$() & ClassDefinition.IS_STATIC) !== 0 ? "static" : "member") + " function with same name and arguments is already defined";
 						errorMsg += ":" + (x + "") + ":" + (this._members[x].getArgumentTypes$().length + "");
 						errorMsg += ":" + (y + "") + ":" + (this._members[y].getArgumentTypes$().length + "");
 					}
@@ -11623,11 +11625,11 @@ ClassDefinition.prototype.resolveTypes$LAnalysisContext$ = function (context) {
 	if (this._extendType != null) {
 		baseClass = this._extendType.getClassDef$();
 		if (baseClass != null) {
-			if ((((baseClass.flags$() & ClassDefinition.IS_FINAL) | 0)) !== 0) {
+			if ((baseClass.flags$() & ClassDefinition.IS_FINAL) !== 0) {
 				context.errors.push(new CompileError(this._extendType.getToken$(), "cannot extend a final class"));
-			} else if ((((baseClass.flags$() & ClassDefinition.IS_INTERFACE) | 0)) !== 0) {
+			} else if ((baseClass.flags$() & ClassDefinition.IS_INTERFACE) !== 0) {
 				context.errors.push(new CompileError(this._extendType.getToken$(), "cannot extend an interface, use the 'implements' keyword"));
-			} else if ((((baseClass.flags$() & ClassDefinition.IS_MIXIN) | 0)) !== 0) {
+			} else if ((baseClass.flags$() & ClassDefinition.IS_MIXIN) !== 0) {
 				context.errors.push(new CompileError(this._extendType.getToken$(), "cannot extend an mixin, use the 'implements' keyword"));
 			}
 		}
@@ -11635,7 +11637,7 @@ ClassDefinition.prototype.resolveTypes$LAnalysisContext$ = function (context) {
 	for (i = 0; i < this._implementTypes.length; ++i) {
 		baseClass = this._implementTypes[i].getClassDef$();
 		if (baseClass != null) {
-			if ((((baseClass.flags$() & (((ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN) | 0))) | 0)) === 0) {
+			if ((baseClass.flags$() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) === 0) {
 				context.errors.push(new CompileError(this._implementTypes[i].getToken$(), "cannot implement a class (only interfaces can be implemented)"));
 			} else {
 				for (j = i + 1; j < this._implementTypes.length; ++j) {
@@ -11650,13 +11652,13 @@ ClassDefinition.prototype.resolveTypes$LAnalysisContext$ = function (context) {
 	if (this.forEachMemberFunction$F$LMemberFunctionDefinition$B$((function (funcDef) {
 		return funcDef.name$() !== "constructor";
 	}))) {
-		isNative = (((this.flags$() & ClassDefinition.IS_NATIVE) | 0)) !== 0;
-		func = new MemberFunctionDefinition(this._token, new Token$2("constructor", true), ((ClassDefinition.IS_FINAL | ((this.flags$() & (((ClassDefinition.IS_NATIVE | ClassDefinition.IS_EXPORT) | 0))) | 0)) | 0), Type.voidType, [], isNative ? null : [], isNative ? null : [], [], this._token, null);
+		isNative = (this.flags$() & ClassDefinition.IS_NATIVE) !== 0;
+		func = new MemberFunctionDefinition(this._token, new Token$2("constructor", true), ClassDefinition.IS_FINAL | this.flags$() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_EXPORT), Type.voidType, [], isNative ? null : [], isNative ? null : [], [], this._token, null);
 		func.setClassDef$LClassDefinition$(this);
 		this._members.push(func);
 	}
 	for (i = 0; i !== this._members.length; ++i) {
-		if (this._members[i] instanceof MemberFunctionDefinition && this._members[i].name$() === "constructor" && (((this._members[i].flags$() & (((ClassDefinition.IS_STATIC | ClassDefinition.IS_DELETE) | 0))) | 0)) === ClassDefinition.IS_DELETE) {
+		if (this._members[i] instanceof MemberFunctionDefinition && this._members[i].name$() === "constructor" && (this._members[i].flags$() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_DELETE)) === ClassDefinition.IS_DELETE) {
 			this._members.splice(i, 1);
 			break;
 		}
@@ -11714,13 +11716,13 @@ ClassDefinition.prototype._analyzeClassDef$LAnalysisContext$ = function (context
 	implementClassDefs = this.implementTypes$().map((function (type) {
 		return type.getClassDef$();
 	}));
-	if ((((this.flags$() & (((ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN) | 0))) | 0)) === 0) {
+	if ((this.flags$() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) === 0) {
 		if (this._baseClassDef != null) {
-			if ((((this._baseClassDef.flags$() & ClassDefinition.IS_FINAL) | 0)) !== 0) {
+			if ((this._baseClassDef.flags$() & ClassDefinition.IS_FINAL) !== 0) {
 				context.errors.push(new CompileError(this.getToken$(), "cannot extend final class '" + this._baseClassDef.classFullName$() + "'"));
 				return;
 			}
-			if ((((this._baseClassDef.flags$() & (((ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN) | 0))) | 0)) !== 0) {
+			if ((this._baseClassDef.flags$() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) !== 0) {
 				context.errors.push(new CompileError(this.getToken$(), "interfaces (or mixins) should be implemented, not extended"));
 				return;
 			}
@@ -11736,7 +11738,7 @@ ClassDefinition.prototype._analyzeClassDef$LAnalysisContext$ = function (context
 		}
 	} else {
 		for (i = 0; i < implementClassDefs.length; ++i) {
-			if ((((implementClassDefs[i].flags$() & (((ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN) | 0))) | 0)) === 0) {
+			if ((implementClassDefs[i].flags$() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) === 0) {
 				context.errors.push(new CompileError(this.getToken$(), "class '" + implementClassDefs[i].classFullName$() + "' can only be extended, not implemented"));
 				return;
 			}
@@ -11753,7 +11755,7 @@ ClassDefinition.prototype._analyzeClassDef$LAnalysisContext$ = function (context
 	}
 	allMixins = [];
 	if (! this.forEachClassToBase$F$LClassDefinition$B$((function (classDef) {
-		if ((((classDef.flags$() & ClassDefinition.IS_MIXIN) | 0)) !== 0) {
+		if ((classDef.flags$() & ClassDefinition.IS_MIXIN) !== 0) {
 			if (allMixins.indexOf(classDef) !== - 1) {
 				context.errors.push(new CompileError($this.getToken$(), "mixin '" + classDef.classFullName$() + "' is implemented twice"));
 				return false;
@@ -11773,16 +11775,16 @@ ClassDefinition.prototype._analyzeClassDef$LAnalysisContext$ = function (context
 			this._assertMemberIsDefinable$LAnalysisContext$LMemberDefinition$LClassDefinition$LToken$(context, interfaceDef._members[j], interfaceDef, this._implementTypes[i].getToken$());
 		}
 	}
-	if ((((this._flags & (((ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN) | 0))) | 0)) === 0) {
+	if ((this._flags & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) === 0) {
 		for (i = 0; i < this._members.length; ++i) {
-			if (this._members[i] instanceof MemberFunctionDefinition && (((this._members[i].flags$() & ClassDefinition.IS_OVERRIDE) | 0)) !== 0) {
+			if (this._members[i] instanceof MemberFunctionDefinition && (this._members[i].flags$() & ClassDefinition.IS_OVERRIDE) !== 0) {
 				if (this._assertFunctionIsOverridableInBaseClasses$LAnalysisContext$LMemberFunctionDefinition$(context, this._members[i]) == null) {
 					context.errors.push(new CompileError(this._members[i].getNameToken$(), "could not find function definition in base classes / mixins to be overridden"));
 				}
 			}
 		}
 		for (i = 0; i < this._implementTypes.length; ++i) {
-			if ((((this._implementTypes[i].getClassDef$().flags$() & ClassDefinition.IS_MIXIN) | 0)) === 0) {
+			if ((this._implementTypes[i].getClassDef$().flags$() & ClassDefinition.IS_MIXIN) === 0) {
 				continue;
 			}
 			theMixin = this._implementTypes[i].getClassDef$();
@@ -11813,12 +11815,12 @@ ClassDefinition.prototype._analyzeClassDef$LAnalysisContext$ = function (context
 			}
 		}
 	}
-	if ((((this._flags & (((((ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_INTERFACE) | 0) | ClassDefinition.IS_MIXIN) | 0))) | 0)) === 0) {
+	if ((this._flags & (ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) === 0) {
 		abstractMembers = [];
 		this.forEachClassToBase$F$LClassDefinition$B$((function (classDef) {
 			return classDef.forEachMember$F$LMemberDefinition$B$((function (member) {
 				var i;
-				if ((((member.flags$() & ClassDefinition.IS_ABSTRACT) | 0)) !== 0) {
+				if ((member.flags$() & ClassDefinition.IS_ABSTRACT) !== 0) {
 					for (i = 0; i < abstractMembers.length; ++i) {
 						if (ClassDefinition$membersAreEqual$LMemberDefinition$LMemberDefinition$(abstractMembers[i], member)) {
 							break;
@@ -11837,7 +11839,7 @@ ClassDefinition.prototype._analyzeClassDef$LAnalysisContext$ = function (context
 				if (abstractMembers.length === 0) {
 					return false;
 				}
-				if ((((member.flags$() & ClassDefinition.IS_ABSTRACT) | 0)) === 0) {
+				if ((member.flags$() & ClassDefinition.IS_ABSTRACT) === 0) {
 					for (i = 0; i < abstractMembers.length; ++i) {
 						if (ClassDefinition$membersAreEqual$LMemberDefinition$LMemberDefinition$(abstractMembers[i], member)) {
 							abstractMembers.splice(i, 1);
@@ -11866,7 +11868,7 @@ ClassDefinition.prototype._analyzeClassDef$LAnalysisContext$ = function (context
 		if (! (member instanceof MemberFunctionDefinition)) {
 			return false;
 		}
-		if ((((member.flags$() & (((ClassDefinition.IS_STATIC | ClassDefinition.IS_EXPORT) | 0))) | 0)) !== ClassDefinition.IS_EXPORT) {
+		if ((member.flags$() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_EXPORT)) !== ClassDefinition.IS_EXPORT) {
 			return false;
 		}
 		if (! $__jsx_ObjectHasOwnProperty.call(usedNames, member.name$())) {
@@ -11877,7 +11879,7 @@ ClassDefinition.prototype._analyzeClassDef$LAnalysisContext$ = function (context
 		if (existingDef.getType$().equals$LType$(member.getType$())) {
 			return false;
 		}
-		if (((($this._flags & ClassDefinition.IS_EXPORT) | 0)) !== 0 && member.name$() === "constructor") {
+		if (($this._flags & ClassDefinition.IS_EXPORT) !== 0 && member.name$() === "constructor") {
 			errMsg = "only one constructor is exportable, please mark others using the __noexport__ attribute";
 		} else {
 			errMsg = "methods with __export__ attribute cannot be overloaded";
@@ -11938,7 +11940,7 @@ ClassDefinition.prototype._assertMemberIsDefinable$LAnalysisContext$LMemberDefin
 	var isCheckingSibling;
 	var i;
 	var isCheckingInterface;
-	if ((((member.flags$() & ClassDefinition.IS_STATIC) | 0)) !== 0) {
+	if ((member.flags$() & ClassDefinition.IS_STATIC) !== 0) {
 		return true;
 	}
 	for (numImplementsToCheck = 0; numImplementsToCheck < this._implementTypes.length; ++numImplementsToCheck) {
@@ -11957,7 +11959,7 @@ ClassDefinition.prototype._assertMemberIsDefinable$LAnalysisContext$LMemberDefin
 			}
 		}
 	} else {
-		isCheckingInterface = (((memberClassDef.flags$() & ClassDefinition.IS_INTERFACE) | 0)) !== 0;
+		isCheckingInterface = (memberClassDef.flags$() & ClassDefinition.IS_INTERFACE) !== 0;
 		if (this._extendType != null && ! this._extendType.getClassDef$()._assertMemberFunctionIsDefinable$LAnalysisContext$LMemberFunctionDefinition$LClassDefinition$LToken$BB(context, member, memberClassDef, token, false, isCheckingInterface)) {
 			return false;
 		}
@@ -11975,7 +11977,7 @@ ClassDefinition.prototype._assertMemberVariableIsDefinable$LAnalysisContext$LMem
 	var i;
 	for (i = 0; i < this._members.length; ++i) {
 		if (this._members[i].name$() === member.name$()) {
-			if ((((this._members[i].flags$() & ClassDefinition.IS_ABSTRACT) | 0)) === 0) {
+			if ((this._members[i].flags$() & ClassDefinition.IS_ABSTRACT) === 0) {
 				context.errors.push(new CompileError(member.getNameToken$(), Util$format$SAS("cannot define property '%1', the name is already used in class '%2'", [ member.getNotation$(), this.classFullName$() ])));
 				return false;
 			}
@@ -12016,13 +12018,13 @@ ClassDefinition.prototype._assertMemberFunctionIsDefinable$LAnalysisContext$LMem
 		if (! Util$typesAreEqual$ALType$ALType$(this._members[i].getArgumentTypes$(), member.getArgumentTypes$())) {
 			continue;
 		}
-		if (! isCheckingInterface && ((((((member.flags$() | this._members[i].flags$()) | 0)) & ClassDefinition.IS_STATIC) | 0)) === 0 && (((member.flags$() & ClassDefinition.IS_OVERRIDE) | 0)) === 0) {
+		if (! isCheckingInterface && ((member.flags$() | this._members[i].flags$()) & ClassDefinition.IS_STATIC) === 0 && (member.flags$() & ClassDefinition.IS_OVERRIDE) === 0) {
 			error = new CompileError(member.getNameToken$(), "overriding functions must have 'override' attribute set");
 			error.addCompileNote$LCompileNote$(new CompileNote(this._members[i].getNameToken$(), Util$format$SAS("defined in base class '%1'", [ this.classFullName$() ])));
 			context.errors.push(error);
 			return false;
 		}
-		if (reportOverridesAsWell && (((this._members[i].flags$() & ClassDefinition.IS_OVERRIDE) | 0)) !== 0) {
+		if (reportOverridesAsWell && (this._members[i].flags$() & ClassDefinition.IS_OVERRIDE) !== 0) {
 			error = new CompileError(member.getNameToken$(), "definition of the function conflicts with sibling mix-in '" + this.classFullName$() + "'");
 			context.errors.push(error);
 			return false;
@@ -12046,8 +12048,8 @@ ClassDefinition.prototype._assertFunctionIsOverridable$LAnalysisContext$LMemberF
 	var overrideReturnType;
 	var memberReturnType;
 	for (i = 0; i < this._members.length; ++i) {
-		if (this._members[i].name$() === overrideDef.name$() && this._members[i] instanceof MemberFunctionDefinition && (((this._members[i].flags$() & ClassDefinition.IS_STATIC) | 0)) === 0 && Util$typesAreEqual$ALType$ALType$(this._members[i].getArgumentTypes$(), overrideDef.getArgumentTypes$())) {
-			if ((((this._members[i].flags$() & ClassDefinition.IS_FINAL) | 0)) !== 0) {
+		if (this._members[i].name$() === overrideDef.name$() && this._members[i] instanceof MemberFunctionDefinition && (this._members[i].flags$() & ClassDefinition.IS_STATIC) === 0 && Util$typesAreEqual$ALType$ALType$(this._members[i].getArgumentTypes$(), overrideDef.getArgumentTypes$())) {
+			if ((this._members[i].flags$() & ClassDefinition.IS_FINAL) !== 0) {
 				context.errors.push(new CompileError(overrideDef.getToken$(), "cannot override final function defined in class '" + this.classFullName$() + "'"));
 				return false;
 			}
@@ -12107,7 +12109,7 @@ ClassDefinition.prototype._getMembers$ALMemberDefinition$BNN = function (list, f
 		if (functionOnly && ! (member instanceof MemberFunctionDefinition)) {
 			return false;
 		}
-		if ((((member.flags$() & flagsMask) | 0)) !== flagsMaskMatch) {
+		if ((member.flags$() & flagsMask) !== flagsMaskMatch) {
 			return false;
 		}
 		for (j = 0; j < list.length; ++j) {
@@ -12129,7 +12131,7 @@ ClassDefinition.prototype.hasDefaultConstructor$ = function () {
 	hasCtorWithArgs = false;
 	for (i = 0; i < this._members.length; ++i) {
 		member = this._members[i];
-		if (member.name$() === "constructor" && (((member.flags$() & ClassDefinition.IS_STATIC) | 0)) === 0 && member instanceof MemberFunctionDefinition) {
+		if (member.name$() === "constructor" && (member.flags$() & ClassDefinition.IS_STATIC) === 0 && member instanceof MemberFunctionDefinition) {
 			if (member.getArguments$().length === 0) {
 				return true;
 			}
@@ -12304,7 +12306,7 @@ MemberVariableDefinition.prototype.serialize$ = function () {
 
 MemberVariableDefinition.prototype.analyze$LAnalysisContext$ = function (context) {
 	var rhs;
-	if (this.getInitialValue$() == null && (((this.getClassDef$().flags$() & ClassDefinition.IS_NATIVE) | 0)) !== ClassDefinition.IS_NATIVE) {
+	if (this.getInitialValue$() == null && (this.getClassDef$().flags$() & ClassDefinition.IS_NATIVE) !== ClassDefinition.IS_NATIVE) {
 		this.setInitialValue$LExpression$(Expression$getDefaultValueExpressionOf$LType$(this.getType$()));
 	}
 	if (this.getInitialValue$() != null) {
@@ -12391,7 +12393,7 @@ MemberVariableDefinition.prototype.getNotation$ = function () {
 	var s;
 	classDef = this.getClassDef$();
 	s = (classDef != null ? classDef.classFullName$() : "<<unknown:" + (this._token.getFilename$() || "?") + ">>");
-	s += ((((this.flags$() & ClassDefinition.IS_STATIC) | 0)) !== 0 ? "." : "#");
+	s += ((this.flags$() & ClassDefinition.IS_STATIC) !== 0 ? "." : "#");
 	s += this.name$();
 	return s;
 };
@@ -12424,7 +12426,7 @@ MemberFunctionDefinition.prototype.isAnonymous$ = function () {
 
 
 MemberFunctionDefinition.prototype.isGenerator$ = function () {
-	return (((this._flags & ClassDefinition.IS_GENERATOR) | 0)) !== 0;
+	return (this._flags & ClassDefinition.IS_GENERATOR) !== 0;
 };
 
 
@@ -12434,7 +12436,7 @@ MemberFunctionDefinition.prototype.getNotation$ = function () {
 	var s;
 	classDef = this.getClassDef$();
 	s = (classDef != null ? classDef.classFullName$() : "<<unknown:" + (this._token.getFilename$() || "?") + ">>");
-	s += ((((this.flags$() & ClassDefinition.IS_STATIC) | 0)) !== 0 ? "." : "#");
+	s += ((this.flags$() & ClassDefinition.IS_STATIC) !== 0 ? "." : "#");
 	s += (this.getNameToken$() != null ? this.name$() : "$" + (this.getToken$().getLineNumber$() + "") + "_" + (this.getToken$().getColumnNumber$() + ""));
 	s += "(";
 	s += this._args.map((function (arg) {
@@ -12709,7 +12711,7 @@ MemberFunctionDefinition.prototype.analyze$LAnalysisContext$ = function (outerCo
 		return;
 	}
 	this._analyzed = true;
-	if ((((this.flags$() & ClassDefinition.IS_GENERATED) | 0)) === 0) {
+	if ((this.flags$() & ClassDefinition.IS_GENERATED) === 0) {
 		docComment = this.getDocComment$();
 		if (docComment) {
 			args = this.getArguments$();
@@ -12813,13 +12815,13 @@ MemberFunctionDefinition.prototype.generateWrappersForDefaultParameters$ = funct
 		if (this.name$() === "constructor") {
 			statement = new ConstructorInvocationStatement(new Token$2("this", false), createObjectType(this.getClassDef$()), argExprs);
 		} else {
-			invocant = ((((this.flags$() & ClassDefinition.IS_STATIC) | 0)) === 0 ? new ThisExpression(new Token$2("this", false), this.getClassDef$()) : new ClassExpression(new Token$2(this.getClassDef$().className$(), true), createObjectType(this.getClassDef$())));
+			invocant = ((this.flags$() & ClassDefinition.IS_STATIC) === 0 ? new ThisExpression(new Token$2("this", false), this.getClassDef$()) : new ClassExpression(new Token$2(this.getClassDef$().className$(), true), createObjectType(this.getClassDef$())));
 			methodRef = new PropertyExpression(new Token$2(".", false), invocant, this.getNameToken$(), this.getArgumentTypes$());
 			callExpression = new CallExpression(new Token$2("(", false), methodRef, argExprs);
 			statement = new ReturnStatement(new Token$2("return", false), callExpression);
 		}
 		if (! (this instanceof TemplateFunctionDefinition)) {
-			wrapper = new MemberFunctionDefinition(this.getToken$(), this.getNameToken$(), ((((this.flags$() | ClassDefinition.IS_INLINE) | 0) | ClassDefinition.IS_GENERATED) | 0), this.getReturnType$(), formalArgs, [], [ statement ], this.getClosures$().slice(0), this._lastTokenOfBody, this._docComment);
+			wrapper = new MemberFunctionDefinition(this.getToken$(), this.getNameToken$(), this.flags$() | ClassDefinition.IS_INLINE | ClassDefinition.IS_GENERATED, this.getReturnType$(), formalArgs, [], [ statement ], this.getClosures$().slice(0), this._lastTokenOfBody, this._docComment);
 		} else {
 			throw new Error("TODO: template function with default parameters in " + this.getNotation$() + " is not yet supported");
 		}
@@ -12856,7 +12858,7 @@ MemberFunctionDefinition.prototype._fixupConstructor$LAnalysisContext$ = functio
 	var insertStmtAt;
 	success = true;
 	isAlternate = false;
-	if ((((this._flags & ClassDefinition.IS_GENERATOR) | 0)) !== 0) {
+	if ((this._flags & ClassDefinition.IS_GENERATOR) !== 0) {
 		context.errors.push(new CompileError(this._token, "constructor must not be a generator"));
 		return;
 	}
@@ -12909,7 +12911,7 @@ MemberFunctionDefinition.prototype._fixupConstructor$LAnalysisContext$ = functio
 	normalStatementFromIndex = stmtIndex;
 	initProperties = {};
 	this._classDef.forEachMemberVariable$F$LMemberVariableDefinition$B$((function (member) {
-		if ((((member.flags$() & (((ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT) | 0))) | 0)) === 0) {
+		if ((member.flags$() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT)) === 0) {
 			initProperties[member.name$()] = true;
 		}
 		return true;
@@ -12944,7 +12946,7 @@ MemberFunctionDefinition.prototype._fixupConstructor$LAnalysisContext$ = functio
 	insertStmtAt = normalStatementFromIndex;
 	this._classDef.forEachMemberVariable$F$LMemberVariableDefinition$B$((function (member) {
 		var stmt;
-		if ((((member.flags$() & (((ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT) | 0))) | 0)) === 0) {
+		if ((member.flags$() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT)) === 0) {
 			if (initProperties[member.name$()]) {
 				stmt = new ExpressionStatement(new AssignmentExpression(new Token$2("=", false), new PropertyExpression$0(new Token$2(".", false), new ThisExpression(new Token$2("this", false), $this._classDef), member.getNameToken$(), [], member.getType$()), member.getInitialValue$()));
 				$this._statements.splice(insertStmtAt++, 0, stmt);
@@ -13049,7 +13051,7 @@ MemberFunctionDefinition.prototype.getLocal$LAnalysisContext$S = function (conte
 
 
 MemberFunctionDefinition.prototype.getType$ = function () {
-	return ((((this._flags & ClassDefinition.IS_STATIC) | 0)) !== 0 ? new StaticFunctionType(this._token, this._returnType, this.getArgumentTypes$(), false) : new MemberFunctionType(this._token, new ObjectType(this._classDef), this._returnType, this.getArgumentTypes$(), false));
+	return ((this._flags & ClassDefinition.IS_STATIC) !== 0 ? new StaticFunctionType(this._token, this._returnType, this.getArgumentTypes$(), false) : new MemberFunctionType(this._token, new ObjectType(this._classDef), this._returnType, this.getArgumentTypes$(), false));
 };
 
 
@@ -14629,7 +14631,7 @@ TemplateFunctionType.prototype._deduceByArgumentTypes$LToken$ALType$BBALCompileN
 	var member;
 	var i;
 	errors = [];
-	if (((((this._funcDef.flags$() & ClassDefinition.IS_STATIC) | 0)) === ClassDefinition.IS_STATIC) !== isStatic) {
+	if (((this._funcDef.flags$() & ClassDefinition.IS_STATIC) === ClassDefinition.IS_STATIC) !== isStatic) {
 		if (isStatic) {
 			notes.push(new CompileNote(token, 'candidate function not viable: expected a static function, but got a member function'));
 		} else {
@@ -14664,7 +14666,7 @@ TemplateFunctionType.prototype._getExpectedTypes$ALUtil$x2EArgumentTypeRequest$N
 	var instantiationContext;
 	var hasCallback;
 	var callbackArgTypes;
-	if (((((this._funcDef.flags$() & ClassDefinition.IS_STATIC) | 0)) !== 0) !== isStatic) {
+	if (((this._funcDef.flags$() & ClassDefinition.IS_STATIC) !== 0) !== isStatic) {
 		return;
 	}
 	argTypes = [];
@@ -16123,7 +16125,7 @@ Parser.prototype._classDefinition$ = function () {
 	this._templateInners = [];
 	this._classFlags = 0;
 	if (this._outerClass) {
-		this._classFlags |= ((this._outerClass.classFlags & ClassDefinition.IS_NATIVE) | 0);
+		this._classFlags |= this._outerClass.classFlags & ClassDefinition.IS_NATIVE;
 	}
 	nativeSource = null;
 	docComment = null;
@@ -16138,14 +16140,14 @@ Parser.prototype._classDefinition$ = function () {
 		if (token.getValue$() === "class") {
 			break;
 		} else if (token.getValue$() === "interface") {
-			if ((((this._classFlags & (((ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE) | 0))) | 0)) !== 0) {
+			if ((this._classFlags & (ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) !== 0) {
 				this._newError$S("interface cannot have final or native attribute set");
 				return null;
 			}
 			this._classFlags |= ClassDefinition.IS_INTERFACE;
 			break;
 		} else if (token.getValue$() === "mixin") {
-			if ((((this._classFlags & (((((ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE) | 0) | ClassDefinition.IS_EXPORT) | 0))) | 0)) !== 0) {
+			if ((this._classFlags & (ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE | ClassDefinition.IS_EXPORT)) !== 0) {
 				this._newError$S("mixin cannot have final, native, or __export__ attribute set");
 				return null;
 			}
@@ -16177,7 +16179,7 @@ Parser.prototype._classDefinition$ = function () {
 		default:
 			throw new Error("logic flaw");
 		}
-		if ((((this._classFlags & newFlag) | 0)) !== 0) {
+		if ((this._classFlags & newFlag) !== 0) {
 			this._newError$S("same attribute cannot be specified more than once");
 			return null;
 		}
@@ -16194,24 +16196,24 @@ Parser.prototype._classDefinition$ = function () {
 		return new ParsedObjectType(new QualifiedName(token), []);
 	})));
 	this._objectTypesUsed.push(this._classType);
-	if ((((this._classFlags & (((ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN) | 0))) | 0)) === 0) {
+	if ((this._classFlags & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) === 0) {
 		if (this._expectOpt$S("extends") != null) {
 			this._extendType = this._objectTypeDeclaration$LToken$BF$LClassDefinition$B$(null, true, (function (classDef) {
-				return (((classDef.flags$() & (((((ClassDefinition.IS_MIXIN | ClassDefinition.IS_INTERFACE) | 0) | ClassDefinition.IS_FINAL) | 0))) | 0)) === 0;
+				return (classDef.flags$() & (ClassDefinition.IS_MIXIN | ClassDefinition.IS_INTERFACE | ClassDefinition.IS_FINAL)) === 0;
 			}));
 		}
 		if (this._extendType == null && className.getValue$() !== "Object") {
 			this._extendType = new ParsedObjectType(new QualifiedName(new Token$2("Object", true)), []);
 			this._objectTypesUsed.push(this._extendType);
 		}
-	} else if ((((this._classFlags & (((((ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL) | 0) | ClassDefinition.IS_NATIVE) | 0))) | 0)) !== 0) {
+	} else if ((this._classFlags & (ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE)) !== 0) {
 		this._newError$S("interface or mixin cannot have attributes: 'abstract', 'final', 'native");
-		this._classFlags &= ~ (((((ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL) | 0) | ClassDefinition.IS_NATIVE) | 0));
+		this._classFlags &= ~ (ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE);
 	}
 	if (this._expectOpt$S("implements") != null) {
 		do {
 			implementType = this._objectTypeDeclaration$LToken$BF$LClassDefinition$B$(null, true, (function (classDef) {
-				return (((classDef.flags$() & (((ClassDefinition.IS_MIXIN | ClassDefinition.IS_INTERFACE) | 0))) | 0)) !== 0;
+				return (classDef.flags$() & (ClassDefinition.IS_MIXIN | ClassDefinition.IS_INTERFACE)) !== 0;
 			}));
 			if (implementType != null) {
 				this._implementTypes.push(implementType);
@@ -16248,12 +16250,12 @@ Parser.prototype._classDefinition$ = function () {
 		if (this._expect$S(";") == null) {
 			return null;
 		}
-		if ((((this._classFlags & ClassDefinition.IS_NATIVE) | 0)) === 0) {
+		if ((this._classFlags & ClassDefinition.IS_NATIVE) === 0) {
 			this._errors.push(new CompileError(assignToken, "in-line native definition requires native attribute"));
 			return null;
 		}
 	}
-	if ((((this._classFlags & ClassDefinition.IS_NATIVE) | 0)) === 0 && Util$isBuiltInClass$S(className.getValue$())) {
+	if ((this._classFlags & ClassDefinition.IS_NATIVE) === 0 && Util$isBuiltInClass$S(className.getValue$())) {
 		this._errors.push(new CompileError(className, "cannot re-define a built-in class"));
 		success = false;
 	} else if (this._outerClass != null) {
@@ -16343,7 +16345,7 @@ Parser.prototype._memberDefinition$ = function () {
 			docComment = this._docComment;
 		}
 		if (token.getValue$() === "const") {
-			if ((((flags & ClassDefinition.IS_STATIC) | 0)) === 0) {
+			if ((flags & ClassDefinition.IS_STATIC) === 0) {
 				this._newError$S("constants must be static");
 				return null;
 			}
@@ -16355,7 +16357,7 @@ Parser.prototype._memberDefinition$ = function () {
 			if (isNoExport) {
 				this._newError$S("same attribute cannot be specified more than once");
 				return null;
-			} else if ((((flags & ClassDefinition.IS_EXPORT) | 0)) !== 0) {
+			} else if ((flags & ClassDefinition.IS_EXPORT) !== 0) {
 				this._newError$S("cannot set the attribute, already declared as __export__");
 				return null;
 			}
@@ -16364,7 +16366,7 @@ Parser.prototype._memberDefinition$ = function () {
 			newFlag = 0;
 			switch (token.getValue$()) {
 			case "static":
-				if ((((this._classFlags & (((ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN) | 0))) | 0)) !== 0) {
+				if ((this._classFlags & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) !== 0) {
 					this._newError$S("interfaces and mixins cannot have static members");
 					return null;
 				}
@@ -16374,14 +16376,14 @@ Parser.prototype._memberDefinition$ = function () {
 				newFlag = ClassDefinition.IS_ABSTRACT;
 				break;
 			case "override":
-				if ((((this._classFlags & ClassDefinition.IS_INTERFACE) | 0)) !== 0) {
+				if ((this._classFlags & ClassDefinition.IS_INTERFACE) !== 0) {
 					this._newError$S("functions of an interface cannot have 'override' attribute set");
 					return null;
 				}
 				newFlag = ClassDefinition.IS_OVERRIDE;
 				break;
 			case "final":
-				if ((((this._classFlags & ClassDefinition.IS_INTERFACE) | 0)) !== 0) {
+				if ((this._classFlags & ClassDefinition.IS_INTERFACE) !== 0) {
 					this._newError$S("functions of an interface cannot have 'final' attribute set");
 					return null;
 				}
@@ -16412,7 +16414,7 @@ Parser.prototype._memberDefinition$ = function () {
 			default:
 				throw new Error("logic flaw");
 			}
-			if ((((flags & newFlag) | 0)) !== 0) {
+			if ((flags & newFlag) !== 0) {
 				this._newError$S("same attribute cannot be specified more than once");
 				return null;
 			}
@@ -16423,7 +16425,7 @@ Parser.prototype._memberDefinition$ = function () {
 		if (isNoExport) {
 			return false;
 		}
-		if (((($this._classFlags & ClassDefinition.IS_EXPORT) | 0)) === 0) {
+		if (($this._classFlags & ClassDefinition.IS_EXPORT) === 0) {
 			return false;
 		}
 		if (name.charAt(0) === "_") {
@@ -16431,17 +16433,17 @@ Parser.prototype._memberDefinition$ = function () {
 		}
 		return true;
 	}
-	if ((((this._classFlags & ClassDefinition.IS_INTERFACE) | 0)) !== 0) {
+	if ((this._classFlags & ClassDefinition.IS_INTERFACE) !== 0) {
 		flags |= ClassDefinition.IS_ABSTRACT;
 	}
 	if (token.getValue$() === "function") {
 		return this._functionDefinition$LToken$NLDocComment$F$SB$(token, flags, docComment, shouldExport);
 	}
-	if ((((flags & ~ (((((((((ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT) | 0) | ClassDefinition.IS_CONST) | 0) | ClassDefinition.IS_READONLY) | 0) | ClassDefinition.IS_EXPORT) | 0))) | 0)) !== 0) {
+	if ((flags & ~ (ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_CONST | ClassDefinition.IS_READONLY | ClassDefinition.IS_EXPORT)) !== 0) {
 		this._newError$S("variables may only have attributes: static, abstract, const");
 		return null;
 	}
-	if ((((flags & ClassDefinition.IS_READONLY) | 0)) !== 0 && (((this._classFlags & ClassDefinition.IS_NATIVE) | 0)) === 0) {
+	if ((flags & ClassDefinition.IS_READONLY) !== 0 && (this._classFlags & ClassDefinition.IS_NATIVE) === 0) {
 		this._newError$S("only native classes may use the __readonly__ attribute");
 		return null;
 	}
@@ -16461,7 +16463,7 @@ Parser.prototype._memberDefinition$ = function () {
 	initialValue = null;
 	closures = [];
 	if (this._expectOpt$S("=") != null) {
-		if ((((flags & ClassDefinition.IS_ABSTRACT) | 0)) !== 0) {
+		if ((flags & ClassDefinition.IS_ABSTRACT) !== 0) {
 			this._newError$S("abstract variable cannot have default value");
 			return null;
 		}
@@ -16479,7 +16481,7 @@ Parser.prototype._memberDefinition$ = function () {
 	if (! this._expect$S(";")) {
 		return null;
 	}
-	if (this._typeArgs.length === 0 && initialValue == null && (((this._classFlags & ClassDefinition.IS_NATIVE) | 0)) === 0) {
+	if (this._typeArgs.length === 0 && initialValue == null && (this._classFlags & ClassDefinition.IS_NATIVE) === 0) {
 		initialValue = Expression$getDefaultValueExpressionOf$LType$(type);
 	}
 	return new MemberVariableDefinition(token, name, flags, type, initialValue, closures, docComment);
@@ -16505,17 +16507,17 @@ Parser.prototype._functionDefinition$LToken$NLDocComment$F$SB$ = function (token
 		flags |= ClassDefinition.IS_EXPORT;
 	}
 	if (name.getValue$() === "constructor") {
-		if ((((this._classFlags & ClassDefinition.IS_INTERFACE) | 0)) !== 0) {
+		if ((this._classFlags & ClassDefinition.IS_INTERFACE) !== 0) {
 			this._newError$S("interface cannot have a constructor");
 			return null;
 		}
-		if ((((flags & (((ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL) | 0))) | 0)) !== 0) {
+		if ((flags & (ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL)) !== 0) {
 			this._newError$S("constructor cannot be declared as 'abstract' or 'final'");
 			return null;
 		}
 		flags |= ClassDefinition.IS_FINAL;
 	}
-	flags |= ((this._classFlags & (((ClassDefinition.IS_NATIVE | ClassDefinition.IS_FINAL) | 0))) | 0);
+	flags |= this._classFlags & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FINAL);
 	typeArgs = this._formalTypeArguments$();
 	if (typeArgs == null) {
 		return null;
@@ -16527,7 +16529,7 @@ Parser.prototype._functionDefinition$LToken$NLDocComment$F$SB$ = function (token
 		if (this._expect$S("(") == null) {
 			return null;
 		}
-		args = this._functionArgumentsExpr$BBB((((this._classFlags & ClassDefinition.IS_NATIVE) | 0)) !== 0, true, true);
+		args = this._functionArgumentsExpr$BBB((this._classFlags & ClassDefinition.IS_NATIVE) !== 0, true, true);
 		if (args == null) {
 			return null;
 		}
@@ -16543,8 +16545,8 @@ Parser.prototype._functionDefinition$LToken$NLDocComment$F$SB$ = function (token
 				return null;
 			}
 		}
-		if ((((flags & ClassDefinition.IS_DELETE) | 0)) !== 0) {
-			if (name.getValue$() !== "constructor" || (((flags & ClassDefinition.IS_STATIC) | 0)) !== 0) {
+		if ((flags & ClassDefinition.IS_DELETE) !== 0) {
+			if (name.getValue$() !== "constructor" || (flags & ClassDefinition.IS_STATIC) !== 0) {
 				this._newError$S("only constructors may have the \"delete\" attribute set");
 				return null;
 			}
@@ -16556,12 +16558,12 @@ Parser.prototype._functionDefinition$LToken$NLDocComment$F$SB$ = function (token
 		function createDefinition(locals, statements, closures, lastToken) {
 			return (typeArgs.length !== 0 ? new TemplateFunctionDefinition(token, name, flags, typeArgs, returnType, args, locals, statements, closures, lastToken, docComment) : new MemberFunctionDefinition(token, name, flags, returnType, args, locals, statements, closures, lastToken, docComment));
 		}
-		if ((((this._classFlags & ClassDefinition.IS_INTERFACE) | 0)) !== 0) {
+		if ((this._classFlags & ClassDefinition.IS_INTERFACE) !== 0) {
 			if (this._expect$S(";") == null) {
 				return null;
 			}
 			return createDefinition(null, null, [], null);
-		} else if ((((flags & (((((ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_NATIVE) | 0) | ClassDefinition.IS_DELETE) | 0))) | 0)) !== 0) {
+		} else if ((flags & (ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_NATIVE | ClassDefinition.IS_DELETE)) !== 0) {
 			endDeclToken = this._expect$AS([ ";", "{" ]);
 			if (endDeclToken == null) {
 				return null;
@@ -18648,7 +18650,7 @@ function _Util$0$exprHasSideEffects$LExpression$(expr) {
 			return false;
 		} else if (expr instanceof CallExpression) {
 			callingFuncDef = _DetermineCalleeCommand$getCallingFuncDef$LStashable$(expr);
-			if (callingFuncDef != null && (((callingFuncDef.flags$() & ClassDefinition.IS_PURE) | 0)) !== 0) {
+			if (callingFuncDef != null && (callingFuncDef.flags$() & ClassDefinition.IS_PURE) !== 0) {
 			} else {
 				return false;
 			}
@@ -19064,31 +19066,31 @@ _LinkTimeOptimizationCommand.prototype.performOptimization$ = function () {
 		return true;
 	}));
 	this.getCompiler$().forEachClassDef$F$LParser$LClassDefinition$B$((function (parser, classDef) {
-		if ((((classDef.flags$() & (((((((((ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN) | 0) | ClassDefinition.IS_NATIVE) | 0) | ClassDefinition.IS_FINAL) | 0) | ClassDefinition.IS_EXPORT) | 0))) | 0)) === 0 && $this.getStash$LStashable$(classDef).extendedBy.length === 0) {
+		if ((classDef.flags$() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN | ClassDefinition.IS_NATIVE | ClassDefinition.IS_FINAL | ClassDefinition.IS_EXPORT)) === 0 && $this.getStash$LStashable$(classDef).extendedBy.length === 0) {
 			$this.log$S("marking class as final: " + classDef.className$());
-			classDef.setFlags$N(((classDef.flags$() | ClassDefinition.IS_FINAL) | 0));
+			classDef.setFlags$N(classDef.flags$() | ClassDefinition.IS_FINAL);
 			classDef.forEachMemberFunction$F$LMemberFunctionDefinition$B$((function (funcDef) {
-				if ((((funcDef.flags$() & (((ClassDefinition.IS_STATIC | ClassDefinition.IS_FINAL) | 0))) | 0)) === 0) {
-					funcDef.setFlags$N(((funcDef.flags$() | ClassDefinition.IS_FINAL) | 0));
+				if ((funcDef.flags$() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_FINAL)) === 0) {
+					funcDef.setFlags$N(funcDef.flags$() | ClassDefinition.IS_FINAL);
 				}
 				return true;
 			}));
-		} else if ((((classDef.flags$() & (((ClassDefinition.IS_NATIVE | ClassDefinition.IS_FINAL) | 0))) | 0)) === 0) {
+		} else if ((classDef.flags$() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FINAL)) === 0) {
 			classDef.forEachMemberFunction$F$LMemberFunctionDefinition$B$((function (funcDef) {
 				var overrides;
-				if ((((funcDef.flags$() & (((((ClassDefinition.IS_STATIC | ClassDefinition.IS_NATIVE) | 0) | ClassDefinition.IS_FINAL) | 0))) | 0)) !== 0) {
-				} else if ((((funcDef.flags$() & ClassDefinition.IS_ABSTRACT) | 0)) === 0) {
+				if ((funcDef.flags$() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_NATIVE | ClassDefinition.IS_FINAL)) !== 0) {
+				} else if ((funcDef.flags$() & ClassDefinition.IS_ABSTRACT) === 0) {
 					if (funcDef.getStatements$() == null) {
 						throw new Error("a non-native, non-abstract function with out function body?");
 					}
 					overrides = $this._getOverrides$LClassDefinition$ALClassDefinition$SALType$(classDef, $this.getStash$LStashable$(classDef).extendedBy, funcDef.name$(), funcDef.getArgumentTypes$());
 					if (overrides.length === 0) {
 						$this.log$S("marking function as final: " + funcDef.getNotation$());
-						funcDef.setFlags$N(((funcDef.flags$() | ClassDefinition.IS_FINAL) | 0));
+						funcDef.setFlags$N(funcDef.flags$() | ClassDefinition.IS_FINAL);
 					} else {
 						$this.log$S("function has overrides, not marking as final: " + funcDef.getNotation$());
 					}
-				} else if ((((funcDef.flags$() & ClassDefinition.IS_ABSTRACT) | 0)) !== 0) {
+				} else if ((funcDef.flags$() & ClassDefinition.IS_ABSTRACT) !== 0) {
 				}
 				return true;
 			}));
@@ -19117,7 +19119,7 @@ _LinkTimeOptimizationCommand.prototype._getOverridesByClass$LClassDefinition$LCl
 	var i;
 	overrides = this._getOverrides$LClassDefinition$ALClassDefinition$SALType$(srcClassDef, this.getStash$LStashable$(classDef).extendedBy, name, argTypes);
 	function addOverride(funcDef) {
-		if (funcDef.name$() === name && (((funcDef.flags$() & ClassDefinition.IS_ABSTRACT) | 0)) === 0 && Util$typesAreEqual$ALType$ALType$(funcDef.getArgumentTypes$(), argTypes)) {
+		if (funcDef.name$() === name && (funcDef.flags$() & ClassDefinition.IS_ABSTRACT) === 0 && Util$typesAreEqual$ALType$ALType$(funcDef.getArgumentTypes$(), argTypes)) {
 			overrides.push(funcDef);
 			return false;
 		}
@@ -19187,7 +19189,7 @@ _StripOptimizeCommand.prototype._touchInstance$LClassDefinition$ = function (cla
 		}
 	}
 	classDef.forEachMemberVariable$F$LMemberVariableDefinition$B$((function (varDef) {
-		if ((((varDef.flags$() & ClassDefinition.IS_STATIC) | 0)) === 0) {
+		if ((varDef.flags$() & ClassDefinition.IS_STATIC) === 0) {
 			$this._membersToWalk.push(varDef);
 		}
 		return true;
@@ -19251,7 +19253,7 @@ _StripOptimizeCommand.prototype.performOptimization$ = function () {
 		if (classDef instanceof TemplateClassDefinition) {
 			return false;
 		}
-		if ((((classDef.flags$() & ClassDefinition.IS_NATIVE) | 0)) !== 0) {
+		if ((classDef.flags$() & ClassDefinition.IS_NATIVE) !== 0) {
 			return false;
 		}
 		return true;
@@ -19264,10 +19266,10 @@ _StripOptimizeCommand.prototype.performOptimization$ = function () {
 		}));
 	}));
 	this.getCompiler$().forEachClassDef$F$LParser$LClassDefinition$B$((function (parser, classDef) {
-		if (! (classDef instanceof TemplateClassDefinition) && (((classDef.flags$() & ClassDefinition.IS_NATIVE) | 0)) !== 0) {
+		if (! (classDef instanceof TemplateClassDefinition) && (classDef.flags$() & ClassDefinition.IS_NATIVE) !== 0) {
 			classDef.forEachMemberFunction$F$LMemberFunctionDefinition$B$((function (funcDef) {
 				if (funcDef.name$() === "constructor") {
-				} else if ((((funcDef.flags$() & ClassDefinition.IS_FINAL) | 0)) !== 0) {
+				} else if ((funcDef.flags$() & ClassDefinition.IS_FINAL) !== 0) {
 				} else {
 					$this._touchMethod$SALType$(funcDef.name$(), funcDef.getArgumentTypes$());
 				}
@@ -19278,13 +19280,13 @@ _StripOptimizeCommand.prototype.performOptimization$ = function () {
 	}));
 	this.getCompiler$().forEachClassDef$F$LParser$LClassDefinition$B$((function (parser, classDef) {
 		if (isEmittedClass(classDef)) {
-			if ((((classDef.flags$() & ClassDefinition.IS_EXPORT) | 0)) !== 0) {
+			if ((classDef.flags$() & ClassDefinition.IS_EXPORT) !== 0) {
 				$this._touchInstance$LClassDefinition$(classDef);
 			}
 			classDef.forEachMember$F$LMemberDefinition$B$((function (member) {
 				var funcDef;
-				if ((((member.flags$() & ClassDefinition.IS_EXPORT) | 0)) !== 0) {
-					if ((((member.flags$() & ClassDefinition.IS_STATIC) | 0)) !== 0) {
+				if ((member.flags$() & ClassDefinition.IS_EXPORT) !== 0) {
+					if ((member.flags$() & ClassDefinition.IS_STATIC) !== 0) {
 						$this._touchStatic$LMemberDefinition$(member);
 					} else if (member instanceof MemberFunctionDefinition) {
 						funcDef = member;
@@ -19313,11 +19315,11 @@ _StripOptimizeCommand.prototype.performOptimization$ = function () {
 		var isTouched;
 		var listOfArgTypes;
 		var i;
-		if ((((member.flags$() & ClassDefinition.IS_EXPORT) | 0)) !== 0) {
+		if ((member.flags$() & ClassDefinition.IS_EXPORT) !== 0) {
 			return true;
 		}
 		isTouched = $this.getStash$LStashable$(member).touched;
-		if ((((member.flags$() & ClassDefinition.IS_STATIC) | 0)) !== 0) {
+		if ((member.flags$() & ClassDefinition.IS_STATIC) !== 0) {
 			return isTouched;
 		} else if (member instanceof MemberFunctionDefinition) {
 			if (member.name$() === "constructor") {
@@ -19348,7 +19350,7 @@ _StripOptimizeCommand.prototype.performOptimization$ = function () {
 			for (memberIndex = 0; memberIndex !== members.length; ) {
 				member = members[memberIndex];
 				if (memberShouldPreserve(member)) {
-					if (member instanceof MemberFunctionDefinition && (((member.flags$() & ClassDefinition.IS_STATIC) | 0)) === 0 && member.name$() === "constructor") {
+					if (member instanceof MemberFunctionDefinition && (member.flags$() & ClassDefinition.IS_STATIC) === 0 && member.name$() === "constructor") {
 						++numConstructors;
 					}
 					++memberIndex;
@@ -19360,7 +19362,7 @@ _StripOptimizeCommand.prototype.performOptimization$ = function () {
 			}
 			if (numConstructors === 0) {
 				$this.log$S("substituting fake constructor for class: " + classDef.className$());
-				ctor = new MemberFunctionDefinition(null, new Token$2("constructor", true), ((ClassDefinition.IS_FINAL | ((classDef.flags$() & ClassDefinition.IS_EXPORT) | 0)) | 0), Type.voidType, [], [], [], [], classDef.getToken$(), null);
+				ctor = new MemberFunctionDefinition(null, new Token$2("constructor", true), ClassDefinition.IS_FINAL | classDef.flags$() & ClassDefinition.IS_EXPORT, Type.voidType, [], [], [], [], classDef.getToken$(), null);
 				ctor.setClassDef$LClassDefinition$(classDef);
 				members.push(ctor);
 			}
@@ -19374,8 +19376,8 @@ _StripOptimizeCommand.prototype.performOptimization$ = function () {
 		classDefs = parser.getClassDefs$();
 		for (i = 0; i !== classDefs.length; ) {
 			preserve = true;
-			if ((((classDefs[i].flags$() & ClassDefinition.IS_NATIVE) | 0)) !== 0 && classDefs[i].getNativeSource$() != null && ! $this.getStash$LStashable$(classDefs[i]).touched && classDefs[i].forEachMember$F$LMemberDefinition$B$((function (member) {
-				if ((((member.flags$() & ClassDefinition.IS_STATIC) | 0)) === 0) {
+			if ((classDefs[i].flags$() & ClassDefinition.IS_NATIVE) !== 0 && classDefs[i].getNativeSource$() != null && ! $this.getStash$LStashable$(classDefs[i]).touched && classDefs[i].forEachMember$F$LMemberDefinition$B$((function (member) {
+				if ((member.flags$() & ClassDefinition.IS_STATIC) === 0) {
 					return true;
 				}
 				return ! $this.getStash$LStashable$(member).touched;
@@ -19420,7 +19422,7 @@ _StripOptimizeCommand.prototype._walkExpression$LExpression$ = function (expr) {
 			propertyExpr = expr;
 			holderClassDef = propertyExpr.getHolderType$().getClassDef$();
 			if (propertyExpr.isClassSpecifier$()) {
-				if ((((holderClassDef.flags$() & ClassDefinition.IS_NATIVE) | 0)) !== 0) {
+				if ((holderClassDef.flags$() & ClassDefinition.IS_NATIVE) !== 0) {
 					$this._touchInstance$LClassDefinition$(holderClassDef);
 				}
 			} else {
@@ -19630,7 +19632,7 @@ function _DetermineCalleeCommand$findCallingFunctionInClass$LClassDefinition$SAL
 	var found;
 	found = Util$findFunctionInClass$LClassDefinition$SALType$B(classDef, funcName, argTypes, isStatic);
 	if (found != null) {
-		if ((((found.flags$() & (((ClassDefinition.IS_STATIC | ClassDefinition.IS_FINAL) | 0))) | 0)) === 0) {
+		if ((found.flags$() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_FINAL)) === 0) {
 			found = null;
 		}
 	}
@@ -19679,7 +19681,7 @@ _StaticizeOptimizeCommand.prototype.performOptimization$ = function () {
 	var memberCanBeStaticized;
 	function memberCanBeStaticized(funcDef) {
 		var onStatement;
-		if ((((funcDef.flags$() & (((((((((ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_ABSTRACT) | 0) | ClassDefinition.IS_FINAL) | 0) | ClassDefinition.IS_STATIC) | 0) | ClassDefinition.IS_NATIVE) | 0))) | 0)) !== ClassDefinition.IS_FINAL) {
+		if ((funcDef.flags$() & (ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_FINAL | ClassDefinition.IS_STATIC | ClassDefinition.IS_NATIVE)) !== ClassDefinition.IS_FINAL) {
 			return false;
 		}
 		if (funcDef.name$() === "constructor") {
@@ -19704,7 +19706,7 @@ _StaticizeOptimizeCommand.prototype.performOptimization$ = function () {
 		return true;
 	}
 	this.getCompiler$().forEachClassDef$F$LParser$LClassDefinition$B$((function (parser, classDef) {
-		if ((((classDef.flags$() & (((ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN) | 0))) | 0)) !== 0) {
+		if ((classDef.flags$() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) !== 0) {
 			return true;
 		}
 		classDef.forEachMemberFunction$F$LMemberFunctionDefinition$B$((function onFunction(funcDef) {
@@ -19757,7 +19759,7 @@ _StaticizeOptimizeCommand.prototype._staticizeMethod$LMemberFunctionDefinition$ 
 	newName = this._newStaticFunctionName$LClassDefinition$SALType$B(classDef, funcDef.name$(), [ new ObjectType(classDef) ].concat(funcDef.getType$().getArgumentTypes$()), true);
 	this.getStash$LStashable$(funcDef).altName = newName;
 	staticFuncDef._nameToken = new Token$2(newName, true);
-	staticFuncDef.setFlags$N(((((funcDef.flags$() & ~ ClassDefinition.IS_EXPORT) | 0) | ClassDefinition.IS_STATIC) | 0));
+	staticFuncDef.setFlags$N(funcDef.flags$() & ~ ClassDefinition.IS_EXPORT | ClassDefinition.IS_STATIC);
 	thisArg = new ArgumentDeclaration(new Token$2("$this", false), new ObjectType(classDef));
 	staticFuncDef.getArguments$().unshift(thisArg);
 	staticFuncDef.forEachStatement$F$LStatement$B$((function onStatement(statement) {
@@ -19807,7 +19809,7 @@ _StaticizeOptimizeCommand.prototype._rewriteMethodCallsToStatic$LExpression$F$LE
 			if (calleeExpr instanceof PropertyExpression && ! calleeExpr.getExpr$().isClassSpecifier$() && ! calleeExpr.getType$().isAssignable$()) {
 				propertyExpr = calleeExpr;
 				receiverType = propertyExpr.getExpr$().getType$().resolveIfNullable$();
-				if ((((receiverType.getClassDef$().flags$() & (((ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN) | 0))) | 0)) === 0) {
+				if ((receiverType.getClassDef$().flags$() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) === 0) {
 					funcDef = $this._findFunctionInClassTree$LClassDefinition$SALType$B(receiverType.getClassDef$(), propertyExpr.getIdentifierToken$().getValue$(), propertyExpr.getType$().getArgumentTypes$(), false);
 					if (funcDef != null && (newName = $this.getStash$LStashable$(funcDef).altName) != null) {
 						onExpr(propertyExpr.getExpr$(), (function (expr) {
@@ -19825,7 +19827,7 @@ _StaticizeOptimizeCommand.prototype._rewriteMethodCallsToStatic$LExpression$F$LE
 			funcDef = $this._findFunctionInClassTree$LClassDefinition$SALType$B(classDef, superExpr.getName$().getValue$(), superExpr.getFunctionType$().getArgumentTypes$(), false);
 			if (funcDef != null && (newName = $this.getStash$LStashable$(funcDef).altName) != null) {
 				Util$forEachExpression$F$LExpression$F$LExpression$V$B$ALExpression$(onExpr, superExpr.getArguments$());
-				if ((((rewritingFuncDef.flags$() & ClassDefinition.IS_STATIC) | 0)) !== 0) {
+				if ((rewritingFuncDef.flags$() & ClassDefinition.IS_STATIC) !== 0) {
 					thisArg = rewritingFuncDef.getArguments$()[0];
 					thisVar = new LocalExpression(thisArg.getName$(), thisArg);
 				} else {
@@ -19870,7 +19872,7 @@ _UnclassifyOptimizationCommand.prototype.performOptimization$ = function () {
 	classDefs.forEach((function (classDef) {
 		$this.log$S("unclassifying class: " + classDef.className$());
 		classDef.forEachMemberFunction$F$LMemberFunctionDefinition$B$((function onFunction(funcDef) {
-			if ((((funcDef.flags$() & ClassDefinition.IS_STATIC) | 0)) === 0 && funcDef.name$() !== "constructor") {
+			if ((funcDef.flags$() & ClassDefinition.IS_STATIC) === 0 && funcDef.name$() !== "constructor") {
 				$this.log$S("rewriting method to static function: " + funcDef.name$());
 				$this._rewriteFunctionAsStatic$LMemberFunctionDefinition$(funcDef);
 			}
@@ -19894,7 +19896,7 @@ _UnclassifyOptimizationCommand.prototype.performOptimization$ = function () {
 		}
 		classDef.forEachMemberFunction$F$LMemberFunctionDefinition$B$(onFunction);
 		classDef.forEachMemberVariable$F$LMemberVariableDefinition$B$((function (varDef) {
-			if ((((varDef.flags$() & ClassDefinition.IS_STATIC) | 0)) !== 0) {
+			if ((varDef.flags$() & ClassDefinition.IS_STATIC) !== 0) {
 				if (varDef.getInitialValue$() != null) {
 					$this._rewriteMethodCallsToStatic$LExpression$F$LExpression$V$ALClassDefinition$(varDef.getInitialValue$(), (function (expr) {
 						varDef.setInitialValue$LExpression$(expr);
@@ -19915,8 +19917,8 @@ _UnclassifyOptimizationCommand.prototype._getClassesToUnclassify$ = function () 
 	var hasInlineableCtor;
 	candidates = [];
 	this.getCompiler$().forEachClassDef$F$LParser$LClassDefinition$B$((function (parser, classDef) {
-		if ((((classDef.flags$() & (((((ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE) | 0) | ClassDefinition.IS_EXPORT) | 0))) | 0)) === ClassDefinition.IS_FINAL && classDef.extendType$().getClassDef$().className$() === "Object" && classDef.implementTypes$().length === 0 && classDef.forEachMemberFunction$F$LMemberFunctionDefinition$B$((function (funcDef) {
-			return (((funcDef.flags$() & (((ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_EXPORT) | 0))) | 0)) === 0;
+		if ((classDef.flags$() & (ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE | ClassDefinition.IS_EXPORT)) === ClassDefinition.IS_FINAL && classDef.extendType$().getClassDef$().className$() === "Object" && classDef.implementTypes$().length === 0 && classDef.forEachMemberFunction$F$LMemberFunctionDefinition$B$((function (funcDef) {
+			return (funcDef.flags$() & (ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_EXPORT)) === 0;
 		}))) {
 			candidates.push(classDef);
 		}
@@ -19962,7 +19964,7 @@ _UnclassifyOptimizationCommand.prototype._getClassesToUnclassify$ = function () 
 		}
 		classDef.forEachMemberFunction$F$LMemberFunctionDefinition$B$(onFunction);
 		classDef.forEachMemberVariable$F$LMemberVariableDefinition$B$((function (varDef) {
-			if ((((varDef.flags$() & ClassDefinition.IS_STATIC) | 0)) !== 0) {
+			if ((varDef.flags$() & ClassDefinition.IS_STATIC) !== 0) {
 				if (varDef.getInitialValue$() != null) {
 					onExpr(varDef.getInitialValue$());
 				}
@@ -19975,7 +19977,7 @@ _UnclassifyOptimizationCommand.prototype._getClassesToUnclassify$ = function () 
 		hasInlineableCtor = false;
 		candidates[candidateIndex].forEachMemberFunction$F$LMemberFunctionDefinition$B$((function (funcDef) {
 			var inliner;
-			if ((((funcDef.flags$() & ClassDefinition.IS_STATIC) | 0)) === 0 && funcDef.name$() === "constructor") {
+			if ((funcDef.flags$() & ClassDefinition.IS_STATIC) === 0 && funcDef.name$() === "constructor") {
 				inliner = $this._createInliner$LMemberFunctionDefinition$(funcDef);
 				$this.log$S(funcDef.getNotation$() + " is" + (inliner ? "" : " not") + " inlineable");
 				if (inliner) {
@@ -20013,7 +20015,7 @@ _UnclassifyOptimizationCommand.prototype._createInliner$LMemberFunctionDefinitio
 	}
 	propertyNames = [];
 	funcDef.getClassDef$().forEachMemberVariable$F$LMemberVariableDefinition$B$((function (member) {
-		if ((((member.flags$() & ClassDefinition.IS_STATIC) | 0)) === 0) {
+		if ((member.flags$() & ClassDefinition.IS_STATIC) === 0) {
 			propertyNames.push(member.name$());
 		}
 		return true;
@@ -20126,7 +20128,7 @@ _UnclassifyOptimizationCommand.prototype._rewriteFunctionAsStatic$LMemberFunctio
 			return expr.forEachExpression$F$LExpression$F$LExpression$V$B$(onExpr);
 		})) && statement.forEachStatement$F$LStatement$B$(onStatement);
 	}));
-	funcDef.setFlags$N(((funcDef.flags$() | ClassDefinition.IS_STATIC) | 0));
+	funcDef.setFlags$N(funcDef.flags$() | ClassDefinition.IS_STATIC);
 };
 
 
@@ -20222,7 +20224,7 @@ _FoldConstantCommand.prototype._optimizeExpression$LExpression$F$LExpression$V$ 
 				}
 				return member == null;
 			}));
-			if (member != null && (((member.flags$() & ClassDefinition.IS_CONST) | 0)) !== 0) {
+			if (member != null && (member.flags$() & ClassDefinition.IS_CONST) !== 0) {
 				this._foldStaticConst$LMemberVariableDefinition$(member);
 				foldedExpr = this._toFoldedExpr$LExpression$LType$(member.getInitialValue$(), member.getType$());
 				if (foldedExpr != null) {
@@ -20338,7 +20340,7 @@ _FoldConstantCommand.prototype._foldCallExpression$LCallExpression$F$LExpression
 	var recvStr;
 	propertyExpr = callExpr.getExpr$();
 	holderType = propertyExpr.getHolderType$();
-	if ((((holderType.getClassDef$().flags$() & ClassDefinition.IS_NATIVE) | 0)) === 0) {
+	if ((holderType.getClassDef$().flags$() & ClassDefinition.IS_NATIVE) === 0) {
 		return;
 	}
 	function argAsNumber(index) {
@@ -20351,7 +20353,7 @@ _FoldConstantCommand.prototype._foldCallExpression$LCallExpression$F$LExpression
 		}
 		return member == null;
 	}));
-	if (member != null && (((member.flags$() & ClassDefinition.IS_PURE) | 0)) === 0) {
+	if (member != null && (member.flags$() & ClassDefinition.IS_PURE) === 0) {
 		return;
 	}
 	if (propertyExpr.getExpr$().isClassSpecifier$()) {
@@ -20528,17 +20530,17 @@ _FoldConstantCommand.prototype._foldNumericBinaryExpressionOfConstants$LBinaryEx
 		break;
 	case "&":
 		this._foldNumericBinaryExpressionAsInteger$LBinaryExpression$F$LExpression$V$F$III$(expr, replaceCb, (function (x, y) {
-			return ((x & y) | 0);
+			return x & y;
 		}));
 		break;
 	case "|":
 		this._foldNumericBinaryExpressionAsInteger$LBinaryExpression$F$LExpression$V$F$III$(expr, replaceCb, (function (x, y) {
-			return ((x | y) | 0);
+			return x | y;
 		}));
 		break;
 	case "^":
 		this._foldNumericBinaryExpressionAsInteger$LBinaryExpression$F$LExpression$V$F$III$(expr, replaceCb, (function (x, y) {
-			return ((x ^ y) | 0);
+			return x ^ y;
 		}));
 		break;
 	case "<":
@@ -20581,7 +20583,7 @@ _FoldConstantCommand.prototype._foldNumericBinaryExpressionAsInteger$LBinaryExpr
 	var value;
 	value = calcCb((+expr.getFirstExpr$().getToken$().getValue$() | 0), (+expr.getSecondExpr$().getToken$().getValue$() | 0));
 	this.log$S("folding operator " + expr.getToken$().getNotation$() + " to int: " + (value + ""));
-	if (value !== (((value | 0) | 0))) {
+	if (value !== (value | 0)) {
 		throw new Error("value is not an integer");
 	}
 	replaceCb(new IntegerLiteralExpression(new Token$3(value + "")));
@@ -20925,7 +20927,7 @@ _DeadCodeEliminationOptimizeCommand.prototype._delayAssignmentsBetweenLocals$LMe
 			}
 		} else if (expr instanceof CallExpression) {
 			callingFuncDef = _DetermineCalleeCommand$getCallingFuncDef$LStashable$(expr);
-			if (callingFuncDef != null && (((callingFuncDef.flags$() & ClassDefinition.IS_PURE) | 0)) !== 0) {
+			if (callingFuncDef != null && (callingFuncDef.flags$() & ClassDefinition.IS_PURE) !== 0) {
 			} else {
 				expr.forEachExpression$F$LExpression$F$LExpression$V$B$(onExpr);
 				if (funcDef.getParent$() != null || funcDef.getClosures$().length !== 0) {
@@ -21300,7 +21302,7 @@ _InlineOptimizeCommand.prototype._getArgsAndThisIfCallExprIsInlineable$LCallExpr
 	this.log$S("optimizing calling function " + callingFuncDef.getNotation$());
 	this.optimizeFunction$LMemberFunctionDefinition$(callingFuncDef);
 	receiverExpr = null;
-	if ((((callingFuncDef.flags$() & ClassDefinition.IS_STATIC) | 0)) === 0) {
+	if ((callingFuncDef.flags$() & ClassDefinition.IS_STATIC) === 0) {
 		calleeExpr = callExpr.getExpr$();
 		if (! (calleeExpr instanceof PropertyExpression)) {
 			throw new Error("unexpected type of expression");
@@ -21395,7 +21397,7 @@ _InlineOptimizeCommand.prototype._functionIsInlineable$LMemberFunctionDefinition
 			if (statements == null) {
 				return false;
 			}
-			requestsInline = (((funcDef.flags$() & ClassDefinition.IS_INLINE) | 0)) !== 0;
+			requestsInline = (funcDef.flags$() & ClassDefinition.IS_INLINE) !== 0;
 			if (requestsInline) {
 			} else if (! $this._isWorthInline$LMemberFunctionDefinition$(funcDef)) {
 				return false;
@@ -21554,7 +21556,7 @@ _InlineOptimizeCommand.prototype._createVarsAndInit$LMemberFunctionDefinition$LM
 		return new LocalExpression(tempVar.getName$(), tempVar);
 	}
 	argUsed = this._countNumberOfArgsUsed$LMemberFunctionDefinition$(calleeFuncDef);
-	if ((((calleeFuncDef.flags$() & ClassDefinition.IS_STATIC) | 0)) === 0) {
+	if ((calleeFuncDef.flags$() & ClassDefinition.IS_STATIC) === 0) {
 		thisIdx = argsAndThisAndLocals.length - 1;
 		recvExpr = argsAndThisAndLocals[thisIdx];
 		if (! (recvExpr instanceof LeafExpression || _Util$0$exprIsIndependent$LExpression$(recvExpr) && argUsed["this"] <= 1)) {
@@ -21624,7 +21626,7 @@ _InlineOptimizeCommand.prototype._rewriteExpression$LExpression$LExpression$F$LE
 
 _InlineOptimizeCommand.prototype._functionHasThis$LMemberFunctionDefinition$ = function (funcDef) {
 	do {
-		if ((((funcDef.flags$() & ClassDefinition.IS_STATIC) | 0)) === 0) {
+		if ((funcDef.flags$() & ClassDefinition.IS_STATIC) === 0) {
 			return true;
 		}
 	} while ((funcDef = funcDef.getParent$()) != null);
@@ -22009,7 +22011,7 @@ _UnboxOptimizeCommand.prototype._newExpressionCanUnbox$LExpression$ = function (
 	var $this = this;
 	var ctor;
 	var stash;
-	if ((((newExpr.getType$().getClassDef$().flags$() & ClassDefinition.IS_NATIVE) | 0)) !== 0) {
+	if ((newExpr.getType$().getClassDef$().flags$() & ClassDefinition.IS_NATIVE) !== 0) {
 		return false;
 	}
 	ctor = _DetermineCalleeCommand$getCallingFuncDef$LStashable$(newExpr);
@@ -22058,7 +22060,7 @@ _UnboxOptimizeCommand.prototype._unboxVariable$LMemberFunctionDefinition$LLocalV
 	variableMap = {};
 	local.getType$().getClassDef$().forEachClassFromBase$F$LClassDefinition$B$((function (classDef) {
 		classDef.forEachMemberVariable$F$LMemberVariableDefinition$B$((function (member) {
-			if ((((member.flags$() & (((ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT) | 0))) | 0)) === 0) {
+			if ((member.flags$() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_ABSTRACT)) === 0) {
 				variableMap[member.name$()] = $this.createVar$LMemberFunctionDefinition$LType$S(funcDef, member.getType$(), local.getName$().getValue$() + "$" + member.name$());
 			}
 			return true;
@@ -22321,7 +22323,7 @@ _NoDebugCommand.prototype.performOptimization$ = function () {
 		if (classDef.className$() === "JSX") {
 			classDef.forEachMemberVariable$F$LMemberVariableDefinition$B$((function (memberVariable) {
 				var falseExpr;
-				if (memberVariable.name$() === "DEBUG" && (((memberVariable.flags$() & ClassDefinition.IS_STATIC) | 0)) !== 0) {
+				if (memberVariable.name$() === "DEBUG" && (memberVariable.flags$() & ClassDefinition.IS_STATIC) !== 0) {
 					$this.log$S("set JSX.DEBUG = " + (stash.debugValue + ""));
 					falseExpr = new BooleanLiteralExpression(new Token$2(stash.debugValue + "", true));
 					memberVariable.setInitialValue$LExpression$(falseExpr);
@@ -22346,7 +22348,7 @@ _TailRecursionOptimizeCommand.prototype.optimizeFunction$LMemberFunctionDefiniti
 	var altered;
 	var statements;
 	var body;
-	if ((((funcDef.flags$() & (((((ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_ABSTRACT) | 0) | ClassDefinition.IS_NATIVE) | 0))) | 0)) !== 0 || (((funcDef.flags$() & (((ClassDefinition.IS_STATIC | ClassDefinition.IS_FINAL) | 0))) | 0)) === 0) {
+	if ((funcDef.flags$() & (ClassDefinition.IS_OVERRIDE | ClassDefinition.IS_ABSTRACT | ClassDefinition.IS_NATIVE)) !== 0 || (funcDef.flags$() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_FINAL)) === 0) {
 		return false;
 	}
 	altered = false;
@@ -22801,7 +22803,7 @@ Compiler.prototype._generateCode$ALCompileError$ = function (errors) {
 	for (i = 0; i < this._parsers.length; ++i) {
 		classDefs = classDefs.concat(this._parsers[i].getClassDefs$());
 		this._parsers[i].getTemplateClassDefs$().forEach((function (templateClassDef) {
-			if ((((templateClassDef.flags$() & ClassDefinition.IS_NATIVE) | 0)) !== 0 && templateClassDef.getNativeSource$() != null) {
+			if ((templateClassDef.flags$() & ClassDefinition.IS_NATIVE) !== 0 && templateClassDef.getNativeSource$() != null) {
 				classDefs.push(templateClassDef);
 			}
 		}));
@@ -22814,7 +22816,7 @@ Compiler.prototype._generateCode$ALCompileError$ = function (errors) {
 	nativeClassNames = {};
 	foundConflict = false;
 	classDefs.forEach((function (classDef) {
-		if ((((classDef.flags$() & ClassDefinition.IS_NATIVE) | 0)) === 0) {
+		if ((classDef.flags$() & ClassDefinition.IS_NATIVE) === 0) {
 			return;
 		}
 		if ($__jsx_ObjectHasOwnProperty.call(nativeClassNames, classDef.className$()) && ! (classDef instanceof InstantiatedClassDefinition && nativeClassNames[classDef.className$()] instanceof InstantiatedClassDefinition && classDef.getTemplateClass$() == nativeClassNames[classDef.className$()].getTemplateClass$()) && classDef.getNativeSource$() == null && classDef.getOuterClassDef$() == null) {
@@ -22847,7 +22849,7 @@ Compiler.prototype._generateCode$ALCompileError$ = function (errors) {
 		throw new Error("logic flaw, could not find class definition of '" + deps[0].className$() + "'");
 	});
 	for (i = 0; i < classDefs.length; ) {
-		if ((((classDefs[i].flags$() & ClassDefinition.IS_NATIVE) | 0)) !== 0) {
+		if ((classDefs[i].flags$() & ClassDefinition.IS_NATIVE) !== 0) {
 			maxIndexOfClasses = - 1;
 		} else {
 			deps = classDefs[i].implementTypes$().map((function (t) {
@@ -22877,19 +22879,19 @@ Compiler.prototype._exportEntryPoints$ = function () {
 	this.forEachClassDef$F$LParser$LClassDefinition$B$((function (parser, classDef) {
 		switch (classDef.classFullName$()) {
 		case "_Main":
-			classDef.setFlags$N(((classDef.flags$() | ClassDefinition.IS_EXPORT) | 0));
+			classDef.setFlags$N(classDef.flags$() | ClassDefinition.IS_EXPORT);
 			classDef.forEachMemberFunction$F$LMemberFunctionDefinition$B$((function (funcDef) {
-				if ((((funcDef.flags$() & ClassDefinition.IS_STATIC) | 0)) !== 0 && funcDef.name$() === "main" && funcDef.getArguments$().length === 1 && Util$isArrayOf$LClassDefinition$LType$(funcDef.getArgumentTypes$()[0].getClassDef$(), Type.stringType)) {
-					funcDef.setFlags$N(((funcDef.flags$() | ClassDefinition.IS_EXPORT) | 0));
+				if ((funcDef.flags$() & ClassDefinition.IS_STATIC) !== 0 && funcDef.name$() === "main" && funcDef.getArguments$().length === 1 && Util$isArrayOf$LClassDefinition$LType$(funcDef.getArgumentTypes$()[0].getClassDef$(), Type.stringType)) {
+					funcDef.setFlags$N(funcDef.flags$() | ClassDefinition.IS_EXPORT);
 				}
 				return true;
 			}));
 			break;
 		case "_Test":
-			classDef.setFlags$N(((classDef.flags$() | ClassDefinition.IS_EXPORT) | 0));
+			classDef.setFlags$N(classDef.flags$() | ClassDefinition.IS_EXPORT);
 			classDef.forEachMemberFunction$F$LMemberFunctionDefinition$B$((function (funcDef) {
-				if ((((funcDef.flags$() & ClassDefinition.IS_STATIC) | 0)) === 0 && (funcDef.name$().match(/^test/) || funcDef.name$() === "constructor") && funcDef.getArguments$().length === 0) {
-					funcDef.setFlags$N(((funcDef.flags$() | ClassDefinition.IS_EXPORT) | 0));
+				if ((funcDef.flags$() & ClassDefinition.IS_STATIC) === 0 && (funcDef.name$().match(/^test/) || funcDef.name$() === "constructor") && funcDef.getArguments$().length === 0) {
+					funcDef.setFlags$N(funcDef.flags$() | ClassDefinition.IS_EXPORT);
 				}
 				return true;
 			}));
@@ -23053,9 +23055,9 @@ function CompletionCandidates$makeClassCandidate$LClassDefinition$(classDef) {
 	data.word = classDef.className$();
 	data.definedFilename = classDef.getToken$().getFilename$();
 	data.definedLineNumber = classDef.getToken$().getLineNumber$();
-	if ((((classDef.flags$() & ClassDefinition.IS_INTERFACE) | 0)) !== 0) {
+	if ((classDef.flags$() & ClassDefinition.IS_INTERFACE) !== 0) {
 		data.kind = "interface";
-	} else if ((((classDef.flags$() & ClassDefinition.IS_MIXIN) | 0)) !== 0) {
+	} else if ((classDef.flags$() & ClassDefinition.IS_MIXIN) !== 0) {
 		data.kind = "mixin";
 	} else {
 		data.kind = "class";
@@ -23224,7 +23226,7 @@ _CompletionCandidatesOfProperty.prototype.getCandidates$AHX = function (candidat
 	isStatic = this._expr.isClassSpecifier$();
 	classDef.forEachClassToBase$F$LClassDefinition$B$((function (c) {
 		c.forEachMember$F$LMemberDefinition$B$((function (member) {
-			if (((((member.flags$() & ClassDefinition.IS_STATIC) | 0)) !== 0) === isStatic) {
+			if (((member.flags$() & ClassDefinition.IS_STATIC) !== 0) === isStatic) {
 				if (! isStatic && member.name$() === "constructor") {
 					return true;
 				}
@@ -23242,7 +23244,7 @@ function _CompletionCandidatesOfProperty$_makeMemberCandidate$LMemberDefinition$
 	var data;
 	var docComment;
 	var mf;
-	kind = (((member.flags$() & ClassDefinition.IS_STATIC) | 0) ? "static member" : "member");
+	kind = (member.flags$() & ClassDefinition.IS_STATIC ? "static member" : "member");
 	kind += (member instanceof MemberFunctionDefinition ? " function" : " variable");
 	data = {};
 	data.word = member.name$();
@@ -23511,9 +23513,9 @@ DocumentGenerator.prototype._buildDocOfClass$LParser$LClassDefinition$ = functio
 	var typeArgs;
 	_ = "";
 	typeName = "class";
-	if ((((classDef.flags$() & ClassDefinition.IS_INTERFACE) | 0)) !== 0) {
+	if ((classDef.flags$() & ClassDefinition.IS_INTERFACE) !== 0) {
 		typeName = "interface";
-	} else if ((((classDef.flags$() & ClassDefinition.IS_MIXIN) | 0)) !== 0) {
+	} else if ((classDef.flags$() & ClassDefinition.IS_MIXIN) !== 0) {
 		typeName = "mixin";
 	}
 	typeArgs = (classDef instanceof TemplateClassDefinition ? classDef.getTypeArguments$() : []);
@@ -23557,7 +23559,7 @@ DocumentGenerator.prototype._buildDocOfClass$LParser$LClassDefinition$ = functio
 		}));
 	}
 	classDef.forEachMemberFunction$F$LMemberFunctionDefinition$B$((function (funcDef) {
-		if (! (funcDef instanceof InstantiatedMemberFunctionDefinition) && $this._isConstructor$LMemberFunctionDefinition$(funcDef) && (((funcDef.flags$() & ClassDefinition.IS_DELETE) | 0)) === 0 && ! $this._isPrivate$LMemberDefinition$(funcDef)) {
+		if (! (funcDef instanceof InstantiatedMemberFunctionDefinition) && $this._isConstructor$LMemberFunctionDefinition$(funcDef) && (funcDef.flags$() & ClassDefinition.IS_DELETE) === 0 && ! $this._isPrivate$LMemberDefinition$(funcDef)) {
 			_ += $this._buildDocOfFunction$LParser$LMemberFunctionDefinition$(parser, funcDef).replace(/\n$/, "");
 			_ += "\n";
 		}
@@ -23608,8 +23610,8 @@ DocumentGenerator.prototype._buildDocOfFunction$LParser$LMemberFunctionDefinitio
 	var args;
 	var argsHTML;
 	_ = "";
-	ignoreFlags = ((((funcDef.getClassDef$().flags$() & (((ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE) | 0))) | 0) | ClassDefinition.IS_INLINE) | 0);
-	funcName = (this._isConstructor$LMemberFunctionDefinition$(funcDef) ? "new " + this._name$S(funcDef.getClassDef$().classFullName$()) : this._flagsToHTML$N(((funcDef.flags$() & ~ ignoreFlags) | 0)) + " function " + this._name$S(funcDef.name$()));
+	ignoreFlags = funcDef.getClassDef$().flags$() & (ClassDefinition.IS_FINAL | ClassDefinition.IS_NATIVE) | ClassDefinition.IS_INLINE;
+	funcName = (this._isConstructor$LMemberFunctionDefinition$(funcDef) ? "new " + this._name$S(funcDef.getClassDef$().classFullName$()) : this._flagsToHTML$N(funcDef.flags$() & ~ ignoreFlags) + " function " + this._name$S(funcDef.name$()));
 	args = funcDef.getArguments$();
 	argsHTML = args.map((function (arg) {
 		return $this._escape$S(arg.getName$().getValue$()) + " : " + $this._typeToHTML$LParser$LType$(parser, arg.getType$());
@@ -23792,31 +23794,31 @@ DocumentGenerator.prototype._classDefToHTML$LParser$LClassDefinition$ = function
 DocumentGenerator.prototype._flagsToHTML$N = function (flags) {
 	var strs;
 	strs = [];
-	if ((((flags & ClassDefinition.IS_STATIC) | 0)) !== 0) {
+	if ((flags & ClassDefinition.IS_STATIC) !== 0) {
 		strs.push("static");
 	}
-	if ((((flags & ClassDefinition.IS_CONST) | 0)) !== 0) {
+	if ((flags & ClassDefinition.IS_CONST) !== 0) {
 		strs.push("const");
 	}
-	if ((((flags & ClassDefinition.IS_READONLY) | 0)) !== 0) {
+	if ((flags & ClassDefinition.IS_READONLY) !== 0) {
 		strs.push("__readonly__");
 	}
-	if ((((flags & ClassDefinition.IS_ABSTRACT) | 0)) !== 0) {
+	if ((flags & ClassDefinition.IS_ABSTRACT) !== 0) {
 		strs.push("abstract");
 	}
-	if ((((flags & ClassDefinition.IS_FINAL) | 0)) !== 0) {
+	if ((flags & ClassDefinition.IS_FINAL) !== 0) {
 		strs.push("final");
 	}
-	if ((((flags & ClassDefinition.IS_OVERRIDE) | 0)) !== 0) {
+	if ((flags & ClassDefinition.IS_OVERRIDE) !== 0) {
 		strs.push("override");
 	}
-	if ((((flags & ClassDefinition.IS_INLINE) | 0)) !== 0) {
+	if ((flags & ClassDefinition.IS_INLINE) !== 0) {
 		strs.push("inline");
 	}
-	if ((((flags & ClassDefinition.IS_NATIVE) | 0)) !== 0) {
+	if ((flags & ClassDefinition.IS_NATIVE) !== 0) {
 		strs.push("native");
 	}
-	if ((((flags & ClassDefinition.IS_EXPORT) | 0)) !== 0) {
+	if ((flags & ClassDefinition.IS_EXPORT) !== 0) {
 		strs.push("__export__");
 	}
 	return strs.join(" ");
@@ -23885,7 +23887,7 @@ DocumentGenerator.prototype._getDescriptionOfNamedArgument$LDocComment$S = funct
 
 
 DocumentGenerator.prototype._isConstructor$LMemberFunctionDefinition$ = function (funcDef) {
-	return funcDef.name$() === "constructor" && (((funcDef.flags$() & ClassDefinition.IS_STATIC) | 0)) === 0;
+	return funcDef.name$() === "constructor" && (funcDef.flags$() & ClassDefinition.IS_STATIC) === 0;
 };
 
 
@@ -23895,7 +23897,7 @@ DocumentGenerator.prototype._isPrivate$LClassDefinition$ = function (classDef) {
 
 
 DocumentGenerator.prototype._isPrivate$LMemberDefinition$ = function (memberDef) {
-	return !! (memberDef.name$().charAt(0) === "_" || memberDef.getDocComment$() && memberDef.getDocComment$().getTagByName$S('private') || (((memberDef.flags$() & ClassDefinition.IS_GENERATED) | 0)) !== 0);
+	return !! (memberDef.name$().charAt(0) === "_" || memberDef.getDocComment$() && memberDef.getDocComment$().getTagByName$S('private') || (memberDef.flags$() & ClassDefinition.IS_GENERATED) !== 0);
 };
 
 
@@ -25141,7 +25143,7 @@ _Minifier$x2E_MinifyingNamer.prototype.getNameOfStaticFunction$LClassDefinition$
 _Minifier$x2E_MinifyingNamer.prototype.getNameOfConstructor$LClassDefinition$ALType$ = function (classDef, argTypes) {
 	var name;
 	var mangledName;
-	if ((((classDef.flags$() & ClassDefinition.IS_NATIVE) | 0)) !== 0) {
+	if ((classDef.flags$() & ClassDefinition.IS_NATIVE) !== 0) {
 		name = _Util$getNameOfNativeConstructor$LClassDefinition$(classDef);
 		if (this._isCounting$()) {
 			_Minifier$_incr$HNS(this._minifier._globalUseCount, name);
@@ -25164,7 +25166,7 @@ _Minifier$x2E_MinifyingNamer.prototype.getNameOfClass$LClassDefinition$ = functi
 	if (this._isCounting$()) {
 		_Minifier$_incr$HNS(this._minifier._globalUseCount, name);
 	}
-	if ((((classDef.flags$() & (((ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE) | 0))) | 0)) === 0 && ! this._isCounting$()) {
+	if ((classDef.flags$() & (ClassDefinition.IS_NATIVE | ClassDefinition.IS_FAKE)) === 0 && ! this._isCounting$()) {
 		return this._minifier._globalConversionTable[name];
 	}
 	return name;
@@ -25473,6 +25475,9 @@ $__jsx_lazy_init(_LogicalExpressionEmitter, "_operatorPrecedence", function () {
 $__jsx_lazy_init(_ShiftExpressionEmitter, "_operatorPrecedence", function () {
 	return {};
 });
+$__jsx_lazy_init(_BinaryNumberExpressionEmitter, "_OPS_RETURNING_INT", function () {
+	return ({ '&': true, '|': true, '^': true });
+});
 $__jsx_lazy_init(_BinaryNumberExpressionEmitter, "_operatorPrecedence", function () {
 	return {};
 });
@@ -25499,8 +25504,8 @@ $__jsx_lazy_init(NodePlatform, "_isColorSupported", function () {
 });
 Meta.VERSION_STRING = "0.9.72";
 Meta.VERSION_NUMBER = 0.009072;
-Meta.LAST_COMMIT_HASH = "f82369af9e74eb683e78096905a5795cdb8c8615";
-Meta.LAST_COMMIT_DATE = "2014-01-16 18:56:32 +0900";
+Meta.LAST_COMMIT_HASH = "868dbae0e68730a8d02f4226fe2685b7a4a365dd";
+Meta.LAST_COMMIT_DATE = "2014-01-17 10:58:41 +0900";
 $__jsx_lazy_init(Meta, "IDENTIFIER", function () {
 	return Meta.VERSION_STRING + " (" + Meta.LAST_COMMIT_DATE + "; " + Meta.LAST_COMMIT_HASH + ")";
 });
