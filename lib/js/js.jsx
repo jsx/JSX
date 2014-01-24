@@ -48,6 +48,11 @@ final native class js {
 	 */
 	static function eval(jsSource : string) : variant;
 
+	/**
+	 * new Function
+	 */
+	static function newFunction(...argsAndBody : string) : variant;
+
 } = """(function () {
 	var global = (function () { return this; }());
 	return {
@@ -55,6 +60,7 @@ final native class js {
 		eval: global.eval,
 		invoke: function(invocant, methodName, args) {
 			return invocant[methodName].apply(invocant, args);
-		}
+		},
+		newFunction: Function
 	};
 }())""";
