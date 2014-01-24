@@ -241,7 +241,7 @@ class Compiler {
 		if (imprt instanceof WildcardImport) {
 			var wildImprt = imprt as WildcardImport;
 			// read the files from a directory
-			var resolvedDir = this._resolvePath(wildImprt.getFilenameToken().getFilename(), wildImprt.getDirectory());
+			var resolvedDir = this._resolvePath(wildImprt.getFilenameToken().getFilename(), wildImprt.getDirectory(), true);
 			var files = new string[];
 			try {
 				files = this._platform.getFilesInDirectory(resolvedDir);
@@ -268,7 +268,7 @@ class Compiler {
 			}
 		} else {
 			// read one file
-			var path = this._resolvePath(imprt.getFilenameToken().getFilename(), Util.decodeStringLiteral(imprt.getFilenameToken().getValue()));
+			var path = this._resolvePath(imprt.getFilenameToken().getFilename(), Util.decodeStringLiteral(imprt.getFilenameToken().getValue()), false);
 			if (path == parser.getPath()) {
 				errors.push(new CompileError(imprt.getFilenameToken(), "cannot import itself"));
 				return false;
@@ -519,7 +519,7 @@ class Compiler {
 		return ! isFatal;
 	}
 
-	function _resolvePathFromNodeModules (srcDir : string, givenPath : string) : string {
+	function _resolvePathFromNodeModules (srcDir : string, givenPath : string, isWildcard : boolean) : string {
 
 		var firstSlashAtGivenPath = givenPath.indexOf("/");
 		var moduleName = firstSlashAtGivenPath != -1 ? givenPath.substring(0, firstSlashAtGivenPath) : givenPath;
@@ -544,12 +544,13 @@ class Compiler {
 				}
 			}
 
-			if (firstSlashAtGivenPath != -1) {
+			if (isWildcard || firstSlashAtGivenPath != -1) {
 				// if given path is package/filename, then return a filename relative to package.json/[directories]/[lib] (or default to "lib")
 				var libDir = packageJson["directories"] && packageJson["directories"]["lib"]
 					? packageJson["directories"]["lib"] as string
 					: "lib";
-				return Util.resolvePath(moduleDir + "/" + libDir + "/" + givenPath.substring(firstSlashAtGivenPath + 1));
+				var subPathWithLeadingSlash = firstSlashAtGivenPath != -1 ? givenPath.substring(firstSlashAtGivenPath): "";
+				return Util.resolvePath(moduleDir + "/" + libDir + subPathWithLeadingSlash);
 			} else {
 				// given path did not contain "/", so return package.json/[main] or "index.jsx"
 				var main = packageJson["main"] ? packageJson["main"] as string : "index.jsx";
@@ -574,10 +575,10 @@ class Compiler {
 		return "";
 	}
 
-	function _resolvePath (srcPath : string, givenPath : string) : string {
+	function _resolvePath (srcPath : string, givenPath : string, isWildcard : boolean) : string {
 		if (givenPath.match(/^\.{1,2}\//) == null) {
 			// search the file from srcPath/node_modulues (handled before --add-search-path since the library-level prefs should be preferred over global-level)
-			var path = this._resolvePathFromNodeModules(Util.dirname(srcPath), givenPath);
+			var path = this._resolvePathFromNodeModules(Util.dirname(srcPath), givenPath, isWildcard);
 			if (path != "")
 				return path;
 			// search the file from [one-of-the-search-paths]/givenPath
