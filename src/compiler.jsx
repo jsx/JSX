@@ -519,16 +519,77 @@ class Compiler {
 		return ! isFatal;
 	}
 
+	function _resolvePathFromNodeModules (srcDir : string, givenPath : string) : string {
+
+		var firstSlashAtGivenPath = givenPath.indexOf("/");
+		var moduleName = firstSlashAtGivenPath != -1 ? givenPath.substring(0, firstSlashAtGivenPath) : givenPath;
+
+		// search for givenPath in given "node_modules" dir
+		function lookupInNodeModules(nodeModulesDir : string) : string {
+			var moduleDir = nodeModulesDir + "/" + moduleName;
+
+			// return if module does not exist
+			if (! this._platform.fileExists(moduleDir)) {
+				return "";
+			}
+
+			// found the package, read package.json
+			var packageJson : variant = {} : Map.<variant>;
+			if (this._platform.fileExists(moduleDir + "/package.json")) {
+				try {
+					var packageJsonRaw = this._platform.load(moduleDir + "/package.json");
+					packageJson = JSON.parse(packageJsonRaw);
+				} catch (e : variant) {
+					this._platform.warn("could not parse file:" + moduleDir + "/package.json");
+				}
+			}
+
+			if (firstSlashAtGivenPath != -1) {
+				// if given path is package/filename, then return a filename relative to package.json/[directories]/[lib] (or default to "lib")
+				var libDir = packageJson["directories"] && packageJson["directories"]["lib"]
+					? packageJson["directories"]["lib"] as string
+					: "lib";
+				return Util.resolvePath(moduleDir + "/" + libDir + "/" + givenPath.substring(firstSlashAtGivenPath + 1));
+			} else {
+				// given path did not contain "/", so return package.json/[main] or "index.jsx"
+				var main = packageJson["main"] ? packageJson["main"] as string : "index.jsx";
+				return Util.resolvePath(moduleDir + "/" + main);
+			}
+		}
+
+		// lookup dependencies (from "srcDir/node_modules", "srcDir/../../node_modules", ...)
+		while (true) {
+			var path = lookupInNodeModules(srcDir + "/node_modules");
+			if (path != "") {
+				return path;
+			}
+			// lookup parent dependencies
+			var match = srcDir.match(/^(.*)\/node_modules\/[^\/]+$/);
+			if (match == null) {
+				break;
+			}
+			srcDir = match[1];
+		}
+
+		return "";
+	}
+
 	function _resolvePath (srcPath : string, givenPath : string) : string {
 		if (givenPath.match(/^\.{1,2}\//) == null) {
+			// search the file from srcPath/node_modulues (handled before --add-search-path since the library-level prefs should be preferred over global-level)
+			var path = this._resolvePathFromNodeModules(Util.dirname(srcPath), givenPath);
+			if (path != "")
+				return path;
+			// search the file from [one-of-the-search-paths]/givenPath
 			var searchPaths = this._searchPaths.concat(this._emitter.getSearchPaths());
 			for (var i = 0; i < searchPaths.length; ++i) {
-				var path = Util.resolvePath(searchPaths[i] + "/" + givenPath);
+				path = Util.resolvePath(searchPaths[i] + "/" + givenPath);
 				// check the existence of the file, at the same time filling the cache
 				if (this._platform.fileExists(path))
 					return path;
 			}
 		}
+		// return path relative to srcPath
 		var lastSlashAt = srcPath.lastIndexOf("/");
 		path = Util.resolvePath((lastSlashAt != -1 ? srcPath.substring(0, lastSlashAt + 1) : "") + givenPath);
 		return path;
