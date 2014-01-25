@@ -519,6 +519,25 @@ class Compiler {
 		return ! isFatal;
 	}
 
+	var _packageJsonCache = new Map.<Map.<variant>>;
+
+	function _readPackageJson(moduleDir : string) : Map.<variant> {
+		if (this._packageJsonCache.hasOwnProperty(moduleDir)) {
+			return this._packageJsonCache[moduleDir];
+		}
+		var json = null : Map.<variant>;
+		if (this._platform.fileExists(moduleDir + "/package.json")) {
+			try {
+				var contents = this._platform.load(moduleDir + "/package.json");
+				json = JSON.parse(contents) as Map.<variant>;
+			} catch (e : variant) {
+				this._platform.warn("could not parse file:" + moduleDir + "/package.json");
+			}
+		}
+		this._packageJsonCache[moduleDir] = json;
+		return json;
+	}
+
 	function _resolvePathFromNodeModules (srcDir : string, givenPath : string, isWildcard : boolean) : string {
 
 		var firstSlashAtGivenPath = givenPath.indexOf("/");
@@ -534,14 +553,9 @@ class Compiler {
 			}
 
 			// found the package, read package.json
-			var packageJson : variant = {} : Map.<variant>;
-			if (this._platform.fileExists(moduleDir + "/package.json")) {
-				try {
-					var packageJsonRaw = this._platform.load(moduleDir + "/package.json");
-					packageJson = JSON.parse(packageJsonRaw);
-				} catch (e : variant) {
-					this._platform.warn("could not parse file:" + moduleDir + "/package.json");
-				}
+			var packageJson = this._readPackageJson(moduleDir);
+			if (packageJson == null) {
+				packageJson = {};
 			}
 
 			if (isWildcard || firstSlashAtGivenPath != -1) {
