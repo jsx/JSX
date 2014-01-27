@@ -1,5 +1,10 @@
 Revision history for the JSX software development kit
 
+0.9.74 2014-01-27 15:14:00+0900
+    [FEATURES]
+    - emit compile warning if identical files are imported from different directories
+    - experimental support for npm (#275)
+
 0.9.73 2014-01-24 15:11:00+0900
     [FEATURES]
     - an untyped map literal with certain types of elements is type-deducted to Array.<variant> if it is passed to a function taking such type as an argument (#291)
