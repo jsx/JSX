@@ -225,17 +225,10 @@ class Compiler {
 			parser.parse("", new CompileError[]);
 			return false;
 		}
-		// check if a file with identical content has already been loaded
-		for (var i = 0; i != parserIndex; ++i) {
-			if (this._parsers[i].getContent() == content
-				&& Util.basename(this._parsers[i].getPath()) == Util.basename(parser.getPath())) {
-				errors.push(new CompileWarning(parser.getSourceToken(), "the file (with identical content) has been read from different locations:"));
-				errors[errors.length - 1].addCompileNotes([
-					new CompileNote(parser.getSourceToken(), "from here as: " + parser.getPath()),
-					new CompileNote(this._parsers[i].getSourceToken(), "from here as: " + this._parsers[i].getPath()),
-				]);
-				break;
-			}
+		// check conflicts
+		var conflictWarning = this._checkConflictOfNpmModulesParsed(parserIndex) ?: this._checkConflictOfIdenticalFiles(parserIndex, content);
+		if (conflictWarning != null) {
+			errors.push(conflictWarning);
 		}
 		// parse
 		parser.parse(content, errors);
@@ -248,6 +241,57 @@ class Compiler {
 			}
 		}
 		return true;
+	}
+
+	var _npmModulesParsed = new Map.<number>; // map of module_name => parser index
+
+	function _checkConflictOfNpmModulesParsed(parserIndex : number) : CompileWarning {
+		function getModuleNameAndPath(path : string) : string[] {
+			var match = path.match(/^(?:.*\/|)node_modules\/([^\/]+)\//);
+			if (match == null) {
+				return null;
+			}
+			return [
+				match[1],
+				match[0].substring(0, match[0].length - 1), // strip trailing "/"
+			];
+		}
+		var parser = this._parsers[parserIndex];
+		var moduleNameAndPath = getModuleNameAndPath(parser.getPath());
+		// return if the source file is not part of a npm module
+		if (moduleNameAndPath == null) {
+			return null;
+		}
+		// register and return if the source file is a npm module that is loaded for the first time
+		if (! this._npmModulesParsed.hasOwnProperty(moduleNameAndPath[0])) {
+			this._npmModulesParsed[moduleNameAndPath[0]] = parserIndex;
+			return null;
+		}
+		// check conflict
+		var offendingParser = this._parsers[this._npmModulesParsed[moduleNameAndPath[0]]];
+		var offendingModulePath = getModuleNameAndPath(offendingParser.getPath())[1];
+		if (offendingModulePath == moduleNameAndPath[1]) {
+			return null;
+		}
+		// found conflict
+		return new CompileWarning(parser.getSourceToken(), "please consider running \"npm dedupe\"; the NPM module has already been read from a different location:")
+			.addCompileNote(new CompileNote(offendingParser.getSourceToken(), "at first from here as: " + offendingParser.getPath()))
+			.addCompileNote(new CompileNote(parser.getSourceToken(), "and now from here as: " + parser.getPath()))
+			as CompileWarning;
+	}
+
+	function _checkConflictOfIdenticalFiles(parserIndex : number, content : string) : CompileWarning {
+		var parser = this._parsers[parserIndex];
+		for (var i = 0; i != parserIndex; ++i) {
+			if (this._parsers[i].getContent() == content
+				&& Util.basename(this._parsers[i].getPath()) == Util.basename(parser.getPath())) {
+				return new CompileWarning(parser.getSourceToken(), "the file (with identical content) has been read from different locations:")
+					.addCompileNote(new CompileNote(parser.getSourceToken(), "from here as: " + parser.getPath()))
+					.addCompileNote(new CompileNote(this._parsers[i].getSourceToken(), "from here as: " + this._parsers[i].getPath()))
+					as CompileWarning;
+			}
+		}
+		return null;
 	}
 
 	function _handleImport (errors : CompileError[], parser : Parser, imprt : Import) : boolean {
