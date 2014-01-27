@@ -651,8 +651,9 @@ class Compiler {
 
 	function _resolvePath (srcPath : string, givenPath : string, isWildcard : boolean) : string {
 		if (givenPath.match(/^\.{1,2}\//) == null) {
-			// search the file from srcPath/node_modulues (handled before --add-search-path since the library-level prefs should be preferred over global-level)
-			var path = this._resolvePathFromNodeModules(Util.dirname(srcPath), givenPath, isWildcard);
+			var srcDir = Util.dirname(srcPath);
+			// search srcDir/node_modules (handled before --add-search-path since the library-level prefs should be preferred over global-level)
+			var path = this._resolvePathFromNodeModules(srcDir, givenPath, isWildcard);
 			if (path != "")
 				return path;
 			// search the file from [one-of-the-search-paths]/givenPath
@@ -661,6 +662,12 @@ class Compiler {
 				path = Util.resolvePath(searchPaths[i] + "/" + givenPath);
 				// check the existence of the file, at the same time filling the cache
 				if (this._platform.fileExists(path))
+					return path;
+			}
+			// search from [cwd]/node_modules
+			if (srcDir != ".") {
+				path = this._resolvePathFromNodeModules(".", givenPath, isWildcard);
+				if (path != "")
 					return path;
 			}
 		}
