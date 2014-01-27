@@ -2924,8 +2924,44 @@ class JavaScriptEmitter implements Emitter {
 		this._runenv = runenv;
 	}
 
-	override function getSearchPaths () : string[] {
-		return [ this._platform.getRoot() + "/lib/js" ];
+	/**
+	 * node.js compatible search
+	 */
+	override function getSearchPaths (srcPath : string) : string[] {
+		var lastSlashAt = srcPath.lastIndexOf("/");
+		var baseDir = Util.resolvePath((lastSlashAt != -1 ? srcPath.substring(0, lastSlashAt) : ""));
+		var defaultDir = this._platform.getRoot() + "/lib/js";
+
+		// Use cache or use default value
+		if (JavaScriptEmitter._searchPathCache.hasOwnProperty(baseDir))
+		{
+			return JavaScriptEmitter._searchPathCache[baseDir];
+		}
+		try
+		{
+			var absBaseDir = Util.resolvePath(this._platform.getWorkingDir() + '/' + baseDir);
+		}
+		catch (e : Error)
+		{
+			// only node environment supports getWorkingDir().
+			var result = [baseDir, defaultDir];
+			JavaScriptEmitter._searchPathCache[baseDir] = result;
+			return result;
+		}
+		// Search package.json
+		var result = [baseDir] : string[];
+		JavaScriptEmitter._searchPathCache[baseDir] = result;
+
+		var dirparts = absBaseDir.split('/');
+
+		while (dirparts.length > 0)
+		{
+			var nodeModulesPath = dirparts.join('/') + '/node_modules';
+			result.push(nodeModulesPath);
+			dirparts.pop();
+		}
+		result.push(defaultDir);
+		return result;
 	}
 
 	override function setOutputFile (name : Nullable.<string>) : void {
@@ -3796,12 +3832,14 @@ class JavaScriptEmitter implements Emitter {
 		}
 	}
 
+	static var _searchPathCache : Map.<string[]>;
 	static var _initialized = false;
 	static function _initialize () : void {
 		if (JavaScriptEmitter._initialized) {
 			return;
 		}
 		JavaScriptEmitter._initialized = true;
+		JavaScriptEmitter._searchPathCache = {} : Map.<string[]>;
 
 		var precedence = [
 			[

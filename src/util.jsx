@@ -29,7 +29,6 @@ import "./platform.jsx";
 import Token from "./parser.jsx";
 
 class Util {
-
 	static function cloneArray.<T> (a : T[]) : T[] {
 		var r = [] : T[];
 		for (var i = 0; i < a.length; ++i)

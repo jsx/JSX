@@ -70,6 +70,11 @@ class NodePlatform extends Platform {
 		return node.fs.existsSync(this._absPath(name));
 	}
 
+	override function isFile (name : string) : boolean {
+		name = Util.resolvePath(name);
+		return node.fs.statSync(this._absPath(name)).isFile();
+	}
+
 	override function getFilesInDirectory (path : string) : string[] {
 		return node.fs.readdirSync(this._absPath(path));
 	}
@@ -114,6 +119,10 @@ class NodePlatform extends Platform {
 
 	override function setWorkingDir (dir : string) : void {
 		this._cwd = this._absPath(dir);
+	}
+
+	override function getWorkingDir () : string {
+		return this._cwd;
 	}
 
 	override function mkpath (path : string) : void {
