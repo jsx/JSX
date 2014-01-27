@@ -140,7 +140,7 @@ class Compiler {
 		var errors = new CompileError[];
 		// parse all files
 		for (var i = 0; i < this._parsers.length; ++i) {
-			if (! this.parseFile(errors, this._parsers[i])) {
+			if (! this._parseFile(errors, i)) {
 				if (! this._handleErrors(errors))
 					return false;
 			}
@@ -215,7 +215,8 @@ class Compiler {
 		return this._fileCache[path];
 	}
 
-	function parseFile (errors : CompileError[], parser : Parser) : boolean {
+	function _parseFile (errors : CompileError[], parserIndex : number) : boolean {
+		var parser = this._parsers[parserIndex];
 		// read file
 		var content = this.getFileContent(errors, parser.getSourceToken(), parser.getPath());
 		if (content == null) {
@@ -223,6 +224,18 @@ class Compiler {
 			// because some compilation mode continues to run after errors.
 			parser.parse("", new CompileError[]);
 			return false;
+		}
+		// check if a file with identical content has already been loaded
+		for (var i = 0; i != parserIndex; ++i) {
+			if (this._parsers[i].getContent() == content
+				&& Util.basename(this._parsers[i].getPath()) == Util.basename(parser.getPath())) {
+				errors.push(new CompileWarning(parser.getSourceToken(), "the file (with identical content) has been read from different locations:"));
+				errors[errors.length - 1].addCompileNotes([
+					new CompileNote(parser.getSourceToken(), "from here as: " + parser.getPath()),
+					new CompileNote(this._parsers[i].getSourceToken(), "from here as: " + this._parsers[i].getPath()),
+				]);
+				break;
+			}
 		}
 		// parse
 		parser.parse(content, errors);
@@ -502,6 +515,9 @@ class Compiler {
 				}
 				if (doWarn != false) {
 					this._platform.warn(warning.format(this.getPlatform()));
+					warning.getCompileNotes().forEach(function (note) {
+						this._platform.warn(note.format(this.getPlatform()));
+					});
 					if (this._warningAsError) {
 						isFatal = true;
 					}

@@ -619,7 +619,7 @@ class Parser {
 	var _filename : string;
 	var _completionRequest : CompletionRequest;
 
-	var _input : string;
+	var _content : Nullable.<string>;
 	var _lines : string[];
 	var _tokenLength : number;
 	var _lineNumber : number; // one origin
@@ -656,10 +656,10 @@ class Parser {
 		this._completionRequest = completionRequest;
 	}
 
-	function parse (input : string, errors : CompileError[]) : boolean {
+	function parse (content : string, errors : CompileError[]) : boolean {
 		// lexer properties
-		this._input = input;
-		this._lines = this._input.split(_Lexer.rxNewline);
+		this._content = content;
+		this._lines = this._content.split(_Lexer.rxNewline);
 		this._tokenLength = 0;
 		this._lineNumber = 1; // one origin
 		this._columnOffset = 0; // zero origin
@@ -708,6 +708,10 @@ class Parser {
 			return false;
 
 		return true;
+	}
+
+	function getContent() : string {
+		return this._content;
 	}
 
 	function _getInput () : string {
