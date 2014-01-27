@@ -502,6 +502,9 @@ class Compiler {
 				}
 				if (doWarn != false) {
 					this._platform.warn(warning.format(this.getPlatform()));
+					warning.getCompileNotes().forEach(function (note) {
+						this._platform.warn(note.format(this.getPlatform()));
+					});
 					if (this._warningAsError) {
 						isFatal = true;
 					}
