@@ -650,20 +650,28 @@ class Compiler {
 	}
 
 	function _resolvePath (srcPath : string, givenPath : string, isWildcard : boolean) : string {
+		/*
+		the search order is: 1) --add-search-path, 2) node_modules/, 3) relative to src file
+
+		This is defined as such to provide freedom to users:
+
+		- users may use ```import "./foo.jsx"``` to explicitly specify 3
+		- users may use --add-search-path explicitly to avoid diamond dependency problem of NPM
+		*/
 		if (givenPath.match(/^\.{1,2}\//) == null) {
-			var srcDir = Util.dirname(srcPath);
-			// search srcDir/node_modules (handled before --add-search-path since the library-level prefs should be preferred over global-level)
-			var path = this._resolvePathFromNodeModules(srcDir, givenPath, isWildcard);
-			if (path != "")
-				return path;
 			// search the file from [one-of-the-search-paths]/givenPath
 			var searchPaths = this._searchPaths.concat(this._emitter.getSearchPaths());
 			for (var i = 0; i < searchPaths.length; ++i) {
-				path = Util.resolvePath(searchPaths[i] + "/" + givenPath);
+				var path = Util.resolvePath(searchPaths[i] + "/" + givenPath);
 				// check the existence of the file, at the same time filling the cache
 				if (this._platform.fileExists(path))
 					return path;
 			}
+			// search srcDir/node_modules
+			var srcDir = Util.dirname(srcPath);
+			var path = this._resolvePathFromNodeModules(srcDir, givenPath, isWildcard);
+			if (path != "")
+				return path;
 			// search from [cwd]/node_modules
 			if (srcDir != ".") {
 				path = this._resolvePathFromNodeModules(".", givenPath, isWildcard);
