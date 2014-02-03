@@ -2119,7 +2119,7 @@ class _FunctionExpressionEmitter extends _OperatorExpressionEmitter {
 		this._emitter._emit("(", funcDef.getToken());
 		var funcLocal = funcDef.getFuncLocal();
 		this._emitter.getNamer().enterScope(funcLocal, function () {
-			this._emitter._emit("function " + (funcDef.isGenerator() ? "* " : "") + (funcLocal != null ? this._emitter.getNamer().getNameOfLocalVariable(funcLocal) : "") + "(", funcDef.getToken());
+			this._emitter._emit("function " + (funcDef.isGenerator() && this._emitter._enableES6Generator ? "* " : "") + (funcLocal != null ? this._emitter.getNamer().getNameOfLocalVariable(funcLocal) : "") + "(", funcDef.getToken());
 			this._emitter.getNamer().enterFunction(funcDef, function () {
 				var args = funcDef.getArguments();
 				for (var i = 0; i < args.length; ++i) {

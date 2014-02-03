@@ -3144,6 +3144,9 @@ class Parser {
 	}
 
 	function _functionExpr (token : Token) : Expression {
+		var isGenerator = false;
+		if (this._expectOpt("*") != null)
+			isGenerator = true;
 		var name = this._expectIdentifierOpt();
 		if (this._expect("(") == null)
 			return null;
@@ -3171,7 +3174,7 @@ class Parser {
 			funcLocal = new LocalVariable(name, type);
 		}
 
-		var funcDef = this._functionBody(token, name, funcLocal, args, returnType, true, false);
+		var funcDef = this._functionBody(token, name, funcLocal, args, returnType, true, isGenerator);
 		if (funcDef == null) {
 			return null;
 		}
