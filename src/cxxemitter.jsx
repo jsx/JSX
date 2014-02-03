@@ -97,6 +97,44 @@ class _IfStatementEmitter extends _StatementEmitter {
 
 }
 
+class _WhileStatementEmitter extends _StatementEmitter {
+
+	var _statement : WhileStatement;
+
+	function constructor (emitter : CplusplusEmitter, statement : WhileStatement) {
+		super(emitter);
+		this._statement = statement;
+	}
+
+	override function emit () : void {
+		this._emitter._emit("while (", this._statement.getToken());
+		this._emitter._getExpressionEmitterFor(this._statement.getExpr()).emit(0);
+		this._emitter._emit(") {\n", null);
+		this._emitter._emitStatements(this._statement.getStatements());
+		this._emitter._emit("}\n", null);
+	}
+
+}
+
+class _DoWhileStatementEmitter extends _StatementEmitter {
+
+	var _statement : DoWhileStatement;
+
+	function constructor (emitter : CplusplusEmitter, statement : DoWhileStatement) {
+		super(emitter);
+		this._statement = statement;
+	}
+
+	override function emit () : void {
+		this._emitter._emit("do {", this._statement.getToken());
+		this._emitter._emitStatements(this._statement.getStatements());
+		this._emitter._emit("} while (", null);
+		this._emitter._getExpressionEmitterFor(this._statement.getExpr()).emit(0);
+		this._emitter._emit(");\n", null);
+	}
+
+}
+
 class _ReturnStatementEmitter extends _StatementEmitter {
 
 	var _statement : ReturnStatement;
@@ -986,8 +1024,8 @@ int main() {
 		// 	return new _BreakStatementEmitter(this, statement as BreakStatement);
 		// else if (statement instanceof ContinueStatement)
 		// 	return new _ContinueStatementEmitter(this, statement as ContinueStatement);
-		// else if (statement instanceof DoWhileStatement)
-		// 	return new _DoWhileStatementEmitter(this, statement as DoWhileStatement);
+		else if (statement instanceof DoWhileStatement)
+			return new _DoWhileStatementEmitter(this, statement as DoWhileStatement);
 		// else if (statement instanceof ForInStatement)
 		// 	return new _ForInStatementEmitter(this, statement as ForInStatement);
 		else if (statement instanceof ForStatement)
@@ -1000,8 +1038,8 @@ int main() {
 		// 	return new _CaseStatementEmitter(this, statement as CaseStatement);
 		// else if (statement instanceof DefaultStatement)
 		// 	return new _DefaultStatementEmitter(this, statement as DefaultStatement);
-		// else if (statement instanceof WhileStatement)
-		// 	return new _WhileStatementEmitter(this, statement as WhileStatement);
+		else if (statement instanceof WhileStatement)
+			return new _WhileStatementEmitter(this, statement as WhileStatement);
 		// else if (statement instanceof TryStatement)
 		// 	return new _TryStatementEmitter(this, statement as TryStatement);
 		// else if (statement instanceof CatchStatement)
