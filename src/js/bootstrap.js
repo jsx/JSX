@@ -88,7 +88,7 @@ __jsx_generator_object.prototype.next = function () {
 			this.__status = 2;
 			done = true;
 		}
-		return new { value: this.__value, done: done };
+		return { value: this.__value, done: done };
 	case 1:
 		throw new Error("Generator is already running");
 	case 2:
