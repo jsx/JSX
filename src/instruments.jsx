@@ -856,14 +856,12 @@ class CodeTransformer {
 	var _compiler : Compiler;
 	var _emitter : Emitter;
 
-	var _stopIterationClassDef : ClassDefinition;
 	var _jsxGeneratorClassDef : TemplateClassDefinition;
 
 	function constructor () {
 		this._forceTransform = false;
 		this._transformExprs = true;
 
-		this._stopIterationClassDef = null;
 		this._jsxGeneratorClassDef = null;
 	}
 
@@ -872,8 +870,6 @@ class CodeTransformer {
 		this._emitter = emitter;
 		var builtins = compiler.getBuiltinParsers()[0];
 
-		// get built-in classes related to generators
-		this._stopIterationClassDef = builtins.lookup([], null, "StopIteration");
 		for (var i = 0; i < builtins._templateClassDefs.length; ++i) {
 			if (builtins._templateClassDefs[i].className() == "__jsx_generator") {
 				this._jsxGeneratorClassDef = builtins._templateClassDefs[i];
@@ -881,7 +877,6 @@ class CodeTransformer {
 			}
 		}
 
-		assert this._stopIterationClassDef != null;
 		assert this._jsxGeneratorClassDef != null;
 
 		return this;
