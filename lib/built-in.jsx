@@ -1030,7 +1030,7 @@ class __jsx_generator.<T> implements Enumerable.<T> {
 }
 
 /** @see http://wiki.ecmascript.org/doku.php?id=harmony:specification_drafts */
-native class Promise.<T> {
+native final class Promise.<T> {
 
 	static function all (promises : Array.<Promise.<T>>) : Promise.<Array.<T>>;
 	static function race (promises : Array.<Promise.<T>>) : Promise.<T>;
