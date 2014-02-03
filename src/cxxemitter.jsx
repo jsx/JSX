@@ -569,6 +569,43 @@ class _LogicalExpressionEmitter extends _OperatorExpressionEmitter {
 
 }
 
+class _ConditionalExpressionEmitter extends _OperatorExpressionEmitter {
+
+	var _expr : ConditionalExpression;
+
+	function constructor (emitter : CplusplusEmitter, expr : ConditionalExpression) {
+		super(emitter);
+		this._expr = expr;
+	}
+
+	override function _emit () : void {
+		var precedence = this._getPrecedence();
+		var ifTrueExpr = this._expr.getIfTrueExpr();
+		if (ifTrueExpr != null) {
+			this._emitter._getExpressionEmitterFor(this._expr.getCondExpr()).emit(precedence - 1);
+			this._emitter._emit(" ? ", null);
+			this._emitter._getExpressionEmitterFor(ifTrueExpr).emit(precedence);
+			this._emitter._emit(" : ", null);
+			this._emitter._getExpressionEmitterFor(this._expr.getIfFalseExpr()).emit(precedence);
+		} else {
+			this._emitter._getExpressionEmitterFor(this._expr.getCondExpr()).emit(precedence - 1);
+			this._emitter._emit(" || ", null);
+			this._emitter._getExpressionEmitterFor(this._expr.getIfFalseExpr()).emit(precedence - 1);
+		}
+	}
+
+	override function _getPrecedence () : number {
+		return this._expr.getIfTrueExpr() != null ? _ConditionalExpressionEmitter._operatorPrecedence : _LogicalExpressionEmitter._operatorPrecedence["||"] as number;
+	}
+
+	static var _operatorPrecedence = 0;
+
+	static function _setOperatorPrecedence (op : string, precedence : number) : void {
+		_ConditionalExpressionEmitter._operatorPrecedence = precedence;
+	}
+
+}
+
 class _AdditiveExpressionEmitter extends _OperatorExpressionEmitter {
 
 	var _expr : AdditiveExpression;
@@ -1215,10 +1252,10 @@ int main() {
 		// 	return new _InExpressionEmitter(this, expr as InExpression);
 		// else if (expr instanceof ShiftExpression)
 		// 	return new _ShiftExpressionEmitter(this, expr as ShiftExpression);
-		// else if (expr instanceof ConditionalExpression)
-		// 	return new _ConditionalExpressionEmitter(this, expr as ConditionalExpression);
 		else if (expr instanceof LogicalExpression)
 			return new _LogicalExpressionEmitter(this, expr as LogicalExpression);
+		else if (expr instanceof ConditionalExpression)
+			return new _ConditionalExpressionEmitter(this, expr as ConditionalExpression);
 		else if (expr instanceof CallExpression)
 			return new _CallExpressionEmitter(this, expr as CallExpression);
 		// else if (expr instanceof SuperExpression)
@@ -1365,8 +1402,8 @@ int main() {
 				{ "&=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
 				{ "^=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
 				{ "|=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence }
-			// ], [
-			// 	{ "?":          _ConditionalExpressionEmitter._setOperatorPrecedence }
+			], [
+				{ "?":          _ConditionalExpressionEmitter._setOperatorPrecedence }
 			// ], [
 			// 	{ ",":          _CommaExpressionEmitter._setOperatorPrecedence }
 			]
