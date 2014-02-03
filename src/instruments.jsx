@@ -1078,7 +1078,7 @@ class CodeTransformer {
 		  $generatorN.__next = null;
 		  $generatorN.__value = null;
 		*/
-		statements.splice(idx, 2,
+		funcDef.getStatements().push(
 			new ExpressionStatement(
 				new AssignmentExpression(
 					new Token("=", false),
@@ -1099,10 +1099,10 @@ class CodeTransformer {
 						new LocalExpression(new Token(genLocalName, false), genLocal),
 						new Token("__next", true),
 						[],
-						new StaticFunctionType(null, this._transformingFuncDef.getReturnType(), [], true)),
+						new StaticFunctionType(null, funcDef.getReturnType(), [], true)),
 					new NullExpression(
 						new Token("null", false),
-						new StaticFunctionType(null, this._transformingFuncDef.getReturnType(), [], true)))));
+						new StaticFunctionType(null, funcDef.getReturnType(), [], true)))));
 
 		// replace yield statement
 		/*
