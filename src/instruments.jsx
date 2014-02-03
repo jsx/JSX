@@ -856,13 +856,13 @@ class CodeTransformer {
 	var _compiler : Compiler;
 	var _emitter : Emitter;
 
-	var _jsxGeneratorClassDef : TemplateClassDefinition;
+	var _jsxGeneratorObject : TemplateClassDefinition;
 
 	function constructor () {
 		this._forceTransform = false;
 		this._transformExprs = true;
 
-		this._jsxGeneratorClassDef = null;
+		this._jsxGeneratorObject = null;
 	}
 
 	function setup (compiler : Compiler, emitter : Emitter) : CodeTransformer {
@@ -871,13 +871,13 @@ class CodeTransformer {
 		var builtins = compiler.getBuiltinParsers()[0];
 
 		for (var i = 0; i < builtins._templateClassDefs.length; ++i) {
-			if (builtins._templateClassDefs[i].className() == "__jsx_generator") {
-				this._jsxGeneratorClassDef = builtins._templateClassDefs[i];
+			if (builtins._templateClassDefs[i].className() == "__jsx_generator_object") {
+				this._jsxGeneratorObject = builtins._templateClassDefs[i];
 				break;
 			}
 		}
 
-		assert this._jsxGeneratorClassDef != null;
+		assert this._jsxGeneratorObject != null;
 
 		return this;
 	}
@@ -1141,7 +1141,7 @@ class CodeTransformer {
 
 		// declare generator object
 		/*
-		  var $generatorN = new __jsx_generator;
+		  var $generatorN = new __jsx_generator_object;
 		*/
 		var newExpr = new NewExpression(new Token("new", false), genType, []);
 		newExpr.analyze(new AnalysisContext([], null, null), null);
@@ -1181,9 +1181,9 @@ class CodeTransformer {
 
 	function _instantiateGeneratorType (yieldingType : Type) : Type {
 		// instantiate generator
-		var genClassDef = this._jsxGeneratorClassDef.getParser().lookupTemplate(
+		var genClassDef = this._jsxGeneratorObject.getParser().lookupTemplate(
 			[],	// errors
-			new TemplateInstantiationRequest(null, "__jsx_generator", [ yieldingType ] : Type[]),
+			new TemplateInstantiationRequest(null, "__jsx_generator_object", [ yieldingType ] : Type[]),
 			(parser, classDef) -> null
 		);
 		assert genClassDef != null;
@@ -1199,7 +1199,7 @@ class CodeTransformer {
 					return classDef;
 				});
 		};
-		var parser = this._jsxGeneratorClassDef.getParser();
+		var parser = this._jsxGeneratorObject.getParser();
 		genClassDef.resolveTypes(createContext(parser));
 		genClassDef.analyze(createContext(parser));
 
