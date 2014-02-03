@@ -1078,10 +1078,36 @@ class CodeTransformer {
 		var genLocal = new LocalVariable(new Token(genLocalName, false), genType);
 		funcDef.getLocals().push(genLocal);
 
-		// insert epilogue code `throw new StopIteration`
-		var newExpr = new NewExpression(new Token("new", false), new ObjectType(this._stopIterationClassDef), []);
-		newExpr.analyze(new AnalysisContext([], null, null), null);
-		funcDef.getStatements().push(new ThrowStatement(new Token("throw", false), newExpr));
+		// insert epilogue code
+		/*
+		  $generatorN.__next = null;
+		  $generatorN.__value = null;
+		*/
+		statements.splice(idx, 2,
+			new ExpressionStatement(
+				new AssignmentExpression(
+					new Token("=", false),
+					new PropertyExpression(
+						new Token(".", false),
+						new LocalExpression(new Token(genLocalName, false), genLocal),
+						new Token("__value", false),
+						[],
+						yieldingType),
+					new NullExpression(
+						new Token("null", false),
+						yieldingType))),
+			new ExpressionStatement(
+				new AssignmentExpression(
+					new Token("=", false),
+					new PropertyExpression(
+						new Token(".", false),
+						new LocalExpression(new Token(genLocalName, false), genLocal),
+						new Token("__next", true),
+						[],
+						new StaticFunctionType(null, this._transformingFuncDef.getReturnType(), [], true)),
+					new NullExpression(
+						new Token("null", false),
+						new StaticFunctionType(null, this._transformingFuncDef.getReturnType(), [], true)
 
 		// replace yield statement
 		/*
