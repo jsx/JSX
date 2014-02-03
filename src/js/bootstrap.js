@@ -65,6 +65,40 @@ var $__jsx_ObjectToString = Object.prototype.toString;
 var $__jsx_ObjectHasOwnProperty = Object.prototype.hasOwnProperty;
 
 /*
+ * generator emulation helpers
+ */
+function __jsx_generator_object() {
+	this.__next = null;
+	this.__value = undefined;
+	this.__status = 0;	// SUSPENDED: 0, ACTIVE: 1, DEAD: 2
+}
+
+__jsx_generator_object.prototype.next = function () {
+	switch (this.__status) {
+	case 0:
+		this.__status = 1;
+
+		// go next!
+		this.__next();
+
+		var done = false;
+		if (this.__next != null) {
+			this.__status = 0;
+		} else {
+			this.__status = 2;
+			done = true;
+		}
+		return new { value: this.__value, done: done };
+	case 1:
+		throw new Error("Generator is already running");
+	case 2:
+		throw new Error("Generator is already finished");
+	default:
+		throw new Error("Unexpected generator internal state");
+	}
+};
+
+/*
  * profiler object, initialized afterwards
  */
 function $__jsx_profiler() {

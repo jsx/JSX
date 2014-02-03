@@ -1000,55 +1000,7 @@ native class GeneratorObject.<T> {
 
 }
 
-class __jsx_generator_result.<T> extends IteratorResult.<T> {
-
-	function constructor (value : Nullable.<T>, done : boolean) {
-		this.value = value;
-		this.done = done;
-	}
-
-}
-
-class __jsx_generator_object.<T> extends GeneratorObject.<T> {
-
-        var __next : () -> void;
-        var __value : T;
-
-	static const SUSPENDED = 1;
-	static const ACTIVE = 3;
-	static const DEAD = 2;
-
-        var __status : int = SUSPENDED;
-
-        function constructor () { }
-
-        override function next () : IteratorResult.<T> {
-		switch (this.__status) {
-		case __jsx_generator_object.<T>.ACTIVE:
-			throw new Error("Generator is already running");
-
-		case __jsx_generator_object.<T>.SUSPENDED:
-			this.__status = __jsx_generator_object.<T>.ACTIVE;
-
-			// go next!
-			this.__next();
-
-			var done = false;
-			if (this.__next != null) {
-				this.__status = __jsx_generator_object.<T>.SUSPENDED;
-			} else {
-				this.__status = __jsx_generator_object.<T>.DEAD;
-				done = true;
-			}
-			return new __jsx_generator_result.<T>(this.__value, done);
-
-		case __jsx_generator_object.<T>.DEAD:
-			throw new Error("Generator is already finished");
-
-		default:
-			throw new Error("Unexpected generator iternal state");
-		}
-        }
+native class __jsx_generator_object.<T> extends GeneratorObject.<T> {
 }
 
 // 5.12
