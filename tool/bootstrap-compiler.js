@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// generatedy by JSX compiler 0.9.71 (2013-12-15 21:44:17 +0900; f396503f3f30a75c49db445e88abc2cfec392d76)
+// generatedy by JSX compiler 0.9.75 (2014-02-03 18:17:21 +0900; 8c807402af2781b4947762f22e74b874234d0558)
 var JSX = {};
 (function (JSX) {
 /**
@@ -292,7 +292,17 @@ function _Main$main$AS(args) {
 _Main.main = _Main$main$AS;
 _Main.main$AS = _Main$main$AS;
 
-var js$0 = (function () { var global = (function () { return this; }()); return { global: global, eval: global.eval, invoke: function(invocant, methodName, args) { return invocant[methodName].apply(invocant, args); } }; }());
+var js$0 = (function () {
+	var global = (function () { return this; }());
+	return {
+		global: global,
+		eval: global.eval,
+		invoke: function(invocant, methodName, args) {
+			return invocant[methodName].apply(invocant, args);
+		},
+		newFunction: Function
+	};
+}());
 function node() {}
 $__jsx_extend([node], Object);
 function node$require$S(source) {
@@ -505,33 +515,33 @@ function Util$isNativeClass$LType$(type) {
 
 Util.isNativeClass$LType$ = Util$isNativeClass$LType$;
 
-function Util$lhsHasNoSideEffects$LExpression$(lhsExpr) {
+function Util$lhsHasSideEffects$LExpression$(lhsExpr) {
 	var holderExpr;
 	var arrayExpr;
 	if (lhsExpr instanceof LocalExpression) {
-		return true;
+		return false;
 	}
 	if (lhsExpr instanceof PropertyExpression) {
 		holderExpr = lhsExpr.getExpr$();
 		if (Util$isNativeClass$LType$(holderExpr.getType$()) && ! Util$isBuiltInClass$LType$(holderExpr.getType$())) {
-			return false;
+			return true;
 		}
 		if (holderExpr instanceof ThisExpression || holderExpr instanceof LocalExpression || holderExpr.isClassSpecifier$()) {
-			return true;
+			return false;
 		}
 	} else if (lhsExpr instanceof ArrayExpression) {
 		arrayExpr = lhsExpr;
 		if (Util$isNativeClass$LType$(arrayExpr.getFirstExpr$().getType$()) && ! Util$isBuiltInClass$LType$(arrayExpr.getFirstExpr$().getType$())) {
-			return false;
-		}
-		if (arrayExpr.getFirstExpr$() instanceof LocalExpression && arrayExpr.getSecondExpr$() instanceof LeafExpression) {
 			return true;
 		}
+		if (arrayExpr.getFirstExpr$() instanceof LocalExpression && arrayExpr.getSecondExpr$() instanceof LeafExpression) {
+			return false;
+		}
 	}
-	return false;
+	return true;
 };
 
-Util.lhsHasNoSideEffects$LExpression$ = Util$lhsHasNoSideEffects$LExpression$;
+Util.lhsHasSideEffects$LExpression$ = Util$lhsHasSideEffects$LExpression$;
 
 function Util$instantiateTemplate$LAnalysisContext$LToken$SALType$(context, token, className, typeArguments) {
 	return context.parser.lookupTemplate$ALCompileError$LTemplateInstantiationRequest$F$LParser$LClassDefinition$LClassDefinition$$(context.errors, new TemplateInstantiationRequest(token, className, typeArguments), context.postInstantiationCallback);
@@ -593,7 +603,7 @@ function Util$analyzeArgs$LAnalysisContext$ALExpression$LExpression$ALUtil$x2EAr
 					return null;
 				}
 			}
-		} else if (args[i] instanceof ArrayLiteralExpression && args[i].getType$() == null) {
+		} else if (args[i] instanceof ArrayLiteralExpression) {
 			arrayExpr = args[i];
 			expectedArrayType = null;
 			for (j = 0; j < expectedTypes.length; ++ j) {
@@ -610,7 +620,7 @@ function Util$analyzeArgs$LAnalysisContext$ALExpression$LExpression$ALUtil$x2EAr
 			} else if (expectedArrayType != null) {
 				arrayExpr.setType$LType$(expectedArrayType);
 			}
-		} else if (args[i] instanceof MapLiteralExpression && args[i].getType$() == null) {
+		} else if (args[i] instanceof MapLiteralExpression) {
 			mapExpr = args[i];
 			expectedMapType = null;
 			for (j = 0; j < expectedTypes.length; ++ j) {
@@ -3743,7 +3753,7 @@ _FusedAssignmentExpressionEmitter.prototype._emitDivAssignToInt$N = function (ou
 	var classDef;
 	firstExpr = this._expr.getFirstExpr$();
 	secondExpr = this._expr.getSecondExpr$();
-	if (! Util$lhsHasNoSideEffects$LExpression$(firstExpr)) {
+	if (Util$lhsHasSideEffects$LExpression$(firstExpr)) {
 		this._emitter._emit$SLToken$("$__jsx_div_assign(", this._expr.getToken$());
 		if (firstExpr instanceof PropertyExpression) {
 			propertyExpr = firstExpr;
@@ -5206,7 +5216,7 @@ Statement.prototype.analyze$LAnalysisContext$ = function (context) {
 	} catch ($__jsx_catch_0) {
 		if ($__jsx_catch_0 instanceof Error) {
 			token = this.getToken$();
-			srcPos = (token != null ? Util$format$SAS(" at file %1, line %2", [ token.getFilename$(), token.getLineNumber$() + "" ]) : "");
+			srcPos = (token != null ? Util$format$SAS(" at file %1, line %2, near %3", [ token.getFilename$(), token.getLineNumber$() + "", token.getValue$() ]) : "");
 			$__jsx_catch_0.message = Util$format$SAS("fatal error while compiling statement%1\n%2", [ srcPos, $__jsx_catch_0.message ]);
 			throw $__jsx_catch_0;
 		} else {
@@ -7438,7 +7448,7 @@ MapLiteralExpression.prototype.analyze$LAnalysisContext$LExpression$ = function 
 			context.errors.push(new CompileError(this._token, "specified type is not a map type"));
 			return false;
 		}
-		expectedType = this._type.getTypeArguments$()[0];
+		expectedType = this._type.getTypeArguments$()[0].toNullableType$();
 		for (i = 0; i < this._elements.length; ++ i) {
 			elementType = this._elements[i].getExpr$().getType$();
 			if (! elementType.isConvertibleTo$LType$(expectedType)) {
@@ -15002,7 +15012,7 @@ function Scope(prev, locals, funcLocal, args, statements, closures, isGenerator)
 
 $__jsx_extend([Scope], Object);
 function Parser(sourceToken, filename, completionRequest) {
-	this._input = "";
+	this._content = null;
 	this._lines = null;
 	this._tokenLength = 0;
 	this._lineNumber = 0;
@@ -15036,12 +15046,12 @@ function Parser(sourceToken, filename, completionRequest) {
 };
 
 $__jsx_extend([Parser], Object);
-Parser.prototype.parse$SALCompileError$ = function (input, errors) {
+Parser.prototype.parse$SALCompileError$ = function (content, errors) {
 	var compLineNumber;
 	var line;
 	var importToken;
-	this._input = input;
-	this._lines = this._input.split(_Lexer.rxNewline);
+	this._content = content;
+	this._lines = this._content.split(_Lexer.rxNewline);
 	this._tokenLength = 0;
 	this._lineNumber = 1;
 	this._columnOffset = 0;
@@ -15083,6 +15093,11 @@ Parser.prototype.parse$SALCompileError$ = function (input, errors) {
 		return false;
 	}
 	return true;
+};
+
+
+Parser.prototype.getContent$ = function () {
+	return this._content;
 };
 
 
@@ -21057,7 +21072,7 @@ _InlineOptimizeCommand.prototype._expandStatementExpression$LMemberFunctionDefin
 			cb(stmtIndex);
 			return true;
 		}
-	} else if (expr instanceof AssignmentExpression && Util$lhsHasNoSideEffects$LExpression$(expr.getFirstExpr$()) && expr.getSecondExpr$() instanceof CallExpression) {
+	} else if (expr instanceof AssignmentExpression && ! Util$lhsHasSideEffects$LExpression$(expr.getFirstExpr$()) && expr.getSecondExpr$() instanceof CallExpression) {
 		args = this._getArgsAndThisIfCallExprIsInlineable$LCallExpression$(expr.getSecondExpr$());
 		if (args != null) {
 			stmtIndex = this._expandCallingFunction$LMemberFunctionDefinition$ALStatement$NLMemberFunctionDefinition$ALExpression$(funcDef, statements, stmtIndex, _DetermineCalleeCommand$getCallingFuncDef$LStashable$(expr.getSecondExpr$()), args);
@@ -22208,6 +22223,8 @@ function Compiler(platform) {
 	this._searchPaths = null;
 	this._builtinParsers = null;
 	this._emitter = null;
+	this._npmModulesParsed = {};
+	this._packageJsonCache = {};
 	this._platform = platform;
 	this._mode = Compiler.MODE_COMPILE;
 	this._transformer = null;
@@ -22315,7 +22332,7 @@ Compiler.prototype.compile$ = function () {
 	var builtins;
 	errors = [];
 	for (i = 0; i < this._parsers.length; ++ i) {
-		if (! this.parseFile$ALCompileError$LParser$(errors, this._parsers[i])) {
+		if (! this._parseFile$ALCompileError$N(errors, i)) {
 			if (! this._handleErrors$ALCompileError$(errors)) {
 				return false;
 			}
@@ -22398,14 +22415,21 @@ Compiler.prototype.getFileContent$ALCompileError$LToken$S = function (errors, so
 };
 
 
-Compiler.prototype.parseFile$ALCompileError$LParser$ = function (errors, parser) {
+Compiler.prototype._parseFile$ALCompileError$N = function (errors, parserIndex) {
+	var parser;
 	var content;
+	var conflictWarning;
 	var imports;
 	var i;
+	parser = this._parsers[parserIndex];
 	content = this.getFileContent$ALCompileError$LToken$S(errors, parser.getSourceToken$(), parser.getPath$());
 	if (content == null) {
 		parser.parse$SALCompileError$("", []);
 		return false;
+	}
+	conflictWarning = this._checkConflictOfNpmModulesParsed$N(parserIndex) || this._checkConflictOfIdenticalFiles$NS(parserIndex, content);
+	if (conflictWarning != null) {
+		errors.push(conflictWarning);
 	}
 	parser.parse$SALCompileError$(content, errors);
 	if (this._mode !== Compiler.MODE_PARSE) {
@@ -22420,6 +22444,52 @@ Compiler.prototype.parseFile$ALCompileError$LParser$ = function (errors, parser)
 };
 
 
+Compiler.prototype._checkConflictOfNpmModulesParsed$N = function (parserIndex) {
+	var $this = this;
+	var getModuleNameAndPath;
+	var parser;
+	var moduleNameAndPath;
+	var offendingParser;
+	var offendingModulePath;
+	function getModuleNameAndPath(path) {
+		var match;
+		match = path.match(/^(?:.*\/|)node_modules\/([^\/]+)\//);
+		if (match == null) {
+			return null;
+		}
+		return [ match[1], match[0].substring(0, match[0].length - 1) ];
+	}
+	parser = this._parsers[parserIndex];
+	moduleNameAndPath = getModuleNameAndPath(parser.getPath$());
+	if (moduleNameAndPath == null) {
+		return null;
+	}
+	if (! $__jsx_ObjectHasOwnProperty.call(this._npmModulesParsed, moduleNameAndPath[0])) {
+		this._npmModulesParsed[moduleNameAndPath[0]] = parserIndex;
+		return null;
+	}
+	offendingParser = this._parsers[this._npmModulesParsed[moduleNameAndPath[0]]];
+	offendingModulePath = getModuleNameAndPath(offendingParser.getPath$())[1];
+	if (offendingModulePath === moduleNameAndPath[1]) {
+		return null;
+	}
+	return new CompileWarning(parser.getSourceToken$(), "please consider running \"npm dedupe\"; the NPM module has already been read from a different location:").addCompileNote$LCompileNote$(new CompileNote(offendingParser.getSourceToken$(), "at first from here as: " + offendingParser.getPath$())).addCompileNote$LCompileNote$(new CompileNote(parser.getSourceToken$(), "and now from here as: " + parser.getPath$()));
+};
+
+
+Compiler.prototype._checkConflictOfIdenticalFiles$NS = function (parserIndex, content) {
+	var parser;
+	var i;
+	parser = this._parsers[parserIndex];
+	for (i = 0; i !== parserIndex; ++ i) {
+		if (this._parsers[i].getContent$() === content && Util$basename$S(this._parsers[i].getPath$()) === Util$basename$S(parser.getPath$())) {
+			return new CompileWarning(parser.getSourceToken$(), "the file (with identical content) has been read from different locations:").addCompileNote$LCompileNote$(new CompileNote(parser.getSourceToken$(), "from here as: " + parser.getPath$())).addCompileNote$LCompileNote$(new CompileNote(this._parsers[i].getSourceToken$(), "from here as: " + this._parsers[i].getPath$()));
+		}
+	}
+	return null;
+};
+
+
 Compiler.prototype._handleImport$ALCompileError$LParser$LImport$ = function (errors, parser, imprt) {
 	var wildImprt;
 	var resolvedDir;
@@ -22430,7 +22500,7 @@ Compiler.prototype._handleImport$ALCompileError$LParser$LImport$ = function (err
 	var newParser;
 	if (imprt instanceof WildcardImport) {
 		wildImprt = imprt;
-		resolvedDir = this._resolvePath$SS(wildImprt.getFilenameToken$().getFilename$(), wildImprt.getDirectory$());
+		resolvedDir = this._resolvePath$SSB(wildImprt.getFilenameToken$().getFilename$(), wildImprt.getDirectory$(), true);
 		files = [];
 		try {
 			files = this._platform.getFilesInDirectory$S(resolvedDir);
@@ -22458,7 +22528,7 @@ Compiler.prototype._handleImport$ALCompileError$LParser$LImport$ = function (err
 			return false;
 		}
 	} else {
-		path = this._resolvePath$SS(imprt.getFilenameToken$().getFilename$(), Util$decodeStringLiteral$S(imprt.getFilenameToken$().getValue$()));
+		path = this._resolvePath$SSB(imprt.getFilenameToken$().getFilename$(), Util$decodeStringLiteral$S(imprt.getFilenameToken$().getValue$()), false);
 		if (path === parser.getPath$()) {
 			errors.push(new CompileError(imprt.getFilenameToken$(), "cannot import itself"));
 			return false;
@@ -22712,6 +22782,9 @@ Compiler.prototype._handleErrors$ALCompileError$ = function (errors) {
 			}
 			if (doWarn !== false) {
 				$this._platform.warn$S(warning.format$LPlatform$($this.getPlatform$()));
+				warning.getCompileNotes$().forEach((function (note) {
+					$this._platform.warn$S(note.format$LPlatform$($this.getPlatform$()));
+				}));
 				if ($this._warningAsError) {
 					isFatal = true;
 				}
@@ -22729,16 +22802,97 @@ Compiler.prototype._handleErrors$ALCompileError$ = function (errors) {
 };
 
 
-Compiler.prototype._resolvePath$SS = function (srcPath, givenPath) {
+Compiler.prototype._readPackageJson$S = function (moduleDir) {
+	var json;
+	var contents;
+	if ($__jsx_ObjectHasOwnProperty.call(this._packageJsonCache, moduleDir)) {
+		return this._packageJsonCache[moduleDir];
+	}
+	json = null;
+	if (this._platform.fileExists$S(moduleDir + "/package.json")) {
+		try {
+			contents = this._platform.load$S(moduleDir + "/package.json");
+			json = JSON.parse(contents);
+		} catch ($__jsx_catch_0) {
+			{
+				this._platform.warn$S("could not parse file:" + moduleDir + "/package.json");
+			}
+		}
+	}
+	this._packageJsonCache[moduleDir] = json;
+	return json;
+};
+
+
+Compiler.prototype._resolvePathFromNodeModules$SSB = function (srcDir, givenPath, isWildcard) {
+	var $this = this;
+	var firstSlashAtGivenPath;
+	var moduleName;
+	var lookupInNodeModules;
+	var path;
+	var match;
+	firstSlashAtGivenPath = givenPath.indexOf("/");
+	moduleName = (firstSlashAtGivenPath !== - 1 ? givenPath.substring(0, firstSlashAtGivenPath) : givenPath);
+	function lookupInNodeModules(nodeModulesDir) {
+		var moduleDir;
+		var packageJson;
+		var libDir;
+		var subPathWithLeadingSlash;
+		var main;
+		moduleDir = nodeModulesDir + "/" + moduleName;
+		if (! $this._platform.fileExists$S(moduleDir)) {
+			return "";
+		}
+		packageJson = $this._readPackageJson$S(moduleDir);
+		if (packageJson == null) {
+			packageJson = ({  });
+		}
+		if (isWildcard || firstSlashAtGivenPath !== - 1) {
+			libDir = (packageJson.directories && packageJson.directories.lib ? packageJson.directories.lib + "" : "lib");
+			subPathWithLeadingSlash = (firstSlashAtGivenPath !== - 1 ? givenPath.substring(firstSlashAtGivenPath) : "");
+			return Util$resolvePath$S(moduleDir + "/" + libDir + subPathWithLeadingSlash);
+		} else {
+			main = (packageJson.main ? packageJson.main + "" : "index.jsx");
+			return Util$resolvePath$S(moduleDir + "/" + main);
+		}
+	}
+	while (true) {
+		path = lookupInNodeModules(srcDir + "/node_modules");
+		if (path !== "") {
+			return path;
+		}
+		match = srcDir.match(/^(.*)\/node_modules\/[^\/]+$/);
+		if (match == null) {
+			break;
+		}
+		srcDir = match[1];
+	}
+	return "";
+};
+
+
+Compiler.prototype._resolvePath$SSB = function (srcPath, givenPath, isWildcard) {
+	var srcDir;
+	var path;
 	var searchPaths;
 	var i;
-	var path;
 	var lastSlashAt;
 	if (givenPath.match(/^\.{1,2}\//) == null) {
+		srcDir = Util$dirname$S(srcPath);
+		path = this._resolvePathFromNodeModules$SSB(srcDir, givenPath, isWildcard);
+		if (path !== "") {
+			return path;
+		}
 		searchPaths = this._searchPaths.concat(this._emitter.getSearchPaths$());
 		for (i = 0; i < searchPaths.length; ++ i) {
 			path = Util$resolvePath$S(searchPaths[i] + "/" + givenPath);
 			if (this._platform.fileExists$S(path)) {
+				return path;
+			}
+		}
+		if (srcDir !== ".") {
+			path = this._resolvePathFromNodeModules$SSB(".", givenPath, isWildcard);
+			if (path !== "") {
 				return path;
 			}
 		}
@@ -25281,10 +25435,10 @@ $__jsx_lazy_init(NodePlatform, "_isColorSupported", function () {
 		return false;
 	})();
 });
-Meta.VERSION_STRING = "0.9.71";
-Meta.VERSION_NUMBER = 0.009071;
-Meta.LAST_COMMIT_HASH = "f396503f3f30a75c49db445e88abc2cfec392d76";
-Meta.LAST_COMMIT_DATE = "2013-12-15 21:44:17 +0900";
+Meta.VERSION_STRING = "0.9.75";
+Meta.VERSION_NUMBER = 0.009075;
+Meta.LAST_COMMIT_HASH = "8c807402af2781b4947762f22e74b874234d0558";
+Meta.LAST_COMMIT_DATE = "2014-02-03 18:17:21 +0900";
 $__jsx_lazy_init(Meta, "IDENTIFIER", function () {
 	return Meta.VERSION_STRING + " (" + Meta.LAST_COMMIT_DATE + "; " + Meta.LAST_COMMIT_HASH + ")";
 });
@@ -25398,7 +25552,7 @@ $__jsx_lazy_init(_Lexer, "rxHeredocEndSingleQuoted", function () {
 });
 _Lexer.rxNewline = /(?:\r\n?|\n)/;
 $__jsx_lazy_init(_Lexer, "keywords", function () {
-	return Util$asSet$AS([ "null", "true", "false", "NaN", "Infinity", "break", "do", "instanceof", "typeof", "case", "else", "new", "var", "catch", "finally", "return", "void", "const", "for", "switch", "while", "function", "this", "if", "throw", "in", "try", "class", "extends", "super", "import", "implements", "static", "__FILE__", "__LINE__", "undefined" ]);
+	return Util$asSet$AS([ "null", "true", "false", "NaN", "Infinity", "break", "do", "instanceof", "typeof", "case", "else", "new", "var", "finally", "return", "void", "const", "for", "switch", "while", "function", "this", "if", "throw", "in", "try", "class", "extends", "super", "import", "implements", "static", "__FILE__", "__LINE__", "undefined" ]);
 });
 $__jsx_lazy_init(_Lexer, "reserved", function () {
 	return Util$asSet$AS([ "debugger", "with", "export", "let", "private", "public", "yield", "protected", "extern", "native", "as", "operator" ]);
