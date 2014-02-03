@@ -502,6 +502,35 @@ abstract class _OperatorExpressionEmitter extends _ExpressionEmitter {
 
 }
 
+class _ArrayExpressionEmitter extends _OperatorExpressionEmitter {
+
+	var _expr : ArrayExpression;
+
+	function constructor (emitter : CplusplusEmitter, expr : ArrayExpression) {
+		super(emitter);
+		this._expr = expr;
+	}
+
+	override function _emit () : void {
+		this._emitter._emit("(*", null);
+		this._emitter._getExpressionEmitterFor(this._expr.getFirstExpr()).emit(_ArrayExpressionEmitter._operatorPrecedence);
+		this._emitter._emit(")[", this._expr.getToken());
+		this._emitter._getExpressionEmitterFor(this._expr.getSecondExpr()).emit(0);
+		this._emitter._emit("]", null);
+	}
+
+	override function _getPrecedence () : number {
+		return _ArrayExpressionEmitter._operatorPrecedence;
+	}
+
+	static var _operatorPrecedence = 0;
+
+	static function _setOperatorPrecedence (op : string, precedence : number) : void {
+		_ArrayExpressionEmitter._operatorPrecedence = precedence;
+	}
+
+}
+
 class _ShiftExpressionEmitter extends _OperatorExpressionEmitter {
 
 	var _expr : ShiftExpression;
@@ -1382,8 +1411,8 @@ int main() {
 			return new _UnaryExpressionEmitter(this, expr as SignExpression);
 		else if (expr instanceof AdditiveExpression)
 			return new _AdditiveExpressionEmitter(this, expr as AdditiveExpression);
-		// else if (expr instanceof ArrayExpression)
-		// 	return new _ArrayExpressionEmitter(this, expr as ArrayExpression);
+		else if (expr instanceof ArrayExpression)
+			return new _ArrayExpressionEmitter(this, expr as ArrayExpression);
 		else if (expr instanceof AssignmentExpression)
 			return new _AssignmentExpressionEmitter(this, expr as AssignmentExpression);
 		else if (expr instanceof FusedAssignmentExpression)
@@ -1394,10 +1423,10 @@ int main() {
 			return new _EqualityExpressionEmitter(this, expr as EqualityExpression);
 		// else if (expr instanceof InExpression)
 		// 	return new _InExpressionEmitter(this, expr as InExpression);
-		// else if (expr instanceof ShiftExpression)
-		// 	return new _ShiftExpressionEmitter(this, expr as ShiftExpression);
 		else if (expr instanceof LogicalExpression)
 			return new _LogicalExpressionEmitter(this, expr as LogicalExpression);
+		else if (expr instanceof ShiftExpression)
+			return new _ShiftExpressionEmitter(this, expr as ShiftExpression);
 		else if (expr instanceof ConditionalExpression)
 			return new _ConditionalExpressionEmitter(this, expr as ConditionalExpression);
 		else if (expr instanceof CallExpression)
@@ -1484,7 +1513,7 @@ int main() {
 
 		var precedence = [
 			[
-			// 	{ "[":          _ArrayExpressionEmitter._setOperatorPrecedence },
+				{ "[":          _ArrayExpressionEmitter._setOperatorPrecedence },
 				{ ".":          _PropertyExpressionEmitter._setOperatorPrecedence },
 				{ "(":          _CallExpressionEmitter._setOperatorPrecedence },
 			// 	{ "super":      _SuperExpressionEmitter._setOperatorPrecedence },
