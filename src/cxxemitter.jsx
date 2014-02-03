@@ -431,6 +431,28 @@ class _StringLiteralExpressionEmitter extends _ExpressionEmitter {
 
 }
 
+class _ArrayLiteralExpressionEmitter extends _ExpressionEmitter {
+
+	var _expr : ArrayLiteralExpression;
+
+	function constructor (emitter : CplusplusEmitter, expr : ArrayLiteralExpression) {
+		super(emitter);
+		this._expr = expr;
+	}
+
+	override function emit (outerOpPrecedence : number) : void {
+		this._emitter._emit(this._emitter.getNameOfClassDef(this._expr.getType() as ObjectType) + "::of(", null);
+		var exprs = this._expr.getExprs();
+		for (var i = 0; i < exprs.length; ++i) {
+			if (i != 0)
+				this._emitter._emit(", ", null);
+			this._emitter._getExpressionEmitterFor(exprs[i]).emit(0);
+		}
+		this._emitter._emit(")", null);
+	}
+
+}
+
 class _ThisExpressionEmitter extends _ExpressionEmitter {
 
 	var _expr : ThisExpression;
@@ -1332,8 +1354,8 @@ int main() {
 			return new _StringLiteralExpressionEmitter(this, expr as StringLiteralExpression);
 		// else if (expr instanceof RegExpLiteralExpression)
 		// 	return new _RegExpLiteralExpressionEmitter(this, expr as RegExpLiteralExpression);
-		// else if (expr instanceof ArrayLiteralExpression)
-		// 	return new _ArrayLiteralExpressionEmitter(this, expr as ArrayLiteralExpression);
+		else if (expr instanceof ArrayLiteralExpression)
+			return new _ArrayLiteralExpressionEmitter(this, expr as ArrayLiteralExpression);
 		// else if (expr instanceof MapLiteralExpression)
 		// 	return new _MapLiteralExpressionEmitter(this, expr as MapLiteralExpression);
 		else if (expr instanceof ThisExpression)
