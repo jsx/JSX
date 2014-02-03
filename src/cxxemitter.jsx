@@ -135,6 +135,36 @@ class _DoWhileStatementEmitter extends _StatementEmitter {
 
 }
 
+class _BreakStatementEmitter extends _StatementEmitter {
+
+	var _statement : BreakStatement;
+
+	function constructor (emitter : CplusplusEmitter, statement : BreakStatement) {
+		super(emitter);
+		this._statement = statement;
+	}
+
+	override function emit () : void {
+		this._emitter._emit("break;\n");
+	}
+
+}
+
+class _ContinueStatementEmitter extends _StatementEmitter {
+
+	var _statement : ContinueStatement;
+
+	function constructor (emitter : CplusplusEmitter, statement : ContinueStatement) {
+		super(emitter);
+		this._statement = statement;
+	}
+
+	override function emit () : void {
+		this._emitter._emit("continue;\n");
+	}
+
+}
+
 class _ReturnStatementEmitter extends _StatementEmitter {
 
 	var _statement : ReturnStatement;
@@ -1063,10 +1093,10 @@ int main() {
 			return new _ReturnStatementEmitter(this, statement as ReturnStatement);
 		// else if (statement instanceof DeleteStatement)
 		// 	return new _DeleteStatementEmitter(this, statement as DeleteStatement);
-		// else if (statement instanceof BreakStatement)
-		// 	return new _BreakStatementEmitter(this, statement as BreakStatement);
-		// else if (statement instanceof ContinueStatement)
-		// 	return new _ContinueStatementEmitter(this, statement as ContinueStatement);
+		else if (statement instanceof BreakStatement)
+			return new _BreakStatementEmitter(this, statement as BreakStatement);
+		else if (statement instanceof ContinueStatement)
+			return new _ContinueStatementEmitter(this, statement as ContinueStatement);
 		else if (statement instanceof DoWhileStatement)
 			return new _DoWhileStatementEmitter(this, statement as DoWhileStatement);
 		// else if (statement instanceof ForInStatement)
