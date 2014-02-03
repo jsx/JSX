@@ -981,7 +981,7 @@ native class TypeError extends Error {
 	function constructor(message : string);
 }
 
-interface IteratorResult.<T> {
+native __fake__ class IteratorResult.<T> {
 
 	var done : boolean;
 	var value : Nullable.<T>;
@@ -1000,7 +1000,7 @@ native class GeneratorObject.<T> {
 
 }
 
-class __jsx_generator_result.<T> implements IteratorResult.<T> {
+class __jsx_generator_result.<T> extends IteratorResult.<T> {
 
 	function constructor (value : Nullable.<T>, done : boolean) {
 		this.value = value;
