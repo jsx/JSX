@@ -6,6 +6,7 @@
 #include <iostream>
 #include <sstream>
 #include <cmath>
+#include <string>
 
 namespace JSX {
 
@@ -26,27 +27,31 @@ namespace JSX {
     string () : string("") {
     }
 
-    string (const char* data) :
-      length_(strlen(data)),
-      data_(data) {
+    string (const char *cstr) : str(cstr) {
     }
 
-    string (number n);
-
-    operator const char* () const {
-      return data_;
+    string (const std::string& str) : str(str) {
     }
 
-    string operator+ (const string& rhs) const;
+    string (number n) {
+      std::stringstream ss;
+      ss << n;
+      str = ss.str();
+    }
+
+    string operator+ (const string& rhs) const {
+      return string(str + rhs.str);
+    }
+
+    operator const char * () const {
+      return str.c_str();
+    }
 
   private:
 
-    int length_;
-    const char* data_;
+    std::string str;
 
   };
-
-  string operator+ (const char *lhs, const string& rhs);
 
   class variant;
 
@@ -394,25 +399,6 @@ namespace JSX {
 
   string toString(number num) {
     return string(num);
-  }
-
-  string::string(number n) {
-    std::stringstream ss;
-    ss << n;
-    const char *data = ss.str().c_str();
-    length_ = strlen(data);
-    data_ = data;
-  }
-
-  string string::operator+ (const string& rhs) const {
-    char *data = new char[length_ + rhs.length_];
-    strcpy(data, data_);
-    strcpy(data + length_, rhs.data_);
-    return string(data);
-  }
-
-  string operator+ (const char *lhs, const string& rhs) {
-    return string(lhs) + rhs;
   }
 
   template<typename T> string Array<T>::toString() {
