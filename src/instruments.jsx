@@ -1102,7 +1102,7 @@ class CodeTransformer {
 						new StaticFunctionType(null, this._transformingFuncDef.getReturnType(), [], true)),
 					new NullExpression(
 						new Token("null", false),
-						new StaticFunctionType(null, this._transformingFuncDef.getReturnType(), [], true)
+						new StaticFunctionType(null, this._transformingFuncDef.getReturnType(), [], true)))));
 
 		// replace yield statement
 		/*
