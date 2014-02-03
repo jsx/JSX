@@ -480,6 +480,41 @@ abstract class _OperatorExpressionEmitter extends _ExpressionEmitter {
 
 }
 
+class _ShiftExpressionEmitter extends _OperatorExpressionEmitter {
+
+	var _expr : ShiftExpression;
+
+	function constructor (emitter : CplusplusEmitter, expr : ShiftExpression) {
+		super(emitter);
+		this._expr = expr;
+	}
+
+	override function _emit () : void {
+		var op = this._expr.getToken().getValue();
+		if (op != ">>>") {
+			this._emitter._getExpressionEmitterFor(this._expr.getFirstExpr()).emit(_ShiftExpressionEmitter._operatorPrecedence[op]);
+		} else {
+			op = ">>";
+			this._emitter._emit("static_cast<unsigned>(");
+			this._emitter._getExpressionEmitterFor(this._expr.getFirstExpr()).emit(0);
+			this._emitter._emit(")");
+		}
+		this._emitter._emit(" " + op + " ", this._expr.getToken());
+		this._emitter._getExpressionEmitterFor(this._expr.getSecondExpr()).emit(_ShiftExpressionEmitter._operatorPrecedence[op] - 1);
+	}
+
+	override function _getPrecedence () : number {
+		return _ShiftExpressionEmitter._operatorPrecedence[this._expr.getToken().getValue()];
+	}
+
+	static const _operatorPrecedence = new Map.<number>;
+
+	static function _setOperatorPrecedence (op : string, precedence : number) : void {
+		_ShiftExpressionEmitter._operatorPrecedence[op] = precedence;
+	}
+
+}
+
 class _BinaryNumberExpressionEmitter extends _OperatorExpressionEmitter {
 
 	var _expr : BinaryNumberExpression;
@@ -1453,10 +1488,10 @@ int main() {
 				{ "+":          _AdditiveExpressionEmitter._setOperatorPrecedence },
 				{ "-":          _BinaryNumberExpressionEmitter._setOperatorPrecedence }
 			], [
-			// 	{ "<<":         _ShiftExpressionEmitter._setOperatorPrecedence },
-			// 	{ ">>":         _ShiftExpressionEmitter._setOperatorPrecedence },
-			// 	{ ">>>":        _ShiftExpressionEmitter._setOperatorPrecedence }
-			// ], [
+				{ "<<":         _ShiftExpressionEmitter._setOperatorPrecedence },
+				{ ">>":         _ShiftExpressionEmitter._setOperatorPrecedence },
+				{ ">>>":        _ShiftExpressionEmitter._setOperatorPrecedence }
+			], [
 				{ "<":          _BinaryNumberExpressionEmitter._setOperatorPrecedence },
 				{ ">":          _BinaryNumberExpressionEmitter._setOperatorPrecedence },
 				{ "<=":         _BinaryNumberExpressionEmitter._setOperatorPrecedence },
