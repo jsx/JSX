@@ -541,6 +541,34 @@ class _PropertyExpressionEmitter extends _UnaryExpressionEmitter {
 
 }
 
+class _LogicalExpressionEmitter extends _OperatorExpressionEmitter {
+
+	var _expr : LogicalExpression;
+
+	function constructor (emitter : CplusplusEmitter, expr : LogicalExpression) {
+		super(emitter);
+		this._expr = expr;
+	}
+
+	override function _emit () : void {
+		var op = this._expr.getToken().getValue();
+		this._emitter._getExpressionEmitterFor(this._expr.getFirstExpr()).emit(_LogicalExpressionEmitter._operatorPrecedence[op]);
+		this._emitter._emit(" " + op + " ", this._expr.getToken());
+		this._emitter._getExpressionEmitterFor(this._expr.getSecondExpr()).emit(_LogicalExpressionEmitter._operatorPrecedence[op] - 1);
+	}
+
+	override function _getPrecedence () : number {
+		return _LogicalExpressionEmitter._operatorPrecedence[this._expr.getToken().getValue()];
+	}
+
+	static const _operatorPrecedence = new Map.<number>;
+
+	static function _setOperatorPrecedence (op : string, precedence : number) : void {
+		_LogicalExpressionEmitter._operatorPrecedence[op] = precedence;
+	}
+
+}
+
 class _AdditiveExpressionEmitter extends _OperatorExpressionEmitter {
 
 	var _expr : AdditiveExpression;
@@ -1185,12 +1213,12 @@ int main() {
 			return new _EqualityExpressionEmitter(this, expr as EqualityExpression);
 		// else if (expr instanceof InExpression)
 		// 	return new _InExpressionEmitter(this, expr as InExpression);
-		// else if (expr instanceof LogicalExpression)
-		// 	return new _LogicalExpressionEmitter(this, expr as LogicalExpression);
 		// else if (expr instanceof ShiftExpression)
 		// 	return new _ShiftExpressionEmitter(this, expr as ShiftExpression);
 		// else if (expr instanceof ConditionalExpression)
 		// 	return new _ConditionalExpressionEmitter(this, expr as ConditionalExpression);
+		else if (expr instanceof LogicalExpression)
+			return new _LogicalExpressionEmitter(this, expr as LogicalExpression);
 		else if (expr instanceof CallExpression)
 			return new _CallExpressionEmitter(this, expr as CallExpression);
 		// else if (expr instanceof SuperExpression)
@@ -1321,10 +1349,10 @@ int main() {
 			], [
 				{ "|":          _BinaryNumberExpressionEmitter._setOperatorPrecedence }
 			], [
-			// 	{ "&&":         _LogicalExpressionEmitter._setOperatorPrecedence }
-			// ], [
-			// 	{ "||":         _LogicalExpressionEmitter._setOperatorPrecedence }
-			// ], [
+				{ "&&":         _LogicalExpressionEmitter._setOperatorPrecedence }
+			], [
+				{ "||":         _LogicalExpressionEmitter._setOperatorPrecedence }
+			], [
 				{ "=":          _AssignmentExpressionEmitter._setOperatorPrecedence },
 				{ "*=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
 				{ "/=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
