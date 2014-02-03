@@ -962,7 +962,7 @@ class _FunctionStatementEmitter extends _StatementEmitter {
 	override function emit () : void {
 		var funcDef = this._statement.getFuncDef();
 		assert funcDef.getFuncLocal() != null;
-		this._emitter._emit("function " + (funcDef.isGenerator() ? "* " : "") + this._emitter.getNamer().getNameOfLocalVariable(funcDef.getFuncLocal()) + "(", funcDef.getToken());
+		this._emitter._emit("function " + (funcDef.isGenerator() && this._emitter._enableES6Generator ? "* " : "") + this._emitter.getNamer().getNameOfLocalVariable(funcDef.getFuncLocal()) + "(", funcDef.getToken());
 		this._emitter.getNamer().enterFunction(funcDef, function () {
 			var args = funcDef.getArguments();
 			for (var i = 0; i < args.length; ++i) {
@@ -2888,6 +2888,7 @@ class JavaScriptEmitter implements Emitter {
 	var _enableProfiler : boolean;
 	var _enableMinifier : boolean;
 	var _enableRunTimeTypeCheck = true;
+	var _enableES6Generator = true;
 
 	var _bootstrapBuilder : _BootstrapBuilder;
 	var _sourceMapper : SourceMapper;
@@ -3017,6 +3018,10 @@ class JavaScriptEmitter implements Emitter {
 
 	override function setEnableMinifier(enable : boolean) : void {
 		this._enableMinifier = enable;
+	}
+
+	function setES6Generator (enable : boolean) : void {
+		this._enableES6Generator = enable;
 	}
 
 	override function emit (classDefs : ClassDefinition[]) : void {

@@ -852,6 +852,7 @@ class CodeTransformer {
 
 	var _forceTransform : boolean;
 	var _transformExprs : boolean;
+	var _generatorEmulationMode : boolean;
 
 	var _compiler : Compiler;
 	var _emitter : Emitter;
@@ -861,6 +862,7 @@ class CodeTransformer {
 	function constructor () {
 		this._forceTransform = false;
 		this._transformExprs = true;
+		this._generatorEmulationMode = false;
 
 		this._jsxGeneratorObject = null;
 	}
@@ -884,6 +886,10 @@ class CodeTransformer {
 
 	function setForceTransform (force : boolean) : void {
 		this._forceTransform = force;
+	}
+
+	function setGeneratorEmulationMode (mode : boolean) : void {
+		this._generatorEmulationMode = mode;
 	}
 
 	function getEmitter () : Emitter {
@@ -933,11 +939,13 @@ class CodeTransformer {
 			});
 		}
 		// transform generators
-		this._getAllClosures().forEach((funcDef) -> {
-			if (funcDef.isGenerator()) {
-				this._transformGenerator(funcDef);
-			}
-		});
+		if (this._generatorEmulationMode || this._forceTransform) {
+			this._getAllClosures().forEach((funcDef) -> {
+				if (funcDef.isGenerator()) {
+					this._transformGenerator(funcDef);
+				}
+			});
+		}
 	}
 
 	function _transformGenerator (funcDef : MemberFunctionDefinition) : void {
