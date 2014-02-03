@@ -363,7 +363,7 @@ namespace JSX {
     template<typename U> U reduceRight(function<U(Nullable<U>, Nullable<T>, number)> callbackfn, U initialValue);
     template<typename U> U reduceRight(function<U(Nullable<U>, Nullable<T>, number, Array<T>)> callbackfn, U initialValue);
 
-    template<typename... Args> static Array<T> of(const Args&... elemN);
+    template<typename... Args> static Array<T>* of(const Args&... elemN);
 
     /**
      * <p>A positive integer between 0 and a value less than 2<sup>32</sup> that specifies the number of elements in an array.</p>
@@ -379,8 +379,8 @@ namespace JSX {
     int push_();
     template<typename... Args> int push_(const Nullable<T>& t, const Args&... itemN);
 
-    static Array<T> of_(const Array<T>& ary);
-    template<typename... Args> static Array<T> of_(const Array<T>& ary, const Nullable<T>& t, const Args&... elemN);
+    static Array<T>* of_(Array<T>* ary);
+    template<typename... Args> static Array<T>* of_(Array<T>* ary, const Nullable<T>& t, const Args&... elemN);
 
   };
 
@@ -428,16 +428,16 @@ namespace JSX {
     return push(itemN...);
   }
 
-  template<typename T> template<typename... Args> Array<T> Array<T>::of(const Args&... elemN) {
+  template<typename T> template<typename... Args> Array<T>* Array<T>::of(const Args&... elemN) {
     return of_(new Array<T>, elemN...);
   }
 
-  template<typename T> Array<T> Array<T>::of_(const Array<T>& ary) {
+  template<typename T> Array<T>* Array<T>::of_(Array<T>* ary) {
     return ary;
   }
 
-  template<typename T> template<typename... Args> Array<T> Array<T>::of_(const Array<T>& ary, const Nullable<T>& t, const Args&... elemN) {
-    ary.push(t);
+  template<typename T> template<typename... Args> Array<T>* Array<T>::of_(Array<T>* ary, const Nullable<T>& t, const Args&... elemN) {
+    ary->push(t);
     return of_(ary, elemN...);
   }
 
