@@ -566,6 +566,34 @@ class _AssignmentExpressionEmitter extends _OperatorExpressionEmitter {
 
 }
 
+class _FusedAssignmentExpressionEmitter extends _OperatorExpressionEmitter {
+
+	var _expr : FusedAssignmentExpression;
+
+	function constructor (emitter : CplusplusEmitter, expr : FusedAssignmentExpression) {
+		super(emitter);
+		this._expr = expr;
+	}
+
+	override function _emit () : void {
+		var op = this._expr.getToken().getValue();
+		this._emitter._getExpressionEmitterFor(this._expr.getFirstExpr()).emit(this._getPrecedence());
+		this._emitter._emit(" " + op + " ");
+		this._emitter._getExpressionEmitterFor(this._expr.getSecondExpr()).emit(0);
+	}
+
+	override function _getPrecedence () : number {
+		return _FusedAssignmentExpressionEmitter._operatorPrecedence[this._expr.getToken().getValue()];
+	}
+
+	static const _operatorPrecedence = new Map.<number>;
+
+	static function _setOperatorPrecedence (op : string, precedence : number) : void {
+		_FusedAssignmentExpressionEmitter._operatorPrecedence[op] = precedence;
+	}
+
+}
+
 class _CallExpressionEmitter extends _OperatorExpressionEmitter {
 
 	var _expr : CallExpression;
@@ -1119,8 +1147,8 @@ int main() {
 		// 	return new _ArrayExpressionEmitter(this, expr as ArrayExpression);
 		else if (expr instanceof AssignmentExpression)
 			return new _AssignmentExpressionEmitter(this, expr as AssignmentExpression);
-		// else if (expr instanceof FusedAssignmentExpression)
-		// 	return new _FusedAssignmentExpressionEmitter(this, expr as FusedAssignmentExpression);
+		else if (expr instanceof FusedAssignmentExpression)
+			return new _FusedAssignmentExpressionEmitter(this, expr as FusedAssignmentExpression);
 		else if (expr instanceof BinaryNumberExpression)
 			return new _BinaryNumberExpressionEmitter(this, expr as BinaryNumberExpression);
 		else if (expr instanceof EqualityExpression)
@@ -1268,17 +1296,17 @@ int main() {
 			// 	{ "||":         _LogicalExpressionEmitter._setOperatorPrecedence }
 			// ], [
 				{ "=":          _AssignmentExpressionEmitter._setOperatorPrecedence },
-			// 	{ "*=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
-			// 	{ "/=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
-			// 	{ "%=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
-			// 	{ "+=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
-			// 	{ "-=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
-			// 	{ "<<=":        _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
-			// 	{ ">>=":        _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
-			// 	{ ">>>=":       _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
-			// 	{ "&=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
-			// 	{ "^=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
-			// 	{ "|=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence }
+				{ "*=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
+				{ "/=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
+				{ "%=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
+				{ "+=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
+				{ "-=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
+				{ "<<=":        _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
+				{ ">>=":        _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
+				{ ">>>=":       _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
+				{ "&=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
+				{ "^=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence },
+				{ "|=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence }
 			// ], [
 			// 	{ "?":          _ConditionalExpressionEmitter._setOperatorPrecedence }
 			// ], [
