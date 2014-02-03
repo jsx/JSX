@@ -366,6 +366,38 @@ class _NullExpressionEmitter extends _ExpressionEmitter {
 
 }
 
+class _BooleanLiteralExpressionEmitter extends _ExpressionEmitter {
+
+	var _expr : BooleanLiteralExpression;
+
+	function constructor (emitter : CplusplusEmitter, expr : BooleanLiteralExpression) {
+		super(emitter);
+		this._expr = expr;
+	}
+
+	override function emit (outerOpPrecedence : number) : void {
+		var token = this._expr.getToken();
+		this._emitter._emit(token.getValue(), token);
+	}
+
+}
+
+class _IntegerLiteralExpressionEmitter extends _ExpressionEmitter {
+
+	var _expr : IntegerLiteralExpression;
+
+	function constructor (emitter : CplusplusEmitter, expr : IntegerLiteralExpression) {
+		super(emitter);
+		this._expr = expr;
+	}
+
+	override function emit (outerOpPrecedence : number) : void {
+		var token = this._expr.getToken();
+		this._emitter._emit(token.getValue(), token);
+	}
+
+}
+
 class _NumberLiteralExpressionEmitter extends _ExpressionEmitter {
 
 	var _expr : NumberLiteralExpression;
@@ -1255,10 +1287,10 @@ int main() {
 			return new _ClassExpressionEmitter(this, expr as ClassExpression);
 		else if (expr instanceof NullExpression)
 			return new _NullExpressionEmitter(this, expr as NullExpression);
-		// else if (expr instanceof BooleanLiteralExpression)
-		// 	return new _BooleanLiteralExpressionEmitter(this, expr as BooleanLiteralExpression);
-		// else if (expr instanceof IntegerLiteralExpression)
-		// 	return new _IntegerLiteralExpressionEmitter(this, expr as IntegerLiteralExpression);
+		else if (expr instanceof BooleanLiteralExpression)
+			return new _BooleanLiteralExpressionEmitter(this, expr as BooleanLiteralExpression);
+		else if (expr instanceof IntegerLiteralExpression)
+			return new _IntegerLiteralExpressionEmitter(this, expr as IntegerLiteralExpression);
 		else if (expr instanceof NumberLiteralExpression)
 			return new _NumberLiteralExpressionEmitter(this, expr as NumberLiteralExpression);
 		else if (expr instanceof StringLiteralExpression)
