@@ -1029,6 +1029,29 @@ class __jsx_generator.<T> implements Enumerable.<T> {
 
 }
 
+/** @see http://wiki.ecmascript.org/doku.php?id=harmony:specification_drafts */
+native class Promise.<T> {
+
+	static function all (promises : Array.<Promise.<T>>) : Promise.<Array.<T>>;
+	static function race (promises : Array.<Promise.<T>>) : Promise.<T>;
+
+	/**
+	 * <p>If given value is a promse, then return the value. Otherwise, make a new promise that is fulfilled with the value.</p>
+	 */
+	static function cast (x : Promise.<T>) : Promise.<T>;
+	static function cast (x : T) : Promise.<T>;
+
+	static function reject (reason : variant) : Promise.<T>;
+	static function resolve (result : T) : Promise.<T>;
+
+	function constructor (executor : function(resolve :function(result:T):void, reject :function(reason:variant):void):void);
+
+	function then.<U> (onFulfilled : function(result:T):U) : Promise.<U>;
+	function then.<U> (onFulfilled : function(result:T):U, onRejected : function(reason:variant):void) : Promise.<U>;
+	function catch (onRejected : function(reason:variant):void) : void;
+
+}
+
 // 5.12
 /**
  * <p>Provides static functions to manipulate JSON.</p>
