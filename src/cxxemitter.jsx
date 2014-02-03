@@ -165,6 +165,61 @@ class _ContinueStatementEmitter extends _StatementEmitter {
 
 }
 
+class _SwitchStatementEmitter extends _StatementEmitter {
+
+	var _statement : SwitchStatement;
+
+	function constructor (emitter : CplusplusEmitter, statement : SwitchStatement) {
+		super(emitter);
+		this._statement = statement;
+	}
+
+	override function emit () : void {
+		this._emitter._emit("switch (", this._statement.getToken());
+		this._emitter._getExpressionEmitterFor(this._statement.getExpr()).emit(0);
+		this._emitter._emit(") {\n", null);
+		this._emitter._emitStatements(this._statement.getStatements());
+		this._emitter._emit("}\n", null);
+	}
+
+}
+
+class _CaseStatementEmitter extends _StatementEmitter {
+
+	var _statement : CaseStatement;
+
+	function constructor (emitter : CplusplusEmitter, statement : CaseStatement) {
+		super(emitter);
+		this._statement = statement;
+	}
+
+	override function emit () : void {
+		this._emitter._reduceIndent();
+		this._emitter._emit("case ", null);
+		this._emitter._getExpressionEmitterFor(this._statement.getExpr()).emit(0);
+		this._emitter._emit(":\n", null);
+		this._emitter._advanceIndent();
+	}
+
+}
+
+class _DefaultStatementEmitter extends _StatementEmitter {
+
+	var _statement : DefaultStatement;
+
+	function constructor (emitter : CplusplusEmitter, statement : DefaultStatement) {
+		super(emitter);
+		this._statement = statement;
+	}
+
+	override function emit () : void {
+		this._emitter._reduceIndent();
+		this._emitter._emit("default:\n", null);
+		this._emitter._advanceIndent();
+	}
+
+}
+
 class _ReturnStatementEmitter extends _StatementEmitter {
 
 	var _statement : ReturnStatement;
@@ -1170,12 +1225,12 @@ int main() {
 			return new _ForStatementEmitter(this, statement as ForStatement);
 		else if (statement instanceof IfStatement)
 			return new _IfStatementEmitter(this, statement as IfStatement);
-		// else if (statement instanceof SwitchStatement)
-		// 	return new _SwitchStatementEmitter(this, statement as SwitchStatement);
-		// else if (statement instanceof CaseStatement)
-		// 	return new _CaseStatementEmitter(this, statement as CaseStatement);
-		// else if (statement instanceof DefaultStatement)
-		// 	return new _DefaultStatementEmitter(this, statement as DefaultStatement);
+		else if (statement instanceof SwitchStatement)
+			return new _SwitchStatementEmitter(this, statement as SwitchStatement);
+		else if (statement instanceof CaseStatement)
+			return new _CaseStatementEmitter(this, statement as CaseStatement);
+		else if (statement instanceof DefaultStatement)
+			return new _DefaultStatementEmitter(this, statement as DefaultStatement);
 		else if (statement instanceof WhileStatement)
 			return new _WhileStatementEmitter(this, statement as WhileStatement);
 		// else if (statement instanceof TryStatement)
