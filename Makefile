@@ -60,6 +60,9 @@ test-transformed:
 test-transformed-optimized:
 	JSX_OPTS="--enable-cps-transform --optimize release,-no-log,-no-assert" $(MAKE) test-core
 
+test-cpp:
+	JSX_OPTS="--target c++" $(MAKE) test-core
+
 test-core:
 	$(PROVE) --jobs "$(JOBS)" t/run/*.jsx t/compile_error/*.jsx t/lib/*.jsx t/src/*.jsx t/web/*.jsx
 
