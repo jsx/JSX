@@ -29,6 +29,7 @@ import "./platform.jsx";
 import "./util.jsx";
 import "./optimizer.jsx";
 import "./completion.jsx";
+import "./instruments.jsx";
 import "./statement.jsx";
 
 
@@ -41,6 +42,7 @@ class Compiler {
 
 	var _platform : Platform;
 	var _mode : number;
+	var _transformer : CodeTransformer;
 	var _optimizer : Optimizer;
 	var _warningFilters : Array.<function(:CompileWarning):Nullable.<boolean>>;
 	var _warningAsError : boolean;
@@ -53,6 +55,7 @@ class Compiler {
 	function constructor (platform : Platform) {
 		this._platform = platform;
 		this._mode = Compiler.MODE_COMPILE;
+		this._transformer = null;
 		this._optimizer = null;
 		this._warningFilters = [] : Array.<function(:CompileWarning):Nullable.<boolean>>;
 		this._warningAsError = false;
@@ -87,6 +90,10 @@ class Compiler {
 
 	function setEmitter (emitter : Emitter) : void {
 		this._emitter = emitter;
+	}
+
+	function setTransformer (transformer : CodeTransformer) : void {
+		this._transformer = transformer;
 	}
 
 	function setOptimizer (optimizer : Optimizer) : void {
@@ -172,6 +179,8 @@ class Compiler {
 		case Compiler.MODE_DOC:
 			return true;
 		}
+		// transformation
+		this._transform();
 		// optimization
 		this._optimize();
 		// TODO peep-hole and dead store optimizations, etc.
@@ -352,6 +361,11 @@ class Compiler {
 			classDef.analyzeUnusedVariables();
 			return true;
 		});
+	}
+
+	function _transform () : void {
+		if (this._transformer != null)
+			this._transformer.setup(this, this._emitter).performTransformation();
 	}
 
 	function _optimize () : void {
