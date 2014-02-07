@@ -1062,6 +1062,8 @@ class CodeTransformer {
 						j = replaceGoto(switchStmt.getStatements(), j);
 					}
 				}
+				statements.splice(i + 1, 0, makeBreak());
+				i = i + 1;
 			}
 		}
 
