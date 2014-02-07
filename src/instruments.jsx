@@ -1213,12 +1213,13 @@ class CodeTransformer {
 		// replace entry point
 		/*
 		  $loop(0);
+		  return $returnN;
 
 		  -> $generatorN.__next = 0;
 		     $generatorN.__loop = $loop;
 		 */
 		var statements = funcDef.getStatements();
-		statements.splice(statements.length - 1, 1,
+		statements.splice(statements.length - 2, 2,
 			new ExpressionStatement(
 				new AssignmentExpression(
 					new Token("=", false),
