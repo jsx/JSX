@@ -964,7 +964,7 @@ class CodeTransformer {
 		});
 	}
 
-	function _doCPSTransform (funcDef : MemberFunctionDefinition, postFragmentationCallback : (string, Statement[]) -> void) : void {
+	function _doCPSTransform (funcDef : MemberFunctionDefinition, bbCallback : (string, Statement[]) -> void) : void {
 		this._transformingFuncDef = funcDef;
 
 		var returnLocal : LocalVariable = null;
@@ -983,93 +983,140 @@ class CodeTransformer {
 		}
 		// insert prologue code
 		statements.unshift(
-			new GotoStatement("$L_enter"),
 			new LabelStatement("$L_enter")
 		);
 		// insert epilogue code
 		statements.push(
 			new GotoStatement("$L_exit"),
-			new LabelStatement("$L_exit")
-		);
+			new LabelStatement("$L_exit"),
+			new ReturnStatement(new Token("return", false), null));
 		funcDef._statements = statements;
+
+		// replace goto statements with calls of closures
+		this._eliminateGotos(funcDef, bbCallback);
 
 		if (! Type.voidType.equals(funcDef.getReturnType())) {
 			funcDef._statements.push(new ReturnStatement(new Token("return", false), new LocalExpression(returnLocal.getName(), returnLocal)));
 			this._leaveFunction();
 		}
-
-		// replace goto statements with calls of closures
-		this._eliminateGotos(funcDef, postFragmentationCallback);
 	}
 
-	function _eliminateGotos (funcDef : MemberFunctionDefinition, postFragmentationCallback : (string, Statement[]) -> void) : void {
+	function _eliminateGotos (funcDef : MemberFunctionDefinition, bbCallback : (string, Statement[]) -> void) : void {
 		var statements = funcDef.getStatements();
-		// collect labels
-		var labels = new Map.<LocalVariable>;
-		for (var i = 0; i < statements.length; ++i) {
-			if (statements[i] instanceof LabelStatement && labels[(statements[i] as LabelStatement).getName()] == null) {
-				var name = (statements[i] as LabelStatement).getName();
-				labels[name] = new LocalVariable(new Token(name, true), new StaticFunctionType(null, Type.voidType, [], true));
-				funcDef.getLocals().push(labels[name]);
+
+		var loopVar = new LocalVariable(new Token("$loop", true), new StaticFunctionType(null, Type.voidType, [ Type.integerType ] : Type[], true));
+		funcDef.getLocals().push(loopVar);
+
+		// create executor
+		var nextVar = new ArgumentDeclaration(new Token("$next", true), Type.integerType);
+		var executor = this._createNamedFunction(funcDef, null, new Token("$loop", true), [ nextVar ], Type.voidType);
+		executor.setFuncLocal(loopVar);
+
+		// number labels
+		var labelIndeces = new Map.<int>;
+		for (var i = 0, c = 0; i < statements.length; ++i) {
+			if (statements[i] instanceof LabelStatement) {
+				var name =(statements[i] as LabelStatement).getName();
+				labelIndeces[name] = c++;
 			}
 		}
+
+		function makeJump (gotoStmt : GotoStatement) : Statement {
+			var name = gotoStmt.getLabel();
+			var index;
+			if ((index = labelIndeces[name]) == null) {
+				throw new Error("logic flaw! label not found");
+			}
+			return new ExpressionStatement(
+				new AssignmentExpression(
+					new Token("=", false),
+					new LocalExpression(new Token("$next", true), nextVar),
+					new IntegerLiteralExpression(new Token("" + index, false))));
+		}
+
+		function replaceGoto (statements : Statement[], index : int) : void {
+			assert statements[index] instanceof GotoStatement;
+			var gotoStmt = statements[index] as GotoStatement;
+			statements.splice(index, 1, makeJump(gotoStmt));
+		}
+
 		// replace gotos with function call (and return statement)
 		for (var i = 0; i < statements.length; ++i) {
 			var stmt = statements[i];
+
 			if (stmt instanceof GotoStatement) {
-				var name = (stmt as GotoStatement).getLabel();
-				statements[i] = new ReturnStatement(new Token("return", false), new CallExpression(new Token("(", false), new LocalExpression(null, labels[name]), []));
+				replaceGoto(statements, i);
 			} else if (stmt instanceof IfStatement) {
 				var ifStmt = stmt as IfStatement;
-				var succLabel = (ifStmt.getOnTrueStatements()[0] as GotoStatement).getLabel();
-				ifStmt.getOnTrueStatements()[0] = new ReturnStatement(new Token("return", false), new CallExpression(new Token("(", false), new LocalExpression(null, labels[succLabel]), []));
-				var failLabel = (ifStmt.getOnFalseStatements()[0] as GotoStatement).getLabel();
-				ifStmt.getOnFalseStatements()[0] = new ReturnStatement(new Token("return", false), new CallExpression(new Token("(", false), new LocalExpression(null, labels[failLabel]), []));
+				replaceGoto(ifStmt.getOnTrueStatements(), 0);
+				replaceGoto(ifStmt.getOnFalseStatements(), 0);
 			} else if (stmt instanceof SwitchStatement) {
 				var switchStmt = stmt as SwitchStatement;
 				for (var j = 0; j < switchStmt.getStatements().length; ++j) {
 					if (switchStmt.getStatements()[j] instanceof GotoStatement) {
-						name = (switchStmt.getStatements()[j] as GotoStatement).getLabel();
-						switchStmt.getStatements()[j] = new ReturnStatement(new Token("return", false), new CallExpression(new Token("(", false), new LocalExpression(null, labels[name]), []));
+						replaceGoto(switchStmt.getStatements(), j);
 					}
 				}
 			}
 		}
-		// entry basic block
-		var entry = new Statement[];
-		for (var i = 0; i < statements.length; ++i) {
-			if (statements[i] instanceof LabelStatement) { // until first label
-				break;
-			}
-			entry.push(statements[i]);
+
+		function makeBasicBlock (label : string, body : Statement[]) : Statement[] {
+			var statements = body.concat([]);
+			statements.unshift(
+				new CaseStatement(
+					new Token("case", false),
+					new IntegerLiteralExpression(new Token("" + labelIndeces[label], false))));
+			statements.push(
+				new BreakStatement(
+					new Token("break", false),
+					null));
+			return statements;
 		}
-		// remaining basic blocks
+
+		// basic blocks
 		var basicBlocks = new Statement[];
-		var currentLabel : LabelStatement = null;
-		while (i < statements.length) {
+		for (var i = 0; i < statements.length;) {
 			var currentLabel = statements[i] as LabelStatement;
+			++i;
 
 			// read the block
 			var body = new Statement[];
-			++i;
 			for (; i < statements.length; ++i) {
 				if (statements[i] instanceof LabelStatement) {
 					break;
 				}
 				body.push(statements[i]);
 			}
-			postFragmentationCallback(currentLabel.getName(), body);
+			bbCallback(currentLabel.getName(), body);
 
-			// create a function block
-			var block = this._createAnonymousFunction(funcDef, null, [], this._transformingFuncDef.getReturnType());
-			block._statements = body;
-			basicBlocks.push(new ExpressionStatement(
-				new AssignmentExpression(
-					new Token("=", false),
-					new LocalExpression(null, labels[currentLabel.getName()]),
-					new FunctionExpression(new Token("function", false), block))));
+			// create a basic block
+			basicBlocks = basicBlocks.concat(makeBasicBlock(currentLabel.getName(), body));
 		}
-		funcDef._statements = basicBlocks.concat(entry);
+
+		// create while-switch loop
+		var switchStmt = new SwitchStatement(
+			new Token("switch", false),
+			null,
+			new LocalExpression(new Token("$next", true), nextVar),
+			basicBlocks);
+		var whileStmt = new WhileStatement(
+			new Token("while", false),
+			null,
+			new BooleanLiteralExpression(new Token("true", false)),
+			[ switchStmt ] : Statement[]);
+
+		// set the vm to executor
+		executor._statements = [ whileStmt ] : Statement[];
+
+		// amend funcDef._statements
+		funcDef.getStatements().length = 0;
+		funcDef.getStatements().push(new FunctionStatement(
+			new Token("function", false), executor));
+		funcDef.getStatements().push(new ExpressionStatement(
+			new CallExpression(
+				new Token("(", false),
+				new LocalExpression(new Token("$loop", true), loopVar),
+				[ new IntegerLiteralExpression(new Token("0", false)) ] : Expression[])));
 	}
 
 	function _transformGeneratorCore(funcDef : MemberFunctionDefinition) : void {
@@ -1081,46 +1128,16 @@ class CodeTransformer {
 		var genLocal = new LocalVariable(new Token(genLocalName, false), genType);
 		funcDef.getLocals().push(genLocal);
 
-		// insert epilogue code
-		/*
-		  $generatorN.__next = null;
-		  $generatorN.__value = null;
-		*/
-		funcDef.getStatements().push(
-			new ExpressionStatement(
-				new AssignmentExpression(
-					new Token("=", false),
-					new PropertyExpression(
-						new Token(".", false),
-						new LocalExpression(new Token(genLocalName, false), genLocal),
-						new Token("__value", false),
-						[],
-						yieldingType),
-					new NullExpression(
-						new Token("null", false),
-						yieldingType))),
-			new ExpressionStatement(
-				new AssignmentExpression(
-					new Token("=", false),
-					new PropertyExpression(
-						new Token(".", false),
-						new LocalExpression(new Token(genLocalName, false), genLocal),
-						new Token("__next", true),
-						[],
-						new StaticFunctionType(null, funcDef.getReturnType(), [], true)),
-					new NullExpression(
-						new Token("null", false),
-						new StaticFunctionType(null, funcDef.getReturnType(), [], true)))));
-
-		// replace yield statement
-		/*
-		  yield expr;
-		  $LABEL();
-
-		  -> $generatorN.__value = expr;
-		     $generatorN.__next = $LABEL;
-		 */
 		this._doCPSTransform(funcDef, function (label : string, statements : Statement[]) : void {
+			// replace yield statement
+			/*
+			  yield expr;
+			  $next = LABEL;
+
+                          -> $generatorN.__value = expr;
+			     $generatorN.__next = $LABEL;
+			     return;
+			*/
 			if (2 <= statements.length && statements[statements.length - 2] instanceof YieldStatement) {
 				var idx = statements.length - 2;
 				statements.splice(idx, 2,
@@ -1132,7 +1149,7 @@ class CodeTransformer {
 								new LocalExpression(new Token(genLocalName, false), genLocal),
 								new Token("__value", false),
 								[],
-								yieldingType),
+								yieldingType.toNullableType()),
 							(statements[idx] as YieldStatement).getExpr())),
 					new ExpressionStatement(
 						new AssignmentExpression(
@@ -1142,8 +1159,42 @@ class CodeTransformer {
 								new LocalExpression(new Token(genLocalName, false), genLocal),
 								new Token("__next", true),
 								[],
-								new StaticFunctionType(null, this._transformingFuncDef.getReturnType(), [], true)),
-							((statements[idx + 1] as ReturnStatement).getExpr()as CallExpression).getExpr())));
+								Type.integerType.toNullableType()),
+							(statements[idx + 1] as ExpressionStatement).getExpr())),
+					new ReturnStatement(new Token("return", false), null));
+			}
+			// insert epilogue code
+			/*
+			  return;
+
+			  -> $generatorN.__value = $returnM;
+			     $generatorN.__next = -1;
+			     return;
+			*/
+			else if (statements.length == 1 && statements[statements.length - 1] instanceof ReturnStatement) {
+				statements.splice(statements.length - 1, 0,
+					new ExpressionStatement(
+						new AssignmentExpression(
+							new Token("=", false),
+							new PropertyExpression(
+								new Token(".", false),
+								new LocalExpression(new Token(genLocalName, false), genLocal),
+								new Token("__value", false),
+								[],
+								yieldingType),
+							new LocalExpression(
+								this._getTopReturnLocal().getName(),
+								this._getTopReturnLocal()))),
+					new ExpressionStatement(
+						new AssignmentExpression(
+							new Token("=", false),
+							new PropertyExpression(
+								new Token(".", false),
+								new LocalExpression(new Token(genLocalName, false), genLocal),
+								new Token("__next", true),
+								[],
+								Type.integerType.toNullableType()),
+							new IntegerLiteralExpression(new Token("-1", false)))));
 			}
 		});
 
@@ -1161,9 +1212,10 @@ class CodeTransformer {
 
 		// replace entry point
 		/*
-		  $L_enter();
+		  $loop(0);
 
-		  -> $generatorN.__next = $L_enter;
+		  -> $generatorN.__next = 0;
+		     $generatorN.__loop = $loop;
 		 */
 		var statements = funcDef.getStatements();
 		statements.splice(statements.length - 1, 1,
@@ -1175,10 +1227,18 @@ class CodeTransformer {
 						new LocalExpression(new Token(genLocalName, false), genLocal),
 						new Token("__next", true),
 						[],
-						new StaticFunctionType(null, this._transformingFuncDef.getReturnType(), [], true)),
-					new LocalExpression(
-						new Token("$L_enter", true),
-						(((statements[statements.length - 1] as ReturnStatement).getExpr() as CallExpression).getExpr() as LocalExpression).getLocal()))));
+						Type.integerType.toNullableType()),
+					new IntegerLiteralExpression(new Token("0", false)))),
+			new ExpressionStatement(
+				new AssignmentExpression(
+					new Token("=", false),
+					new PropertyExpression(
+						new Token(".", false),
+						new LocalExpression(new Token(genLocalName, false), genLocal),
+						new Token("__loop", true),
+						[],
+						new StaticFunctionType(null, Type.voidType, [ Type.integerType ] : Type[], true)),
+					new LocalExpression(new Token("$loop", true), funcDef.getLocals()[funcDef.getLocals().length - 1]))));
 
 		// return the generator
 		statements.push(
@@ -1429,12 +1489,16 @@ class CodeTransformer {
 	// }
 
 	function _createAnonymousFunction (parent : MemberFunctionDefinition, token : Token /* null for auto-gen */, args : ArgumentDeclaration[], returnType : Type) : MemberFunctionDefinition {
+		return this._createNamedFunction(parent, token, null, args, returnType);
+	}
+
+	function _createNamedFunction (parent : MemberFunctionDefinition, token : Token /* null for auto-gen */, nameToken : Token, args : ArgumentDeclaration[], returnType : Type) : MemberFunctionDefinition {
 		if (token == null) {
 			token = new Token("function", false);
 		}
 		var funcDef = new MemberFunctionDefinition(
 			token,
-			null, // name
+			nameToken,
 			ClassDefinition.IS_STATIC,
 			returnType,
 			args,
