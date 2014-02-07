@@ -1,3 +1,7 @@
+/*JSX_OPTS
+--enable-generator-emulation
+*/
+
 /***
  * Experimental generator
  */
@@ -13,25 +17,25 @@ class Async {
     };
   }
 
-  static function run(coro : () -> Enumerable.<(variant)->void>) : void {
+  static function run(coro : () -> Generator.<(variant)->void>) : void {
     Async.go(coro());
   }
 
   static function go(v : variant) : void {
-    var g = v as Enumerable.<(variant)->void>;
-    try {
-      var cb = g.next();
-      cb(g);
-    }
-    catch (si : StopIteration) {
+    var g = v as Generator.<(variant)->void>;
+
+    var data = g.next();
+    if (data.done) {
       return; // nothing
+    } else {
+      data.value(g);
     }
   }
 }
 
 class _Main {
   static function main(args : string[]) : void {
-    Async.run(() -> {
+    Async.run(function * () {
       log "H";
       yield Async.sleep(100);
       log "e";

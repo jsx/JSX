@@ -852,19 +852,19 @@ class CodeTransformer {
 
 	var _forceTransform : boolean;
 	var _transformExprs : boolean;
+	var _generatorEmulationMode : boolean;
 
 	var _compiler : Compiler;
 	var _emitter : Emitter;
 
-	var _stopIterationClassDef : ClassDefinition;
-	var _jsxGeneratorClassDef : TemplateClassDefinition;
+	var _jsxGeneratorObject : TemplateClassDefinition;
 
 	function constructor () {
 		this._forceTransform = false;
 		this._transformExprs = true;
+		this._generatorEmulationMode = false;
 
-		this._stopIterationClassDef = null;
-		this._jsxGeneratorClassDef = null;
+		this._jsxGeneratorObject = null;
 	}
 
 	function setup (compiler : Compiler, emitter : Emitter) : CodeTransformer {
@@ -872,23 +872,24 @@ class CodeTransformer {
 		this._emitter = emitter;
 		var builtins = compiler.getBuiltinParsers()[0];
 
-		// get built-in classes related to generators
-		this._stopIterationClassDef = builtins.lookup([], null, "StopIteration");
 		for (var i = 0; i < builtins._templateClassDefs.length; ++i) {
-			if (builtins._templateClassDefs[i].className() == "__jsx_generator") {
-				this._jsxGeneratorClassDef = builtins._templateClassDefs[i];
+			if (builtins._templateClassDefs[i].className() == "__jsx_generator_object") {
+				this._jsxGeneratorObject = builtins._templateClassDefs[i];
 				break;
 			}
 		}
 
-		assert this._stopIterationClassDef != null;
-		assert this._jsxGeneratorClassDef != null;
+		assert this._jsxGeneratorObject != null;
 
 		return this;
 	}
 
 	function setForceTransform (force : boolean) : void {
 		this._forceTransform = force;
+	}
+
+	function setGeneratorEmulationMode (mode : boolean) : void {
+		this._generatorEmulationMode = mode;
 	}
 
 	function getEmitter () : Emitter {
@@ -938,11 +939,13 @@ class CodeTransformer {
 			});
 		}
 		// transform generators
-		this._getAllClosures().forEach((funcDef) -> {
-			if (funcDef.isGenerator()) {
-				this._transformGenerator(funcDef);
-			}
-		});
+		if (this._generatorEmulationMode || this._forceTransform) {
+			this._getAllClosures().forEach((funcDef) -> {
+				if (funcDef.isGenerator()) {
+					this._transformGenerator(funcDef);
+				}
+			});
+		}
 	}
 
 	function _transformGenerator (funcDef : MemberFunctionDefinition) : void {
@@ -1078,10 +1081,36 @@ class CodeTransformer {
 		var genLocal = new LocalVariable(new Token(genLocalName, false), genType);
 		funcDef.getLocals().push(genLocal);
 
-		// insert epilogue code `throw new StopIteration`
-		var newExpr = new NewExpression(new Token("new", false), new ObjectType(this._stopIterationClassDef), []);
-		newExpr.analyze(new AnalysisContext([], null, null), null);
-		funcDef.getStatements().push(new ThrowStatement(new Token("throw", false), newExpr));
+		// insert epilogue code
+		/*
+		  $generatorN.__next = null;
+		  $generatorN.__value = null;
+		*/
+		funcDef.getStatements().push(
+			new ExpressionStatement(
+				new AssignmentExpression(
+					new Token("=", false),
+					new PropertyExpression(
+						new Token(".", false),
+						new LocalExpression(new Token(genLocalName, false), genLocal),
+						new Token("__value", false),
+						[],
+						yieldingType),
+					new NullExpression(
+						new Token("null", false),
+						yieldingType))),
+			new ExpressionStatement(
+				new AssignmentExpression(
+					new Token("=", false),
+					new PropertyExpression(
+						new Token(".", false),
+						new LocalExpression(new Token(genLocalName, false), genLocal),
+						new Token("__next", true),
+						[],
+						new StaticFunctionType(null, funcDef.getReturnType(), [], true)),
+					new NullExpression(
+						new Token("null", false),
+						new StaticFunctionType(null, funcDef.getReturnType(), [], true)))));
 
 		// replace yield statement
 		/*
@@ -1120,7 +1149,7 @@ class CodeTransformer {
 
 		// declare generator object
 		/*
-		  var $generatorN = new __jsx_generator;
+		  var $generatorN = new __jsx_generator_object;
 		*/
 		var newExpr = new NewExpression(new Token("new", false), genType, []);
 		newExpr.analyze(new AnalysisContext([], null, null), null);
@@ -1160,9 +1189,9 @@ class CodeTransformer {
 
 	function _instantiateGeneratorType (yieldingType : Type) : Type {
 		// instantiate generator
-		var genClassDef = this._jsxGeneratorClassDef.getParser().lookupTemplate(
+		var genClassDef = this._jsxGeneratorObject.getParser().lookupTemplate(
 			[],	// errors
-			new TemplateInstantiationRequest(null, "__jsx_generator", [ yieldingType ] : Type[]),
+			new TemplateInstantiationRequest(null, "__jsx_generator_object", [ yieldingType ] : Type[]),
 			(parser, classDef) -> null
 		);
 		assert genClassDef != null;
@@ -1178,7 +1207,7 @@ class CodeTransformer {
 					return classDef;
 				});
 		};
-		var parser = this._jsxGeneratorClassDef.getParser();
+		var parser = this._jsxGeneratorObject.getParser();
 		genClassDef.resolveTypes(createContext(parser));
 		genClassDef.analyze(createContext(parser));
 

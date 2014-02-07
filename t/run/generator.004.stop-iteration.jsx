@@ -1,23 +1,23 @@
+/*JSX_OPTS
+--enable-generator-emulation
+*/
 /*EXPECTED
 ok
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function foo () : Enumerable.<number> {
+		function * foo () : number {
 			yield 1;
 			yield 2;
 			yield 3;
 		}
 
 		var g = foo();
-		g.next();
-		g.next();
-		g.next();
+		g.next().value;
+		g.next().value;
+		g.next().value;
 
-		try {
-			g.next();
-		} catch (e : StopIteration) {
+		if (g.next().done)
 			log "ok";
-		}
 	}
 }

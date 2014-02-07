@@ -1,3 +1,6 @@
+/*JSX_OPTS
+--enable-generator-emulation
+*/
 /*EXPECTED
 1
 1
@@ -7,7 +10,7 @@
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function fib () : Enumerable.<number> {
+		function * fib () : number {
 			var a = 0, b = 1;
 			while (true) {
 				var t = a;
@@ -19,7 +22,7 @@ class _Main {
 
 		var g = fib();
 		for (var i = 0; i < 5; ++i) {
-			log g.next();
+			log g.next().value;
 		}
 	}
 }

@@ -1041,7 +1041,7 @@ class _FunctionStatementEmitter extends _StatementEmitter {
 	override function emit () : void {
 		var funcDef = this._statement.getFuncDef();
 		assert funcDef.getFuncLocal() != null;
-		this._emitter._emit("function " + this._emitter.getNamer().getNameOfLocalVariable(funcDef.getFuncLocal()) + "(", funcDef.getToken());
+		this._emitter._emit("function " + (funcDef.isGenerator() && this._emitter._enableES6Generator ? "* " : "") + this._emitter.getNamer().getNameOfLocalVariable(funcDef.getFuncLocal()) + "(", funcDef.getToken());
 		this._emitter.getNamer().enterFunction(funcDef, function () {
 			var args = funcDef.getArguments();
 			for (var i = 0; i < args.length; ++i) {
@@ -1085,6 +1085,38 @@ class _ReturnStatementEmitter extends _StatementEmitter {
 				this._emitter._emit("return $__jsx_profiler.exit();\n", this._statement.getToken());
 			} else {
 				this._emitter._emit("return;\n", this._statement.getToken());
+			}
+		}
+	}
+
+}
+
+class _YieldStatementEmitter extends _StatementEmitter {
+
+	var _statement : YieldStatement;
+
+	function constructor (emitter : JavaScriptEmitter, statement : YieldStatement) {
+		super(emitter);
+		this._statement = statement;
+	}
+
+	override function emit () : void {
+		var expr = this._statement.getExpr();
+		if (expr != null) {
+			this._emitter._emit("yield ", null);
+			if (this._emitter._enableProfiler) {
+				this._emitter._emit("$__jsx_profiler.exit(", null);
+			}
+			this._emitter._emitRHSOfAssignment(this._statement.getExpr(), this._emitter._emittingFunction.getReturnType());
+			if (this._emitter._enableProfiler) {
+				this._emitter._emit(")", null);
+			}
+			this._emitter._emit(";\n", null);
+		} else {
+			if (this._emitter._enableProfiler) {
+				this._emitter._emit("yield $__jsx_profiler.exit();\n", this._statement.getToken());
+			} else {
+				this._emitter._emit("yield;\n", this._statement.getToken());
 			}
 		}
 	}
@@ -2224,7 +2256,7 @@ class _FunctionExpressionEmitter extends _OperatorExpressionEmitter {
 		this._emitter._emit("(", funcDef.getToken());
 		var funcLocal = funcDef.getFuncLocal();
 		this._emitter.getNamer().enterScope(funcLocal, function () {
-			this._emitter._emit("function " + (funcLocal != null ? this._emitter.getNamer().getNameOfLocalVariable(funcLocal) : "") + "(", funcDef.getToken());
+			this._emitter._emit("function " + (funcDef.isGenerator() && this._emitter._enableES6Generator ? "* " : "") + (funcLocal != null ? this._emitter.getNamer().getNameOfLocalVariable(funcLocal) : "") + "(", funcDef.getToken());
 			this._emitter.getNamer().enterFunction(funcDef, function () {
 				var args = funcDef.getArguments();
 				for (var i = 0; i < args.length; ++i) {
@@ -3018,6 +3050,7 @@ class JavaScriptEmitter implements Emitter {
 	var _enableProfiler : boolean;
 	var _enableMinifier : boolean;
 	var _enableRunTimeTypeCheck = true;
+	var _enableES6Generator = true;
 
 	var _bootstrapBuilder : _BootstrapBuilder;
 	var _sourceMapper : SourceMapper;
@@ -3147,6 +3180,10 @@ class JavaScriptEmitter implements Emitter {
 
 	override function setEnableMinifier(enable : boolean) : void {
 		this._enableMinifier = enable;
+	}
+
+	function setES6Generator (enable : boolean) : void {
+		this._enableES6Generator = enable;
 	}
 
 	override function emit (classDefs : ClassDefinition[]) : void {
@@ -3747,6 +3784,8 @@ class JavaScriptEmitter implements Emitter {
 			return new _FunctionStatementEmitter(this, statement as FunctionStatement);
 		else if (statement instanceof ReturnStatement)
 			return new _ReturnStatementEmitter(this, statement as ReturnStatement);
+		else if (statement instanceof YieldStatement)
+			return new _YieldStatementEmitter(this, statement as YieldStatement);
 		else if (statement instanceof DeleteStatement)
 			return new _DeleteStatementEmitter(this, statement as DeleteStatement);
 		else if (statement instanceof BreakStatement)

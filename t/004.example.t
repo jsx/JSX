@@ -13,7 +13,13 @@ my $workdir = tempdir(CLEANUP => 1, DIR => ".");
 
 for my $file(@files) {
     {
-        my $cmd = qq{--executable node --output $workdir/compiled.js $file};
+        my $opts = get_section($file, "JSX_OPTS");
+        if (defined $opts) {
+            chomp $opts;
+        }
+        $opts ||= "";
+
+        my $cmd = qq{$opts --executable node --output $workdir/compiled.js $file};
         my($ok, $stdout, $stderr) = jsx($cmd);
 
         ok $ok, $cmd or fail($stderr);

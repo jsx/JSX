@@ -1,3 +1,6 @@
+/*JSX_OPTS
+--enable-generator-emulation
+*/
 /*EXPECTED
 0
 1
@@ -8,7 +11,7 @@ end
 class _Main {
 	static function main (args : string[]) : void {
 
-		function iota (n : number) : Enumerable.<number> {
+		function * iota (n : number) : number {
 			var i = 0;
 			do {
 				yield i;
@@ -17,12 +20,12 @@ class _Main {
 		}
 
 		var g = iota(4);
-		try {
-			while (true) {
-				log g.next();
-			}
-		} catch (e : StopIteration) {
-			log "end";
+		while (true) {
+			var v = g.next();
+			if (v.done)
+				break;
+			log v.value;
 		}
+		log "end";
 	}
 }

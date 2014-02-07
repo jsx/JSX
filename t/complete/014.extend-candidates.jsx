@@ -28,9 +28,6 @@ class B extends
       "word" : "TypeError"
    },
    {
-      "word" : "StopIteration"
-   },
-   {
       "word" : "Transferable"
    },
    {
@@ -38,6 +35,12 @@ class B extends
    },
    {
       "word" : "Uint8Array"
+   },
+   {
+      "word" : "IteratorResult"
+   },
+   {
+      "word" : "Generator"
    }
 ]
 */

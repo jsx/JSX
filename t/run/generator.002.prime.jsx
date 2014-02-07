@@ -1,3 +1,6 @@
+/*JSX_OPTS
+--enable-generator-emulation
+*/
 /*EXPECTED
 2
 3
@@ -7,7 +10,7 @@
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function prime () : Enumerable.<number> {
+		function * prime () : number {
 			NEXT:
 			for (var n = 2; true; ++n) {
 				for (var m = 2; m * m <= n; ++m) {
@@ -20,7 +23,7 @@ class _Main {
 
 		var g = prime();
 		for (var i = 0; i < 5; ++i) {
-			log g.next();
+			log g.next().value;
 		}
 	}
 }

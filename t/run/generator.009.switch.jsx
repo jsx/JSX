@@ -1,3 +1,6 @@
+/*JSX_OPTS
+--enable-generator-emulation
+*/
 /*EXPECTED
 1
 1
@@ -7,7 +10,7 @@
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function foo (n : number) : Enumerable.<number> {
+		function * foo (n : number) : number {
 			while (true) {
 				switch (n) {
 				case 1:
@@ -26,10 +29,10 @@ class _Main {
 		}
 
 		var f = foo(1);
-		log f.next();
-		log f.next();
-		log f.next();
-		log f.next();
-		log f.next();
+		log f.next().value;
+		log f.next().value;
+		log f.next().value;
+		log f.next().value;
+		log f.next().value;
 	}
 }

@@ -1,3 +1,6 @@
+/*JSX_OPTS
+--enable-generator-emulation
+*/
 /*EXPECTED
 1
 2
@@ -6,21 +9,21 @@
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function foo () : Enumerable.<number> {
+		function * foo () : number {
 			yield 1;
-			function bar () : Enumerable.<number> {
+			function * bar () : number {
 				yield 2;
 				yield 3;
 			}
 			var b = bar();
-			yield b.next();
-			yield b.next();
+			yield b.next().value;
+			yield b.next().value;
 			yield 4;
 		}
 		var f = foo();
-		log f.next();
-		log f.next();
-		log f.next();
-		log f.next();
+		log f.next().value;
+		log f.next().value;
+		log f.next().value;
+		log f.next().value;
 	}
 }

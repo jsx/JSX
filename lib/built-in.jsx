@@ -987,47 +987,63 @@ native class TypeError extends Error {
 	function constructor(message : string);
 }
 
-/**
- * Provides classes and interfaces related to generator.
- * @private EXPERIMENTAL
- */
-class StopIteration extends Error {
-	function constructor() { }
+native __fake__ class IteratorResult.<T> {
+	var done : boolean;
+	var value : Nullable.<T>;
 }
 
-/**
- * @private EXPERIMENTAL
- */
-interface Enumerable.<T> {
-	function next () : T;
+native final class GeneratorFunction {
+	delete function constructor ();
+} = """
+(function () {
+  try {
+    eval('import {GeneratorFunction} from "std:iteration"');
+    return GeneratorFunction;
+  } catch (e) {
+    return function GeneratorFunction () {};
+  }
+})()""";
+
+native __fake__ class Generator.<T> {
+	function next () : IteratorResult.<T>;
 }
 
-// only used by JSX compiler
-class __jsx_generator.<T> implements Enumerable.<T> {
+native class __jsx_generator_object.<T> extends Generator.<T> {
+} = """
+(function () {
+  function __jsx_generator_object() {
+  	this.__next = null;
+  	this.__value = undefined;
+  	this.__status = 0;	// SUSPENDED: 0, ACTIVE: 1, DEAD: 2
+  }
 
-	var __next : () -> void;
-	var __value : T;
-	var __end : boolean = false;
+  __jsx_generator_object.prototype.next = function () {
+  	switch (this.__status) {
+  	case 0:
+  		this.__status = 1;
 
-	function constructor () { }
+  		// go next!
+  		this.__next();
 
-	override function next () : T {
-		// FIXME: wasabiz
-		// stop propagation of StopIteration from inner generator to outer one
-		if (! this.__end) {
-			try {
-				this.__next();
-			} catch (e : StopIteration) {
-				this.__end = true;
-				throw e;
-			}
-			return this.__value;
-		} else {
-			throw new StopIteration;
-		}
-	}
+  		var done = false;
+  		if (this.__next != null) {
+  			this.__status = 0;
+  		} else {
+  			this.__status = 2;
+  			done = true;
+  		}
+  		return { value: this.__value, done: done };
+  	case 1:
+  		throw new Error("Generator is already running");
+  	case 2:
+  		throw new Error("Generator is already finished");
+  	default:
+  		throw new Error("Unexpected generator internal state");
+  	}
+  };
 
-}
+  return __jsx_generator_object;
+}())""";
 
 /** @see http://wiki.ecmascript.org/doku.php?id=harmony:specification_drafts */
 native final class Promise.<T> {

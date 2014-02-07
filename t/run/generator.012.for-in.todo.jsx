@@ -1,3 +1,6 @@
+/*JSX_OPTS
+--enable-generator-emulation
+*/
 /*EXPECTED
 1
 2
@@ -7,19 +10,19 @@ end
 class _Main {
 	static function main (args : string[]) : void {
 
-		function foo (ary : number[]) : Enumerable.<number> {
+		function * foo (ary : Map.<string>) : string {
 			for (var i in ary) {
 				yield i;
 			}
 		}
 
-		var g = foo([1, 2, 3]);
-		try {
-			while (true) {
-				log g.next();
-			}
-		} catch (e : StopIteration) {
-			log "end";
+		var g = foo({ 1:"a", 2:"b", 3:"c" });
+		while (true) {
+			var v = g.next();
+			if (v.done)
+				break;
+			log v.value;
 		}
+		log "end";
 	}
 }
