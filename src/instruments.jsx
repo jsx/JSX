@@ -1034,10 +1034,15 @@ class CodeTransformer {
 					new IntegerLiteralExpression(new Token("" + index, false))));
 		}
 
-		function replaceGoto (statements : Statement[], index : int) : void {
+		function makeBreak () : Statement {
+			return new BreakStatement(new Token("break", false), null);
+		}
+
+		function replaceGoto (statements : Statement[], index : int) : int {
 			assert statements[index] instanceof GotoStatement;
 			var gotoStmt = statements[index] as GotoStatement;
-			statements.splice(index, 1, makeJump(gotoStmt));
+			statements.splice(index, 1, makeJump(gotoStmt), makeBreak());
+			return index + 1;
 		}
 
 		// replace gotos with function call (and return statement)
@@ -1045,7 +1050,7 @@ class CodeTransformer {
 			var stmt = statements[i];
 
 			if (stmt instanceof GotoStatement) {
-				replaceGoto(statements, i);
+				i = replaceGoto(statements, i);
 			} else if (stmt instanceof IfStatement) {
 				var ifStmt = stmt as IfStatement;
 				replaceGoto(ifStmt.getOnTrueStatements(), 0);
@@ -1054,7 +1059,7 @@ class CodeTransformer {
 				var switchStmt = stmt as SwitchStatement;
 				for (var j = 0; j < switchStmt.getStatements().length; ++j) {
 					if (switchStmt.getStatements()[j] instanceof GotoStatement) {
-						replaceGoto(switchStmt.getStatements(), j);
+						j = replaceGoto(switchStmt.getStatements(), j);
 					}
 				}
 			}
