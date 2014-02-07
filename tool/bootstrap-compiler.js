@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// generatedy by JSX compiler 0.9.72 (2014-01-17 10:58:41 +0900; 868dbae0e68730a8d02f4226fe2685b7a4a365dd)
+// generatedy by JSX compiler 0.9.76 (2014-01-27 18:56:39 +0900; 7d1893d04ab5bc00217e13b736eecdba88e70a27)
 var JSX = {};
 (function (JSX) {
 /**
@@ -325,7 +325,17 @@ function _Main$main$AS(args) {
 _Main.main = _Main$main$AS;
 _Main.main$AS = _Main$main$AS;
 
-var js$0 = (function () { var global = (function () { return this; }()); return { global: global, eval: global.eval, invoke: function(invocant, methodName, args) { return invocant[methodName].apply(invocant, args); } }; }());
+var js$0 = (function () {
+	var global = (function () { return this; }());
+	return {
+		global: global,
+		eval: global.eval,
+		invoke: function(invocant, methodName, args) {
+			return invocant[methodName].apply(invocant, args);
+		},
+		newFunction: Function
+	};
+}());
 function node() {}
 $__jsx_extend([node], Object);
 function node$require$S(source) {
@@ -8778,6 +8788,9 @@ SignExpression.prototype.analyze$LAnalysisContext$LExpression$ = function (conte
 
 SignExpression.prototype.getType$ = function () {
 	var type;
+	if (this._token.getValue$() === "-") {
+		return Type.numberType;
+	}
 	type = this._expr.getType$();
 	if (type.resolveIfNullable$().equals$LType$(Type.numberType)) {
 		return Type.numberType;
@@ -11712,6 +11725,7 @@ ClassDefinition.prototype._analyzeClassDef$LAnalysisContext$ = function (context
 	var abstractMembers;
 	var msg;
 	var usedNames;
+	var existingExportedCtor;
 	this._baseClassDef = (this.extendType$() != null ? this.extendType$().getClassDef$() : null);
 	implementClassDefs = this.implementTypes$().map((function (type) {
 		return type.getClassDef$();
@@ -11864,11 +11878,10 @@ ClassDefinition.prototype._analyzeClassDef$LAnalysisContext$ = function (context
 	usedNames = {};
 	this._getMembers$ALMemberDefinition$F$LMemberDefinition$B$([  ], (function (member) {
 		var existingDef;
-		var errMsg;
 		if (! (member instanceof MemberFunctionDefinition)) {
 			return false;
 		}
-		if ((member.flags$() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_EXPORT)) !== ClassDefinition.IS_EXPORT) {
+		if ((member.flags$() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_EXPORT)) !== ClassDefinition.IS_EXPORT || member.name$() === "constructor") {
 			return false;
 		}
 		if (! $__jsx_ObjectHasOwnProperty.call(usedNames, member.name$())) {
@@ -11879,13 +11892,19 @@ ClassDefinition.prototype._analyzeClassDef$LAnalysisContext$ = function (context
 		if (existingDef.getType$().equals$LType$(member.getType$())) {
 			return false;
 		}
-		if (($this._flags & ClassDefinition.IS_EXPORT) !== 0 && member.name$() === "constructor") {
-			errMsg = "only one constructor is exportable, please mark others using the __noexport__ attribute";
-		} else {
-			errMsg = "methods with __export__ attribute cannot be overloaded";
-		}
-		context.errors.push(new CompileError(member.getToken$(), errMsg).addCompileNote$LCompileNote$(new CompileNote(usedNames[member.name$()].getToken$(), "previously defined here")));
+		context.errors.push(new CompileError(member.getToken$(), "methods with __export__ attribute cannot be overloaded").addCompileNote$LCompileNote$(new CompileNote(usedNames[member.name$()].getToken$(), "previously defined here")));
 		return false;
+	}));
+	existingExportedCtor = null;
+	this.forEachMemberFunction$F$LMemberFunctionDefinition$B$((function (funcDef) {
+		if ((funcDef.flags$() & (ClassDefinition.IS_EXPORT | ClassDefinition.IS_STATIC)) === ClassDefinition.IS_EXPORT && funcDef.name$() === "constructor") {
+			if (existingExportedCtor != null) {
+				context.errors.push(new CompileError(funcDef.getToken$(), "only one constructor is exportable per class (or interface or mixin), pleaose mark others using the __noexport__ attribute").addCompileNote$LCompileNote$(new CompileNote(existingExportedCtor.getToken$(), "previously defined here")));
+			} else {
+				existingExportedCtor = funcDef;
+			}
+		}
+		return true;
 	}));
 };
 
@@ -15205,7 +15224,7 @@ function Scope(prev, locals, funcLocal, args, statements, closures, isGenerator)
 
 $__jsx_extend([Scope], Object);
 function Parser(sourceToken, filename, completionRequest) {
-	this._input = "";
+	this._content = null;
 	this._lines = null;
 	this._tokenLength = 0;
 	this._lineNumber = 0;
@@ -15239,12 +15258,12 @@ function Parser(sourceToken, filename, completionRequest) {
 };
 
 $__jsx_extend([Parser], Object);
-Parser.prototype.parse$SALCompileError$ = function (input, errors) {
+Parser.prototype.parse$SALCompileError$ = function (content, errors) {
 	var compLineNumber;
 	var line;
 	var importToken;
-	this._input = input;
-	this._lines = this._input.split(_Lexer.rxNewline);
+	this._content = content;
+	this._lines = this._content.split(_Lexer.rxNewline);
 	this._tokenLength = 0;
 	this._lineNumber = 1;
 	this._columnOffset = 0;
@@ -15286,6 +15305,11 @@ Parser.prototype.parse$SALCompileError$ = function (input, errors) {
 		return false;
 	}
 	return true;
+};
+
+
+Parser.prototype.getContent$ = function () {
+	return this._content;
 };
 
 
@@ -20494,13 +20518,6 @@ _FoldConstantCommand.prototype._foldNumericBinaryExpressionOfConstants$LBinaryEx
 			return x - y;
 		}));
 		break;
-	case "%":
-		this._foldNumericBinaryExpressionAsNumeric$LBinaryExpression$F$LExpression$V$F$III$F$NNN$(expr, replaceCb, (function (x, y) {
-			return (x % y | 0);
-		}), (function (x, y) {
-			return x % y;
-		}));
-		break;
 	case "*":
 		this._foldNumericBinaryExpressionAsNumeric$LBinaryExpression$F$LExpression$V$F$III$F$NNN$(expr, replaceCb, (function (x, y) {
 			return $__jsx_imul(x, y);
@@ -20511,6 +20528,11 @@ _FoldConstantCommand.prototype._foldNumericBinaryExpressionOfConstants$LBinaryEx
 	case "/":
 		this._foldNumericBinaryExpressionAsNumber$LBinaryExpression$F$LExpression$V$F$NNN$(expr, replaceCb, (function (x, y) {
 			return x / y;
+		}));
+		break;
+	case "%":
+		this._foldNumericBinaryExpressionAsNumber$LBinaryExpression$F$LExpression$V$F$NNN$(expr, replaceCb, (function (x, y) {
+			return x % y;
 		}));
 		break;
 	case ">>>":
@@ -22419,6 +22441,8 @@ function Compiler(platform) {
 	this._searchPaths = null;
 	this._builtinParsers = null;
 	this._emitter = null;
+	this._npmModulesParsed = {};
+	this._packageJsonCache = {};
 	this._platform = platform;
 	this._mode = Compiler.MODE_COMPILE;
 	this._transformer = null;
@@ -22526,7 +22550,7 @@ Compiler.prototype.compile$ = function () {
 	var builtins;
 	errors = [];
 	for (i = 0; i < this._parsers.length; ++i) {
-		if (! this.parseFile$ALCompileError$LParser$(errors, this._parsers[i])) {
+		if (! this._parseFile$ALCompileError$N(errors, i)) {
 			if (! this._handleErrors$ALCompileError$(errors)) {
 				return false;
 			}
@@ -22609,14 +22633,21 @@ Compiler.prototype.getFileContent$ALCompileError$LToken$S = function (errors, so
 };
 
 
-Compiler.prototype.parseFile$ALCompileError$LParser$ = function (errors, parser) {
+Compiler.prototype._parseFile$ALCompileError$N = function (errors, parserIndex) {
+	var parser;
 	var content;
+	var conflictWarning;
 	var imports;
 	var i;
+	parser = this._parsers[parserIndex];
 	content = this.getFileContent$ALCompileError$LToken$S(errors, parser.getSourceToken$(), parser.getPath$());
 	if (content == null) {
 		parser.parse$SALCompileError$("", []);
 		return false;
+	}
+	conflictWarning = this._checkConflictOfNpmModulesParsed$N(parserIndex) || this._checkConflictOfIdenticalFiles$NS(parserIndex, content);
+	if (conflictWarning != null) {
+		errors.push(conflictWarning);
 	}
 	parser.parse$SALCompileError$(content, errors);
 	if (this._mode !== Compiler.MODE_PARSE) {
@@ -22631,6 +22662,52 @@ Compiler.prototype.parseFile$ALCompileError$LParser$ = function (errors, parser)
 };
 
 
+Compiler.prototype._checkConflictOfNpmModulesParsed$N = function (parserIndex) {
+	var $this = this;
+	var getModuleNameAndPath;
+	var parser;
+	var moduleNameAndPath;
+	var offendingParser;
+	var offendingModulePath;
+	function getModuleNameAndPath(path) {
+		var match;
+		match = path.match(/^(?:.*\/|)node_modules\/([^\/]+)\//);
+		if (match == null) {
+			return null;
+		}
+		return [ match[1], match[0].substring(0, match[0].length - 1) ];
+	}
+	parser = this._parsers[parserIndex];
+	moduleNameAndPath = getModuleNameAndPath(parser.getPath$());
+	if (moduleNameAndPath == null) {
+		return null;
+	}
+	if (! $__jsx_ObjectHasOwnProperty.call(this._npmModulesParsed, moduleNameAndPath[0])) {
+		this._npmModulesParsed[moduleNameAndPath[0]] = parserIndex;
+		return null;
+	}
+	offendingParser = this._parsers[this._npmModulesParsed[moduleNameAndPath[0]]];
+	offendingModulePath = getModuleNameAndPath(offendingParser.getPath$())[1];
+	if (offendingModulePath === moduleNameAndPath[1]) {
+		return null;
+	}
+	return new CompileWarning(parser.getSourceToken$(), "please consider running \"npm dedupe\"; the NPM module has already been read from a different location:").addCompileNote$LCompileNote$(new CompileNote(offendingParser.getSourceToken$(), "at first from here as: " + offendingParser.getPath$())).addCompileNote$LCompileNote$(new CompileNote(parser.getSourceToken$(), "and now from here as: " + parser.getPath$()));
+};
+
+
+Compiler.prototype._checkConflictOfIdenticalFiles$NS = function (parserIndex, content) {
+	var parser;
+	var i;
+	parser = this._parsers[parserIndex];
+	for (i = 0; i !== parserIndex; ++i) {
+		if (this._parsers[i].getContent$() === content && Util$basename$S(this._parsers[i].getPath$()) === Util$basename$S(parser.getPath$())) {
+			return new CompileWarning(parser.getSourceToken$(), "the file (with identical content) has been read from different locations:").addCompileNote$LCompileNote$(new CompileNote(parser.getSourceToken$(), "from here as: " + parser.getPath$())).addCompileNote$LCompileNote$(new CompileNote(this._parsers[i].getSourceToken$(), "from here as: " + this._parsers[i].getPath$()));
+		}
+	}
+	return null;
+};
+
+
 Compiler.prototype._handleImport$ALCompileError$LParser$LImport$ = function (errors, parser, imprt) {
 	var wildImprt;
 	var resolvedDir;
@@ -22641,7 +22718,7 @@ Compiler.prototype._handleImport$ALCompileError$LParser$LImport$ = function (err
 	var newParser;
 	if (imprt instanceof WildcardImport) {
 		wildImprt = imprt;
-		resolvedDir = this._resolvePath$SS(wildImprt.getFilenameToken$().getFilename$(), wildImprt.getDirectory$());
+		resolvedDir = this._resolvePath$SSB(wildImprt.getFilenameToken$().getFilename$(), wildImprt.getDirectory$(), true);
 		files = [];
 		try {
 			files = this._platform.getFilesInDirectory$S(resolvedDir);
@@ -22669,7 +22746,7 @@ Compiler.prototype._handleImport$ALCompileError$LParser$LImport$ = function (err
 			return false;
 		}
 	} else {
-		path = this._resolvePath$SS(imprt.getFilenameToken$().getFilename$(), Util$decodeStringLiteral$S(imprt.getFilenameToken$().getValue$()));
+		path = this._resolvePath$SSB(imprt.getFilenameToken$().getFilename$(), Util$decodeStringLiteral$S(imprt.getFilenameToken$().getValue$()), false);
 		if (path === parser.getPath$()) {
 			errors.push(new CompileError(imprt.getFilenameToken$(), "cannot import itself"));
 			return false;
@@ -22923,6 +23000,9 @@ Compiler.prototype._handleErrors$ALCompileError$ = function (errors) {
 			}
 			if (doWarn !== false) {
 				$this._platform.warn$S(warning.format$LPlatform$($this.getPlatform$()));
+				warning.getCompileNotes$().forEach((function (note) {
+					$this._platform.warn$S(note.format$LPlatform$($this.getPlatform$()));
+				}));
 				if ($this._warningAsError) {
 					isFatal = true;
 				}
@@ -22940,16 +23020,97 @@ Compiler.prototype._handleErrors$ALCompileError$ = function (errors) {
 };
 
 
-Compiler.prototype._resolvePath$SS = function (srcPath, givenPath) {
+Compiler.prototype._readPackageJson$S = function (moduleDir) {
+	var json;
+	var contents;
+	if ($__jsx_ObjectHasOwnProperty.call(this._packageJsonCache, moduleDir)) {
+		return this._packageJsonCache[moduleDir];
+	}
+	json = null;
+	if (this._platform.fileExists$S(moduleDir + "/package.json")) {
+		try {
+			contents = this._platform.load$S(moduleDir + "/package.json");
+			json = JSON.parse(contents);
+		} catch ($__jsx_catch_0) {
+			{
+				this._platform.warn$S("could not parse file:" + moduleDir + "/package.json");
+			}
+		}
+	}
+	this._packageJsonCache[moduleDir] = json;
+	return json;
+};
+
+
+Compiler.prototype._resolvePathFromNodeModules$SSB = function (srcDir, givenPath, isWildcard) {
+	var $this = this;
+	var firstSlashAtGivenPath;
+	var moduleName;
+	var lookupInNodeModules;
+	var path;
+	var match;
+	firstSlashAtGivenPath = givenPath.indexOf("/");
+	moduleName = (firstSlashAtGivenPath !== - 1 ? givenPath.substring(0, firstSlashAtGivenPath) : givenPath);
+	function lookupInNodeModules(nodeModulesDir) {
+		var moduleDir;
+		var packageJson;
+		var libDir;
+		var subPathWithLeadingSlash;
+		var main;
+		moduleDir = nodeModulesDir + "/" + moduleName;
+		if (! $this._platform.fileExists$S(moduleDir)) {
+			return "";
+		}
+		packageJson = $this._readPackageJson$S(moduleDir);
+		if (packageJson == null) {
+			packageJson = ({  });
+		}
+		if (isWildcard || firstSlashAtGivenPath !== - 1) {
+			libDir = (packageJson.directories && packageJson.directories.lib ? packageJson.directories.lib + "" : "lib");
+			subPathWithLeadingSlash = (firstSlashAtGivenPath !== - 1 ? givenPath.substring(firstSlashAtGivenPath) : "");
+			return Util$resolvePath$S(moduleDir + "/" + libDir + subPathWithLeadingSlash);
+		} else {
+			main = (packageJson.main ? packageJson.main + "" : "index.jsx");
+			return Util$resolvePath$S(moduleDir + "/" + main);
+		}
+	}
+	while (true) {
+		path = lookupInNodeModules(srcDir + "/node_modules");
+		if (path !== "") {
+			return path;
+		}
+		match = srcDir.match(/^(.*)\/node_modules\/[^\/]+$/);
+		if (match == null) {
+			break;
+		}
+		srcDir = match[1];
+	}
+	return "";
+};
+
+
+Compiler.prototype._resolvePath$SSB = function (srcPath, givenPath, isWildcard) {
 	var searchPaths;
 	var i;
 	var path;
+	var srcDir;
 	var lastSlashAt;
 	if (givenPath.match(/^\.{1,2}\//) == null) {
 		searchPaths = this._searchPaths.concat(this._emitter.getSearchPaths$());
 		for (i = 0; i < searchPaths.length; ++i) {
 			path = Util$resolvePath$S(searchPaths[i] + "/" + givenPath);
 			if (this._platform.fileExists$S(path)) {
+				return path;
+			}
+		}
+		srcDir = Util$dirname$S(srcPath);
+		path = this._resolvePathFromNodeModules$SSB(srcDir, givenPath, isWildcard);
+		if (path !== "") {
+			return path;
+		}
+		if (srcDir !== ".") {
+			path = this._resolvePathFromNodeModules$SSB(".", givenPath, isWildcard);
+			if (path !== "") {
 				return path;
 			}
 		}
@@ -25502,10 +25663,10 @@ $__jsx_lazy_init(NodePlatform, "_isColorSupported", function () {
 		return false;
 	})();
 });
-Meta.VERSION_STRING = "0.9.72";
-Meta.VERSION_NUMBER = 0.009072;
-Meta.LAST_COMMIT_HASH = "868dbae0e68730a8d02f4226fe2685b7a4a365dd";
-Meta.LAST_COMMIT_DATE = "2014-01-17 10:58:41 +0900";
+Meta.VERSION_STRING = "0.9.76";
+Meta.VERSION_NUMBER = 0.009076;
+Meta.LAST_COMMIT_HASH = "7d1893d04ab5bc00217e13b736eecdba88e70a27";
+Meta.LAST_COMMIT_DATE = "2014-01-27 18:56:39 +0900";
 $__jsx_lazy_init(Meta, "IDENTIFIER", function () {
 	return Meta.VERSION_STRING + " (" + Meta.LAST_COMMIT_DATE + "; " + Meta.LAST_COMMIT_HASH + ")";
 });
@@ -25619,7 +25780,7 @@ $__jsx_lazy_init(_Lexer, "rxHeredocEndSingleQuoted", function () {
 });
 _Lexer.rxNewline = /(?:\r\n?|\n)/;
 $__jsx_lazy_init(_Lexer, "keywords", function () {
-	return Util$asSet$AS([ "null", "true", "false", "NaN", "Infinity", "break", "do", "instanceof", "typeof", "case", "else", "new", "var", "catch", "finally", "return", "void", "const", "for", "switch", "while", "function", "this", "if", "throw", "in", "try", "class", "extends", "super", "import", "implements", "static", "__FILE__", "__LINE__", "undefined" ]);
+	return Util$asSet$AS([ "null", "true", "false", "NaN", "Infinity", "break", "do", "instanceof", "typeof", "case", "else", "new", "var", "finally", "return", "void", "const", "for", "switch", "while", "function", "this", "if", "throw", "in", "try", "class", "extends", "super", "import", "implements", "static", "__FILE__", "__LINE__", "undefined" ]);
 });
 $__jsx_lazy_init(_Lexer, "reserved", function () {
 	return Util$asSet$AS([ "debugger", "with", "export", "let", "private", "public", "yield", "protected", "extern", "native", "as", "operator" ]);

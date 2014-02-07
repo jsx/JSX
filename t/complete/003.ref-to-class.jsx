@@ -139,6 +139,9 @@ class A {
       "word" : "Enumerable"
    },
    {
+      "word" : "Promise"
+   },
+   {
       "word" : "++"
    },
    {

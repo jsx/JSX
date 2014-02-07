@@ -134,7 +134,8 @@ class _Lexer {
 		// keywords shared with ECMA 262
 		"break",    "do",       "instanceof", "typeof",
 		"case",     "else",     "new",        "var",
-		"catch",    "finally",  "return",     "void",
+		/*"catch",*/ // contextual
+		"finally",  "return",     "void",
 		"const",
 		/*"continue",*/ // contextual
 		"for",      "switch",     "while",
