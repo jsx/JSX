@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// generatedy by JSX compiler 0.9.76 (2014-01-27 18:56:39 +0900; 7d1893d04ab5bc00217e13b736eecdba88e70a27)
+// generatedy by JSX compiler 0.9.76 (2014-02-07 12:58:18 +0900; 834d221cd7abc6b6da85d601974c76a9bc99e94c)
 var JSX = {};
 (function (JSX) {
 /**
@@ -25665,8 +25665,8 @@ $__jsx_lazy_init(NodePlatform, "_isColorSupported", function () {
 });
 Meta.VERSION_STRING = "0.9.76";
 Meta.VERSION_NUMBER = 0.009076;
-Meta.LAST_COMMIT_HASH = "7d1893d04ab5bc00217e13b736eecdba88e70a27";
-Meta.LAST_COMMIT_DATE = "2014-01-27 18:56:39 +0900";
+Meta.LAST_COMMIT_HASH = "834d221cd7abc6b6da85d601974c76a9bc99e94c";
+Meta.LAST_COMMIT_DATE = "2014-02-07 12:58:18 +0900";
 $__jsx_lazy_init(Meta, "IDENTIFIER", function () {
 	return Meta.VERSION_STRING + " (" + Meta.LAST_COMMIT_DATE + "; " + Meta.LAST_COMMIT_HASH + ")";
 });
