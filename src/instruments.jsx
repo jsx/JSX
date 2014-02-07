@@ -1071,10 +1071,6 @@ class CodeTransformer {
 				new CaseStatement(
 					new Token("case", false),
 					new IntegerLiteralExpression(new Token("" + labelIndeces[label], false))));
-			statements.push(
-				new BreakStatement(
-					new Token("break", false),
-					null));
 			return statements;
 		}
 
@@ -1138,14 +1134,15 @@ class CodeTransformer {
 			/*
 			  yield expr;
 			  $next = LABEL;
+			  break;
 
                           -> $generatorN.__value = expr;
 			     $generatorN.__next = $LABEL;
 			     return;
 			*/
-			if (2 <= statements.length && statements[statements.length - 2] instanceof YieldStatement) {
-				var idx = statements.length - 2;
-				statements.splice(idx, 2,
+			if (3 <= statements.length && statements[statements.length - 3] instanceof YieldStatement) {
+				var idx = statements.length - 3;
+				statements.splice(idx, 3,
 					new ExpressionStatement(
 						new AssignmentExpression(
 							new Token("=", false),
