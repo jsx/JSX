@@ -1,3 +1,7 @@
+/*JSX_OPTS
+--enable-generator-emulation
+*/
+
 /***
  * Experimental generator
  */

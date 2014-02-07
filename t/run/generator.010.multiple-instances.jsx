@@ -1,3 +1,6 @@
+/*JSX_OPTS
+--enable-generator-emulation
+*/
 /*EXPECTED
 a 1
 b 1
