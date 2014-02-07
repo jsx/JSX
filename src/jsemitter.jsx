@@ -1890,13 +1890,6 @@ class _AsNoConvertExpressionEmitter extends _ExpressionEmitter {
 						}, "detected invalid cast, value is not a Map or null");
 					}
 					return;
-				} else if ((destClassDef.flags() & ClassDefinition.IS_NATIVE) != 0 && destClassDef instanceof InstantiatedClassDefinition) {
-					var nativeClassName = (destClassDef as InstantiatedClassDefinition).getTemplateClassName();
-					emitWithAssertion(function () {
-						this._emitter._emit("$v == null || $v instanceof " + nativeClassName, this._expr.getToken());
-					}, "detected invalid cast, value is not a " + nativeClassName + " or null");
-
-					return;
 				} else if ((destClassDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) == 0) {
 					emitWithAssertion(function () {
 						this._emitter._emit("$v == null || $v instanceof " + this._emitter.getNamer().getNameOfClass(destClassDef), this._expr.getToken());
