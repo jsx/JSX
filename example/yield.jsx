@@ -13,12 +13,12 @@ class Async {
     };
   }
 
-  static function run(coro : () -> GeneratorObject.<(variant)->void>) : void {
+  static function run(coro : () -> Generator.<(variant)->void>) : void {
     Async.go(coro());
   }
 
   static function go(v : variant) : void {
-    var g = v as GeneratorObject.<(variant)->void>;
+    var g = v as Generator.<(variant)->void>;
 
     var data = g.next();
     if (data.done) {
