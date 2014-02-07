@@ -998,17 +998,9 @@ native final class GeneratorFunction {
   }
 })()""";
 
-native class Generator.<T> {
+native __fake__ class Generator.<T> {
 	function next () : IteratorResult.<T>;
-} = """
-(function () {
-  try {
-    eval('import {Generator} from "std:iteration"');
-    return Generator;
-  } catch (e) {
-    return function Generator () {};
-  }
-})()""";
+}
 
 native class __jsx_generator_object.<T> extends Generator.<T> {
 } = """
@@ -1018,8 +1010,6 @@ native class __jsx_generator_object.<T> extends Generator.<T> {
   	this.__value = undefined;
   	this.__status = 0;	// SUSPENDED: 0, ACTIVE: 1, DEAD: 2
   }
-
-  __jsx_generator_object.prototype = new Generator;
 
   __jsx_generator_object.prototype.next = function () {
   	switch (this.__status) {
