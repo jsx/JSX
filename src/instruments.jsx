@@ -1072,7 +1072,7 @@ class CodeTransformer {
 		funcDef._statements = basicBlocks.concat(entry);
 	}
 
-	function _compileYields(funcDef : MemberFunctionDefinition) : void { // FIXME wasabiz nested generator
+	function _compileYields(funcDef : MemberFunctionDefinition) : void {
 		var yieldingType = (funcDef.getReturnType().getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0];
 
 		// create a generator object
