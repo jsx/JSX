@@ -1,5 +1,10 @@
 Revision history for the JSX software development kit
 
+0.9.77 2014-02-07 13:20:00+0900
+    [FEATURES]
+    - ```int``` type has been changed to strict int32_t
+    - introduce Promise class, defined in ES6
+
 0.9.76 2014-02-03 15:27:00+0900
     [FEATURES]
     - [experimental support for npm] paths added by --add-search-path are preferred over node_modules/ (#275)
