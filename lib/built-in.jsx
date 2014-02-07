@@ -990,11 +990,27 @@ native __fake__ class IteratorResult.<T> {
 
 native final class GeneratorFunction {
 	delete function constructor ();
-}
+} = """
+(function () {
+  try {
+    eval('import {GeneratorFunction} from "std:iteration"');
+    return GeneratorFunction;
+  } catch (e) {
+    return function GeneratorFunction () {};
+  }
+})()""";
 
 native class Generator.<T> {
 	function next () : IteratorResult.<T>;
-}
+} = """
+(function () {
+  try {
+    eval('import {Generator} from "std:iteration"');
+    return Generator;
+  } catch (e) {
+    return function Generator () {};
+  }
+})()""";
 
 native class __jsx_generator_object.<T> extends Generator.<T> {
 }
