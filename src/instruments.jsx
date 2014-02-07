@@ -949,7 +949,7 @@ class CodeTransformer {
 	}
 
 	function _transformGenerator (funcDef : MemberFunctionDefinition) : void {
-		this._compileYields(funcDef);
+		this._transformGeneratorCore(funcDef);
 	}
 
 	var _transformingFuncDef : MemberFunctionDefinition = null;
@@ -1072,7 +1072,7 @@ class CodeTransformer {
 		funcDef._statements = basicBlocks.concat(entry);
 	}
 
-	function _compileYields(funcDef : MemberFunctionDefinition) : void {
+	function _transformGeneratorCore(funcDef : MemberFunctionDefinition) : void {
 		var yieldingType = (funcDef.getReturnType().getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0];
 
 		// create a generator object
