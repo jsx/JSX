@@ -2176,7 +2176,7 @@ class Parser {
 	}
 
 	function _registerGenObjTypeOf (elementType : Type) : ParsedObjectType {
-		var genObjType = new ParsedObjectType(new QualifiedName(new Token("GeneratorObject", true)), [ elementType ]);
+		var genObjType = new ParsedObjectType(new QualifiedName(new Token("Generator", true)), [ elementType ]);
 		this._objectTypesUsed.push(genObjType);
 		return genObjType;
 	}

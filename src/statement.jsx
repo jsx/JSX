@@ -443,15 +443,15 @@ class YieldStatement extends Statement {
 		var returnType = context.funcDef.getReturnType();
 		if (returnType == null) {
 			var yieldType = this._expr.getType();
-			context.funcDef.setReturnType(new ObjectType(Util.instantiateTemplate(context, this._token, "GeneratorObject", [ yieldType ])));
+			context.funcDef.setReturnType(new ObjectType(Util.instantiateTemplate(context, this._token, "Generator", [ yieldType ])));
 		} else {
 			if (returnType instanceof ObjectType
 				&& returnType.getClassDef() instanceof InstantiatedClassDefinition
-				&& (returnType.getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == "GeneratorObject") {
+				&& (returnType.getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == "Generator") {
 					yieldType = (returnType.getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0];
 			} else {
 				// return type is not an instance of Enumerable. the error will be reported by MemberFuncitonDefinition#analyze.
-				context.errors.push(new CompileError(this._token, "cannot convert 'GeneratorObject.<" + this._expr.getType().toString() + ">' to return type '" + returnType.toString() + "'"));
+				context.errors.push(new CompileError(this._token, "cannot convert 'Generator.<" + this._expr.getType().toString() + ">' to return type '" + returnType.toString() + "'"));
 				return false;
 			}
 		}

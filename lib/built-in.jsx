@@ -989,18 +989,14 @@ native __fake__ class IteratorResult.<T> {
 }
 
 native final class GeneratorFunction {
-
 	delete function constructor ();
-
 }
 
-native class GeneratorObject.<T> {
-
+native class Generator.<T> {
 	function next () : IteratorResult.<T>;
-
 }
 
-native class __jsx_generator_object.<T> extends GeneratorObject.<T> {
+native class __jsx_generator_object.<T> extends Generator.<T> {
 }
 
 // 5.12
