@@ -1009,10 +1009,14 @@ native __fake__ class Generator.<T> {
 }
 
 native class __jsx_generator_object.<T> extends Generator.<T> {
+	var __next : int;
+	var __loop : (int) -> void;
+	var __value : Nullable.<T>;
 } = """
 (function () {
   function __jsx_generator_object() {
-  	this.__next = null;
+  	this.__next = 0;
+  	this.__loop = null;
   	this.__value = undefined;
   	this.__status = 0;	// SUSPENDED: 0, ACTIVE: 1, DEAD: 2
   }
@@ -1023,10 +1027,10 @@ native class __jsx_generator_object.<T> extends Generator.<T> {
   		this.__status = 1;
 
   		// go next!
-  		this.__next();
+  		this.__loop(this.__next);
 
   		var done = false;
-  		if (this.__next != null) {
+  		if (this.__next != -1) {
   			this.__status = 0;
   		} else {
   			this.__status = 2;
