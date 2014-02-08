@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 DeNA Co., Ltd.
+ * Copyright (c) 2012,2013 DeNA Co., Ltd. et al.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -140,7 +140,7 @@ class Compiler {
 		var errors = new CompileError[];
 		// parse all files
 		for (var i = 0; i < this._parsers.length; ++i) {
-			if (! this.parseFile(errors, this._parsers[i])) {
+			if (! this._parseFile(errors, i)) {
 				if (! this._handleErrors(errors))
 					return false;
 			}
@@ -215,7 +215,8 @@ class Compiler {
 		return this._fileCache[path];
 	}
 
-	function parseFile (errors : CompileError[], parser : Parser) : boolean {
+	function _parseFile (errors : CompileError[], parserIndex : number) : boolean {
+		var parser = this._parsers[parserIndex];
 		// read file
 		var content = this.getFileContent(errors, parser.getSourceToken(), parser.getPath());
 		if (content == null) {
@@ -223,6 +224,11 @@ class Compiler {
 			// because some compilation mode continues to run after errors.
 			parser.parse("", new CompileError[]);
 			return false;
+		}
+		// check conflicts
+		var conflictWarning = this._checkConflictOfNpmModulesParsed(parserIndex) ?: this._checkConflictOfIdenticalFiles(parserIndex, content);
+		if (conflictWarning != null) {
+			errors.push(conflictWarning);
 		}
 		// parse
 		parser.parse(content, errors);
@@ -237,11 +243,62 @@ class Compiler {
 		return true;
 	}
 
+	var _npmModulesParsed = new Map.<number>; // map of module_name => parser index
+
+	function _checkConflictOfNpmModulesParsed(parserIndex : number) : CompileWarning {
+		function getModuleNameAndPath(path : string) : string[] {
+			var match = path.match(/^(?:.*\/|)node_modules\/([^\/]+)\//);
+			if (match == null) {
+				return null;
+			}
+			return [
+				match[1],
+				match[0].substring(0, match[0].length - 1), // strip trailing "/"
+			];
+		}
+		var parser = this._parsers[parserIndex];
+		var moduleNameAndPath = getModuleNameAndPath(parser.getPath());
+		// return if the source file is not part of a npm module
+		if (moduleNameAndPath == null) {
+			return null;
+		}
+		// register and return if the source file is a npm module that is loaded for the first time
+		if (! this._npmModulesParsed.hasOwnProperty(moduleNameAndPath[0])) {
+			this._npmModulesParsed[moduleNameAndPath[0]] = parserIndex;
+			return null;
+		}
+		// check conflict
+		var offendingParser = this._parsers[this._npmModulesParsed[moduleNameAndPath[0]]];
+		var offendingModulePath = getModuleNameAndPath(offendingParser.getPath())[1];
+		if (offendingModulePath == moduleNameAndPath[1]) {
+			return null;
+		}
+		// found conflict
+		return new CompileWarning(parser.getSourceToken(), "please consider running \"npm dedupe\"; the NPM module has already been read from a different location:")
+			.addCompileNote(new CompileNote(offendingParser.getSourceToken(), "at first from here as: " + offendingParser.getPath()))
+			.addCompileNote(new CompileNote(parser.getSourceToken(), "and now from here as: " + parser.getPath()))
+			as CompileWarning;
+	}
+
+	function _checkConflictOfIdenticalFiles(parserIndex : number, content : string) : CompileWarning {
+		var parser = this._parsers[parserIndex];
+		for (var i = 0; i != parserIndex; ++i) {
+			if (this._parsers[i].getContent() == content
+				&& Util.basename(this._parsers[i].getPath()) == Util.basename(parser.getPath())) {
+				return new CompileWarning(parser.getSourceToken(), "the file (with identical content) has been read from different locations:")
+					.addCompileNote(new CompileNote(parser.getSourceToken(), "from here as: " + parser.getPath()))
+					.addCompileNote(new CompileNote(this._parsers[i].getSourceToken(), "from here as: " + this._parsers[i].getPath()))
+					as CompileWarning;
+			}
+		}
+		return null;
+	}
+
 	function _handleImport (errors : CompileError[], parser : Parser, imprt : Import) : boolean {
 		if (imprt instanceof WildcardImport) {
 			var wildImprt = imprt as WildcardImport;
 			// read the files from a directory
-			var resolvedDir = this._resolvePath(wildImprt.getFilenameToken().getFilename(), wildImprt.getDirectory());
+			var resolvedDir = this._resolvePath(wildImprt.getFilenameToken().getFilename(), wildImprt.getDirectory(), true);
 			var files = new string[];
 			try {
 				files = this._platform.getFilesInDirectory(resolvedDir);
@@ -268,7 +325,7 @@ class Compiler {
 			}
 		} else {
 			// read one file
-			var path = this._resolvePath(imprt.getFilenameToken().getFilename(), Util.decodeStringLiteral(imprt.getFilenameToken().getValue()));
+			var path = this._resolvePath(imprt.getFilenameToken().getFilename(), Util.decodeStringLiteral(imprt.getFilenameToken().getValue()), false);
 			if (path == parser.getPath()) {
 				errors.push(new CompileError(imprt.getFilenameToken(), "cannot import itself"));
 				return false;
@@ -502,6 +559,9 @@ class Compiler {
 				}
 				if (doWarn != false) {
 					this._platform.warn(warning.format(this.getPlatform()));
+					warning.getCompileNotes().forEach(function (note) {
+						this._platform.warn(note.format(this.getPlatform()));
+					});
 					if (this._warningAsError) {
 						isFatal = true;
 					}
@@ -519,8 +579,87 @@ class Compiler {
 		return ! isFatal;
 	}
 
-	function _resolvePath (srcPath : string, givenPath : string) : string {
+	var _packageJsonCache = new Map.<Map.<variant>>;
+
+	function _readPackageJson(moduleDir : string) : Map.<variant> {
+		if (this._packageJsonCache.hasOwnProperty(moduleDir)) {
+			return this._packageJsonCache[moduleDir];
+		}
+		var json = null : Map.<variant>;
+		if (this._platform.fileExists(moduleDir + "/package.json")) {
+			try {
+				var contents = this._platform.load(moduleDir + "/package.json");
+				json = JSON.parse(contents) as Map.<variant>;
+			} catch (e : variant) {
+				this._platform.warn("could not parse file:" + moduleDir + "/package.json");
+			}
+		}
+		this._packageJsonCache[moduleDir] = json;
+		return json;
+	}
+
+	function _resolvePathFromNodeModules (srcDir : string, givenPath : string, isWildcard : boolean) : string {
+
+		var firstSlashAtGivenPath = givenPath.indexOf("/");
+		var moduleName = firstSlashAtGivenPath != -1 ? givenPath.substring(0, firstSlashAtGivenPath) : givenPath;
+
+		// search for givenPath in given "node_modules" dir
+		function lookupInNodeModules(nodeModulesDir : string) : string {
+			var moduleDir = nodeModulesDir + "/" + moduleName;
+
+			// return if module does not exist
+			if (! this._platform.fileExists(moduleDir)) {
+				return "";
+			}
+
+			// found the package, read package.json
+			var packageJson = this._readPackageJson(moduleDir);
+			if (packageJson == null) {
+				packageJson = {};
+			}
+
+			if (isWildcard || firstSlashAtGivenPath != -1) {
+				// if given path is package/filename, then return a filename relative to package.json/[directories]/[lib] (or default to "lib")
+				var libDir = packageJson["directories"] && packageJson["directories"]["lib"]
+					? packageJson["directories"]["lib"] as string
+					: "lib";
+				var subPathWithLeadingSlash = firstSlashAtGivenPath != -1 ? givenPath.substring(firstSlashAtGivenPath): "";
+				return Util.resolvePath(moduleDir + "/" + libDir + subPathWithLeadingSlash);
+			} else {
+				// given path did not contain "/", so return package.json/[main] or "index.jsx"
+				var main = packageJson["main"] ? packageJson["main"] as string : "index.jsx";
+				return Util.resolvePath(moduleDir + "/" + main);
+			}
+		}
+
+		// lookup dependencies (from "srcDir/node_modules", "srcDir/../../node_modules", ...)
+		while (true) {
+			var path = lookupInNodeModules(srcDir + "/node_modules");
+			if (path != "") {
+				return path;
+			}
+			// lookup parent dependencies
+			var match = srcDir.match(/^(.*)\/node_modules\/[^\/]+$/);
+			if (match == null) {
+				break;
+			}
+			srcDir = match[1];
+		}
+
+		return "";
+	}
+
+	function _resolvePath (srcPath : string, givenPath : string, isWildcard : boolean) : string {
+		/*
+		the search order is: 1) --add-search-path, 2) node_modules/, 3) relative to src file
+
+		This is defined as such to provide freedom to users:
+
+		- users may use ```import "./foo.jsx"``` to explicitly specify 3
+		- users may use --add-search-path explicitly to avoid diamond dependency problem of NPM
+		*/
 		if (givenPath.match(/^\.{1,2}\//) == null) {
+			// search the file from [one-of-the-search-paths]/givenPath
 			var searchPaths = this._searchPaths.concat(this._emitter.getSearchPaths());
 			for (var i = 0; i < searchPaths.length; ++i) {
 				var path = Util.resolvePath(searchPaths[i] + "/" + givenPath);
@@ -528,7 +667,19 @@ class Compiler {
 				if (this._platform.fileExists(path))
 					return path;
 			}
+			// search srcDir/node_modules
+			var srcDir = Util.dirname(srcPath);
+			var path = this._resolvePathFromNodeModules(srcDir, givenPath, isWildcard);
+			if (path != "")
+				return path;
+			// search from [cwd]/node_modules
+			if (srcDir != ".") {
+				path = this._resolvePathFromNodeModules(".", givenPath, isWildcard);
+				if (path != "")
+					return path;
+			}
 		}
+		// return path relative to srcPath
 		var lastSlashAt = srcPath.lastIndexOf("/");
 		path = Util.resolvePath((lastSlashAt != -1 ? srcPath.substring(0, lastSlashAt + 1) : "") + givenPath);
 		return path;

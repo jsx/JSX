@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 DeNA Co., Ltd.
+ * Copyright (c) 2012,2013 DeNA Co., Ltd. et al.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -2071,13 +2071,13 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 		switch (expr.getToken().getValue()) {
 
 			// expressions that return number or integer depending on their types
-		case "*": this._foldNumericBinaryExpressionAsNumeric(expr, replaceCb, function (x, y) { return x * y; }); break;
-		case "+": this._foldNumericBinaryExpressionAsNumeric(expr, replaceCb, function (x, y) { return x + y; }); break;
-		case "-": this._foldNumericBinaryExpressionAsNumeric(expr, replaceCb, function (x, y) { return x - y; }); break;
-		case "%": this._foldNumericBinaryExpressionAsNumeric(expr, replaceCb, function (x, y) { return x % y; }); break;
+		case "+": this._foldNumericBinaryExpressionAsNumeric(expr, replaceCb, ((x, y) -> x + y), ((x, y) -> x + y)); break;
+		case "-": this._foldNumericBinaryExpressionAsNumeric(expr, replaceCb, ((x, y) -> x - y), ((x, y) -> x - y)); break;
+		case "*": this._foldNumericBinaryExpressionAsNumeric(expr, replaceCb, ((x, y) -> x * y), ((x, y) -> x * y)); break;
 
 			// expressions that always return number
 		case "/": this._foldNumericBinaryExpressionAsNumber(expr, replaceCb, function (x, y) { return x / y; }); break;
+		case "%": this._foldNumericBinaryExpressionAsNumber(expr, replaceCb, ((x, y) -> x % y)); break;
 
 			// expressions that always return integer
 		case ">>>": this._foldNumericBinaryExpressionAsInteger(expr, replaceCb, function (x, y) { return x >>> y; }); break;
@@ -2098,20 +2098,20 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 		return true;
 	}
 
-	function _foldNumericBinaryExpressionAsNumeric (expr : BinaryExpression, replaceCb : function(:Expression):void, calcCb : function(:number,:number):number) : void {
+	function _foldNumericBinaryExpressionAsNumeric (expr : BinaryExpression, replaceCb : function(:Expression):void, calcCbInt : function (:int, :int):int, calcCbNumber : function(:number,:number):number) : void {
 		if (expr.getFirstExpr() instanceof IntegerLiteralExpression && expr.getSecondExpr() instanceof IntegerLiteralExpression) {
-			this._foldNumericBinaryExpressionAsInteger(expr, replaceCb, calcCb);
+			this._foldNumericBinaryExpressionAsInteger(expr, replaceCb, calcCbInt);
 		} else {
-			this._foldNumericBinaryExpressionAsNumber(expr, replaceCb, calcCb);
+			this._foldNumericBinaryExpressionAsNumber(expr, replaceCb, calcCbNumber);
 		}
 	}
 
-	function _foldNumericBinaryExpressionAsInteger (expr : BinaryExpression, replaceCb : function(:Expression):void, calcCb : function(:number,:number):number) : void {
-		var value = calcCb(expr.getFirstExpr().getToken().getValue() as number, expr.getSecondExpr().getToken().getValue() as number);
+	function _foldNumericBinaryExpressionAsInteger (expr : BinaryExpression, replaceCb : function(:Expression):void, calcCb : function(:int,:int):int) : void {
+		var value : number = calcCb(expr.getFirstExpr().getToken().getValue() as number, expr.getSecondExpr().getToken().getValue() as number);
 		this.log(
 			"folding operator " + expr.getToken().getNotation() +
 			" to int: " + value as string);
-		if (value % 1 != 0)
+		if (value != (value | 0))
 			throw new Error("value is not an integer");
 		replaceCb(new IntegerLiteralExpression(new Token(value as string)));
 	}
@@ -2824,7 +2824,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 			}
 
 		} else if (expr instanceof AssignmentExpression
-			   && Util.lhsHasNoSideEffects((expr as AssignmentExpression).getFirstExpr())
+			   && ! Util.lhsHasSideEffects((expr as AssignmentExpression).getFirstExpr())
 			&& (expr as AssignmentExpression).getSecondExpr() instanceof CallExpression) {
 
 			// inline if the statement is an assignment of a single call expression into a local variable

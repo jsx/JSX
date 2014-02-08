@@ -142,6 +142,9 @@ class A {
       "word" : "Generator"
    },
    {
+      "word" : "Promise"
+   },
+   {
       "word" : "++"
    },
    {

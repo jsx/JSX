@@ -271,10 +271,7 @@ progress.</p>
    service attacks, to guard against running out of memory, or to work around
    platform-specific limitations.
 
-  <p>Implementations that use ECMAScript to implement the APIs defined in
-   this specification must implement them in a manner consistent with the
-   ECMAScript Bindings defined in the Web IDL specification, as this
-   specification uses that specification's terminology. <a
+  <p>The IDL blocks in this specification are conforming IDL fragments as defined by the WebIDL specification. <a
    href="#ref-webidl">[WEBIDL]</a>
                                    
   <h2 id=introduction><span class=secno>2 </span>Introduction</h2>
@@ -814,7 +811,7 @@ progress.</p>
    and <code>maximumAge</code>.</p>
 
   <pre class=idl>
-  [Callback, NoInterfaceObject]
+  [NoInterfaceObject]
   interface <dfn id=position-options>PositionOptions</dfn> {
     attribute boolean <a href="#high-accuracy">enableHighAccuracy</a>;
     attribute long <a href="#timeout">timeout</a>;
@@ -1176,9 +1173,9 @@ progress.</p>
    <dt><a id=ref-context>[BROWSINGCONTEXT]</a>
 
    <dd><cite><a
-    href="http://dev.w3.org/html5/spec/Overview.html#browsing-context">The
+    href="http://www.w3.org/TR/2013/CR-html5-20130806/browsers.html#windows">The
     browsing context in HTML5</a></cite>, Ian Hickson, David Hyatt, Editors.  World Wide Web Consortium.  See
-    http://dev.w3.org/html5/spec/Overview.html#browsing-context
+    http://www.w3.org/TR/2013/CR-html5-20130806/browsers.html#windows
 
    <dt><a id=ref-uri>[URI]</a>
 
@@ -1189,9 +1186,9 @@ progress.</p>
    <dt><a id=ref-navigator>[NAVIGATOR]</a>
 
    <dd><cite><a
-    href="http://www.w3.org/TR/2009/WD-html5-20090423/browsers.html#navigator">Navigator
+    href="http://www.w3.org/TR/2013/CR-html5-20130806/webappapis.html#navigator">Navigator
     interface in HTML5</a></cite>, Ian Hickson, David Hyatt, Editors.  World Wide Web Consortium.  See
-	http://www.w3.org/TR/2009/WD-html5-20090423/browsers.html#navigator
+	http://www.w3.org/TR/2013/CR-html5-20130806/webappapis.html#navigator
 
    <dt><a id=ref-domtimestamp>[DOMTIMESTAMP]</a>
 

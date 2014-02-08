@@ -1,132 +1,115 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr"><head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta name="generator" content="MediaWiki 1.17.1" />
-<link rel="shortcut icon" href="/favicon.ico" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="generator" content="MediaWiki 1.19.7" />
+<link rel="shortcut icon" href="/skins/common/images/favicon.ico" />
 <link rel="search" type="application/opensearchdescription+xml" href="/opensearch_desc.php" title="MozillaWiki (en)" />
 <link rel="EditURI" type="application/rsd+xml" href="https://wiki.mozilla.org/api.php?action=rsd" />
 <link rel="alternate" type="application/atom+xml" title="MozillaWiki Atom feed" href="/index.php?title=Special:RecentChanges&amp;feed=atom" />	<title>GamepadAPI - MozillaWiki</title>
-	<link rel="stylesheet" href="/load.php?debug=false&amp;lang=en&amp;modules=mediawiki.legacy.commonPrint%2Cshared&amp;only=styles&amp;skin=gmo&amp;*" />
+	<link rel="stylesheet" href="https://wiki.mozilla.org/load.php?debug=false&amp;lang=en&amp;modules=mediawiki.legacy.commonPrint%2Cshared&amp;only=styles&amp;skin=gmo&amp;*" />
 <link rel="stylesheet" href="/extensions/Bugzilla/web/jqueryui/1.8.14/themes/base/jquery-ui.css" />
 <link rel="stylesheet" href="/extensions/Bugzilla/web/jqueryui/1.8.14/themes/smoothness/jquery-ui.css" />
 <link rel="stylesheet" href="/extensions/Bugzilla/web/css/demo_page.css" />
 <link rel="stylesheet" href="/extensions/Bugzilla/web/css/demo_table.css" />
-<link rel="stylesheet" href="/skins-mozilla/gmo/style/screen.css?301" media="screen, projection" />
-<link rel="stylesheet" href="/skins-mozilla/gmo/style/enhanced.css?301" media="screen, projection" />
-<link rel="stylesheet" href="/skins-mozilla/gmo/style/mediawiki.css?301" media="screen, projection" />
-<!--[if gte IE 6]><link rel="stylesheet" href="/skins-mozilla/gmo/style/ie.css?301" media="screen, projection" /><![endif]--><meta name="ResourceLoaderDynamicStyles" content="" /><link rel="stylesheet" href="/load.php?debug=false&amp;lang=en&amp;modules=site&amp;only=styles&amp;skin=gmo&amp;*" />
-<link rel="stylesheet" href="/load.php?debug=false&amp;lang=en&amp;modules=site&amp;only=styles&amp;skin=gmo&amp;*" />
-<link rel="stylesheet" href="/load.php?debug=false&amp;lang=en&amp;modules=site&amp;only=styles&amp;skin=gmo&amp;*" />
+<link rel="stylesheet" href="/extensions/Bugzilla/web/css/bugzilla.css" />
+<link rel="stylesheet" href="/skins/../extensions/gmo/skins/gmo/style/screen.css?303" media="screen, projection" />
+<link rel="stylesheet" href="/skins/../extensions/gmo/skins/gmo/style/enhanced.css?303" media="screen, projection" />
+<link rel="stylesheet" href="/skins/../extensions/gmo/skins/gmo/style/mediawiki.css?303" media="screen, projection" />
+<!--[if gte IE 6]><link rel="stylesheet" href="/skins/../extensions/gmo/skins/gmo/style/ie.css?303" media="screen, projection" /><![endif]--><meta name="ResourceLoaderDynamicStyles" content="" />
+<link rel="stylesheet" href="https://wiki.mozilla.org/load.php?debug=false&amp;lang=en&amp;modules=site&amp;only=styles&amp;skin=gmo&amp;*" />
+<style>a:lang(ar),a:lang(ckb),a:lang(fa),a:lang(kk-arab),a:lang(mzn),a:lang(ps),a:lang(ur){text-decoration:none}a.new,#quickbar a.new{color:#ba0000}
 
-	<link rel="stylesheet" type="text/css" media="print" href="/skins-mozilla/common/commonPrint.css" />
+/* cache key: wiki_mozilla_org:resourceloader:filter:minify-css:7:c88e2bcd56513749bec09a7e29cb3ffa */</style>
+
+	<link rel="stylesheet" type="text/css" media="print" href="/skins/common/commonPrint.css" />
+	<script>if(window.mw){
+mw.config.set({"wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"GamepadAPI","wgTitle":"GamepadAPI","wgCurRevisionId":517076,"wgArticleId":49120,"wgIsArticle":true,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],"wgCategories":["Web APIs"],"wgBreakFrames":false,"wgPageContentLanguage":"en","wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgRelevantPageName":"GamepadAPI","wgRestrictionEdit":[],"wgRestrictionMove":[],"wgWikiEditorEnabledModules":{"toolbar":false,"dialogs":false,"hidesig":true,"templateEditor":false,"templates":false,"preview":false,"previewDialog":false,"publish":false,"toc":false},"sfgAutocompleteValues":[],"sfgAutocompleteOnAllChars":false,"sfgFieldProperties":[],"sfgDependentFields":[],"sfgShowOnSelect":[],"sfgScriptPath":"/extensions/SemanticForms"});
+}</script>					<script src="https://wiki.mozilla.org/load.php?debug=false&amp;lang=en&amp;modules=startup&amp;only=scripts&amp;skin=gmo&amp;*"></script>
+<script>if(window.mw){
+mw.config.set({"wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"GamepadAPI","wgTitle":"GamepadAPI","wgCurRevisionId":517076,"wgArticleId":49120,"wgIsArticle":true,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],"wgCategories":["Web APIs"],"wgBreakFrames":false,"wgPageContentLanguage":"en","wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgRelevantPageName":"GamepadAPI","wgRestrictionEdit":[],"wgRestrictionMove":[],"wgWikiEditorEnabledModules":{"toolbar":false,"dialogs":false,"hidesig":true,"templateEditor":false,"templates":false,"preview":false,"previewDialog":false,"publish":false,"toc":false},"sfgAutocompleteValues":[],"sfgAutocompleteOnAllChars":false,"sfgFieldProperties":[],"sfgDependentFields":[],"sfgShowOnSelect":[],"sfgScriptPath":"/extensions/SemanticForms"});
+}</script><script>if(window.mw){
+mw.loader.implement("user.options",function($){mw.user.options.set({"ccmeonemails":0,"cols":80,"date":"default","diffonly":0,"disablemail":0,"disablesuggest":0,"editfont":"default","editondblclick":0,"editsection":1,"editsectiononrightclick":0,"enotifminoredits":0,"enotifrevealaddr":0,"enotifusertalkpages":1,"enotifwatchlistpages":0,"extendwatchlist":0,"externaldiff":0,"externaleditor":0,"fancysig":0,"forceeditsummary":0,"gender":"unknown","hideminor":0,"hidepatrolled":0,"highlightbroken":1,"imagesize":2,"justify":0,"math":1,"minordefault":0,"newpageshidepatrolled":0,"nocache":0,"noconvertlink":0,"norollbackdiff":0,"numberheadings":0,"previewonfirst":0,"previewontop":1,"quickbar":5,"rcdays":7,"rclimit":50,"rememberpassword":0,"rows":25,"searchlimit":20,"showhiddencats":0,"showjumplinks":1,"shownumberswatching":1,"showtoc":1,"showtoolbar":1,"skin":"gmo","stubthreshold":0,"thumbsize":2,"underline":2,"uselivepreview":0,"usenewrc":0,"watchcreations":0,"watchdefault":0,"watchdeletion":0,
+"watchlistdays":3,"watchlisthideanons":0,"watchlisthidebots":0,"watchlisthideliu":0,"watchlisthideminor":0,"watchlisthideown":0,"watchlisthidepatrolled":0,"watchmoves":0,"wllimit":250,"swl_email":true,"swl_watchlisttoplink":true,"variant":"en","language":"en","searchNs0":true,"searchNs1":false,"searchNs2":false,"searchNs3":false,"searchNs4":false,"searchNs5":false,"searchNs6":false,"searchNs7":false,"searchNs8":false,"searchNs9":true,"searchNs10":false,"searchNs11":true,"searchNs12":false,"searchNs13":false,"searchNs14":false,"searchNs15":false,"searchNs100":true,"searchNs101":true,"searchNs102":true,"searchNs103":true,"searchNs104":true,"searchNs105":true,"searchNs106":true,"searchNs107":true,"searchNs108":true,"searchNs109":true,"searchNs110":true,"searchNs111":true,"searchNs112":true,"searchNs113":true,"searchNs114":true,"searchNs115":true,"searchNs116":true,"searchNs117":true,"searchNs118":true,"searchNs119":true,"searchNs120":true,"searchNs121":true,"searchNs122":true,
+"searchNs123":true,"searchNs124":true,"searchNs125":true,"searchNs126":true,"searchNs127":true,"searchNs128":true,"searchNs129":true,"searchNs130":true,"searchNs131":true,"searchNs134":false,"searchNs135":false,"searchNs138":false,"searchNs139":false,"searchNs140":false,"searchNs141":false});;},{},{});mw.loader.implement("user.tokens",function($){mw.user.tokens.set({"editToken":"+\\","watchToken":false});;},{},{});
+
+/* cache key: wiki_mozilla_org:resourceloader:filter:minify-js:7:84d48c41b96b93bc473fafbcf7e9c2ec */
+}</script>
+<script>if(window.mw){
+mw.loader.load(["mediawiki.page.startup","mediawiki.legacy.wikibits","mediawiki.legacy.ajax"]);
+}</script>		<link rel="alternate" type="application/rdf+xml" title="GamepadAPI" href="/index.php?title=Special:ExportRDF/GamepadAPI&amp;xmlmime=rdf" />
 	<script>if ( window.mediaWiki ) {
-	mediaWiki.config.set({"wgCanonicalNamespace": "", "wgCanonicalSpecialPageName": false, "wgNamespaceNumber": 0, "wgPageName": "GamepadAPI", "wgTitle": "GamepadAPI", "wgAction": "view", "wgArticleId": 49120, "wgIsArticle": true, "wgUserName": null, "wgUserGroups": ["*"], "wgCurRevisionId": 403423, "wgCategories": ["Web APIs"], "wgBreakFrames": false, "wgRestrictionEdit": [], "wgRestrictionMove": [], "wgFCKEditorDir": "extensions/FCKeditor/fckeditor/", "wgFCKEditorExtDir": "extensions/FCKeditor", "wgFCKEditorToolbarSet": "Wiki", "wgFCKEditorHeight": "0", "sfgRemoveText": "Remove", "sfgAutocompleteOnAllChars": false, "sfgAutocompleteValues": {}, "sfgShowOnSelect": {}, "sfgFormErrorsHeader": "There were errors with your form input; see below", "sfgBlankErrorStr": "cannot be blank", "sfgBadURLErrorStr": "must have the correct URL format, starting with \"http\"", "sfgBadEmailErrorStr": "must have a valid email address format", "sfgBadNumberErrorStr": "must be a valid number", "sfgBadDateErrorStr": "must be a valid date", "sfgAnonEditWarning": "Warning: You are not logged in. Your IP address will be recorded in this page\'s edit history."});
-}
-</script>	<script type="text/javascript" src="/skins-mozilla/common/wikibits.js"></script>
-	<script type="text/javascript" src="/index.php?title=-&amp;action=raw&amp;gen=js&amp;useskin=gmo"></script>					<link rel="stylesheet" type="text/css" href="/skins-mozilla/common/shCore.css"></link>
 
-<link rel="stylesheet" type="text/css" href="/skins-mozilla/common/shThemeDefault.css"></link>
-
-<script type="text/javascript" src="/skins-mozilla/common/allsyntax.min.js"></script>
-
-<script type="text/javascript">SyntaxHighlighter.all();</script>
-
-<script src="/extensions/Urchin/urchin.js" type="text/javascript"></script>
-		<script type="text/javascript">
-			urchinTracker();
-		</script>
-		
-<script src="/extensions/Bugzilla/web/jquery/1.6.2/jquery.min.js?301"></script>
-<script src="/extensions/Bugzilla/web/jqueryui/1.8.14/jquery-ui.min.js?301"></script>
-<script src="/extensions/Bugzilla/web/js/jquery.dataTables.js?301"></script>
-<script>
-$(document).ready(function() { 
-                    $(".bugzilla").dataTable({
-                                    "bJQueryUI": true
-                     })});
-</script>
-		<link rel="alternate" type="application/rdf+xml" title="GamepadAPI" href="/index.php?title=Special:ExportRDF/GamepadAPI&amp;xmlmime=rdf" />
-    <script src="/load.php?debug=false&amp;lang=en&amp;modules=startup&amp;only=scripts&amp;skin=gmo&amp;*"></script>
-    <script src="/load.php?debug=false&amp;lang=en&amp;modules=site&amp;only=scripts&amp;skin=gmo&amp;*"></script>
-    <script>if ( window.mediaWiki ) {
-
-        mediaWiki.loader.load(["mediawiki.util", "mediawiki.legacy.wikibits", "mediawiki.legacy.ajax", "ext.smw.sorttable"]);
-        mediaWiki.loader.go();
-    }
-    </script>
-    <script type="text/javascript"> if ( window.isMSIE55 ) fixalpha(); </script>
+		mediaWiki.loader.load(["mediawiki.util", "mediawiki.legacy.wikibits", "mediawiki.legacy.ajax", "ext.smw.sorttable"]);
+		mediaWiki.loader.go();
+	}
+	</script>
+	<script type="text/javascript"> if ( window.isMSIE55 ) fixalpha(); </script>
 </head>
 <body class="mediawiki home ltr ns-0 ns-subject page-GamepadAPI skin-gmo">
 <ul id="skip">
-    <li><a href="#q">Skip to Search</a></li>
-    <li><a href="#nav">Skip to Navigation</a></li>
-    <li><a href="#localnav">Skip to Sub Navigation</a></li>
-    <li><a href="#main">Skip to Content</a></li>
+	<li><a href="#q">Skip to Search</a></li>
+	<li><a href="#nav">Skip to Navigation</a></li>
+	<li><a href="#localnav">Skip to Sub Navigation</a></li>
+	<li><a href="#main">Skip to Content</a></li>
 </ul>
 
 <div id="header">
-    <h1 class="unitPng"><a href="/">MozillaWiki</a></h1>
-    <div id="header-contents">
-        <ul id="nav">
-            <li id="ca-nstab-main"
-            class="selected"            ><a href="/GamepadAPI">Page</a></li><li id="ca-talk"
-            class="new"            ><a href="/index.php?title=Talk:GamepadAPI&amp;action=edit&amp;redlink=1">Discussion</a></li><li id="ca-viewsource"
-                        ><a href="/index.php?title=GamepadAPI&amp;action=edit">View source</a></li><li id="ca-history"
-                        ><a href="/index.php?title=GamepadAPI&amp;action=history">History</a></li>        </ul>
-            
-        <form action="/Special:Search" id="quick-search"><div>
-	        <input id="q" name="search" type="text" />
-            <input type="image" id="quick-search-btn" alt="Search" src="/skins-mozilla/gmo/img/screen/template/search-submit.png">
-        </form>
-            
-        </div>
-    </div>
+	<h1 class="unitPng"><a href="/">MozillaWiki</a></h1>
+	<div id="header-contents">
+		<ul id="nav">
+ <li id='ca-nstab-main' class="selected"><a href='/GamepadAPI'  title="View the content page [c]" accesskey="c">Page</a></li><li id='ca-talk' class="new"><a href='/index.php?title=Talk:GamepadAPI&amp;action=edit&amp;redlink=1'  title="Discussion about the content page [t]" accesskey="t">Discussion</a></li><li id='ca-viewsource' "><a href='/index.php?title=GamepadAPI&amp;action=edit'  title="This page is protected.&#10;You can view its source [e]" accesskey="e">View source</a></li><li id='ca-history' "><a href='/index.php?title=GamepadAPI&amp;action=history'  title="Past revisions of this page [h]" accesskey="h">History</a></li>		</ul>
+
+		<form action="/Special:Search" id="quick-search"><div>
+			<input id="q" name="search" type="text" />
+			<input type="image" id="quick-search-btn" alt="Search" src="/skins/../extensions/gmo/skins/gmo/img/screen/template/search-submit.png"/>
+		</div></form>
+
+	</div>
 
 </div>
-    
-</div>
+
 <div id="main">
-                
-            <div id="wiki-tools">         
-                <script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
-                                <div class='portlet' id='p-navigation'>
-                    <h2>Navigation</h2>
-                    <div class='pBody'>
-                        <ul>
-                                                        <li id="n-mainpage-description"><a href="/Main_Page">Main page</a></li>
-                                                        <li id="n-portal"><a href="/MozillaWiki:Community_portal">Community portal</a></li>
-                                                        <li id="n-currentevents"><a href="http://blog.mozilla.com/">Mozilla News</a></li>
-                                                        <li id="n-recentchanges"><a href="/Special:RecentChanges">Recent changes</a></li>
-                                                        <li id="n-randompage"><a href="/Special:Random">Random page</a></li>
-                                                        <li id="n-help"><a href="/Help:Contents">Help</a></li>
-                                                    </ul>
-                    </div>
-                </div>
-                <div class="portlet" id="p-personal">
-                    <h2>Personal tools</h2>
-                    <div class="pBody">
-                        <ul>
-                        <li id="pt-login"><a href="/index.php?title=Special:UserLogin&amp;returnto=GamepadAPI">Log in / create account</a></li>                        </ul>
-                    </div>
-                </div>                  
-	            
-	            <div class="portlet" id="p-tb">
-		            <h2>Toolbox</h2>
-		            <div class="pBody">
-			            <ul>
-					      					      <li id="t-whatlinkshere"><a href="/Special:WhatLinksHere/GamepadAPI">What links here</a></li>
-					      					      <li id="t-recentchangeslinked"><a href="/Special:RecentChangesLinked/GamepadAPI">Related changes</a></li>
-					      				          				          				          				          				          				          				          				          				          <li id="t-specialpages"><a href="/Special:SpecialPages">Special pages</a></li>				          <li id="t-smwbrowselink"><a href="/Special:Browse/GamepadAPI" title="Special:Browse/GamepadAPI">Browse properties</a></li>					    </ul>
-		            </div>
-	            </div>             </div>
-            
-            <div id="main-content">              
-                <h1 id="page-title">GamepadAPI</h1>
-                <div id="breadcrumbs">
-                    <a href="https://wiki.mozilla.org">Home</a>&nbsp;&raquo;&nbsp;<a href="https://wiki.mozilla.org/GamepadAPI">GamepadAPI</a>                </div>
-                <h3 id="siteSub">From MozillaWiki</h3>
-                <div id="contentSub"></div>
-                                                <div id="jump-to-nav">Jump to: <a href="#column-one">navigation</a>, <a href="#searchInput">search</a></div>                <!-- start content -->
-                <table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
+	
+			<div id="wiki-tools">
+				<script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
+								<div class='portlet' id='p-navigation'>
+					<h2>Navigation</h2>
+					<div class='pBody'>
+						<ul>
+														<li id="n-mainpage-description"><a href="/Main_Page">Main page</a></li>
+														<li id="n-portal"><a href="/MozillaWiki:Community_portal">Community portal</a></li>
+														<li id="n-currentevents"><a href="http://blog.mozilla.com/">Mozilla News</a></li>
+														<li id="n-recentchanges"><a href="/Special:RecentChanges">Recent changes</a></li>
+														<li id="n-randompage"><a href="/Special:Random">Random page</a></li>
+														<li id="n-help"><a href="/Help:Contents">Help</a></li>
+													</ul>
+					</div>
+				</div>
+				<div class="portlet" id="p-personal">
+					<h2>Personal tools</h2>
+					<div class="pBody">
+						<ul>
+						<li id="pt-login"><a href="/index.php?title=Special:UserLogin&amp;returnto=GamepadAPI">Log in / create account</a></li>						</ul>
+					</div>
+				</div>
+
+				<div class="portlet" id="p-tb">
+					<h2>Toolbox</h2>
+					<div class="pBody">
+						<ul>
+						  						  <li id="t-whatlinkshere"><a href="/Special:WhatLinksHere/GamepadAPI">What links here</a></li>
+						  						  <li id="t-recentchangeslinked"><a href="/Special:RecentChangesLinked/GamepadAPI">Related changes</a></li>
+						  						  						  						  						  						  						  						  						  						  <li id="t-specialpages"><a href="/Special:SpecialPages">Special pages</a></li>						  <li id="t-smwbrowselink"><a href="/Special:Browse/GamepadAPI" title="Special:Browse/GamepadAPI">Browse properties</a></li>						</ul>
+					</div>
+				</div> 			</div>
+
+			<div id="main-content">
+				<h1 id="page-title">GamepadAPI</h1>
+				<div id="breadcrumbs">
+					<a href="https://wiki.mozilla.org">Home</a>&nbsp;&raquo;&nbsp;<a href="https://wiki.mozilla.org/GamepadAPI">GamepadAPI</a>				</div>
+				<h3 id="siteSub">From MozillaWiki</h3>
+				<div id="contentSub"></div>
+												<div id="jump-to-nav">Jump to: <a href="#column-one">navigation</a>, <a href="#searchInput">search</a></div>				<!-- start content -->
+				<div id="mw-content-text" lang="en" dir="ltr" class="mw-content-ltr"><table id="toc" class="toc"><tr><td><div id="toctitle"><h2>Contents</h2></div>
 <ul>
 <li class="toclevel-1 tocsection-1"><a href="#Web_Gamepad_API_.28Draft_Recommendation.29"><span class="tocnumber">1</span> <span class="toctext">Web Gamepad API (Draft Recommendation)</span></a>
 <ul>
@@ -165,13 +148,13 @@ $(document).ready(function() {
 <h2> <span class="mw-headline" id="Web_Gamepad_API_.28Draft_Recommendation.29"> Web Gamepad API (Draft Recommendation) </span></h2>
 <h3> <span class="mw-headline" id="Abstract"> Abstract </span></h3>
 <p>The HTML5 specification introduces many of the necessary components for rich interactive and game development, from &lt;canvas&gt; and WebGL to &lt;audio&gt; and &lt;video&gt;.  At the same time, JavaScript implementations have matured to the point where they can now support many tasks which previously required native code.  The Web Gamepad API presents a new way for web and game developers, as well as interaction designers, to access and use gamepads and other controllers for games.
-</p><p>This API is currently in <a href="http://dvcs.w3.org/hg/webevents/raw-file/default/gamepad.html" class="external text" rel="nofollow">Editor's Draft status at the W3C</a>, and will be subject to change.
+</p><p>This API is currently in <a rel="nofollow" class="external text" href="https://dvcs.w3.org/hg/gamepad/raw-file/default/gamepad.html">Editor's Draft status at the W3C</a>, and will be subject to change.
 </p>
 <h3> <span class="mw-headline" id="Authors"> Authors </span></h3>
-<ul><li> Ted Mielczarek (<a href="https://twitter.com/#!/TedMielczarek" class="external text" rel="nofollow">@TedMielczarek</a>)
-</li><li> Jason Orendorff (<a href="https://twitter.com/#!/jorendorff" class="external text" rel="nofollow">@jorendorff</a>)
-</li><li> David Humphrey (<a href="http://twitter.com/humphd" class="external text" rel="nofollow">@humphd</a>)
-</li><li> Kevin Gadd (<a href="https://twitter.com/#!/antumbral" class="external text" rel="nofollow">@antumbral</a>)
+<ul><li> Ted Mielczarek (<a rel="nofollow" class="external text" href="https://twitter.com/#!/TedMielczarek">@TedMielczarek</a>)
+</li><li> Jason Orendorff (<a rel="nofollow" class="external text" href="https://twitter.com/#!/jorendorff">@jorendorff</a>)
+</li><li> David Humphrey (<a rel="nofollow" class="external text" href="http://twitter.com/humphd">@humphd</a>)
+</li><li> Kevin Gadd (<a rel="nofollow" class="external text" href="https://twitter.com/#!/antumbral">@antumbral</a>)
 </li></ul>
 <h2> <span class="mw-headline" id="API_Tutorial"> API Tutorial </span></h2>
 <p>This API introduces new events on the window object for reading gamepad and controller (hereby referred to as <i>gamepad</i>) state.  In addition to these events, the API also adds a Gamepad object, which can be used to query the state of connected gamepads.
@@ -450,20 +433,20 @@ interface nsIDOMGamepadAxisMoveEvent&#160;: nsIDOMEvent
 </p><p>The <b>gamepad</b> attribute provides access to the associated nsIDOMGamepad object, with full axes state information available via <b>gamepad.axes</b>.
 </p>
 <h2> <span class="mw-headline" id="Resources">Resources</span></h2>
-<p>Implementation and discussion on this API is happening in <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=604039" class="external text" rel="nofollow">bug 604039</a>.  Feedback and suggestions are welcome.
+<p>Implementation and discussion on this API is happening in <a rel="nofollow" class="external text" href="https://bugzilla.mozilla.org/show_bug.cgi?id=604039">bug 604039</a>.  Feedback and suggestions are welcome.
 </p>
 <h3> <span class="mw-headline" id="Obtaining_Builds">Obtaining Builds</span></h3>
-<p>The latest information about custom builds for testing the API is in <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=604039" class="external text" rel="nofollow">bug 604039</a>.  However, the most recent try-server builds are available at:
-</p><p><a href="http://people.mozilla.com/~tmielczarek/mouselock+gamepad/" class="external free" rel="nofollow">http://people.mozilla.com/~tmielczarek/mouselock+gamepad/</a>
+<p>The latest information about custom builds for testing the API is in <a rel="nofollow" class="external text" href="https://bugzilla.mozilla.org/show_bug.cgi?id=604039">bug 604039</a>.  However, the most recent try-server builds are available at:
+</p><p><a rel="nofollow" class="external free" href="http://people.mozilla.com/~tmielczarek/mouselock+gamepad/">http://people.mozilla.com/~tmielczarek/mouselock+gamepad/</a>
 </p>
 <h3> <span class="mw-headline" id="Demos.2C_Libraries.2C_Other_Code">Demos, Libraries, Other Code</span></h3>
 <p>Examples of the Web Gamepad API should be added here.  NOTE, the API is evolving, and some of the following examples may be based on earlier versions.
 </p>
-<ul><li> Gamepad visualisation demo - <a href="http://robhawkes.github.com/gamepad-demo/" class="external free" rel="nofollow">http://robhawkes.github.com/gamepad-demo/</a>
-</li><li> Simple API demo page - <a href="https://bug604039.bugzilla.mozilla.org/attachment.cgi?id=549214" class="external free" rel="nofollow">https://bug604039.bugzilla.mozilla.org/attachment.cgi?id=549214</a>
-</li><li> Another API demo page - <a href="https://bug604039.bugzilla.mozilla.org/attachment.cgi?id=550638" class="external free" rel="nofollow">https://bug604039.bugzilla.mozilla.org/attachment.cgi?id=550638</a>
-</li><li> Example of using MozGamepad* listeners - <a href="https://gist.github.com/58b0f9ed647f72da9173" class="external free" rel="nofollow">https://gist.github.com/58b0f9ed647f72da9173</a>
-</li><li> Gamepad API controlling &lt;video&gt; - <a href="http://weblog.bocoup.com/javascript-firefox-nightly-introduces-dom-gamepad-events" class="external free" rel="nofollow">http://weblog.bocoup.com/javascript-firefox-nightly-introduces-dom-gamepad-events</a>, <a href="http://jsfiddle.net/rwaldron/wPuGB/" class="external free" rel="nofollow">http://jsfiddle.net/rwaldron/wPuGB/</a>
+<ul><li> Gamepad visualisation demo - <a rel="nofollow" class="external free" href="http://robhawkes.github.com/gamepad-demo/">http://robhawkes.github.com/gamepad-demo/</a>
+</li><li> Simple API demo page - <a rel="nofollow" class="external free" href="https://bug604039.bugzilla.mozilla.org/attachment.cgi?id=549214">https://bug604039.bugzilla.mozilla.org/attachment.cgi?id=549214</a>
+</li><li> Another API demo page - <a rel="nofollow" class="external free" href="https://bug604039.bugzilla.mozilla.org/attachment.cgi?id=550638">https://bug604039.bugzilla.mozilla.org/attachment.cgi?id=550638</a>
+</li><li> Example of using MozGamepad* listeners - <a rel="nofollow" class="external free" href="https://gist.github.com/58b0f9ed647f72da9173">https://gist.github.com/58b0f9ed647f72da9173</a>
+</li><li> Gamepad API controlling &lt;video&gt; - <a rel="nofollow" class="external free" href="http://weblog.bocoup.com/javascript-firefox-nightly-introduces-dom-gamepad-events">http://weblog.bocoup.com/javascript-firefox-nightly-introduces-dom-gamepad-events</a>, <a rel="nofollow" class="external free" href="http://jsfiddle.net/rwaldron/wPuGB/">http://jsfiddle.net/rwaldron/wPuGB/</a>
 </li></ul>
 <h3> <span class="mw-headline" id="Design_Considerations">Design Considerations</span></h3>
 <ul><li> Should feel web-native.
@@ -483,7 +466,7 @@ interface nsIDOMGamepadAxisMoveEvent&#160;: nsIDOMEvent
 <ul><li> Even the same gamepad looks different on different OSes!
 </li><li> Across multiple devices this is insanity
 </li><li> Should try to expose enough info to let content handle this, Kevin Gadd has an "Input Device API" that is higher-level and might be a good fit here.
-</li><li> This can totally be done in JavaScript: <a href="https://github.com/jbuck/input.js" class="external free" rel="nofollow">https://github.com/jbuck/input.js</a>
+</li><li> This can totally be done in JavaScript: <a rel="nofollow" class="external free" href="https://github.com/jbuck/input.js">https://github.com/jbuck/input.js</a>
 </li></ul>
 </li></ul>
 <h3> <span class="mw-headline" id="Discussion">Discussion</span></h3>
@@ -495,40 +478,61 @@ interface nsIDOMGamepadAxisMoveEvent&#160;: nsIDOMEvent
 </li><li> Probably a fingerprinting concern, may not want to ship this 
 </li><li> How much do we push to content vs. try to handle in the browser? 
 </li><li> We'll get new try builds and put up a web page to gather data from users with various devices 
-</li><li> This can totally be done in JavaScript: <a href="https://github.com/jbuck/input.js" class="external free" rel="nofollow">https://github.com/jbuck/input.js</a>
+</li><li> This can totally be done in JavaScript: <a rel="nofollow" class="external free" href="https://github.com/jbuck/input.js">https://github.com/jbuck/input.js</a>
 </li></ul>
 </li><li> Need timestamps per event (using milliseconds like requestAnimationFrame) 
 </li><li> sicking is going to schedule a security review to get some more people thinking about it 
-</li><li> Proposal for a polling based API (soliciting feedback): <a href="https://sites.google.com/a/chromium.org/dev/developers/gamepad-api" class="external free" rel="nofollow">https://sites.google.com/a/chromium.org/dev/developers/gamepad-api</a>
+</li><li> Proposal for a polling based API (soliciting feedback): <a rel="nofollow" class="external free" href="https://sites.google.com/a/chromium.org/dev/developers/gamepad-api">https://sites.google.com/a/chromium.org/dev/developers/gamepad-api</a>
 </li></ul>
 
 <!-- 
 NewPP limit report
 Preprocessor node count: 184/1000000
-Post-expand include size: 128/2097152 bytes
+Post‐expand include size: 128/2097152 bytes
 Template argument size: 24/2097152 bytes
 Expensive parser function count: 0/100
 -->
 
-<!-- Saved in parser cache with key wiki_mozilla_org:pcache:idhash:49120-0!*!0!!en!*!edit=0 and timestamp 20121217171938 -->
-<div class="printfooter">
-Retrieved from "<a href="https://wiki.mozilla.org/GamepadAPI">https://wiki.mozilla.org/GamepadAPI</a>"</div>
-                <div id='catlinks' class='catlinks'><div id="mw-normal-catlinks"><a href="/Special:Categories" title="Special:Categories">Category</a>: <span dir='ltr'><a href="/Category:Web_APIs" title="Category:Web APIs">Web APIs</a></span></div></div>                <!-- end content -->
-                                <div class="visualClear"></div>
-            </div>
+<!-- Saved in parser cache with key wiki_mozilla_org:pcache:idhash:49120-0!*!*!!en!*!* and timestamp 20131119082900 -->
+</div><div class="printfooter">
+Retrieved from "<a href="https://wiki.mozilla.org/index.php?title=GamepadAPI&amp;oldid=517076">https://wiki.mozilla.org/index.php?title=GamepadAPI&amp;oldid=517076</a>"</div>
+				<div id='catlinks' class='catlinks'><div id="mw-normal-catlinks" class="mw-normal-catlinks"><a href="/Special:Categories" title="Special:Categories">Category</a>: <ul><li><a href="/Category:Web_APIs" title="Category:Web APIs">Web APIs</a></li></ul></div></div>				<!-- end content -->
+								<div class="visualClear"></div>
+			</div>
 
-            </div><!-- end #main -->
+			</div><!-- end #main -->
 </div>
 <div id="footer-wrap">
-    <div class="cols" id="footer">
-        <div class="six-col">
-	        <a href="/" id="logo-footer"><img src="/skins-mozilla/gmo/img/screen/template/screen/logo_footer.png"></a>
-        </div>
-        <div class="col-span">
-        		<span id="f-lastmod"> This page was last modified on 2 March 2012, at 19:36.</span>		<span id="f-viewcount">This page has been accessed 21,405 times. </span>		<ul id="f-list">
-									<li id="f-about"><a href="/MozillaWiki:About" title="MozillaWiki:About">About MozillaWiki</a></li>			<li id="f-disclaimer"><a href="/MozillaWiki:General_disclaimer" title="MozillaWiki:General disclaimer">Disclaimers</a></li>            <li><a href="http://www.mozilla.org/about/policies/privacy-policy.html">Privacy Policy</a></li>
+	<div class="cols" id="footer">
+		<div class="six-col">
+			<a href="/" id="logo-footer"><img src="/skins/../extensions/gmo/skins/gmo/img/screen/template/screen/logo_footer.png"></a>
+		</div>
+		<div class="col-span">
+				<span id="f-lastmod"> This page was last modified on 11 February 2013, at 02:39.</span>		<span id="f-viewcount">This page has been accessed 34,633 times. </span>		<ul id="f-list">
+									<li id="f-about"><a href="/MozillaWiki:About" title="MozillaWiki:About">About MozillaWiki</a></li>			<li id="f-disclaimer"><a href="/MozillaWiki:General_disclaimer" title="MozillaWiki:General disclaimer">Disclaimers</a></li>			<li><a href="http://www.mozilla.org/about/policies/privacy-policy.html">Privacy Policy</a></li>
 		</ul>
-		<div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="/skins-mozilla/common/images/poweredby_mediawiki_88x31.png" height="31" width="88" alt="Powered by MediaWiki" /></a> <a href="http://www.semantic-mediawiki.org/wiki/Semantic_MediaWiki"><img src="/extensions/SemanticMediaWiki/skins/images/smw_button.png" alt="Powered by Semantic MediaWiki" /></a></div>        </div>       
-    </div><!-- end #footer -->
+		<div id="f-poweredbyico"><a href="//www.mediawiki.org/"><img src="/skins/common/images/poweredby_mediawiki_88x31.png" height="31" width="88" alt="Powered by MediaWiki" /></a> <a href="http://www.semantic-mediawiki.org/wiki/Semantic_MediaWiki"><img src="/extensions/SemanticMediaWiki/resources/images/smw_button.png" alt="Powered by Semantic MediaWiki" /></a></div>		</div>
+	</div><!-- end #footer -->
 </div>
 
+<script>if(window.mw){
+mw.loader.load(["mediawiki.user","mediawiki.page.ready"], null, true);
+}</script>
+<script src="/extensions/Bugzilla/web/jquery/1.6.2/jquery.min.js?303"></script>
+<script src="/extensions/Bugzilla/web/jqueryui/1.8.14/jquery-ui.min.js?303"></script>
+<script src="/extensions/Bugzilla/web/js/jquery.dataTables.js?303"></script>
+<script>
+$(document).ready(function() { 
+                        $("table.bugzilla").dataTable({
+                                    "bJQueryUI": true
+                     })});
+</script>
+<script src="https://wiki.mozilla.org/load.php?debug=false&amp;lang=en&amp;modules=site&amp;only=scripts&amp;skin=gmo&amp;*"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-35433268-22");
+pageTracker._trackPageview();
+</script><!-- Served in 0.264 secs. --></body></html>

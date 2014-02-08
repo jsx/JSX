@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright (c) 2012 DeNA Co., Ltd.
+ * Copyright (c) 2012,2013 DeNA Co., Ltd. et al.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -48,4 +48,19 @@ final native class js {
 	 */
 	static function eval(jsSource : string) : variant;
 
-} = "(function () { var global = (function () { return this; }()); return { global: global, eval: global.eval, invoke: function(invocant, methodName, args) { return invocant[methodName].apply(invocant, args); } }; }())";
+	/**
+	 * new Function
+	 */
+	static function newFunction(...argsAndBody : string) : variant;
+
+} = """(function () {
+	var global = (function () { return this; }());
+	return {
+		global: global,
+		eval: global.eval,
+		invoke: function(invocant, methodName, args) {
+			return invocant[methodName].apply(invocant, args);
+		},
+		newFunction: Function
+	};
+}())""";

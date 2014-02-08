@@ -17,6 +17,27 @@ interface WindowAnimationTiming {
     void mozCancelAnimationFrame(long handle);
 };
 
+// https://dvcs.w3.org/hg/fullscreen/raw-file/tip/Overview.html
+partial interface Element {
+  void       requestFullscreen();
+  void webkitRequestFullscreen();
+  void    mozRequestFullscreen();
+};
+
+partial interface Document {
+  readonly attribute boolean? fullscreenEnabled;
+  readonly attribute Element? fullscreenElement;
+
+  readonly attribute boolean? webkitFullscreenEnabled;
+  readonly attribute Element? webkitFullscreenElement;
+
+  readonly attribute boolean? mozFullscreenEnabled;
+  readonly attribute Element? mozFullscreenElement;
+
+  void       exitFullscreen();
+  void webkitExitFullscreen();
+  void    mozExitFullscreen();
+};
 Window implements WindowAnimationTiming;
 
 callback FrameRequestCallback = void (DOMTimeStamp time);
@@ -144,3 +165,8 @@ Navigator implements NavigatorUserMedia;
 HTMLElement implements ElementCSSInlineStyle;
 SVGELement implements ElementCSSInlineStyle;
 
+// http://www.w3.org/TR/2013/ED-css3-conditional-20131109/
+interface CSS {
+    static boolean supports(DOMString property, DOMString value);
+    static boolean supports(DOMString conditionText);
+};

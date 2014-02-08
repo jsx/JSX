@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 DeNA Co., Ltd.
+ * Copyright (c) 2012,2013 DeNA Co., Ltd. et al.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -30,7 +30,7 @@ import "timer.jsx";
 
 class _Test extends TestCase {
 
-	// synchrounous tests
+	// synchrounous tests which run in serial
 
 	function testClearTimeout() : void {
 		var id = Timer.setTimeout(() -> {
@@ -41,7 +41,7 @@ class _Test extends TestCase {
 		this.expect(id, "clearTimeout").toBe(id);
 	}
 
-	// asynchronous tests
+	// asynchronous tests which start in parallel but run in serial
 
 	function testSetTimeout() : void {
 		this.async((async) -> {
@@ -58,8 +58,8 @@ class _Test extends TestCase {
 	}
 }</code></pre>
 
- * @author DeNA., Co., Ltd.
- * @version 1.0.0
+ * @author DeNA., Co., Ltd. et. al.
+ * @version 1.1.0
  */
 
 import "timer.jsx";
@@ -93,6 +93,15 @@ class TestCase {
 	 */
 	function tearDown() : void { }
 
+	/**
+	 * Set up for each asynchronous test method.
+	 */
+	function setUp(async : AsyncContext) : void { }
+
+	/**
+	 * Tear down for each asynchronous test method.
+	 */
+	function tearDown(async : AsyncContext) : void { }
 
 	/* low-level hooks called by src/js/runtests.js */
 
@@ -106,7 +115,7 @@ class TestCase {
 			this.finish();
 		}
 		else { // asynchronous
-			var next = this._tasks.shift() as function():void;
+			var next = this._tasks.shift();
 			next();
 		}
 	}
@@ -178,19 +187,20 @@ class TestCase {
 	/* async test stuff */
 
 	/**
-	 * Prepares an asynchronous test with timeout handler.
+	 * Prepares an asynchronous test block with a timeout handler.
 	 */
 	function async(testBody : function(:AsyncContext):void, timeoutHandler : function(:AsyncContext):void, timeoutMS : int) : void {
 
 		var async = new AsyncContext(this, this._currentName, timeoutHandler, timeoutMS);
 
 		this._tasks.push(function() : void {
+			this.setUp(async);
 			testBody(async);
 		});
 	}
 
 	/**
-	 * Prepares an asynchronous test.
+	 * Prepares an asynchronous test block.
 	 * Automatically call <code>this.fail()</code> on timeout.
 	 */
 	function async(testBody : function(:AsyncContext):void, timeoutMS : int) : void {
@@ -202,16 +212,15 @@ class TestCase {
 
 	/* matcher factory */
 
-	// want to delcare expect.<T>(value : T) : TestCase.Matcher.<T>
 	/**
 	 * <p>Creates a test matcher for a value.</p>
 	 * <p>Usage: <code>this.expect(testingValue).toBe(expectedValue)</code></p>
 	 */
-	function expect(value : variant) : TestCase.Matcher {
+	function expect.<T>(value : T) : TestCase.Matcher {
 		++this._count;
 		return new TestCase.Matcher(this, value);
 	}
-	function expect(value : variant, message : string) : TestCase.Matcher {
+	function expect.<T>(value : T, message : string) : TestCase.Matcher {
 		++this._count;
 		return new TestCase.Matcher(this, value, message);
 	}
@@ -239,8 +248,8 @@ class TestCase {
 
 		if (op != null) {
 			this.diag("comparing with " + op + s.replace(" - ", " for "));
-			this._dump("got:      ", got);
-			this._dump("expected: ", expected);
+			this._dump("got     :", got);
+			this._dump("expected:", expected);
 		}
 		throw new TestCase.Failure(name != null ? name : "");
 	}
@@ -269,7 +278,7 @@ class TestCase {
 			console.dir(value);
 		}
 		else { // primitive value
-			this.diag(tag + value as string);
+			this.diag(tag + " " + value as string);
 		}
 	}
 
@@ -391,7 +400,7 @@ class TestCase {
 	}
 
 	/**
-	 * Shows notes.
+	 * Shows notes on verbose mode.
 	 */
 	function note(message : string) : void {
 		if(this.verbose) {
@@ -410,7 +419,7 @@ class TestCase {
 	}
 
 	/**
-	 * Executes Assertion Executor, created by <code>TestCase#expect()</code>
+	 * Assertion Matcher, created by <code>TestCase#expect()</code>
 	 */
 	class Matcher {
 
@@ -454,45 +463,32 @@ class TestCase {
 
 		function toMatch(x : RegExp) : void {
 			this._match(x.test(this._got as string),
-					this._got, x, "match");
+					this._got, x, "RegExp.test()");
 		}
 		function notToMatch(x : RegExp) : void {
 			this._match(! x.test(this._got as string),
-					this._got, x, "not match");
+					this._got, x, "! RegExp.test()");
 		}
 
 		/**
-		 * Tests whether the given array equals to the expected.
+		 * Tests whether the given collection equals to the expected.
 		 */
-		function toEqual(x : Array.<variant>) : void {
+		function toEqual.<Collection>(x : Collection) : void {
 			assert x != null;
 
-			if (! (this._got instanceof Array.<variant>)) {
-				this._test._nok(this._name, "equals", this._got, x);
+			if (! (this._got instanceof Collection)) {
+				this._test._nok(this._name, "TestCase#equals()", this._got, x);
 				return;
 			}
 
-			var got = this._got as Array.<variant>;
+			var got = this._got as Collection;
 			if (this._test.equals(got, x)) {
 				this._test._ok(this._name);
 			}
 			else {
-				this._test._nok(this._name, "equals", got, x);
+				this._test._nok(this._name, "TestCase#equals()", got, x);
 				this._test.note(this._test.difflet(got, x));
 			}
-		}
-
-		function toEqual(x : Array.<string>) : void {
-			this.toEqual(x as __noconvert__ Array.<variant>);
-		}
-		function toEqual(x : Array.<number>) : void {
-			this.toEqual(x as __noconvert__ Array.<variant>);
-		}
-		function toEqual(x : Array.<int>) : void {
-			this.toEqual(x as __noconvert__ Array.<variant>);
-		}
-		function toEqual(x : Array.<boolean>) : void {
-			this.toEqual(x as __noconvert__ Array.<variant>);
 		}
 
 		function _match(value : boolean, got : variant, expected : variant, op : string) : void {
@@ -517,7 +513,6 @@ class TestCase {
 }
 
 class AsyncContext {
-
 	var _test : TestCase;
 	var _name : string;
 	var _timerId : TimerHandle;
@@ -533,18 +528,22 @@ class AsyncContext {
 		this._timerId = id;
 	}
 
+	/**
+	 * The name of the running test method, e.g. <code>"testAsyncFoo"</code>.
+	 */
 	function name() : string { return this._name; }
 
 	/*
-	 * Tells the test case that the asynchronous test is finished.
+	 * Tells that the asynchronous test is finished.
 	 */
 	function done() : void {
 		Timer.clearTimeout(this._timerId);
 
+		this._test.tearDown(this);
 		this._test.after(this._name);
 
 		if(this._test._tasks.length != 0) {
-			var next = this._test._tasks.shift() as function():void;
+			var next = this._test._tasks.shift();
 			next();
 		}
 		else {

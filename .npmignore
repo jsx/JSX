@@ -7,6 +7,9 @@ _builtins.js
 v8.log
 CodeMirror-*
 bootstrap/
+.jsx.*
+.jsx
+tmp/
 
 # products
 
@@ -30,3 +33,7 @@ node_modules/
 darwin-*
 linux-*
 *:*
+
+# git stuff
+
+.git*

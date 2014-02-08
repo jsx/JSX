@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 DeNA Co., Ltd.
+ * Copyright (c) 2012,2013 DeNA Co., Ltd. et al.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -167,30 +167,30 @@ class Util {
 		return false;
 	}
 
-	static function lhsHasNoSideEffects (lhsExpr : Expression) : boolean {
+	static function lhsHasSideEffects (lhsExpr : Expression) : boolean {
 		if (lhsExpr instanceof LocalExpression)
-			return true;
+			return false;
 		if (lhsExpr instanceof PropertyExpression) {
 			var holderExpr = (lhsExpr as PropertyExpression).getExpr();
 			if (Util.isNativeClass(holderExpr.getType()) && !Util.isBuiltInClass(holderExpr.getType())) {
-				return false;
+				return true;
 			}
 			if (holderExpr instanceof ThisExpression
 				|| holderExpr instanceof LocalExpression
 				|| holderExpr.isClassSpecifier()) {
-				return true;
+				return false;
 			}
 		} else if (lhsExpr instanceof ArrayExpression) {
 			var arrayExpr = lhsExpr as ArrayExpression;
 			if (Util.isNativeClass(arrayExpr.getFirstExpr().getType()) && !Util.isBuiltInClass(arrayExpr.getFirstExpr().getType())) {
-				return false;
+				return true;
 			}
 			if (arrayExpr.getFirstExpr() instanceof LocalExpression
 				&& arrayExpr.getSecondExpr() instanceof LeafExpression) {
-				return true;
+				return false;
 			}
 		}
-		return false;
+		return true;
 	}
 
 	static function instantiateTemplate (context : AnalysisContext, token : Token, className : string, typeArguments : Type[]) : ClassDefinition {
@@ -259,7 +259,7 @@ class Util {
 					if (! (args[i] as FunctionExpression).deductTypeIfUnknown(context, expectedCallbackType))
 						return null;
 				}
-			} else if (args[i] instanceof ArrayLiteralExpression && (args[i] as ArrayLiteralExpression).getType() == null) {
+			} else if (args[i] instanceof ArrayLiteralExpression) {
 				var arrayExpr = args[i] as ArrayLiteralExpression;
 				var expectedArrayType = null : Type;
 				for (var j = 0; j < expectedTypes.length; ++j) {
@@ -281,7 +281,7 @@ class Util {
 				} else if (expectedArrayType != null) {
 					arrayExpr.setType(expectedArrayType);
 				}
-			} else if (args[i] instanceof MapLiteralExpression && (args[i] as MapLiteralExpression).getType() == null) {
+			} else if (args[i] instanceof MapLiteralExpression) {
 				var mapExpr = args[i] as MapLiteralExpression;
 				var expectedMapType = null : Type;
 				for (var j = 0; j < expectedTypes.length; ++j) {

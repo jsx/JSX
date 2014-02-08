@@ -1,721 +1,937 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
-<html dir="ltr" xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <title>Touch Events version 1</title>
-    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
-    <meta content="width=device-width" name="viewport" />
-    <!-- 
-      === NOTA BENE ===
-      For the three scripts below, if your spec resides on dev.w3 you can check them
-      out in the same tree and use relative links so that they'll work offline,
-      -->
-
-    <style type="text/css">
-/*<![CDATA[*/
-      .event {
-        font-family: monospace;
-        color: #459900;
-      }
-
-      pre.idl {
-        white-space: pre-wrap;
-      }
-    /*]]>*/
-    </style>
-    <link href="respec.css" rel="stylesheet" type="text/css" charset="utf-8" />
-    <link href="http://www.w3.org/StyleSheets/TR/W3C-CR" rel="stylesheet" type="text/css" charset="utf-8" />
-
-</head>
-<body style="display: inherit;">
-  <div class="head">
+<!doctype html>
+<html prefix="bibo: http://purl.org/ontology/bibo/ w3p: http://www.w3.org/2001/02pd/rec54#" content="en" property="dcterms:language" about="" typeof="bibo:Document w3p:REC" lang="en">
+  <head>
+      <title>Touch Events</title>
+      <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+      <meta name="viewport" content="width=device-width">
+      <!--
+        === NOTA BENE ===
+        For the three scripts below, if your spec resides on dev.w3 you can check them
+        out in the same tree and use relative links so that they'll work offline,
+       -->
+          <style type="text/css">
+        .event {
+          font-family: monospace;
+          color: #459900;
+        }        pre.idl {
+          white-space: pre-wrap;
+        }
+      </style>
+    <style>/*****************************************************************
+   * ReSpec 3 CSS
+   * Robin Berjon - http://berjon.com/
+   *****************************************************************/  /* --- INLINES --- */
+  em.rfc2119 {
+      text-transform:     lowercase;
+      font-variant:       small-caps;
+      font-style:         normal;
+      color:              #900;
+  }  h1 acronym, h2 acronym, h3 acronym, h4 acronym, h5 acronym, h6 acronym, a acronym,
+  h1 abbr, h2 abbr, h3 abbr, h4 abbr, h5 abbr, h6 abbr, a abbr {
+      border: none;
+  }  dfn {
+      font-weight:    bold;
+  }  a.internalDFN {
+      color:  inherit;
+      border-bottom:  1px solid #99c;
+      text-decoration:    none;
+  }  a.externalDFN {
+      color:  inherit;
+      border-bottom:  1px dotted #ccc;
+      text-decoration:    none;
+  }  a.bibref {
+      text-decoration:    none;
+  }  cite .bibref {
+      font-style: normal;
+  }  code {
+      color:  #ff4500;
+  }  /* --- TOC --- */
+  .toc a, .tof a {
+      text-decoration:    none;
+  }  a .secno, a .figno {
+      color:  #000;
+  }  ul.tof, ol.tof {
+      list-style: none outside none;
+  }  .caption {
+      margin-top: 0.5em;
+      font-style:   italic;
+  }  /* --- TABLE --- */
+  table.simple {
+      border-spacing: 0;
+      border-collapse:    collapse;
+      border-bottom:  3px solid #005a9c;
+  }  .simple th {
+      background: #005a9c;
+      color:  #fff;
+      padding:    3px 5px;
+      text-align: left;
+  }  .simple th[scope="row"] {
+      background: inherit;
+      color:  inherit;
+      border-top: 1px solid #ddd;
+  }  .simple td {
+      padding:    3px 10px;
+      border-top: 1px solid #ddd;
+  }  .simple tr:nth-child(even) {
+      background: #f0f6ff;
+  }  /* --- DL --- */
+  .section dd > p:first-child {
+      margin-top: 0;
+  }  .section dd > p:last-child {
+      margin-bottom: 0;
+  }  .section dd {
+      margin-bottom:  1em;
+  }  .section dl.attrs dd, .section dl.eldef dd {
+      margin-bottom:  0;
+  }
+  </style><style>/* --- EXAMPLES --- */
+  div.example-title {
+      min-width: 7.5em;
+      color: #b9ab2d;
+  }
+  div.example-title span {
+      text-transform: uppercase;
+  }
+  aside.example, div.example, div.illegal-example {
+      padding: 0.5em;
+      margin: 1em 0;
+      position: relative;
+      clear: both;
+  }
+  div.illegal-example { color: red }
+  div.illegal-example p { color: black }
+  aside.example, div.example {
+      padding: .5em;
+      border-left-width: .5em;
+      border-left-style: solid;
+      border-color: #e0cb52;
+      background: #fcfaee;
+  }  aside.example div.example {
+      border-left-width: .1em;
+      border-color: #999;
+      background: #fff;
+  }
+  aside.example div.example div.example-title {
+      color: #999;
+  }
+  </style><style>/* --- ISSUES/NOTES --- */
+  div.issue-title, div.note-title {
+      padding-right:  1em;
+      min-width: 7.5em;
+      color: #b9ab2d;
+  }
+  div.issue-title { color: #e05252; }
+  div.note-title { color: #2b2; }
+  div.issue-title span, div.note-title span {
+      text-transform: uppercase;
+  }
+  div.note, div.issue {
+      margin-top: 1em;
+      margin-bottom: 1em;
+  }
+  .note > p:first-child, .issue > p:first-child { margin-top: 0 }
+  .issue, .note {
+      padding: .5em;
+      border-left-width: .5em;
+      border-left-style: solid;
+  }
+  div.issue, div.note {
+      padding: 1em 1.2em 0.5em;
+      margin: 1em 0;
+      position: relative;
+      clear: both;
+  }
+  span.note, span.issue { padding: .1em .5em .15em; }  .issue {
+      border-color: #e05252;
+      background: #fbe9e9;
+  }
+  .note {
+      border-color: #52e052;
+      background: #e9fbe9;
+  }
+  </style><style>/* --- WEB IDL --- */
+  pre.idl {
+      border-top: 1px solid #90b8de;
+      border-bottom: 1px solid #90b8de;
+      padding:    1em;
+      line-height:    120%;
+  }  pre.idl::before {
+      content:    "WebIDL";
+      display:    block;
+      width:      150px;
+      background: #90b8de;
+      color:  #fff;
+      font-family:    initial;
+      padding:    3px;
+      font-weight:    bold;
+      margin: -1em 0 1em -1em;
+  }  .idlType {
+      color:  #ff4500;
+      font-weight:    bold;
+      text-decoration:    none;
+  }  /*.idlModule*/
+  /*.idlModuleID*/
+  /*.idlInterface*/
+  .idlInterfaceID, .idlDictionaryID, .idlCallbackID, .idlEnumID {
+      font-weight:    bold;
+      color:  #005a9c;
+  }
+  a.idlEnumItem {
+      color:  #000;
+      border-bottom:  1px dotted #ccc;
+      text-decoration: none;
+  }  .idlSuperclass {
+      font-style: italic;
+      color:  #005a9c;
+  }  /*.idlAttribute*/
+  .idlAttrType, .idlFieldType, .idlMemberType {
+      color:  #005a9c;
+  }
+  .idlAttrName, .idlFieldName, .idlMemberName {
+      color:  #ff4500;
+  }
+  .idlAttrName a, .idlFieldName a, .idlMemberName a {
+      color:  #ff4500;
+      border-bottom:  1px dotted #ff4500;
+      text-decoration: none;
+  }  /*.idlMethod*/
+  .idlMethType, .idlCallbackType {
+      color:  #005a9c;
+  }
+  .idlMethName {
+      color:  #ff4500;
+  }
+  .idlMethName a {
+      color:  #ff4500;
+      border-bottom:  1px dotted #ff4500;
+      text-decoration: none;
+  }  /*.idlCtor*/
+  .idlCtorName {
+      color:  #ff4500;
+  }
+  .idlCtorName a {
+      color:  #ff4500;
+      border-bottom:  1px dotted #ff4500;
+      text-decoration: none;
+  }  /*.idlParam*/
+  .idlParamType {
+      color:  #005a9c;
+  }
+  .idlParamName, .idlDefaultValue {
+      font-style: italic;
+  }  .extAttr {
+      color:  #666;
+  }  /*.idlSectionComment*/
+  .idlSectionComment {
+      color: gray;
+  }  /*.idlConst*/
+  .idlConstType {
+      color:  #005a9c;
+  }
+  .idlConstName {
+      color:  #ff4500;
+  }
+  .idlConstName a {
+      color:  #ff4500;
+      border-bottom:  1px dotted #ff4500;
+      text-decoration: none;
+  }  /*.idlException*/
+  .idlExceptionID {
+      font-weight:    bold;
+      color:  #c00;
+  }  .idlTypedefID, .idlTypedefType {
+      color:  #005a9c;
+  }  .idlRaises, .idlRaises a.idlType, .idlRaises a.idlType code, .excName a, .excName a code {
+      color:  #c00;
+      font-weight:    normal;
+  }  .excName a {
+      font-family:    monospace;
+  }  .idlRaises a.idlType, .excName a.idlType {
+      border-bottom:  1px dotted #c00;
+  }  .excGetSetTrue, .excGetSetFalse, .prmNullTrue, .prmNullFalse, .prmOptTrue, .prmOptFalse {
+      width:  45px;
+      text-align: center;
+  }
+  .excGetSetTrue, .prmNullTrue, .prmOptTrue { color:  #0c0; }
+  .excGetSetFalse, .prmNullFalse, .prmOptFalse { color:  #c00; }  .idlImplements a {
+      font-weight:    bold;
+  }  dl.attributes, dl.methods, dl.constants, dl.constructors, dl.fields, dl.dictionary-members {
+      margin-left:    2em;
+  }  .attributes dt, .methods dt, .constants dt, .constructors dt, .fields dt, .dictionary-members dt {
+      font-weight:    normal;
+  }  .attributes dt code, .methods dt code, .constants dt code, .constructors dt code, .fields dt code, .dictionary-members dt code {
+      font-weight:    bold;
+      color:  #000;
+      font-family:    monospace;
+  }  .attributes dt code, .fields dt code, .dictionary-members dt code {
+      background:  #ffffd2;
+  }  .attributes dt .idlAttrType code, .fields dt .idlFieldType code, .dictionary-members dt .idlMemberType code {
+      color:  #005a9c;
+      background:  transparent;
+      font-family:    inherit;
+      font-weight:    normal;
+      font-style: italic;
+  }  .methods dt code {
+      background:  #d9e6f8;
+  }  .constants dt code {
+      background:  #ddffd2;
+  }  .constructors dt code {
+      background:  #cfc;
+  }  .attributes dd, .methods dd, .constants dd, .constructors dd, .fields dd, .dictionary-members dd {
+      margin-bottom:  1em;
+  }  table.parameters, table.exceptions {
+      border-spacing: 0;
+      border-collapse:    collapse;
+      margin: 0.5em 0;
+      width:  100%;
+  }
+  table.parameters { border-bottom:  1px solid #90b8de; }
+  table.exceptions { border-bottom:  1px solid #deb890; }  .parameters th, .exceptions th {
+      color:  #fff;
+      padding:    3px 5px;
+      text-align: left;
+      font-family:    initial;
+      font-weight:    normal;
+      text-shadow:    #666 1px 1px 0;
+  }
+  .parameters th { background: #90b8de; }
+  .exceptions th { background: #deb890; }  .parameters td, .exceptions td {
+      padding:    3px 10px;
+      border-top: 1px solid #ddd;
+      vertical-align: top;
+  }  .parameters tr:first-child td, .exceptions tr:first-child td {
+      border-top: none;
+  }  .parameters td.prmName, .exceptions td.excName, .exceptions td.excCodeName {
+      width:  100px;
+  }  .parameters td.prmType {
+      width:  120px;
+  }  table.exceptions table {
+      border-spacing: 0;
+      border-collapse:    collapse;
+      width:  100%;
+  }
+  </style><link href="https://www.w3.org/StyleSheets/TR/W3C-REC" rel="stylesheet"></head>
+    <body id="respecDocument" role="document" class="h-entry"><div id="respecHeader" role="contentinfo" class="head">
     <p>
-      <a href="http://www.w3.org/"><img width="72" height="48" alt="W3C" src="http://www.w3.org/Icons/w3c_home"></img></a>
+        <a href="http://www.w3.org/"><img src="https://www.w3.org/Icons/w3c_home" alt="W3C" height="48" width="72"></a>
     </p>
-    <h1 id="title" class="title">
-      Touch Events version 1
-    </h1>
-    <h2 id="w3c-candidate-recommendation-15-december-2011">
-      <acronym title="World Wide Web Consortium">W3C</acronym> Candidate Recommendation 15 December 2011
-    </h2>
+    <h1 class="title p-name" id="title" property="dcterms:title">Touch Events</h1>
+    <h2 id="w3c-recommendation-10-october-2013" property="dcterms:issued" datatype="xsd:dateTime" content="2013-10-10T04:00:00.000Z"><abbr title="World Wide Web Consortium">W3C</abbr> Recommendation <time class="dt-published" datetime="2013-10-10">10 October 2013</time></h2>
     <dl>
-      <dt>
-        This version:
-      </dt>
-      <dd>
-        <a href="http://www.w3.org/TR/2011/CR-touch-events-20111215/">http://www.w3.org/TR/2011/CR-touch-events-20111215/</a>
-      </dd>
-      <dt>
-        Latest published version:
-      </dt>
-      <dd>
-        <a href="http://www.w3.org/TR/touch-events/">http://www.w3.org/TR/touch-events/</a>
-      </dd>
-      <dt>
-        Latest editor's draft:
-      </dt>
-      <dd>
-        <a href="http://dvcs.w3.org/hg/webevents/raw-file/v1/touchevents.html">http://dvcs.w3.org/hg/webevents/raw-file/v1/touchevents.html</a>
-      </dd>
-      <dt>
-        Previous version:
-      </dt>
-      <dd>
-        <a href="http://www.w3.org/TR/2011/WD-touch-events-20111027/">http://www.w3.org/TR/2011/WD-touch-events-20111027/</a>
-      </dd>
+        <dt>This version:</dt>
+        <dd><a class="u-url" href="http://www.w3.org/TR/2013/REC-touch-events-20131010/">http://www.w3.org/TR/2013/REC-touch-events-20131010/</a></dd>
+        <dt>Latest published version:</dt>
+        <dd><a href="http://www.w3.org/TR/touch-events/">http://www.w3.org/TR/touch-events/</a></dd>
+        <dt>Latest editor's draft:</dt>
+        <dd><a href="http://dvcs.w3.org/hg/webevents/raw-file/v1/touchevents.html">http://dvcs.w3.org/hg/webevents/raw-file/v1/touchevents.html</a></dd>
+        <dt>Previous version:</dt>
+        <dd><a rel="dcterms:replaces" href="http://www.w3.org/TR/2013/PR-touch-events-20130509/">http://www.w3.org/TR/2013/PR-touch-events-20130509/</a></dd>
+      <dt>Editors:</dt>
+      <dd class="p-author h-card vcard" rel="bibo:editor" inlist=""><span typeof="foaf:Person"><a class="u-url url p-name fn" rel="foaf:homepage" property="foaf:name" content="Doug Schepers" href="http://schepers.cc/">Doug Schepers</a>, <a rel="foaf:workplaceHomepage" class="p-org org h-org h-card" href="http://w3.org/"><abbr title="World Wide Web Consortium">W3C</abbr></a></span>
+  </dd>
+  <dd class="p-author h-card vcard" rel="bibo:editor" inlist=""><span typeof="foaf:Person"><span property="foaf:name" class="p-name fn">Sangwhan Moon</span>, <a rel="foaf:workplaceHomepage" class="p-org org h-org h-card" href="http://www.opera.com/">Opera Software ASA</a></span>
+  </dd>
+  <dd class="p-author h-card vcard" rel="bibo:editor" inlist=""><span typeof="foaf:Person"><a class="u-url url p-name fn" rel="foaf:homepage" property="foaf:name" content="Matt Brubeck" href="http://limpet.net/mbrubeck/">Matt Brubeck</a>, <a rel="foaf:workplaceHomepage" class="p-org org h-org h-card" href="http://www.mozilla.org/">Mozilla</a></span>
+  </dd>
+  <dd class="p-author h-card vcard" rel="bibo:editor" inlist=""><span typeof="foaf:Person"><span property="foaf:name" class="p-name fn">Arthur Barstow</span>, <a rel="foaf:workplaceHomepage" class="p-org org h-org h-card" href="http://www.nokia.com/">Nokia</a></span>
+  </dd>
     </dl>
-
-    <dl>
-      <dt>Public Comments:</dt>
-      <dd>
-        <a href="mailto:public-webevents@w3.org">public-webevents@w3.org</a>
-      </dd>
-      <dt>Working Group:</dt>
-
-      <dd>
-        <a href="http://www.w3.org/2010/webevents/">Web Events WG</a>
-      </dd>
-    </dl>
-
-    <dl>
-      <dt>
-        Editors:
-      </dt>
-      <dd>
-        <a href="http://limpet.net/mbrubeck/">Matt Brubeck</a>, <a href="http://www.mozilla.org/">Mozilla</a>
-      </dd>
-      <dd>
-        <span>Sangwhan Moon</span>, <a href="http://www.opera.com/">Opera Software ASA</a>
-      </dd>
-      <dd>
-        <a href="http://schepers.cc/">Doug Schepers</a>, <a href="http://w3.org/"><acronym title="World Wide Web Consortium">W3C</acronym></a>
-      </dd>
-    </dl>
-    <p class="copyright">
-      <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2011 <a href="http://www.w3.org/"><acronym title="World Wide Web Consortium">W3C</acronym></a><sup>®</sup> (<a href="http://www.csail.mit.edu/"><acronym title="Massachusetts Institute of Technology">MIT</acronym></a>, <a href="http://www.ercim.eu/"><acronym title="European Research Consortium for Informatics and Mathematics">ERCIM</acronym></a>, <a href="http://www.keio.ac.jp/">Keio</a>), All Rights Reserved. <acronym title="World Wide Web Consortium">W3C</acronym> <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>, <a href="http://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a> and <a href="http://www.w3.org/Consortium/Legal/copyright-documents">document use</a> rules apply.
-    </p>
-    <hr/>
+    
+    <p>Please refer to the <a href="http://www.w3.org/TR/2013/REC-touch-events-20131010/REC-touch-events-20131010-errata.html"><strong>errata</strong></a> for this document, which may include some normative corrections.</p>
+      <p>
+        The English version of this specification is the only normative version. Non-normative
+        <a href="http://www.w3.org/Consortium/Translation/">translations</a> may also be available.
+      </p>
+        <p class="copyright">
+          <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> ©
+          2013
+          <a href="http://www.w3.org/"><abbr title="World Wide Web Consortium">W3C</abbr></a><sup>®</sup>
+          (<a href="http://www.csail.mit.edu/"><abbr title="Massachusetts Institute of Technology">MIT</abbr></a>,
+          <a href="http://www.ercim.eu/"><abbr title="European Research Consortium for Informatics and Mathematics">ERCIM</abbr></a>,
+          <a href="http://www.keio.ac.jp/">Keio</a>, <a href="http://ev.buaa.edu.cn/">Beihang</a>),
+          All Rights Reserved.
+          <abbr title="World Wide Web Consortium">W3C</abbr> <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>,
+          <a href="http://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a> and
+          <a href="http://www.w3.org/Consortium/Legal/copyright-documents">document use</a> rules apply.
+        </p>
+      <hr>
   </div>
-
-
-    <div id="abstract" class="introductory section"><h2>Abstract</h2>
-      <p>
-        The Touch Events specification defines a set of low-level events that represent one or more points of contact with a touch-sensitive surface, and changes of those points with respect to the surface and any DOM elements displayed upon it (e.g. for touch screens) or associated with it (e.g. for drawing tablets without displays).
-      </p>
-    </div><div class="introductory section" id="sotd"><h2>Status of This Document</h2><p><em>This section describes the status of this document at the time of its publication. Other documents may supersede this document. A list of current <acronym title="World Wide Web Consortium">W3C</acronym> publications and the latest revision of this technical report can be found in the <a href="http://www.w3.org/TR/"><acronym title="World Wide Web Consortium">W3C</acronym> technical reports index</a> at http://www.w3.org/TR/.</em></p>
-     This specification is the 15 December 2011 Candidate Recommendation. 
-     Comments for the <a href="http://www.w3.org/TR/2011/WD-touch-events-20110913/">13 September 2011 Last Call Working Draft</a>
-     are tracked in the <a href="http://www.w3.org/2010/webevents/wiki/TouchEvents-LCWD-13-Sep-2011">comment tracking document</a>
-     and comments for the <a href="http://www.w3.org/TR/2011/WD-touch-events-20111027/">27 October 2011 Last Call Working Draft</a>
-     are tracked in a separate <a href="http://www.w3.org/2010/webevents/wiki/TouchEvents-LCWD-27-Oct-2011">comment tracking document</a>.
-
-     During the Candidate Recommendation period, the WG will complete its
-     <a href="http://dvcs.w3.org/hg/webevents/">test suite</a> and two or more independent implementations
-     must pass each test before the specification exits Candidate Recommendation.
-     The group will also create an Implementation Report.
-
-    <p>This document was published by the <a href="http://www.w3.org/2010/webevents/">Web Events Working Group</a> as a Candidate Recommendation. This document is intended to become a <acronym title="World Wide Web Consortium">W3C</acronym> Recommendation. If you wish to make comments regarding this document, please send them to <a href="mailto:public-webevents@w3.org">public-webevents@w3.org</a> (<a href="mailto:public-webevents-request@w3.org?subject=subscribe">subscribe</a>, <a href="http://lists.w3.org/Archives/Public/public-webevents/">archives</a>). <acronym title="World Wide Web Consortium">W3C</acronym> publishes a Candidate Recommendation to indicate that the document is believed to be stable and to encourage implementation by the developer community. This Candidate Recommendation is expected to advance to Proposed Recommendation no earlier than 15 March 2012. All feedback is welcome.</p><p>Publication as a Candidate Recommendation does not imply endorsement by the <acronym title="World Wide Web Consortium">W3C</acronym> Membership. This is a draft document and may be updated, replaced or obsoleted by other documents at any time. It is inappropriate to cite this document as other than work in progress.</p><p>This document was produced by a group operating under the <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/">5 February 2004 <acronym title="World Wide Web Consortium">W3C</acronym> Patent Policy</a>. 
-      
-      <acronym title="World Wide Web Consortium">W3C</acronym> maintains a <a rel="disclosure" href="http://www.w3.org/2004/01/pp-impl/45559/status">public list of any patent disclosures</a> made in connection with the deliverables of the group; that page also includes instructions for disclosing a patent. An individual who has actual knowledge of a patent which the individual believes contains <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#def-essential">Essential Claim(s)</a> must disclose the information in accordance with <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#sec-Disclosure">section 6 of the <acronym title="World Wide Web Consortium">W3C</acronym> Patent Policy</a>.
-      
-      </p>
-    <p>Implementors should note that 
-      <a href="http://www.w3.org/2004/01/pp-impl/45559/status">patent disclosures</a>
-       have been made related to this specification.
-    </p>
-
-      
-      </div><div id="toc" class="section"><h2 class="introductory">Table of Contents</h2><ul class="toc"><li class="tocline"><a href="#introduction" class="tocxref"><span class="secno">1. </span>Introduction</a></li><li class="tocline"><a href="#conformance" class="tocxref"><span class="secno">2. </span>Conformance</a></li><li class="tocline"><a href="#touch-interface" class="tocxref"><span class="secno">3. </span><span class="idlType formerLink idlType"><code>Touch</code></span> Interface</a><ul class="toc"><li class="tocline"><a href="#attributes" class="tocxref"><span class="secno">3.1 </span>Attributes</a></li></ul></li><li class="tocline"><a href="#touchlist-interface" class="tocxref"><span class="secno">4. </span><span class="idlType formerLink idlType"><code>TouchList</code></span> Interface</a><ul class="toc"><li class="tocline"><a href="#attributes-1" class="tocxref"><span class="secno">4.1 </span>Attributes</a></li><li class="tocline"><a href="#methods" class="tocxref"><span class="secno">4.2 </span>Methods</a></li></ul></li><li class="tocline"><a href="#touchevent-interface" class="tocxref"><span class="secno">5. </span><span class="idlType formerLink idlType"><code>TouchEvent</code></span> Interface</a><ul class="toc"><li class="tocline"><a href="#attributes-2" class="tocxref"><span class="secno">5.1 </span>Attributes</a></li><li class="tocline"><a href="#usage-examples" class="tocxref"><span class="secno">5.2 </span>Usage Examples</a><ul class="toc"><li class="tocline"><a href="#touches-and-targettouches-of-a-touchevent" class="tocxref"><span class="secno">5.2.1 </span>touches and targetTouches of a <span class="idlType formerLink idlType"><code>TouchEvent</code></span></a></li><li class="tocline"><a href="#changedtouches-of-a-touchevent" class="tocxref"><span class="secno">5.2.2 </span>changedTouches of a <span class="idlType formerLink idlType"><code>TouchEvent</code></span></a></li></ul></li><li class="tocline"><a href="#list-of-touchevent-types" class="tocxref"><span class="secno">5.3 </span>List of <span class="idlType formerLink idlType"><code>TouchEvent</code></span> types</a></li><li class="tocline"><a href="#the-touchstart---------event" class="tocxref"><span class="secno">5.4 </span>The <span class="event">touchstart</span>
-        event</a></li><li class="tocline"><a href="#the-touchend-event" class="tocxref"><span class="secno">5.5 </span>The <span class="event">touchend</span> event</a></li><li class="tocline"><a href="#the-touchmove-event" class="tocxref"><span class="secno">5.6 </span>The <span class="event">touchmove</span> event</a></li><li class="tocline"><a href="#the-touchcancel-event" class="tocxref"><span class="secno">5.7 </span>The <span class="event">touchcancel</span> event</a></li></ul></li><li class="tocline"><a href="#extensions-to-the-document-interface" class="tocxref"><span class="secno">6. </span>Extensions to the <span class="idlType formerLink idlType"><code>Document</code></span> Interface</a><ul class="toc"><li class="tocline"><a href="#methods-1" class="tocxref"><span class="secno">6.1 </span>Methods</a></li></ul></li><li class="tocline"><a href="#mouse-events" class="tocxref"><span class="secno">7. </span>Interaction with Mouse Events</a></li><li class="tocline"><a href="#glossary" class="tocxref"><span class="secno">8. </span>Glossary</a></li><li class="tocline"><a href="#issues" class="tocxref"><span class="secno">9. </span>Issues</a></li><li class="tocline"><a href="#acknowledgements" class="tocxref"><span class="secno">A. </span>Acknowledgements</a></li><li class="tocline"><a href="#references" class="tocxref"><span class="secno">B. </span>References</a><ul class="toc"><li class="tocline"><a href="#normative-references" class="tocxref"><span class="secno">B.1 </span>Normative references</a></li><li class="tocline"><a href="#informative-references" class="tocxref"><span class="secno">B.2 </span>Informative references</a></li></ul></li></ul></div>
-
-    <div class="informative section" id="introduction">
-      
-<!-- OddPage -->
-<h2><span class="secno">1. </span>Introduction</h2><p><em>This section is non-normative.</em></p>
-
-      <p>
-        User Agents that run on terminals which provide touch input to use web
-        applications typically use interpreted mouse events to allow users
-        to access interactive web applications. However, these interpreted
-        events, being normalized data based on the physical touch input, tend
-        to have limitations on delivering the intended user experience.
-        Additionally, it is not possible to handle concurrent input regardless
-        of device capability, due to constraints of mouse events: both
-        system level limitations and legacy compatibility.
-      </p>
-
-      <p>
-        Meanwhile, native applications are capable of handling both cases with
-        the provided system APIs.
-      </p>
-
-      <p>
-        The Touch Events specification provides a solution to this problem by
-        specifying interfaces to allow web applications to directly handle touch
-        events, and multiple touch points for capable devices.
-      </p>
-    </div>
-
-    <div id="conformance" class="section">
-<!-- OddPage -->
-<h2><span class="secno">2. </span>Conformance</h2><p>As well as sections marked as non-normative, all authoring guidelines, diagrams, examples, and notes in this specification are non-normative. Everything else in this specification is normative.</p>
-<p>The key words <em class="rfc2119" title="must">must</em>, <em class="rfc2119" title="must not">must not</em>, <em class="rfc2119" title="required">required</em>, <em class="rfc2119" title="should">should</em>, <em class="rfc2119" title="should not">should not</em>, <em class="rfc2119" title="recommended">recommended</em>, <em class="rfc2119" title="may">may</em>, and <em class="rfc2119" title="optional">optional</em> in this specification are to be interpreted as described in [<cite><a class="bibref" rel="biblioentry" href="#bib-RFC2119">RFC2119</a></cite>].</p>
-
-      <p>
-        This specification defines conformance criteria that apply to a single
-        product: the <dfn id="dfn-user-agent">user agent</dfn> that implements
-        the interfaces that it contains.
-      </p>
-
-      <p>
-        Implementations that use ECMAScript to implement the APIs defined in
-        this specification must implement them in a manner consistent with the
-        ECMAScript Bindings defined in the Web IDL specification [<cite><a class="bibref" rel="biblioentry" href="#bib-WEBIDL">WEBIDL</a></cite>] as
-        this specification uses that specification and terminology.
-      </p>
-
-      <p>
-        A conforming implementation is required to implement all fields
-        defined in this specification.
-      </p>
-    </div>
-
-    <div id="touch-interface" class="section">
-      
-<!-- OddPage -->
-<h2><span class="secno">3. </span><a href="#idl-def-Touch" class="idlType"><code>Touch</code></a> Interface</h2>
-      <p>
-        This interface describes an individual <a href="#dfn-touch-point" class="internalDFN">touch point</a> for a touch
-        event.  <a href="#idl-def-Touch" class="idlType"><code>Touch</code></a> objects are immutable; after one is created, its
-        attributes must not change.
-      </p>
-
-      <pre class="idl"><span id="idl-def-Touch" class="idlInterface">interface <span class="idlInterfaceID">Touch</span> {
-<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>long</a></span>        <span class="idlAttrName"><a href="#widl-Touch-identifier">identifier</a></span>;</span>
-<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>EventTarget</a></span> <span class="idlAttrName"><a href="#widl-Touch-target">target</a></span>;</span>
-<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>long</a></span>        <span class="idlAttrName"><a href="#widl-Touch-screenX">screenX</a></span>;</span>
-<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>long</a></span>        <span class="idlAttrName"><a href="#widl-Touch-screenY">screenY</a></span>;</span>
-<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>long</a></span>        <span class="idlAttrName"><a href="#widl-Touch-clientX">clientX</a></span>;</span>
-<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>long</a></span>        <span class="idlAttrName"><a href="#widl-Touch-clientY">clientY</a></span>;</span>
-<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>long</a></span>        <span class="idlAttrName"><a href="#widl-Touch-pageX">pageX</a></span>;</span>
-<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>long</a></span>        <span class="idlAttrName"><a href="#widl-Touch-pageY">pageY</a></span>;</span>
-};</span>
-</pre><div id="attributes" class="section"><h3><span class="secno">3.1 </span>Attributes</h3><dl class="attributes"><dt id="widl-Touch-clientX"><code>clientX</code> of type <span class="idlAttrType"><a>long</a></span>, readonly</dt><dd>
-          The horizontal coordinate of point relative to the viewport in pixels,
-          excluding any scroll offset
-        <div><em>No exceptions.</em></div></dd><dt id="widl-Touch-clientY"><code>clientY</code> of type <span class="idlAttrType"><a>long</a></span>, readonly</dt><dd>
-          The vertical coordinate of point relative to the viewport in pixels,
-          excluding any scroll offset
-        <div><em>No exceptions.</em></div></dd><dt id="widl-Touch-identifier"><code>identifier</code> of type <span class="idlAttrType"><a>long</a></span>, readonly</dt><dd>
-          An identification number for each <a href="#dfn-touch-point" class="internalDFN">touch point</a>.
-
-          When a touch point becomes active, it must be assigned an
-          <a>identifier</a> that is distinct from any other <a href="#dfn-active-touch-point" class="internalDFN">active touch
-          point</a>.  While the touch point remains active, all events that
-          refer to it must assign it the same <a>identifier</a>.
-        <div><em>No exceptions.</em></div></dd><dt id="widl-Touch-pageX"><code>pageX</code> of type <span class="idlAttrType"><a>long</a></span>, readonly</dt><dd>
-          The horizontal coordinate of point relative to the viewport in pixels,
-          including any scroll offset
-        <div><em>No exceptions.</em></div></dd><dt id="widl-Touch-pageY"><code>pageY</code> of type <span class="idlAttrType"><a>long</a></span>, readonly</dt><dd>
-          The vertical coordinate of point relative to the viewport in pixels,
-          including any scroll offset
-        <div><em>No exceptions.</em></div></dd><dt id="widl-Touch-screenX"><code>screenX</code> of type <span class="idlAttrType"><a>long</a></span>, readonly</dt><dd>
-          The horizontal coordinate of point relative to the screen in pixels
-        <div><em>No exceptions.</em></div></dd><dt id="widl-Touch-screenY"><code>screenY</code> of type <span class="idlAttrType"><a>long</a></span>, readonly</dt><dd>
-          The vertical coordinate of point relative to the screen in pixels
-        <div><em>No exceptions.</em></div></dd><dt id="widl-Touch-target"><code>target</code> of type <span class="idlAttrType"><a>EventTarget</a></span>, readonly</dt><dd>
-          The <a>Element</a> on which the <a href="#dfn-touch-point" class="internalDFN">touch point</a> started when it
-          was first placed on the surface, even if the <a href="#dfn-touch-point" class="internalDFN">touch point</a> has
-          since moved outside the interactive area of that element.
-        <div><em>No exceptions.</em></div></dd></dl></div>
-    </div>
-
-    <div id="touchlist-interface" class="section">
-      
-<!-- OddPage -->
-<h2><span class="secno">4. </span><a href="#idl-def-TouchList" class="idlType"><code>TouchList</code></a> Interface</h2>
-      <p>
-        This interface defines a list of individual points of contact for a
-        touch event.  <a href="#idl-def-TouchList" class="idlType"><code>TouchList</code></a> objects are immutable; after one is
-        created, its contents must not change.
-      </p>
-
-      <pre class="idl"><span id="idl-def-TouchList" class="idlInterface">interface <span class="idlInterfaceID">TouchList</span> {
-<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>unsigned long</a></span> <span class="idlAttrName"><a href="#widl-TouchList-length">length</a></span>;</span>
-<span class="idlMethod">    <span class="idlMethType"><a>getter Touch</a></span> <span class="idlMethName"><a href="#widl-TouchList-item-getter-Touch-unsigned-long-index">item</a></span> (<span class="idlParam"><span class="idlParamType"><a>unsigned long</a></span> <span class="idlParamName">index</span></span>);</span>
-<span class="idlMethod">    <span class="idlMethType"><a href="#idl-def-Touch" class="idlType"><code>Touch</code></a></span>        <span class="idlMethName"><a href="#widl-TouchList-identifiedTouch-Touch-long-identifier">identifiedTouch</a></span> (<span class="idlParam"><span class="idlParamType"><a>long</a></span> <span class="idlParamName">identifier</span></span>);</span>
-};</span>
-</pre><div id="attributes-1" class="section"><h3><span class="secno">4.1 </span>Attributes</h3><dl class="attributes"><dt id="widl-TouchList-length"><code>length</code> of type <span class="idlAttrType"><a>unsigned long</a></span>, readonly</dt><dd>
-          returns the number of <a href="#idl-def-Touch" class="idlType"><code>Touch</code></a>es in the list
-        <div><em>No exceptions.</em></div></dd></dl></div><div id="methods" class="section"><h3><span class="secno">4.2 </span>Methods</h3><dl class="methods"><dt id="widl-TouchList-identifiedTouch-Touch-long-identifier"><code>identifiedTouch</code></dt><dd>
-          returns the first <a href="#idl-def-Touch" class="idlType"><code>Touch</code></a> item in the list whose <a>identifier</a> property matches the specified identifier
-        <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">identifier</td><td class="prmType"><code><a>long</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr></table><div><em>No exceptions.</em></div><div><em>Return type: </em><code><a href="#idl-def-Touch" class="idlType"><code>Touch</code></a></code></div></dd><dt id="widl-TouchList-item-getter-Touch-unsigned-long-index"><code>item</code></dt><dd>
-          returns the <a href="#idl-def-Touch" class="idlType"><code>Touch</code></a> at the specified index in the list
-        <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">index</td><td class="prmType"><code><a>unsigned long</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr></table><div><em>No exceptions.</em></div><div><em>Return type: </em><code><a>getter Touch</a></code></div></dd></dl></div>
-    </div>
-
-    <div id="touchevent-interface" class="section">
-      
-<!-- OddPage -->
-<h2><span class="secno">5. </span><a href="#idl-def-TouchEvent" class="idlType"><code>TouchEvent</code></a> Interface</h2>
-      <p>
-        This interface defines the <a href="#dfn-touchstart" class="internalDFN">touchstart</a>, <a href="#dfn-touchend" class="internalDFN">touchend</a>,
-        <a href="#dfn-touchmove" class="internalDFN">touchmove</a>, and <a href="#dfn-touchcancel" class="internalDFN">touchcancel</a> event types.
-        <a href="#idl-def-TouchEvent" class="idlType"><code>TouchEvent</code></a> objects are immutable; after one is created and
-        initialized, its attributes must not change.
-      </p>
-
-      <pre class="idl"><span id="idl-def-TouchEvent" class="idlInterface">interface <span class="idlInterfaceID">TouchEvent</span> : <span class="idlSuperclass"><a>UIEvent</a></span> {
-<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a href="#idl-def-TouchList" class="idlType"><code>TouchList</code></a></span> <span class="idlAttrName"><a href="#widl-TouchEvent-touches">touches</a></span>;</span>
-<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a href="#idl-def-TouchList" class="idlType"><code>TouchList</code></a></span> <span class="idlAttrName"><a href="#widl-TouchEvent-targetTouches">targetTouches</a></span>;</span>
-<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a href="#idl-def-TouchList" class="idlType"><code>TouchList</code></a></span> <span class="idlAttrName"><a href="#widl-TouchEvent-changedTouches">changedTouches</a></span>;</span>
-<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>boolean</a></span>   <span class="idlAttrName"><a href="#widl-TouchEvent-altKey">altKey</a></span>;</span>
-<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>boolean</a></span>   <span class="idlAttrName"><a href="#widl-TouchEvent-metaKey">metaKey</a></span>;</span>
-<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>boolean</a></span>   <span class="idlAttrName"><a href="#widl-TouchEvent-ctrlKey">ctrlKey</a></span>;</span>
-<span class="idlAttribute">    readonly attribute <span class="idlAttrType"><a>boolean</a></span>   <span class="idlAttrName"><a href="#widl-TouchEvent-shiftKey">shiftKey</a></span>;</span>
-};</span>
-</pre><div id="attributes-2" class="section"><h3><span class="secno">5.1 </span>Attributes</h3><dl class="attributes"><dt id="widl-TouchEvent-altKey"><code>altKey</code> of type <span class="idlAttrType"><a>boolean</a></span>, readonly</dt><dd>
-          <code>true</code> if the alt (Alternate) key modifier is activated;
-          otherwise <code>false</code>
-        <div><em>No exceptions.</em></div></dd><dt id="widl-TouchEvent-changedTouches"><code>changedTouches</code> of type <span class="idlAttrType"><a href="#idl-def-TouchList" class="idlType"><code>TouchList</code></a></span>, readonly</dt><dd>
+          <section rel="bibo:chapter" resource="#abstract" typeof="bibo:Chapter" datatype="" property="dcterms:abstract" class="introductory" id="abstract"><h2 id="h2_abstract" role="heading" aria-level="1">Abstract</h2><p>
+        The Touch Events specification defines a set of low-level events that
+        represent one or more points of contact with a touch-sensitive surface,
+        and changes of those points with respect to the surface and any DOM
+        elements displayed upon it (e.g. for touch screens) or associated with it
+        (e.g. for drawing tablets without displays).  It also addresses
+        pen-tablet devices, such as drawing tablets, with consideration toward
+        stylus capabilities.
+      </p></section>
+      <section rel="bibo:chapter" resource="#sotd" typeof="bibo:Chapter" id="sotd" class="introductory">
+        <h2 id="h2_sotd" role="heading" aria-level="1">Status of This Document</h2>
           <p>
-            a list of <a href="#idl-def-Touch" class="idlType"><code>Touch</code></a>es for every point of contact which contributed
-            to the event.
+            <em>This section describes the status of this document at the time of its publication. Other
+            documents may supersede this document. A list of current <abbr title="World Wide Web Consortium">W3C</abbr> publications and the latest revision
+            of this technical report can be found in the <a href="http://www.w3.org/TR/"><abbr title="World Wide Web Consortium">W3C</abbr> technical reports
+            index</a> at http://www.w3.org/TR/.</em>
           </p>
+       <p id="stability-disclaimer">
+       By publishing this Recommendation, <abbr title="World Wide Web Consortium">W3C</abbr> 
+       expects that the functionality specified in this Touch Events Recommendation will 
+       not be affected by changes to HTML5 or Web IDL as those specifications proceed to
+       Recommendation.</p>
+
+       <p>The WG has completed and approved this specification's
+       <a href="http://w3c-test.org/webevents/tests/touch-events-v1/approved/">Test Suite</a>
+       and created an
+       <a href="http://www.w3.org/2010/webevents/wiki/TEv1ImplReport">
+       Implementation Report</a> that shows that two or more independent implementations
+       pass each test.</p>
+       
+       <p>This document has been reviewed by W3C Members, by software developers, and by other W3C groups and interested parties, and is endorsed by the Director as a W3C Recommendation. It is a stable document and may be used as reference material or cited from another document. W3C's role in making the Recommendation is to draw attention to the specification and to promote its widespread deployment. This enhances the functionality and interoperability of the Web.</p>
           <p>
-            For the <a href="#dfn-touchstart" class="internalDFN">touchstart</a> event this must be a list of the touch
-            points that just became active with the current event.  For the
-            <a href="#dfn-touchmove" class="internalDFN">touchmove</a> event this must be a list of the touch points that
-            have moved since the last event.  For the <a href="#dfn-touchend" class="internalDFN">touchend</a> and 
-			<a href="#dfn-touchcancel" class="internalDFN">touchcancel</a> events this must be a list of the touch points 
-			that have just been removed from the surface.
-          </p>
-        <div><em>No exceptions.</em></div></dd><dt id="widl-TouchEvent-ctrlKey"><code>ctrlKey</code> of type <span class="idlAttrType"><a>boolean</a></span>, readonly</dt><dd>
-          <code>true</code> if the ctrl (Control) key modifier is activated;
-          otherwise <code>false</code>
-        <div><em>No exceptions.</em></div></dd><dt id="widl-TouchEvent-metaKey"><code>metaKey</code> of type <span class="idlAttrType"><a>boolean</a></span>, readonly</dt><dd>
-          <code>true</code> if the meta (Meta) key modifier is activated;
-          otherwise <code>false</code>.  On some platforms this attribute may
-          map to a differently-named key modifier.
-        <div><em>No exceptions.</em></div></dd><dt id="widl-TouchEvent-shiftKey"><code>shiftKey</code> of type <span class="idlAttrType"><a>boolean</a></span>, readonly</dt><dd>
-          <code>true</code> if the shift (Shift) key modifier is activated;
-          otherwise <code>false</code>
-        <div><em>No exceptions.</em></div></dd><dt id="widl-TouchEvent-targetTouches"><code>targetTouches</code> of type <span class="idlAttrType"><a href="#idl-def-TouchList" class="idlType"><code>TouchList</code></a></span>, readonly</dt><dd>
-          a list of <a href="#idl-def-Touch" class="idlType"><code>Touch</code></a>es for every point of contact that is touching
-          the surface <em>and</em> started on the element that is the
-          <a>target</a> of the current event.
-        <div><em>No exceptions.</em></div></dd><dt id="widl-TouchEvent-touches"><code>touches</code> of type <span class="idlAttrType"><a href="#idl-def-TouchList" class="idlType"><code>TouchList</code></a></span>, readonly</dt><dd>
-          a list of <a href="#idl-def-Touch" class="idlType"><code>Touch</code></a>es for every point of contact currently
-          touching the surface.
-        <div><em>No exceptions.</em></div></dd></dl></div>
-      
-      <div class="informative section" id="usage-examples">
-          <h3><span class="secno">5.2 </span>Usage Examples</h3><p><em>This section is non-normative.</em></p>
-          
+            This document was published by the <a href="http://www.w3.org/2010/webevents/">Web Events Working Group</a> as a Recommendation.
+            If you wish to make comments regarding this document, please send them to
+            <a href="mailto:public-webevents@w3.org">public-webevents@w3.org</a>
+            (<a href="mailto:public-webevents-request@w3.org?subject=subscribe">subscribe</a>,
+            <a href="http://lists.w3.org/Archives/Public/public-webevents/">archives</a>).
+            All comments are welcome. A list of changes since the last publication is available in <a href="#changes-since-last-publication">Appendix B</a>.</p>
           <p>
-            The examples below demonstrate the relations between the different
-            <a href="#idl-def-TouchList" class="idlType"><code>TouchList</code></a> members defined in a <a href="#idl-def-TouchEvent" class="idlType"><code>TouchEvent</code></a>.
+              This document was produced by a group operating under the
+                     <a id="sotd_patent" about="" rel="w3p:patentRules" href="http://www.w3.org/Consortium/Patent-Policy-20040205/">5 February 2004 <abbr title="World Wide Web Consortium">W3C</abbr> Patent Policy</a>.
+                    <abbr title="World Wide Web Consortium">W3C</abbr> maintains a <a href="http://www.w3.org/2004/01/pp-impl/45559/status" rel="disclosure">public list of any patent disclosures</a>
+                made in connection with the deliverables of the group; that page also includes instructions for
+              disclosing a patent. An individual who has actual knowledge of a patent which the individual believes contains
+              <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#def-essential">Essential Claim(s)</a> must disclose the information in accordance with <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#sec-Disclosure">section 6 of the <abbr title="World Wide Web Consortium">W3C</abbr> Patent Policy</a>.
           </p>
-          
-          <div id="touches-and-targettouches-of-a-touchevent" class="section">
-              <h4><span class="secno">5.2.1 </span>touches and targetTouches of a <a href="#idl-def-TouchEvent" class="idlType"><code>TouchEvent</code></a></h4>
-              
-              <p>
-                This example demonstrates the utility and relations between the
-                touches and targetTouches members defined in the <a href="#idl-def-TouchEvent" class="idlType"><code>TouchEvent</code></a>
-                interface. The following code will generate different output based
-                on the number of touch points on the touchable element and the document:
-              </p>
-      
-              <pre class="example">&lt;div id='touchable'&gt;
-    This element is touchable.
-&lt;/div&gt;
-          
-document.getElementById('touchable').addEventListener('touchstart', function(ev) {
-
-    if (ev.touches.item(0) == ev.targetTouches.item(0))
-    {
-        /**
-         * If the first touch on the surface is also targeting the
-         * &quot;touchable&quot; element, the code below should execute.
-         * Since targetTouches is a subset of touches which covers the
-         * entire surface, TouchEvent.touches &gt;= TouchEvents.targetTouches
-         * is always true.
-         */
-
-        document.write('Hello Touch Events!');
-    }
-
-    if (ev.touches.length == ev.targetTouches.length)
-    {
-        /**
-         * If all of the active touch points are on the &quot;touchable&quot;
-         * element, the length properties should be the same.
-         */
-
-        document.write('All points are on target element')
-    }
-
-    if (ev.touches.length &gt; 1)
-    {
-        /**
-         * On a single touch input device, there can only be one point
-         * of contact on the surface, so the following code can only
-         * execute when the terminal supports multiple touches.
-         */
-
-        document.write('Hello Multiple Touch!');
-    }
-
-}, false);</pre>
-          </div>
-          
-          <div id="changedtouches-of-a-touchevent" class="section">
-              <h4><span class="secno">5.2.2 </span>changedTouches of a <a href="#idl-def-TouchEvent" class="idlType"><code>TouchEvent</code></a></h4>
-              
-              <p>
-                This example demonstrates the utility of changedTouches and it's relation
-                with the other <a href="#idl-def-TouchList" class="idlType"><code>TouchList</code></a> members of the <a href="#idl-def-TouchEvent" class="idlType"><code>TouchEvent</code></a> interface.
-                The code is a example which triggers whenever a touch point is removed
-                from the defined touchable element:
-              </p>
-              
-              <pre class="example">&lt;div id='touchable'&gt;
-    This element is touchable.
-&lt;/div&gt;
-              
-document.getElementById('touchable').addEventListener('touchend', function(ev) {
-
-    /**
-     * Example output when three touch points are on the surface,
-     * two of them being on the &quot;touchable&quot; element and one point
-     * in the &quot;touchable&quot; element is lifted from the surface:
-     *
-     * Touch points removed: 1
-     * Touch points left on element: 1
-     * Touch points left on document: 2
-     */
-
-    document.write('Removed: ' + ev.changedTouches.length);
-    document.write('Remaining on element: ' + ev.targetTouches.length);
-    document.write('Remaining on document: ' + ev.touches.length);
-
-}, false);</pre>
-          </div>
-              
-      </div>
-
-      <div class="informative section" id="list-of-touchevent-types">
-          <h3><span class="secno">5.3 </span>List of <a href="#idl-def-TouchEvent" class="idlType"><code>TouchEvent</code></a> types</h3><p><em>This section is non-normative.</em></p>
-
+    </section><section id="toc"><h2 id="h2_toc" role="heading" aria-level="1" class="introductory">Table of Contents</h2><ul id="respecContents" role="directory" class="toc"><li class="tocline"><a class="tocxref" href="#introduction"><span class="secno">1. </span>Introduction</a></li><li class="tocline"><a class="tocxref" href="#conformance"><span class="secno">2. </span>Conformance</a></li><li class="tocline"><a class="tocxref" href="#touch-interface"><span class="secno">3. </span><span class="formerLink"><code>Touch</code></span> Interface</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#attributes"><span class="secno">3.1 </span>Attributes</a></li></ul></li><li class="tocline"><a class="tocxref" href="#touchlist-interface"><span class="secno">4. </span><span class="formerLink"><code>TouchList</code></span> Interface</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#attributes-1"><span class="secno">4.1 </span>Attributes</a></li><li class="tocline"><a class="tocxref" href="#methods"><span class="secno">4.2 </span>Methods</a></li></ul></li><li class="tocline"><a class="tocxref" href="#touchevent-interface"><span class="secno">5. </span><span class="formerLink"><code>TouchEvent</code></span> Interface</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#attributes-2"><span class="secno">5.1 </span>Attributes</a></li><li class="tocline"><a class="tocxref" href="#touchevent-implementer-s-note"><span class="secno">5.2 </span>TouchEvent Implementer's Note</a></li><li class="tocline"><a class="tocxref" href="#usage-examples"><span class="secno">5.3 </span>Usage Examples</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#touches-and-targettouches-of-a-touchevent"><span class="secno">5.3.1 </span>touches and targetTouches of a <span class="formerLink"><code>TouchEvent</code></span></a></li><li class="tocline"><a class="tocxref" href="#changedtouches-of-a-touchevent"><span class="secno">5.3.2 </span>changedTouches of a <span class="formerLink"><code>TouchEvent</code></span></a></li></ul></li><li class="tocline"><a class="tocxref" href="#list-of-touchevent-types"><span class="secno">5.4 </span>List of <span class="formerLink"><code>TouchEvent</code></span> types</a></li><li class="tocline"><a class="tocxref" href="#the-touchstart-event"><span class="secno">5.5 </span>The <span class="event">touchstart</span>
+          event</a></li><li class="tocline"><a class="tocxref" href="#the-touchend-event"><span class="secno">5.6 </span>The <span class="event">touchend</span> event</a></li><li class="tocline"><a class="tocxref" href="#the-touchmove-event"><span class="secno">5.7 </span>The <span class="event">touchmove</span> event</a></li><li class="tocline"><a class="tocxref" href="#the-touchcancel-event"><span class="secno">5.8 </span>The <span class="event">touchcancel</span> event</a></li></ul></li><li class="tocline"><a class="tocxref" href="#extensions-to-the-document-interface"><span class="secno">6. </span>Extensions to the <span class="formerLink"><code>Document</code></span> Interface</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#methods-1"><span class="secno">6.1 </span>Methods</a></li></ul></li><li class="tocline"><a class="tocxref" href="#mouse-events"><span class="secno">7. </span>Interaction with Mouse Events</a></li><li class="tocline"><a class="tocxref" href="#glossary"><span class="secno">8. </span>Glossary</a></li><li class="tocline"><a class="tocxref" href="#issues"><span class="secno">9. </span>Issues</a></li><li class="tocline"><a class="tocxref" href="#acknowledgements"><span class="secno">A. </span>Acknowledgements</a></li><li class="tocline"><a class="tocxref" href="#changes-since-last-publication"><span class="secno">B. </span>Changes Since Last Publication</a></li><li class="tocline"><a class="tocxref" href="#references"><span class="secno">C. </span>References</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#normative-references"><span class="secno">C.1 </span>Normative references</a></li></ul></li></ul></section>      <section rel="bibo:chapter" resource="#introduction" typeof="bibo:Chapter" id="introduction" class="informative">
+        <!--OddPage--><h2 id="h2_introduction" role="heading" aria-level="1"><span class="secno">1. </span>Introduction</h2><p><em>This section is non-normative.</em></p>
+        <p>
+          User Agents that run on terminals which provide touch input to use web
+          applications typically use interpreted mouse events to allow users
+          to access interactive web applications. However, these interpreted
+          events, being normalized data based on the physical touch input, tend
+          to have limitations on delivering the intended user experience.
+          Additionally, it is not possible to handle concurrent input regardless
+          of device capability, due to constraints of mouse events: both
+          system level limitations and legacy compatibility.
+        </p>
+        <p>
+          Meanwhile, native applications are capable of handling both cases with
+          the provided system APIs.
+        </p>
+        <p>
+          The Touch Events specification provides a solution to this problem by
+          specifying interfaces to allow web applications to directly handle touch
+          events, and multiple touch points for capable devices.
+        </p>        <div class="note"><div id="h_note_1" role="heading" aria-level="2" class="note-title"><span>Note</span></div><p class="">
+          The <abbr title="World Wide Web Consortium">W3C</abbr>'s <a href="http://www.w3.org/WAI/PF/">
+          Protocols and Formats Working Group</a> created a non-normative document
+          that includes a mapping of hardware events (e.g. keyboard events) to touch
+          events. For more information see
+          <a href="http://www.w3.org/WAI/PF/wiki/Touch_Events_Accessibility_Mapping">
+          Touch Events Accessibility Mapping</a>.
+        </p></div>      </section>      <section rel="bibo:chapter" resource="#conformance" typeof="bibo:Chapter" id="conformance"><!--OddPage--><h2 id="h2_conformance" role="heading" aria-level="1"><span class="secno">2. </span>Conformance</h2>
+  <p>
+    As well as sections marked as non-normative, all authoring guidelines, diagrams, examples,
+    and notes in this specification are non-normative. Everything else in this specification is
+    normative.
+  </p>
+  <p>
+    The key words <em title="MUST" class="rfc2119">MUST</em>, <em title="MUST NOT" class="rfc2119">MUST NOT</em>, <em title="REQUIRED" class="rfc2119">REQUIRED</em>, <em title="SHOULD" class="rfc2119">SHOULD</em>, <em title="SHOULD NOT" class="rfc2119">SHOULD NOT</em>, <em title="RECOMMENDED" class="rfc2119">RECOMMENDED</em>, <em title="MAY" class="rfc2119">MAY</em>,
+    and <em title="OPTIONAL" class="rfc2119">OPTIONAL</em> in this specification are to be interpreted as described in [<cite><a href="#bib-RFC2119" class="bibref">RFC2119</a></cite>].
+  </p>
+        <p>
+          This specification defines conformance criteria that apply to a single
+          product: the <dfn id="dfn-user-agent">user agent</dfn> that implements
+          the interfaces that it contains.
+        </p>
+        <p>
+          WindowProxy is defined in [<cite><a href="#bib-HTML5" class="bibref">HTML5</a></cite>].
+        </p>
+          <h3 id="webidl-conform">WebIDL Conformance</h3>
           <p>
-            The following table provides a summary of the types of possible
-            <a href="#idl-def-TouchEvent" class="idlType"><code>TouchEvent</code></a> types defined in this specification. All events
-            should accomplish the bubbling phase. Some events are not cancelable
-            (see <a href="#dfn-preventdefault" class="internalDFN">preventDefault</a>).
+            The IDL blocks in this specification are conforming IDL
+            fragments as defined by the Web IDL specification [<cite><a href="#bib-WEBIDL" class="bibref">WEBIDL</a></cite>].
+          </p>          <p>
+            A conforming Web Events user agent must also be a <a href="http://www.w3.org/TR/WebIDL/#dfn-conforming-ECMAScript-implementation">conforming ECMAScript implementation</a> of this IDL fragments in this specification, with the following exception:</p>          <ul>
+            <li>
+              <a href="http://www.w3.org/TR/WebIDL/#es-attributes">section 4.4.6
+              of Web IDL</a> requires that IDL attributes are reflected as
+              accessor properties on interface prototype objects.  Instead of
+              this, the user agent may reflect IDL attributes as data properties
+              on the platform objects that implement the relevant interface.
+              These data properties must have the same behavior when getting and
+              setting as would be exhibited when invoking the getter and setter
+              of the accessor properties on the platform object.
+            </li>
+          </ul>
+        <p>
+          <strong>Note:</strong> Both ways of reflecting IDL attributes allow for simply getting and setting the property on the platform object to work.  For example, given a Touch object aTouch, evaluating aTouch.target would return the EventTarget for the Touch object.  If the user agent implements IDL attributes as accessor properties, then the property access invokes the getter which returns the EventTarget.  If the user agent implements IDL attributes as data properties on the platform object with the same behavior as would be found with the accessor properties, then the object would appear to have an own property named "target" whose value is an EventTarget object, and the property access would return this value.
+        </p>
+      </section>      <section id="touch-interface">
+        <!--OddPage--><h2 id="h2_touch-interface" role="heading" aria-level="1"><span class="secno">3. </span><a class="idlType" href="#idl-def-Touch"><code>Touch</code></a> Interface</h2>
+        <p>
+          This interface describes an individual <a class="internalDFN" href="#dfn-touch-point">touch point</a> for a touch
+          event.  <a class="idlType" href="#idl-def-Touch"><code>Touch</code></a> objects are immutable; after one is created, its
+          attributes must not change.
+        </p>        <pre class="idl"><span class="idlInterface" id="idl-def-Touch">interface <span class="idlInterfaceID">Touch</span> {
+  <span class="idlAttribute">    readonly    attribute <span class="idlAttrType"><a>long</a></span>        <span class="idlAttrName"><a href="#widl-Touch-identifier">identifier</a></span>;</span>
+  <span class="idlAttribute">    readonly    attribute <span class="idlAttrType"><a>EventTarget</a></span> <span class="idlAttrName"><a href="#widl-Touch-target">target</a></span>;</span>
+  <span class="idlAttribute">    readonly    attribute <span class="idlAttrType"><a>long</a></span>        <span class="idlAttrName"><a href="#widl-Touch-screenX">screenX</a></span>;</span>
+  <span class="idlAttribute">    readonly    attribute <span class="idlAttrType"><a>long</a></span>        <span class="idlAttrName"><a href="#widl-Touch-screenY">screenY</a></span>;</span>
+  <span class="idlAttribute">    readonly    attribute <span class="idlAttrType"><a>long</a></span>        <span class="idlAttrName"><a href="#widl-Touch-clientX">clientX</a></span>;</span>
+  <span class="idlAttribute">    readonly    attribute <span class="idlAttrType"><a>long</a></span>        <span class="idlAttrName"><a href="#widl-Touch-clientY">clientY</a></span>;</span>
+  <span class="idlAttribute">    readonly    attribute <span class="idlAttrType"><a>long</a></span>        <span class="idlAttrName"><a href="#widl-Touch-pageX">pageX</a></span>;</span>
+  <span class="idlAttribute">    readonly    attribute <span class="idlAttrType"><a>long</a></span>        <span class="idlAttrName"><a href="#widl-Touch-pageY">pageY</a></span>;</span>
+  };</span></pre><section id="attributes"><h3 id="h3_attributes" role="heading" aria-level="2"><span class="secno">3.1 </span>Attributes</h3><dl class="attributes"><dt id="widl-Touch-clientX"><code>clientX</code> of type <span class="idlAttrType"><a>long</a></span>, readonly   </dt><dd>
+            The horizontal coordinate of point relative to the viewport in pixels,
+            excluding any scroll offset
+          </dd><dt id="widl-Touch-clientY"><code>clientY</code> of type <span class="idlAttrType"><a>long</a></span>, readonly   </dt><dd>
+            The vertical coordinate of point relative to the viewport in pixels,
+            excluding any scroll offset
+          </dd><dt id="widl-Touch-identifier"><code>identifier</code> of type <span class="idlAttrType"><a>long</a></span>, readonly   </dt><dd>
+            An identification number for each <a class="internalDFN" href="#dfn-touch-point">touch point</a>.            When a touch point becomes active, it must be assigned an
+            <a>identifier</a> that is distinct from any other <a class="internalDFN" href="#dfn-active-touch-point">active touch
+            point</a>.  While the touch point remains active, all events that
+            refer to it must assign it the same <a>identifier</a>.
+          </dd><dt id="widl-Touch-pageX"><code>pageX</code> of type <span class="idlAttrType"><a>long</a></span>, readonly   </dt><dd>
+            The horizontal coordinate of point relative to the viewport in pixels,
+            including any scroll offset
+          </dd><dt id="widl-Touch-pageY"><code>pageY</code> of type <span class="idlAttrType"><a>long</a></span>, readonly   </dt><dd>
+            The vertical coordinate of point relative to the viewport in pixels,
+            including any scroll offset
+          </dd><dt id="widl-Touch-screenX"><code>screenX</code> of type <span class="idlAttrType"><a>long</a></span>, readonly   </dt><dd>
+            The horizontal coordinate of point relative to the screen in pixels
+          </dd><dt id="widl-Touch-screenY"><code>screenY</code> of type <span class="idlAttrType"><a>long</a></span>, readonly   </dt><dd>
+            The vertical coordinate of point relative to the screen in pixels
+          </dd><dt id="widl-Touch-target"><code>target</code> of type <span class="idlAttrType"><a>EventTarget</a></span>, readonly   </dt><dd>
+            The <a>EventTarget</a> on which the <a class="internalDFN" href="#dfn-touch-point">touch point</a> started when it
+            was first placed on the surface, even if the <a class="internalDFN" href="#dfn-touch-point">touch point</a> has
+            since moved outside the interactive area of that element.
+          </dd></dl></section>
+      </section>      <section id="touchlist-interface">
+        <!--OddPage--><h2 id="h2_touchlist-interface" role="heading" aria-level="1"><span class="secno">4. </span><a class="idlType" href="#idl-def-TouchList"><code>TouchList</code></a> Interface</h2>
+        <p>
+          This interface defines a list of individual points of contact for a
+          touch event.  <a class="idlType" href="#idl-def-TouchList"><code>TouchList</code></a> objects are immutable; after one is
+          created, its contents must not change.
+        </p>
+        <p>
+          A TouchList object's <em>supported property indices</em> ([<cite><a href="#bib-WEBIDL" class="bibref">WEBIDL</a></cite>])
+          are the numbers in the range 0 to one less than the length of the list.
+        </p>        <pre class="idl"><span class="idlInterface" id="idl-def-TouchList">interface <span class="idlInterfaceID">TouchList</span> {
+  <span class="idlAttribute">    readonly    attribute <span class="idlAttrType"><a>unsigned long</a></span> <span class="idlAttrName"><a href="#widl-TouchList-length">length</a></span>;</span>
+  <span class="idlMethod">    <span class="idlMethType"><a>getter Touch</a>?</span> <span class="idlMethName"><a href="#widl-TouchList-item-getter-Touch-unsigned-long-index">item</a></span> (<span class="idlParam"><span class="idlParamType"><a>unsigned long</a></span> <span class="idlParamName">index</span></span>);</span>
+  };</span></pre><section id="attributes-1"><h3 id="h3_attributes-1" role="heading" aria-level="2"><span class="secno">4.1 </span>Attributes</h3><dl class="attributes"><dt id="widl-TouchList-length"><code>length</code> of type <span class="idlAttrType"><a>unsigned long</a></span>, readonly   </dt><dd>
+            returns the number of <a class="idlType" href="#idl-def-Touch"><code>Touch</code></a>es in the list
+          </dd></dl></section><section id="methods"><h3 id="h3_methods" role="heading" aria-level="2"><span class="secno">4.2 </span>Methods</h3><dl class="methods"><dt id="widl-TouchList-item-getter-Touch-unsigned-long-index"><code>item</code></dt><dd>
+            returns the <a class="idlType" href="#idl-def-Touch"><code>Touch</code></a> at the specified index in the list or
+            null if the index is not less than the length of the list.
+          <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">index</td><td class="prmType"><code><a>unsigned long</a></code></td><td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td><td class="prmOptFalse"><span role="img" aria-label="False">✘</span></td><td class="prmDesc"></td></tr></table><div><em>Return type: </em><code><a> Touch</a></code>, nullable</div></dd></dl></section>
+      </section>      <section id="touchevent-interface">
+        <!--OddPage--><h2 id="h2_touchevent-interface" role="heading" aria-level="1"><span class="secno">5. </span><a class="idlType" href="#idl-def-TouchEvent"><code>TouchEvent</code></a> Interface</h2>
+        <p>
+          This interface defines the <a class="internalDFN" href="#dfn-touchstart">touchstart</a>, <a class="internalDFN" href="#dfn-touchend">touchend</a>,
+          <a class="internalDFN" href="#dfn-touchmove">touchmove</a>, and <a class="internalDFN" href="#dfn-touchcancel">touchcancel</a> event types.
+          <a class="idlType" href="#idl-def-TouchEvent"><code>TouchEvent</code></a> objects are immutable; after one is created and
+          initialized, its attributes must not change.
+        </p>        <pre class="idl"><span class="idlInterface" id="idl-def-TouchEvent">interface <span class="idlInterfaceID">TouchEvent</span> : <span class="idlSuperclass"><a>UIEvent</a></span> {
+  <span class="idlAttribute">    readonly    attribute <span class="idlAttrType"><a class="idlType" href="#idl-def-TouchList"><code>TouchList</code></a></span> <span class="idlAttrName"><a href="#widl-TouchEvent-touches">touches</a></span>;</span>
+  <span class="idlAttribute">    readonly    attribute <span class="idlAttrType"><a class="idlType" href="#idl-def-TouchList"><code>TouchList</code></a></span> <span class="idlAttrName"><a href="#widl-TouchEvent-targetTouches">targetTouches</a></span>;</span>
+  <span class="idlAttribute">    readonly    attribute <span class="idlAttrType"><a class="idlType" href="#idl-def-TouchList"><code>TouchList</code></a></span> <span class="idlAttrName"><a href="#widl-TouchEvent-changedTouches">changedTouches</a></span>;</span>
+  <span class="idlAttribute">    readonly    attribute <span class="idlAttrType"><a>boolean</a></span>   <span class="idlAttrName"><a href="#widl-TouchEvent-altKey">altKey</a></span>;</span>
+  <span class="idlAttribute">    readonly    attribute <span class="idlAttrType"><a>boolean</a></span>   <span class="idlAttrName"><a href="#widl-TouchEvent-metaKey">metaKey</a></span>;</span>
+  <span class="idlAttribute">    readonly    attribute <span class="idlAttrType"><a>boolean</a></span>   <span class="idlAttrName"><a href="#widl-TouchEvent-ctrlKey">ctrlKey</a></span>;</span>
+  <span class="idlAttribute">    readonly    attribute <span class="idlAttrType"><a>boolean</a></span>   <span class="idlAttrName"><a href="#widl-TouchEvent-shiftKey">shiftKey</a></span>;</span>
+  };</span></pre><section id="attributes-2"><h3 id="h3_attributes-2" role="heading" aria-level="2"><span class="secno">5.1 </span>Attributes</h3><dl class="attributes"><dt id="widl-TouchEvent-altKey"><code>altKey</code> of type <span class="idlAttrType"><a>boolean</a></span>, readonly   </dt><dd>
+            <code>true</code> if the alt (Alternate) key modifier is activated;
+            otherwise <code>false</code>
+          </dd><dt id="widl-TouchEvent-changedTouches"><code>changedTouches</code> of type <span class="idlAttrType"><a class="idlType" href="#idl-def-TouchList"><code>TouchList</code></a></span>, readonly   </dt><dd>
+            <p>
+              a list of <a class="idlType" href="#idl-def-Touch"><code>Touch</code></a>es for every point of contact which contributed
+              to the event.
+            </p>
+            <p>
+              For the <a class="internalDFN" href="#dfn-touchstart">touchstart</a> event this must be a list of the touch
+              points that just became active with the current event.  For the
+              <a class="internalDFN" href="#dfn-touchmove">touchmove</a> event this must be a list of the touch points that
+              have moved since the last event.  For the <a class="internalDFN" href="#dfn-touchend">touchend</a> and
+  			<a class="internalDFN" href="#dfn-touchcancel">touchcancel</a> events this must be a list of the touch points
+  			that have just been removed from the surface.
+            </p>
+          </dd><dt id="widl-TouchEvent-ctrlKey"><code>ctrlKey</code> of type <span class="idlAttrType"><a>boolean</a></span>, readonly   </dt><dd>
+            <code>true</code> if the ctrl (Control) key modifier is activated;
+            otherwise <code>false</code>
+          </dd><dt id="widl-TouchEvent-metaKey"><code>metaKey</code> of type <span class="idlAttrType"><a>boolean</a></span>, readonly   </dt><dd>
+            <code>true</code> if the meta (Meta) key modifier is activated;
+            otherwise <code>false</code>.  On some platforms this attribute may
+            map to a differently-named key modifier.
+          </dd><dt id="widl-TouchEvent-shiftKey"><code>shiftKey</code> of type <span class="idlAttrType"><a>boolean</a></span>, readonly   </dt><dd>
+            <code>true</code> if the shift (Shift) key modifier is activated;
+            otherwise <code>false</code>
+          </dd><dt id="widl-TouchEvent-targetTouches"><code>targetTouches</code> of type <span class="idlAttrType"><a class="idlType" href="#idl-def-TouchList"><code>TouchList</code></a></span>, readonly   </dt><dd>
+            a list of <a class="idlType" href="#idl-def-Touch"><code>Touch</code></a>es for every point of contact that is touching
+            the surface <em>and</em> started on the element that is the
+            <a>target</a> of the current event.
+          </dd><dt id="widl-TouchEvent-touches"><code>touches</code> of type <span class="idlAttrType"><a class="idlType" href="#idl-def-TouchList"><code>TouchList</code></a></span>, readonly   </dt><dd>
+            a list of <a class="idlType" href="#idl-def-Touch"><code>Touch</code></a>es for every point of contact currently
+            touching the surface.
+          </dd></dl></section>
+        <section id="touchevent-implementer-s-note" class="informative">
+         <h3 id="h3_touchevent-implementer-s-note" role="heading" aria-level="2"><span class="secno">5.2 </span>TouchEvent Implementer's Note</h3><p><em>This section is non-normative.</em></p>
+         <div class="note"><div id="h_note_2" role="heading" aria-level="3" class="note-title"><span>Note</span></div><div class="">
+          <p>User agents should ensure that all <a class="idlType" href="#idl-def-Touch"><code>Touch</code></a> objects available from a given
+          <a class="idlType" href="#idl-def-TouchEvent"><code>TouchEvent</code></a> are all associated to the same document that the <a class="idlType" href="#idl-def-TouchEvent"><code>TouchEvent</code></a> was dispatched
+          to. To implement this, user agents should maintain a notion of the current
+          <em>touch-active</em> document. On first touch, this is set to the target document
+          where the touch was created. When all active touch points are released, the
+          <em>touch-active</em> document is cleared. All <a class="idlType" href="#idl-def-TouchEvent"><code>TouchEvent</code></a>s are dispatched to the
+          current <em>touch-active</em> document, and each <a class="idlType" href="#idl-def-Touch"><code>Touch</code></a> object it contains refers
+          only to DOM elements (and co-ordinates) in that document. If a touch starts entirely
+          outside the currently <em>touch-active</em> document, then it is ignored entirely. </p>
+         </div></div>
+        </section>
+        <section id="usage-examples" class="informative">
+            <h3 id="h3_usage-examples" role="heading" aria-level="2"><span class="secno">5.3 </span>Usage Examples</h3><p><em>This section is non-normative.</em></p>
+            <p>
+              The examples below demonstrate the relations between the different
+              <a class="idlType" href="#idl-def-TouchList"><code>TouchList</code></a> members defined in a <a class="idlType" href="#idl-def-TouchEvent"><code>TouchEvent</code></a>.
+            </p>
+            <section id="touches-and-targettouches-of-a-touchevent">
+                <h4 id="h4_touches-and-targettouches-of-a-touchevent" role="heading" aria-level="3"><span class="secno">5.3.1 </span>touches and targetTouches of a <a class="idlType" href="#idl-def-TouchEvent"><code>TouchEvent</code></a></h4><p><em>This section is non-normative.</em></p>
+                    <p>
+                  This example demonstrates the utility and relations between the
+                  touches and targetTouches members defined in the <a class="idlType" href="#idl-def-TouchEvent"><code>TouchEvent</code></a>
+                  interface. The following code will generate different output based
+                  on the number of touch points on the touchable element and the document:
+                </p>
+                <div class="example"><div class="example-title"><span>Example 1</span></div><pre class="example">&lt;div id='touchable'&gt;
+      This element is touchable.
+  &lt;/div&gt;
+  document.getElementById('touchable').addEventListener('touchstart', function(ev) {      if (ev.touches.item(0) == ev.targetTouches.item(0))
+      {
+          /**
+           * If the first touch on the surface is also targeting the
+           * "touchable" element, the code below should execute.
+           * Since targetTouches is a subset of touches which covers the
+           * entire surface, TouchEvent.touches &gt;= TouchEvents.targetTouches
+           * is always true.
+           */          document.write('Hello Touch Events!');
+      }      if (ev.touches.length == ev.targetTouches.length)
+      {
+          /**
+           * If all of the active touch points are on the "touchable"
+           * element, the length properties should be the same.
+           */          document.write('All points are on target element')
+      }      if (ev.touches.length &gt; 1)
+      {
+          /**
+           * On a single touch input device, there can only be one point
+           * of contact on the surface, so the following code can only
+           * execute when the terminal supports multiple touches.
+           */          document.write('Hello Multiple Touch!');
+      }  }, false);</pre></div>
+            </section>
+            <section id="changedtouches-of-a-touchevent">
+                <h4 id="h4_changedtouches-of-a-touchevent" role="heading" aria-level="3"><span class="secno">5.3.2 </span>changedTouches of a <a class="idlType" href="#idl-def-TouchEvent"><code>TouchEvent</code></a></h4>
+                    <p>
+                  This example demonstrates the utility of changedTouches and it's relation
+                  with the other <a class="idlType" href="#idl-def-TouchList"><code>TouchList</code></a> members of the <a class="idlType" href="#idl-def-TouchEvent"><code>TouchEvent</code></a> interface.
+                  The code is a example which triggers whenever a touch point is removed
+                  from the defined touchable element:
+                </p>
+                    <div class="example"><div class="example-title"><span>Example 2</span></div><pre class="example">&lt;div id='touchable'&gt;
+      This element is touchable.
+  &lt;/div&gt;
+      document.getElementById('touchable').addEventListener('touchend', function(ev) {      /**
+       * Example output when three touch points are on the surface,
+       * two of them being on the "touchable" element and one point
+       * in the "touchable" element is lifted from the surface:
+       *
+       * Touch points removed: 1
+       * Touch points left on element: 1
+       * Touch points left on document: 2
+       */      document.write('Removed: ' + ev.changedTouches.length);
+      document.write('Remaining on element: ' + ev.targetTouches.length);
+      document.write('Remaining on document: ' + ev.touches.length);  }, false);</pre></div>
+            </section>
+            </section>
+        <section id="list-of-touchevent-types" class="informative">
+            <h3 id="h3_list-of-touchevent-types" role="heading" aria-level="2"><span class="secno">5.4 </span>List of <a class="idlType" href="#idl-def-TouchEvent"><code>TouchEvent</code></a> types</h3><p><em>This section is non-normative.</em></p>            <p>
+              The following table provides a summary of the types of possible
+              <a class="idlType" href="#idl-def-TouchEvent"><code>TouchEvent</code></a> types defined in this specification. All events
+              should accomplish the bubbling phase. Some events are not cancelable
+              (see <a class="internalDFN" href="#dfn-preventdefault">preventDefault</a>).
+            </p>
+            <!--
+            // FIXME: As of the time of writing, respec.js doesn't have support for
+            // tables like this - we're just piggybacking on a existing class, with
+            // raw markup as a quick and dirty workaround.
+            -->            <table class="parameters" id="table-event-summary">
+            <tbody><tr>
+                <th>Event Type</th>
+                <th>Sync / Async</th>
+                <th>Bubbling phase</th>
+                <th>Trusted proximal event target types</th>
+                <th>DOM interface</th>
+                <th>Cancelable</th>
+                <th>Default Action</th>
+            </tr>
+            <tr>
+                <td><a class="internalDFN" href="#dfn-touchstart">touchstart</a></td>
+                <td>Sync</td>
+                <td>Yes</td>
+                <td><code>Document, Element</code></td>
+                <td><a class="idlType" href="#idl-def-TouchEvent"><code>TouchEvent</code></a></td>
+                <td>Yes</td>
+                <td>undefined</td>
+            </tr>
+            <tr>
+                <td><a class="internalDFN" href="#dfn-touchend">touchend</a></td>
+                <td>Sync</td>
+                <td>Yes</td>
+                <td><code>Document, Element</code></td>
+                <td><a class="idlType" href="#idl-def-TouchEvent"><code>TouchEvent</code></a></td>
+                <td>Yes</td>
+                <td>
+                  Varies: mousemove (If point has been moved), mousedown,
+                  mouseup, click
+                </td>
+            </tr>
+            <tr>
+                <td><a class="internalDFN" href="#dfn-touchmove">touchmove</a></td>
+                <td>Sync</td>
+                <td>Yes</td>
+                <td><code>Document, Element</code></td>
+                <td><a class="idlType" href="#idl-def-TouchEvent"><code>TouchEvent</code></a></td>
+                <td>Yes</td>
+                <td>undefined</td>
+            </tr>
+            <tr>
+                <td><a class="internalDFN" href="#dfn-touchcancel">touchcancel</a></td>
+                <td>Sync</td>
+                <td>Yes</td>
+                <td><code>Document, Element</code></td>
+                <td><a class="idlType" href="#idl-def-TouchEvent"><code>TouchEvent</code></a></td>
+                <td>No</td>
+                <td>none</td>
+            </tr>
+            </tbody></table>
+        </section>
+        <section id="the-touchstart-event" rel="bibo:chapter" resource="#event-touchstart" typeof="bibo:Chapter">
+          <h3 role="heading" aria-level="2" id="event-touchstart"><span class="secno">5.5 </span>The <dfn id="dfn-touchstart" class="event">touchstart</dfn>
+          event</h3>
+          <p>
+            A user agent must dispatch this event type to indicate when the user
+            places a <a class="internalDFN" href="#dfn-touch-point">touch point</a> on the touch surface.
+          </p>          <p>
+            The target of this event must be an <a>Element</a>.  If the touch
+            point is within a frame, the event should be dispatched to an element
+            in the <a>child browsing context</a> of that frame.
+          </p>          <p>
+            If the <a class="internalDFN" href="#dfn-preventdefault">preventDefault</a> method is called on this event, it
+            should prevent any default actions caused by any touch events
+            associated with the same <a class="internalDFN" href="#dfn-active-touch-point">active touch point</a>, including mouse
+            events or scrolling.
           </p>
-          
-          
-<!-- 
-          // FIXME: As of the time of writing, respec.js doesn't have support for
-          // tables like this - we're just piggybacking on a existing class, with
-          // raw markup as a quick and dirty workaround.
-           -->
-
-
-          <table id="table-event-summary" class="parameters">
-          <tbody><tr>
-              <th>Event Type</th>
-              <th>Sync / Async</th>
-              <th>Bubbling phase</th>
-              <th>Trusted proximal event target types</th>
-              <th>DOM interface</th>
-              <th>Cancelable</th>
-              <th>Default Action</th>
-          </tr>
-          <tr> 
-              <td><a href="#dfn-touchstart" class="internalDFN">touchstart</a></td> 
-              <td>Sync</td> 
-              <td>Yes</td> 
-              <td><code>Document, Element</code></td> 
-              <td><a href="#idl-def-TouchEvent" class="idlType"><code>TouchEvent</code></a></td> 
-              <td>Yes</td> 
-              <td>undefined</td> 
-          </tr>
-          <tr> 
-              <td><a href="#dfn-touchend" class="internalDFN">touchend</a></td> 
-              <td>Sync</td> 
-              <td>Yes</td> 
-              <td><code>Document, Element</code></td> 
-              <td><a href="#idl-def-TouchEvent" class="idlType"><code>TouchEvent</code></a></td> 
-              <td>Yes</td> 
-              <td>
-                Varies: mousemove (If point has been moved), mousedown, 
-                mouseup, click
-              </td> 
-          </tr>
-          <tr> 
-              <td><a href="#dfn-touchmove" class="internalDFN">touchmove</a></td> 
-              <td>Sync</td> 
-              <td>Yes</td> 
-              <td><code>Document, Element</code></td> 
-              <td><a href="#idl-def-TouchEvent" class="idlType"><code>TouchEvent</code></a></td> 
-              <td>Yes</td> 
-              <td>undefined</td> 
-          </tr>
-          <tr> 
-              <td><a href="#dfn-touchcancel" class="internalDFN">touchcancel</a></td> 
-              <td>Sync</td> 
-              <td>Yes</td> 
-              <td><code>Document, Element</code></td> 
-              <td><a href="#idl-def-TouchEvent" class="idlType"><code>TouchEvent</code></a></td> 
-              <td>No</td> 
-              <td>none</td> 
-          </tr>
-          </tbody></table>
-      </div>
- 
-      <div id="the-touchstart---------event" class="section">
-        <h3 id="event-touchstart"><span class="secno">5.4 </span>The <dfn class="event" id="dfn-touchstart">touchstart</dfn>
-        event</h3>
+        </section>        
+        <section id="the-touchend-event" rel="bibo:chapter" resource="#event-touchend" typeof="bibo:Chapter">
+          <h3 role="heading" aria-level="2" id="event-touchend"><span class="secno">5.6 </span>The <dfn id="dfn-touchend" class="event">touchend</dfn> event</h3>
+          <p>
+            A user agent must dispatch this event type to indicate when the user
+            removes a <a class="internalDFN" href="#dfn-touch-point">touch point</a> from the touch surface, also including
+            cases where the touch point physically leaves the touch surface, such
+            as being dragged off of the screen.
+          </p>          <p>
+            The <a>target</a> of this event must be the same <a>Element</a> on
+  		  which the <a class="internalDFN" href="#dfn-touch-point">touch point</a> started when it was first
+            placed on the surface, even if the <a class="internalDFN" href="#dfn-touch-point">touch point</a> has since moved
+            outside the interactive area of the <a>target</a> element.
+          </p>          <p>
+            The <a class="internalDFN" href="#dfn-touch-point">touch point</a> or points that were removed must be included
+            in the <a>changedTouches</a> attribute of the <a class="idlType" href="#idl-def-TouchEvent"><code>TouchEvent</code></a>, and
+            must not be included in the <a>touches</a> and <a>targetTouches</a>
+            attributes.
+          </p>
+        </section>        
+        <section id="the-touchmove-event" rel="bibo:chapter" resource="#event-touchmove" typeof="bibo:Chapter">
+          <h3 role="heading" aria-level="2" id="event-touchmove"><span class="secno">5.7 </span>The <dfn id="dfn-touchmove" class="event">touchmove</dfn> event</h3>
+          <p>
+            A user agent must dispatch this event type to indicate when the user
+            moves a <a class="internalDFN" href="#dfn-touch-point">touch point</a> along the touch surface.
+          </p>          <p>
+            The <a>target</a> of this event must be the same <a>Element</a> on
+  		  which the <a class="internalDFN" href="#dfn-touch-point">touch point</a> started when it was first
+            placed on the surface, even if the <a class="internalDFN" href="#dfn-touch-point">touch point</a> has since moved
+            outside the interactive area of the <a>target</a> element.
+          </p>          <p>
+            Note that the rate at which the user agent sends <a class="internalDFN" href="#dfn-touchmove">touchmove</a>
+            events is implementation-defined, and may depend on hardware
+            capabilities and other implementation details.
+          </p>          <p>
+            If the <a class="internalDFN" href="#dfn-preventdefault">preventDefault</a> method is called on the <em>first</em>
+            <a class="internalDFN" href="#dfn-touchmove">touchmove</a> event of an <a class="internalDFN" href="#dfn-active-touch-point">active touch point</a>, it should
+            prevent any default action caused by any <a class="internalDFN" href="#dfn-touchmove">touchmove</a> event
+            associated with the same <a class="internalDFN" href="#dfn-active-touch-point">active touch point</a>, such as scrolling.
+          </p>
+        </section>        
+        <section id="the-touchcancel-event" rel="bibo:chapter" resource="#event-touchcancel" typeof="bibo:Chapter">
+          <h3 role="heading" aria-level="2" id="event-touchcancel"><span class="secno">5.8 </span>The <dfn id="dfn-touchcancel" class="event">touchcancel</dfn> event</h3>
+          <p>
+            A user agent must dispatch this event type to indicate when a touch
+            point has been disrupted in an implementation-specific manner, such as
+            a synchronous event or action originating from the UA canceling the
+            touch, or the touch point leaving the document window into a
+            non-document area which is capable of handling user interactions.
+            (e.g. The UA's native user interface, plug-ins)  A user agent may
+            also dispatch this event type when the user places more <a class="internalDFN" href="#dfn-touch-point">touch
+            point</a>s on the touch surface than the device or implementation is
+            configured to store, in which case the earliest <a class="idlType" href="#idl-def-Touch"><code>Touch</code></a> object
+            in the <a class="idlType" href="#idl-def-TouchList"><code>TouchList</code></a> should be removed.
+          </p>          <p>
+            The <a>target</a> of this event must be the same <a>Element</a> on
+  		  which the <a class="internalDFN" href="#dfn-touch-point">touch point</a> started when it was first
+            placed on the surface, even if the <a class="internalDFN" href="#dfn-touch-point">touch point</a> has since moved
+            outside the interactive area of the <a>target</a> element.
+          </p>          <p>
+            The <a class="internalDFN" href="#dfn-touch-point">touch point</a> or points that were removed must be included
+            in the <a>changedTouches</a> attribute of the <a class="idlType" href="#idl-def-TouchEvent"><code>TouchEvent</code></a>, and
+            must not be included in the <a>touches</a> and <a>targetTouches</a>
+            attributes.
+          </p>
+        </section>
+      </section>      
+      <section id="extensions-to-the-document-interface">
+        <!--OddPage--><h2 id="h2_extensions-to-the-document-interface" role="heading" aria-level="1"><span class="secno">6. </span>Extensions to the <a class="idlType" href="#idl-def-Document"><code>Document</code></a> Interface</h2>
         <p>
-          A user agent must dispatch this event type to indicate when the user
-          places a <a href="#dfn-touch-point" class="internalDFN">touch point</a> on the touch surface.
-        </p>
-
+          The <a class="idlType" href="#idl-def-Document"><code>Document</code></a> interface [<cite><a href="#bib-DOM-LEVEL-3-CORE" class="bibref">DOM-LEVEL-3-CORE</a></cite>] contains methods
+          by which the user can create <a class="idlType" href="#idl-def-Touch"><code>Touch</code></a> and <a class="idlType" href="#idl-def-TouchList"><code>TouchList</code></a>
+          objects.
+        </p>        <pre class="idl"><span class="idlInterface" id="idl-def-Document">partial interface <span class="idlInterfaceID">Document</span> {
+  <span class="idlMethod">    <span class="idlMethType"><a class="idlType" href="#idl-def-Touch"><code>Touch</code></a></span>     <span class="idlMethName"><a href="#widl-Document-createTouch-Touch-WindowProxy-view-EventTarget-target-long-identifier-long-pageX-long-pageY-long-screenX-long-screenY">createTouch</a></span> (<span class="idlParam"><span class="idlParamType"><a>WindowProxy</a></span> <span class="idlParamName">view</span></span>, <span class="idlParam"><span class="idlParamType"><a>EventTarget</a></span> <span class="idlParamName">target</span></span>, <span class="idlParam"><span class="idlParamType"><a>long</a></span> <span class="idlParamName">identifier</span></span>, <span class="idlParam"><span class="idlParamType"><a>long</a></span> <span class="idlParamName">pageX</span></span>, <span class="idlParam"><span class="idlParamType"><a>long</a></span> <span class="idlParamName">pageY</span></span>, <span class="idlParam"><span class="idlParamType"><a>long</a></span> <span class="idlParamName">screenX</span></span>, <span class="idlParam"><span class="idlParamType"><a>long</a></span> <span class="idlParamName">screenY</span></span>);</span>
+  <span class="idlMethod">    <span class="idlMethType"><a class="idlType" href="#idl-def-TouchList"><code>TouchList</code></a></span> <span class="idlMethName"><a href="#widl-Document-createTouchList-TouchList-Touch-touches">createTouchList</a></span> (<span class="idlParam"><span class="idlParamType"><a class="idlType" href="#idl-def-Touch"><code>Touch</code></a>...</span> <span class="idlParamName">touches</span></span>);</span>
+  };</span></pre><section id="methods-1"><h3 id="h3_methods-1" role="heading" aria-level="2"><span class="secno">6.1 </span>Methods</h3><dl class="methods"><dt id="widl-Document-createTouch-Touch-WindowProxy-view-EventTarget-target-long-identifier-long-pageX-long-pageY-long-screenX-long-screenY"><code>createTouch</code></dt><dd>
+            Creates a <a class="idlType" href="#idl-def-Touch"><code>Touch</code></a> object with the specified attributes.
+          <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">view</td><td class="prmType"><code><a>WindowProxy</a></code></td><td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td><td class="prmOptFalse"><span role="img" aria-label="False">✘</span></td><td class="prmDesc"></td></tr><tr><td class="prmName">target</td><td class="prmType"><code><a>EventTarget</a></code></td><td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td><td class="prmOptFalse"><span role="img" aria-label="False">✘</span></td><td class="prmDesc"></td></tr><tr><td class="prmName">identifier</td><td class="prmType"><code><a>long</a></code></td><td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td><td class="prmOptFalse"><span role="img" aria-label="False">✘</span></td><td class="prmDesc"></td></tr><tr><td class="prmName">pageX</td><td class="prmType"><code><a>long</a></code></td><td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td><td class="prmOptFalse"><span role="img" aria-label="False">✘</span></td><td class="prmDesc"></td></tr><tr><td class="prmName">pageY</td><td class="prmType"><code><a>long</a></code></td><td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td><td class="prmOptFalse"><span role="img" aria-label="False">✘</span></td><td class="prmDesc"></td></tr><tr><td class="prmName">screenX</td><td class="prmType"><code><a>long</a></code></td><td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td><td class="prmOptFalse"><span role="img" aria-label="False">✘</span></td><td class="prmDesc"></td></tr><tr><td class="prmName">screenY</td><td class="prmType"><code><a>long</a></code></td><td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td><td class="prmOptFalse"><span role="img" aria-label="False">✘</span></td><td class="prmDesc"></td></tr></table><div><em>Return type: </em><code><a class="idlType" href="#idl-def-Touch"><code>Touch</code></a></code></div></dd><dt id="widl-Document-createTouchList-TouchList-Touch-touches"><code>createTouchList</code></dt><dd>
+            Creates a <a class="idlType" href="#idl-def-TouchList"><code>TouchList</code></a> object consisting of zero or more <a class="idlType" href="#idl-def-Touch"><code>Touch</code></a> objects.
+            Calling this method with no arguments creates a <a class="idlType" href="#idl-def-TouchList"><code>TouchList</code></a> with no objects in it
+            and length 0 (zero).
+          <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">touches</td><td class="prmType"><code><a class="idlType" href="#idl-def-Touch"><code>Touch</code></a></code></td><td class="prmNullFalse"><span role="img" aria-label="False">✘</span></td><td class="prmOptFalse"><span role="img" aria-label="False">✘</span></td><td class="prmDesc"></td></tr></table><div><em>Return type: </em><code><a class="idlType" href="#idl-def-TouchList"><code>TouchList</code></a></code></div></dd></dl></section>        <div class="note"><div id="h_note_3" role="heading" aria-level="2" class="note-title"><span>Note</span></div><p class="">
+          Some user agents implement an initTouchEvent method as part of the
+          <a class="idlType" href="#idl-def-TouchEvent"><code>TouchEvent</code></a> interface.  When this method is available, scripts
+          can use it to initialize the properties of a <a class="idlType" href="#idl-def-TouchEvent"><code>TouchEvent</code></a> object,
+          including its <a class="idlType" href="#idl-def-TouchList"><code>TouchList</code></a> properties (which can be initialized
+          with values returned from <a>createTouchList</a>).  The
+          <a>initTouchEvent</a> method is not yet standardized, but it may appear
+          in some form in a future specification.
+        </p></div>
+      </section>      
+      <section rel="bibo:chapter" resource="#mouse-events" typeof="bibo:Chapter" id="mouse-events">
+        <!--OddPage--><h2 id="h2_mouse-events" role="heading" aria-level="1"><span class="secno">7. </span>Interaction with Mouse Events</h2>
         <p>
-          The target of this event must be an <a>Element</a>.  If the touch
-          point is within a frame, the event should be dispatched to an element
-          in the <a>child browsing context</a> of that frame.
-        </p>
-
+          The user agent may dispatch both touch events and mouse events
+          [<cite><a href="#bib-DOM-LEVEL-2-EVENTS" class="bibref">DOM-LEVEL-2-EVENTS</a></cite>] in response to the same user input.  If the
+          user agent dispatches both touch events and mouse events in response to
+          a single user action, then the <a class="internalDFN" href="#dfn-touchstart">touchstart</a> event type must be
+          dispatched before any mouse event types for that action.  If the
+          <a class="internalDFN" href="#dfn-preventdefault">preventDefault</a> method of <a class="internalDFN" href="#dfn-touchstart">touchstart</a> or <a class="internalDFN" href="#dfn-touchmove">touchmove</a>
+          is called, the user agent should not dispatch any mouse event that
+          would be a consequential result of the the prevented touch event.
+        </p>        
+        <div class="note"><div id="h_note_4" role="heading" aria-level="2" class="note-title"><span>Note</span></div><p class="">
+          If a Web application can process touch events, it can intercept them,
+          and no corresponding mouse events would need to be dispatched by the
+          user agent. If the Web application is not specifically written for
+          touch input devices, it can react to the subsequent mouse events instead.
+        </p></div>        
         <p>
-          If the <a href="#dfn-preventdefault" class="internalDFN">preventDefault</a> method is called on this event, it
-          should prevent any default actions caused by any touch events
-          associated with the same <a href="#dfn-active-touch-point" class="internalDFN">active touch point</a>, including mouse
-          events or scrolling.
+          If the user agent intreprets a sequence of touch events as a click,
+          then it should dispatch <a>mousemove</a>, <a>mousedown</a>,
+          <a>mouseup</a>, and <a>click</a> events (in that order) at the location
+          of the <a class="internalDFN" href="#dfn-touchend">touchend</a> event for the corresponding touch input.  If the
+          contents of the document have changed during processing of the touch
+          events, then the user agent may dispatch the mouse events to a
+          different target than the touch events.
         </p>
-      </div>
-
-      <div id="the-touchend-event" class="section">
-        <h3 id="event-touchend"><span class="secno">5.5 </span>The <dfn class="event" id="dfn-touchend">touchend</dfn> event</h3>
         <p>
-          A user agent must dispatch this event type to indicate when the user
-          removes a <a href="#dfn-touch-point" class="internalDFN">touch point</a> from the touch surface, also including
-          cases where the touch point physically leaves the touch surface, such
-          as being dragged off of the screen.
+          The default actions and ordering of any further touch and mouse events
+          are implementation-defined, except as specified elsewhere.
         </p>
-
+      </section>      <section id="glossary">
+        <!--OddPage--><h2 id="h2_glossary" role="heading" aria-level="1"><span class="secno">8. </span>Glossary</h2>        <dl>
+          <dt><dfn id="dfn-active-touch-point">active touch point</dfn></dt>
+          <dd>
+            A <a class="internalDFN" href="#dfn-touch-point">touch point</a> which is currently on the screen and is being
+            tracked by the user agent.  The touch point becomes active when the
+            user agent first dispatches a <a class="internalDFN" href="#dfn-touchstart">touchstart</a> event indicating its
+            appearance.  It ceases to be active after the user agent dispatches a
+            <a class="internalDFN" href="#dfn-touchend">touchend</a> or <a class="internalDFN" href="#dfn-touchcancel">touchcancel</a> event indicating that the touch
+            point is removed from the surface or no longer tracked.
+          </dd>          
+          <dt><dfn id="dfn-touch-point">touch point</dfn></dt>
+          <dd>
+            The coordinate point at which a pointer (e.g finger or stylus)
+            intersects the target surface of an interface.  This may apply to a
+            finger touching a touch-screen, or an digital pen writing on a piece
+            of paper.
+          </dd>
+          <dt><dfn id="dfn-preventdefault">preventDefault</dfn></dt>
+          <dd>
+            If a event is cancelable, the preventDefault method is used to signify
+            that the event is to be canceled, and any default actions defined in the
+            user agent as a result of this event, or consequential events from the
+            canceled event will not occur. Calling this method on non-cancelable
+            events will have no effect.
+          </dd>
+        </dl>
+      </section>      
+      <section rel="bibo:chapter" resource="#issues" typeof="bibo:Chapter" id="issues" class="informative">
+        <!--OddPage--><h2 id="h2_issues" role="heading" aria-level="1"><span class="secno">9. </span>Issues</h2><p><em>This section is non-normative.</em></p>
         <p>
-          The <a>target</a> of this event must be the same <a>Element</a> on 
-		  which the <a href="#dfn-touch-point" class="internalDFN">touch point</a> started when it was first
-          placed on the surface, even if the <a href="#dfn-touch-point" class="internalDFN">touch point</a> has since moved
-          outside the interactive area of the <a>target</a> element.
+          The working group maintains <a href="http://www.w3.org/2010/webevents/track/issues/open">a list of open issues in this specification</a>.  These issues may be
+          addressed in future revisions of the specification.
         </p>
-
+      </section>      
+      <section id="acknowledgements" class="appendix informative">
+        <!--OddPage--><h2 id="h2_acknowledgements" role="heading" aria-level="1"><span class="secno">A. </span>Acknowledgements</h2><p><em>This section is non-normative.</em></p>
         <p>
-          The <a href="#dfn-touch-point" class="internalDFN">touch point</a> or points that were removed must be included
-          in the <a>changedTouches</a> attribute of the <a href="#idl-def-TouchEvent" class="idlType"><code>TouchEvent</code></a>, and
-          must not be included in the <a>touches</a> and <a>targetTouches</a>
-          attributes.
+          Many thanks to the WebKit engineers for developing the model used as a
+          basis for this spec, Neil Roberts (SitePen) for his summary of WebKit
+          touch events, Peter-Paul Koch (PPK) for his write-ups and suggestions,
+          Robin Berjon for developing the <a href="http://dev.w3.org/2009/dap/ReSpec.js/documentation.html">ReSpec.js spec authoring tool</a>, and the WebEvents WG for their many
+          contributions.
         </p>
-      </div>
-
-      <div id="the-touchmove-event" class="section">
-        <h3 id="event-touchmove"><span class="secno">5.6 </span>The <dfn class="event" id="dfn-touchmove">touchmove</dfn> event</h3>
         <p>
-          A user agent must dispatch this event type to indicate when the user
-          moves a <a href="#dfn-touch-point" class="internalDFN">touch point</a> along the touch surface.
+          Many others have made additional comments as the spec developed, which
+          have led to steady improvements.  Among them are Matthew Schinckel,
+          Andrew Grieve, Cathy Chan, and Boris Zbarsky. If we inadvertently omitted your name,
+          please let me know.
         </p>
-
         <p>
-          The <a>target</a> of this event must be the same <a>Element</a> on 
-		  which the <a href="#dfn-touch-point" class="internalDFN">touch point</a> started when it was first
-          placed on the surface, even if the <a href="#dfn-touch-point" class="internalDFN">touch point</a> has since moved
-          outside the interactive area of the <a>target</a> element.
+          The group acknowledges the following contributors to this specification's
+          test suite: Matt Brubeck, Olli Pettay, Art Barstow, Cathy Chan and Rick Byers.
         </p>
-
-        <p>
-          Note that the rate at which the user agent sends <a href="#dfn-touchmove" class="internalDFN">touchmove</a>
-          events is implementation-defined, and may depend on hardware
-          capabilities and other implementation details.
+      </section>      
+      <section id="changes-since-last-publication" class="appendix informative">
+        <!--OddPage-->
+        <h2 id="h2_changes-since-last-publication" role="heading" aria-level="1"><span class="secno">B. </span>Changes Since Last Publication</h2>
+          <p><em>This section is non-normative.</em></p>
+        <p>The following non-substantive changes were made since the
+          <a href="http://www.w3.org/TR/2013/PR-touch-events-20130509/">
+           09 May 2013 Proposed Recommendation</a> was published:
         </p>
-
-        <p>
-          If the <a href="#dfn-preventdefault" class="internalDFN">preventDefault</a> method is called on the <em>first</em>
-          <a href="#dfn-touchmove" class="internalDFN">touchmove</a> event of an <a href="#dfn-active-touch-point" class="internalDFN">active touch point</a>, it should
-          prevent any default action caused by any <a href="#dfn-touchmove" class="internalDFN">touchmove</a> event
-          associated with the same <a href="#dfn-active-touch-point" class="internalDFN">active touch point</a>, such as scrolling.
-        </p>
-      </div>
-
-      <div id="the-touchcancel-event" class="section">
-        <h3 id="event-touchcancel"><span class="secno">5.7 </span>The <dfn class="event" id="dfn-touchcancel">touchcancel</dfn> event</h3>
-        <p>
-          A user agent must dispatch this event type to indicate when a touch
-          point has been disrupted in an implementation-specific manner, such as
-          a synchronous event or action originating from the UA canceling the
-          touch, or the touch point leaving the document window into a
-          non-document area which is capable of handling user interactions.
-          (e.g. The UA's native user interface, plug-ins)  A user agent may
-          also dispatch this event type when the user places more <a href="#dfn-touch-point" class="internalDFN">touch
-          point</a>s on the touch surface than the device or implementation is
-          configured to store, in which case the earliest <a href="#idl-def-Touch" class="idlType"><code>Touch</code></a> object
-          in the <a href="#idl-def-TouchList" class="idlType"><code>TouchList</code></a> should be removed.
-        </p>
-
-        <p>
-          The <a>target</a> of this event must be the same <a>Element</a> on 
-		  which the <a href="#dfn-touch-point" class="internalDFN">touch point</a> started when it was first
-          placed on the surface, even if the <a href="#dfn-touch-point" class="internalDFN">touch point</a> has since moved
-          outside the interactive area of the <a>target</a> element.
-        </p>
-
-        <p>
-          The <a href="#dfn-touch-point" class="internalDFN">touch point</a> or points that were removed must be included
-          in the <a>changedTouches</a> attribute of the <a href="#idl-def-TouchEvent" class="idlType"><code>TouchEvent</code></a>, and
-          must not be included in the <a>touches</a> and <a>targetTouches</a>
-          attributes.
-        </p>
-      </div>
-    </div>
-
-    <div id="extensions-to-the-document-interface" class="section">
-      
-<!-- OddPage -->
-<h2><span class="secno">6. </span>Extensions to the <a href="#idl-def-Document" class="idlType"><code>Document</code></a> Interface</h2>
-      <p>
-        The <a href="#idl-def-Document" class="idlType"><code>Document</code></a> interface [<cite><a class="bibref" rel="biblioentry" href="#bib-DOM-LEVEL-3-CORE">DOM-LEVEL-3-CORE</a></cite>] contains methods
-        by which the user can create <a href="#idl-def-Touch" class="idlType"><code>Touch</code></a> and <a href="#idl-def-TouchList" class="idlType"><code>TouchList</code></a>
-        objects.
-      </p>
-
-      <pre class="idl"><span id="idl-def-Document" class="idlInterface">partial interface <span class="idlInterfaceID">Document</span> {
-<span class="idlMethod">    <span class="idlMethType"><a href="#idl-def-Touch" class="idlType"><code>Touch</code></a></span>     <span class="idlMethName"><a href="#widl-Document-createTouch-Touch-AbstractView-view-EventTarget-target-long-identifier-long-pageX-long-pageY-long-screenX-long-screenY">createTouch</a></span> (<span class="idlParam"><span class="idlParamType"><a>AbstractView</a></span> <span class="idlParamName">view</span></span>, <span class="idlParam"><span class="idlParamType"><a>EventTarget</a></span> <span class="idlParamName">target</span></span>, <span class="idlParam"><span class="idlParamType"><a>long</a></span> <span class="idlParamName">identifier</span></span>, <span class="idlParam"><span class="idlParamType"><a>long</a></span> <span class="idlParamName">pageX</span></span>, <span class="idlParam"><span class="idlParamType"><a>long</a></span> <span class="idlParamName">pageY</span></span>, <span class="idlParam"><span class="idlParamType"><a>long</a></span> <span class="idlParamName">screenX</span></span>, <span class="idlParam"><span class="idlParamType"><a>long</a></span> <span class="idlParamName">screenY</span></span>);</span>
-<span class="idlMethod">    <span class="idlMethType"><a href="#idl-def-TouchList" class="idlType"><code>TouchList</code></a></span> <span class="idlMethName"><a href="#widl-Document-createTouchList-TouchList-TouchArray-touches">createTouchList</a></span> (<span class="idlParam"><span class="idlParamType"><a href="#idl-def-Touch" class="idlType"><code>Touch</code></a>[]</span> <span class="idlParamName">touches</span></span>);</span>
-<span class="idlMethod">    <span class="idlMethType"><a href="#idl-def-TouchList" class="idlType"><code>TouchList</code></a></span> <span class="idlMethName"><a href="#widl-Document-createTouchList-TouchList-Touch-touch">createTouchList</a></span> (<span class="idlParam"><span class="idlParamType"><a href="#idl-def-Touch" class="idlType"><code>Touch</code></a></span> <span class="idlParamName">touch</span></span>);</span>
-};</span>
-</pre><div id="methods-1" class="section"><h3><span class="secno">6.1 </span>Methods</h3><dl class="methods"><dt id="widl-Document-createTouch-Touch-AbstractView-view-EventTarget-target-long-identifier-long-pageX-long-pageY-long-screenX-long-screenY"><code>createTouch</code></dt><dd>
-          Creates a <a href="#idl-def-Touch" class="idlType"><code>Touch</code></a> object with the specified attributes.
-          
-        <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">view</td><td class="prmType"><code><a>AbstractView</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr><tr><td class="prmName">target</td><td class="prmType"><code><a>EventTarget</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr><tr><td class="prmName">identifier</td><td class="prmType"><code><a>long</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr><tr><td class="prmName">pageX</td><td class="prmType"><code><a>long</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr><tr><td class="prmName">pageY</td><td class="prmType"><code><a>long</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr><tr><td class="prmName">screenX</td><td class="prmType"><code><a>long</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr><tr><td class="prmName">screenY</td><td class="prmType"><code><a>long</a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr></table><div><em>No exceptions.</em></div><div><em>Return type: </em><code><a href="#idl-def-Touch" class="idlType"><code>Touch</code></a></code></div></dd><dt id="widl-Document-createTouchList-TouchList-TouchArray-touches"><code>createTouchList</code></dt><dd>
-          Creates a <a href="#idl-def-TouchList" class="idlType"><code>TouchList</code></a> object containing the specified
-          <a href="#idl-def-Touch" class="idlType"><code>Touch</code></a> objects.
-          
-        <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">touches</td><td class="prmType"><code><a href="#idl-def-Touch" class="idlType"><code>Touch</code></a>[]</code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr></table><div><em>No exceptions.</em></div><div><em>Return type: </em><code><a href="#idl-def-TouchList" class="idlType"><code>TouchList</code></a></code></div></dd><dt id="widl-Document-createTouchList-TouchList-Touch-touch"><code>createTouchList</code></dt><dd>
-          Creates a <a href="#idl-def-TouchList" class="idlType"><code>TouchList</code></a> object containing a single <a href="#idl-def-Touch" class="idlType"><code>Touch</code></a>.
-          
-        <table class="parameters"><tr><th>Parameter</th><th>Type</th><th>Nullable</th><th>Optional</th><th>Description</th></tr><tr><td class="prmName">touch</td><td class="prmType"><code><a href="#idl-def-Touch" class="idlType"><code>Touch</code></a></code></td><td class="prmNullFalse">✘</td><td class="prmOptFalse">✘</td><td class="prmDesc"></td></tr></table><div><em>No exceptions.</em></div><div><em>Return type: </em><code><a href="#idl-def-TouchList" class="idlType"><code>TouchList</code></a></code></div></dd></dl></div>
-    </div>
-
-    <div id="mouse-events" class="section">
-      
-<!-- OddPage -->
-<h2><span class="secno">7. </span>Interaction with Mouse Events</h2>
-      <p>
-        The user agent may dispatch both touch events and mouse events
-        [<cite><a class="bibref" rel="biblioentry" href="#bib-DOM-LEVEL-2-EVENTS">DOM-LEVEL-2-EVENTS</a></cite>] in response to the same user input.  If the
-        user agent dispatches both touch events and mouse events in response to
-        a single user action, then the <a href="#dfn-touchstart" class="internalDFN">touchstart</a> event type must be
-        dispatched before any mouse event types for that action.  If the
-        <a href="#dfn-preventdefault" class="internalDFN">preventDefault</a> method of <a href="#dfn-touchstart" class="internalDFN">touchstart</a> or <a href="#dfn-touchmove" class="internalDFN">touchmove</a>
-        is called, the user agent should not dispatch any mouse event that
-        would be a consequential result of the the prevented touch event.
-      </p>
-
-      <p class="note">
-        If a Web application can process touch events, it can intercept them, 
-        and no corresponding mouse events would need to be dispatched by the 
-        user agent. If the Web application is not specifically written for 
-        touch input devices, it can react to the subsequent mouse events instead.
-      </p>
-
-      <p>
-        If the user agent intreprets a sequence of touch events as a click,
-        then it should dispatch <a>mousemove</a>, <a>mousedown</a>,
-        <a>mouseup</a>, and <a>click</a> events (in that order) at the location
-        of the <a href="#dfn-touchend" class="internalDFN">touchend</a> event for the corresponding touch input.  If the
-        contents of the document have changed during processing of the touch
-        events, then the user agent may dispatch the mouse events to a
-        different target than the touch events.
-      </p>
-
-      <p>
-        The default actions and ordering of any further touch and mouse events
-        are implementation-defined, except as specified elsewhere.
-      </p>
-    </div>
-
-    <div id="glossary" class="section">
-      
-<!-- OddPage -->
-<h2><span class="secno">8. </span>Glossary</h2>
-
-      <dl>
-        <dt><dfn id="dfn-active-touch-point">active touch point</dfn></dt>
-        <dd>
-          A <a href="#dfn-touch-point" class="internalDFN">touch point</a> which is currently on the screen and is being
-          tracked by the user agent.  The touch point becomes active when the
-          user agent first dispatches a <a href="#dfn-touchstart" class="internalDFN">touchstart</a> event indicating its
-          appearance.  It ceases to be active after the user agent dispatches a
-          <a href="#dfn-touchend" class="internalDFN">touchend</a> or <a href="#dfn-touchcancel" class="internalDFN">touchcancel</a> event indicating that the touch
-          point is removed from the surface or no longer tracked.
-        </dd>
-
-        <dt><dfn id="dfn-touch-point">touch point</dfn></dt>
-        <dd>
-          The coordinate point at which a pointer (e.g finger or stylus)
-          intersects the target surface of an interface.  This may apply to a
-          finger touching a touch-screen, or an digital pen writing on a piece
-          of paper.
-        </dd>
-        
-        <dt><dfn id="dfn-preventdefault">preventDefault</dfn></dt>
-        <dd>
-          If a event is cancelable, the preventDefault method is used to signify
-          that the event is to be canceled, and any default actions defined in the
-          user agent as a result of this event, or consequential events from the
-          canceled event will not occur. Calling this method on non-cancelable
-          events will have no effect.
-        </dd>        
-      </dl>
-    </div>
-
-    <div class="informative section" id="issues">
-      
-<!-- OddPage -->
-<h2><span class="secno">9. </span>Issues</h2><p><em>This section is non-normative.</em></p>
-      <p>
-        The working group maintains <a href="http://www.w3.org/2010/webevents/track/products/2">a list of open issues in this specification</a>.  These issues may be
-        addressed in future revisions of the specification.
-      </p>
-    </div>
-
-    <div class="appendix informative section" id="acknowledgements">
-      
-<!-- OddPage -->
-<h2><span class="secno">A. </span>Acknowledgements</h2><p><em>This section is non-normative.</em></p>
-      <p>
-        Many thanks to the WebKit engineers for developing the model used as a
-        basis for this spec, Neil Roberts (SitePen) for his summary of WebKit
-        touch events, Peter-Paul Koch (PPK) for his write-ups and suggestions,
-        Robin Berjon for developing the <a href="http://dev.w3.org/2009/dap/ReSpec.js/documentation.html">ReSpec.js spec authoring tool</a>, and the WebEvents WG for their many
-        contributions.
-      </p>
-
-      <p>
-        Many others have made additional comments as the spec developed, which
-        have led to steady improvements.  Among them are Matthew Schinckel,
-        Andrew Grieve, and Cathy Chan. If I inadvertently omitted your name,
-        please let me know.
-      </p>
-    </div>
-  
-
-<div id="references" class="appendix section">
-<!-- OddPage -->
-<h2><span class="secno">B. </span>References</h2><div id="normative-references" class="section"><h3><span class="secno">B.1 </span>Normative references</h3><dl class="bibliography"><dt id="bib-DOM-LEVEL-2-EVENTS">[DOM-LEVEL-2-EVENTS]</dt><dd>Tom Pixley. <a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Events-20001113"><cite>Document Object Model (DOM) Level 2 Events Specification.</cite></a> 13 November 2000. W3C Recommendation. URL: <a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Events-20001113">http://www.w3.org/TR/2000/REC-DOM-Level-2-Events-20001113</a> 
-</dd><dt id="bib-DOM-LEVEL-3-CORE">[DOM-LEVEL-3-CORE]</dt><dd>Gavin Nicol; et al. <a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407"><cite>Document Object Model (DOM) Level 3 Core Specification.</cite></a> 7 April 2004. W3C Recommendation. URL: <a href="http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407">http://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407</a> 
-</dd><dt id="bib-RFC2119">[RFC2119]</dt><dd>S. Bradner. <a href="http://www.ietf.org/rfc/rfc2119.txt"><cite>Key words for use in RFCs to Indicate Requirement Levels.</cite></a> March 1997. Internet RFC 2119.  URL: <a href="http://www.ietf.org/rfc/rfc2119.txt">http://www.ietf.org/rfc/rfc2119.txt</a> 
-</dd><dt id="bib-WEBIDL">[WEBIDL]</dt><dd>Cameron McCormack. <a href="http://www.w3.org/TR/2011/WD-WebIDL-20110927/"><cite>Web IDL.</cite></a> 27 September 2011. W3C Working Draft. (Work in progress.) URL: <a href="http://www.w3.org/TR/2011/WD-WebIDL-20110927/">http://www.w3.org/TR/2011/WD-WebIDL-20110927/</a> 
-</dd></dl></div><div id="informative-references" class="section"><h3><span class="secno">B.2 </span>Informative references</h3><p>No informative references.</p></div></div></body></html>
+        <ul>
+          <li>Removed the <code>optional</code> keyword from the Web IDL describing the <a href="#widl-Document-createTouchList-TouchList-Touch-touches">createTouchList</a> interface, per <a href="http://dev.w3.org/2006/webapi/WebIDL/#idl-operations">section 3.2.3. Operations</a> of the Web IDL specification.</li>
+          <li>Removed “version 1” from the title.</li>
+         <li>Added a <a href="#webidl-conform">clarification of Web IDL conformance</a>.</li>
+         <li>Added a <a href="#stability-disclaimer">disclaimer regarding the stability of normative references to Web IDL and HTML5</a>.</li>
+        </ul>
+      </section>    
+      <section rel="bibo:chapter" resource="#references" typeof="bibo:Chapter" class="appendix" id="references"><!--OddPage--><h2 id="h2_references" role="heading" aria-level="1"><span class="secno">C. </span>References</h2><section rel="bibo:chapter" resource="#normative-references" typeof="bibo:Chapter" id="normative-references"><h3 id="h3_normative-references" role="heading" aria-level="2"><span class="secno">C.1 </span>Normative references</h3><dl about="" class="bibliography"><dt id="bib-DOM-LEVEL-2-EVENTS">[DOM-LEVEL-2-EVENTS]</dt><dd rel="dcterms:requires">Tom Pixley. <a href="http://www.w3.org/TR/DOM-Level-2-Events/"><cite>Document Object Model (DOM) Level 2 Events Specification</cite></a>. 13 November 2000. W3C Recommendation. URL: <a href="http://www.w3.org/TR/DOM-Level-2-Events/">http://www.w3.org/TR/DOM-Level-2-Events/</a>
+  </dd><dt id="bib-DOM-LEVEL-3-CORE">[DOM-LEVEL-3-CORE]</dt><dd rel="dcterms:requires">Arnaud Le Hors; Philippe Le Hégaret; Lauren Wood; Gavin Nicol; Jonathan Robie; Mike Champion; Steven B Byrne et al. <a href="http://www.w3.org/TR/DOM-Level-3-Core/"><cite>Document Object Model (DOM) Level 3 Core Specification</cite></a>. 7 April 2004. W3C Recommendation. URL: <a href="http://www.w3.org/TR/DOM-Level-3-Core/">http://www.w3.org/TR/DOM-Level-3-Core/</a>
+  </dd><dt id="bib-HTML5">[HTML5]</dt><dd rel="dcterms:requires">Robin Berjon; Steve Faulkner; Travis Leithead; Erika Doyle Navara; Edward O'Connor; Silvia Pfeiffer. <a href="http://www.w3.org/TR/html5/"><cite>HTML5</cite></a>. 6 August 2013. W3C Candidate Recommendation. URL: <a href="http://www.w3.org/TR/html5/">http://www.w3.org/TR/html5/</a>
+  </dd><dt id="bib-RFC2119">[RFC2119]</dt><dd rel="dcterms:requires">S. Bradner. <a href="http://www.ietf.org/rfc/rfc2119.txt"><cite>Key words for use in RFCs to Indicate Requirement Levels.</cite></a> March 1997. Internet RFC 2119.  URL: <a href="http://www.ietf.org/rfc/rfc2119.txt">http://www.ietf.org/rfc/rfc2119.txt</a>
+  </dd><dt id="bib-WEBIDL">[WEBIDL]</dt><dd rel="dcterms:requires">Cameron McCormack. <a href="http://www.w3.org/TR/WebIDL/"><cite>Web IDL</cite></a>. 19 April 2012. W3C Candidate Recommendation. URL: <a href="http://www.w3.org/TR/WebIDL/">http://www.w3.org/TR/WebIDL/</a>
+  </dd></dl></section></section>
+</body>
+</html>

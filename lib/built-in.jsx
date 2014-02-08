@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 DeNA Co., Ltd.
+ * Copyright (c) 2012,2013 DeNA Co., Ltd. et al.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -275,7 +275,13 @@ native final class Array.<T> {
 	function reduce.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>, currentIndex : number) : U) : U;
 	function reduce.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : U) : U;
 	/* with initial value; won't throw exception. */
-	function reduce.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>) : U, initialValue : U) : U;
+	function reduce.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>) : U, initialValue : U) : U {
+		var value = initialValue;
+		for (var i = 0; i < this.length; ++i) {
+			value = callbackfn(value, this[i]);
+		}
+		return value;
+	}
 	function reduce.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>, currentIndex : number) : U, initialValue : U) : U;
 	function reduce.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : U, initialValue : U) : U;
 
@@ -1042,6 +1048,29 @@ native class __jsx_generator_object.<T> extends Generator.<T> {
 
   return __jsx_generator_object;
 }())""";
+
+/** @see http://wiki.ecmascript.org/doku.php?id=harmony:specification_drafts */
+native final class Promise.<T> {
+
+	static function all (promises : Array.<Promise.<T>>) : Promise.<Array.<T>>;
+	static function race (promises : Array.<Promise.<T>>) : Promise.<T>;
+
+	/**
+	 * <p>If given value is a promse, then return the value. Otherwise, make a new promise that is fulfilled with the value.</p>
+	 */
+	static function cast (x : Promise.<T>) : Promise.<T>;
+	static function cast (x : T) : Promise.<T>;
+
+	static function reject (reason : variant) : Promise.<T>;
+	static function resolve (result : T) : Promise.<T>;
+
+	function constructor (executor : function(resolve :function(result:T):void, reject :function(reason:variant):void):void);
+
+	function then.<U> (onFulfilled : function(result:T):U) : Promise.<U>;
+	function then.<U> (onFulfilled : function(result:T):U, onRejected : function(reason:variant):void) : Promise.<U>;
+	function catch (onRejected : function(reason:variant):void) : void;
+
+}
 
 // 5.12
 /**

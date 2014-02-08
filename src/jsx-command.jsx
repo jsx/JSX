@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (c) 2012 DeNA Co., Ltd.
+ * Copyright (c) 2012,2013 DeNA Co., Ltd. et al.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -50,7 +50,7 @@ class JSXCommand {
 			"  --run                      runs _Main.main(:string[]):void after compiling\n" +
 			"  --test                     runs _Test#test*():void after compiling\n" +
 			"  --output file              output file (default:stdout)\n" +
-			"  --input-filename file      names input filename\n" +
+			"  --input-filename file      specifies the root path for searching imports (used when the source-file is \"-\" (stdin))\n" +
 			"  --mode (compile|parse|doc) specifies compilation mode (default:compile)\n" +
 			"  --target (javascript|c++)  specifies target language (default:javascript)\n" +
 			"  --release                  disables run-time type checking and enables optimizations (" + Optimizer.getReleaseOptimizationCommands().join(",")  + ")\n" +

@@ -7,3 +7,10 @@ interface CanvasPixelArray {
   getter octet (in unsigned long index);
   setter void (in unsigned long index, in octet value);
 };
+
+// Introduced in DOM Level 3 (http://www.w3.org/TR/DOM-Level-3-Core/core.html):
+interface DOMStringList {
+  DOMString          item(in unsigned long index);
+  readonly attribute unsigned long   length;
+  boolean            contains(in DOMString str);
+};

@@ -73,7 +73,6 @@ To setup JSX SDK, type the following command:
 
     git clone --recursive git://github.com/jsx/JSX.git
     cd JSX
-    perl extlib/bin/cpanm JSON::XS # optional, to make tests faster
     make # to build bin/jsx
     # edit JSX compiler source files
     make test # to make sure it works

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 DeNA Co., Ltd.
+ * Copyright (c) 2012,2013 DeNA Co., Ltd. et al.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -678,7 +678,7 @@ class MapLiteralExpression extends Expression {
 				context.errors.push(new CompileError(this._token, "specified type is not a map type"));
 				return false;
 			}
-			var expectedType = (this._type as ParsedObjectType).getTypeArguments()[0];
+			var expectedType = (this._type as ParsedObjectType).getTypeArguments()[0].toNullableType();
 			// check type of the elements (expect when expectedType == null, meaning that it is a variant)
 			for (var i = 0; i < this._elements.length; ++i) {
 				var elementType = this._elements[i].getExpr().getType();
@@ -1397,6 +1397,10 @@ class SignExpression extends UnaryExpression {
 	}
 
 	override function getType () : Type {
+		if (this._token.getValue() == "-") {
+			// -(0x80000000 as int) should return 0x80000000
+			return Type.numberType;
+		}
 		var type = this._expr.getType();
 		if (type.resolveIfNullable().equals(Type.numberType))
 			return Type.numberType;
@@ -1797,6 +1801,8 @@ class BinaryNumberExpression extends BinaryExpression {
 		assert this._expr2.getType() != null, this._token.getNotation();
 
 		switch (this._token.getValue()) {
+
+			// these ops may return int or number, depending on the operands
 		case "+":
 		case "-":
 		case "*":
@@ -1804,18 +1810,25 @@ class BinaryNumberExpression extends BinaryExpression {
 				return Type.numberType;
 			else
 				return Type.integerType;
+
+			// these ops returns a number even if both the arguments are int, since the result might include fractional part or become NaN  (note: even ```int % int``` may return NaN which is out of the bounds of ```int``` in case rhs is 0)
 		case "/":
 		case "%":
 			return Type.numberType;
+
+			// these ops always return a boolean
 		case "<":
 		case "<=":
 		case ">":
 		case ">=":
 			return Type.booleanType;
+
+			// these ops always return an int
 		case "&":
 		case "|":
 		case "^":
 			return Type.integerType;
+
 		default:
 			throw new Error("unexpected operator:" + this._token.getValue());
 		}

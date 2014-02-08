@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 DeNA Co., Ltd.
+ * Copyright (c) 2012,2013 DeNA Co., Ltd. et al.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -764,7 +764,8 @@ class ClassDefinition implements Stashable {
 			if (! (member instanceof MemberFunctionDefinition)) {
 				return false;
 			}
-			if ((member.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_EXPORT)) != ClassDefinition.IS_EXPORT) {
+			if ((member.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_EXPORT)) != ClassDefinition.IS_EXPORT
+				|| member.name() == "constructor") {
 				return false;
 			}
 			if (! usedNames.hasOwnProperty(member.name())) {
@@ -775,15 +776,25 @@ class ClassDefinition implements Stashable {
 			if (existingDef.getType().equals(member.getType())) {
 				return false;
 			}
-			if ((this._flags & ClassDefinition.IS_EXPORT) != 0 && member.name() == "constructor") {
-				var errMsg = "only one constructor is exportable, please mark others using the __noexport__ attribute";
-			} else {
-				errMsg = "methods with __export__ attribute cannot be overloaded";
-			}
 			context.errors.push(
-				new CompileError(member.getToken(), errMsg)
+				new CompileError(member.getToken(), "methods with __export__ attribute cannot be overloaded")
 				.addCompileNote(new CompileNote(usedNames[member.name()].getToken(), "previously defined here")));
 			return false;
+		});
+		// check constructor conflicts
+		var existingExportedCtor = null : MemberFunctionDefinition;
+		this.forEachMemberFunction(function (funcDef) {
+			if ((funcDef.flags() & (ClassDefinition.IS_EXPORT | ClassDefinition.IS_STATIC)) == ClassDefinition.IS_EXPORT
+				&& funcDef.name() == "constructor") {
+				if (existingExportedCtor != null) {
+					context.errors.push(
+						new CompileError(funcDef.getToken(), "only one constructor is exportable per class (or interface or mixin), pleaose mark others using the __noexport__ attribute")
+						.addCompileNote(new CompileNote(existingExportedCtor.getToken(), "previously defined here")));
+				} else {
+					existingExportedCtor = funcDef;
+				}
+			}
+			return true;
 		});
 	}
 
