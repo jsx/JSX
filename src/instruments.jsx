@@ -1458,10 +1458,10 @@ class CodeTransformer {
 
 		// setup transformers
 		try {
-			if (this._commands.indexOf("cps") || this._commands.indexOf("generator")) {
+			if (this._commands.indexOf("cps") != -1 || this._commands.indexOf("generator") != -1) {
 				this._cpsTransformer = new _CPSTransformer(this);
 			}
-			if (this._commands.indexOf("generator")) {
+			if (this._commands.indexOf("generator") != -1) {
 				this._generatorTransformer = new _GeneratorTransformer(this, this._cpsTransformer);
 			}
 		} catch (e : Error) {
