@@ -30,6 +30,87 @@ import "./type.jsx";
 import "./util.jsx";
 import "./emitter.jsx";
 
+class _Util {
+
+	static function _getFunctionNestDepth (funcDef : MemberFunctionDefinition) : number {
+		var depth = 0;
+		var parent : MemberFunctionDefinition;
+		while ((parent = funcDef.getParent()) != null) {
+			depth++;
+			funcDef = parent;
+		}
+		return depth;
+	}
+
+	static function _getGeneratorNestDepth (funcDef : MemberFunctionDefinition) : number {
+		var depth = 0;
+		var parent : MemberFunctionDefinition;
+		while ((parent = funcDef.getParent()) != null) {
+			if (parent.isGenerator())
+				depth++;
+			funcDef = parent;
+		}
+		return depth;
+	}
+
+	static var _numUniqVar = 0;
+
+	static function _createFreshArgumentDeclaration (type : Type) : ArgumentDeclaration {
+		var id = _Util._numUniqVar++;
+		return new ArgumentDeclaration(new Token("$a" + id, true), type);
+	}
+
+	static function _createFreshLocalVariable (type : Type) : LocalVariable {
+		var id = _Util._numUniqVar++;
+		return new LocalVariable(new Token("$a" + id, true), type);
+	}
+
+	static function _createAnonymousFunction (parent : MemberFunctionDefinition, token : Token /* null for auto-gen */, args : ArgumentDeclaration[], returnType : Type) : MemberFunctionDefinition {
+		return _Util._createNamedFunction(parent, token, null, args, returnType);
+	}
+
+	static function _createNamedFunction (parent : MemberFunctionDefinition, token : Token /* null for auto-gen */, nameToken : Token, args : ArgumentDeclaration[], returnType : Type) : MemberFunctionDefinition {
+		if (token == null) {
+			token = new Token("function", false);
+		}
+		var funcDef = new MemberFunctionDefinition(
+			token,
+			nameToken,
+			ClassDefinition.IS_STATIC,
+			returnType,
+			args,
+			[], // locals
+			[], // statements
+			[], // closures
+			null,
+			null
+		);
+		Util.linkFunction(funcDef, parent);
+		return funcDef;
+	}
+
+	static function _createIdentityFunction (parent : MemberFunctionDefinition, type : Type) : FunctionExpression {
+		assert ! type.equals(Type.voidType);
+
+		var arg = _Util._createFreshArgumentDeclaration(type);
+		var identity = new MemberFunctionDefinition(
+			new Token("function", false),
+			null,	// name
+			ClassDefinition.IS_STATIC,
+			type,
+			[ arg ],
+			[],	// locals
+			[ new ReturnStatement(new Token("return", false), new LocalExpression(new Token(arg.getName().getValue(), true), arg)) ] : Statement[],
+			[],	// closures
+			null,	// lastToken
+			null
+		);
+		Util.linkFunction(identity, parent);
+		return new FunctionExpression(identity.getToken(), identity);
+	}
+
+}
+
 abstract class _StatementTransformer {
 
 	static var _statementCountMap = new Map.<number>;
@@ -887,7 +968,7 @@ class _CPSTransformer {
 
 		var returnLocal : LocalVariable = null;
 		if (! Type.voidType.equals(funcDef.getReturnType())) {
-			var returnLocalName = "$return" + CodeTransformer._getFunctionNestDepth(funcDef);
+			var returnLocalName = "$return" + _Util._getFunctionNestDepth(funcDef);
 			returnLocal = new LocalVariable(new Token(returnLocalName, false), funcDef.getReturnType());
 			funcDef.getLocals().push(returnLocal);
 			this._enterFunction(returnLocal);
@@ -927,7 +1008,7 @@ class _CPSTransformer {
 
 		// create executor
 		var nextVar = new ArgumentDeclaration(new Token("$next", true), Type.integerType);
-		var executor = this._transformer._createNamedFunction(funcDef, null, new Token("$loop", true), [ nextVar ], Type.voidType);
+		var executor = _Util._createNamedFunction(funcDef, null, new Token("$loop", true), [ nextVar ], Type.voidType);
 		executor.setFuncLocal(loopVar);
 
 		// number labels
@@ -1265,7 +1346,7 @@ class _GeneratorTransformer {
 
 		// create a generator object
 		var genType = this._instantiateGeneratorType(yieldingType);
-		var genLocalName = "$generator" + CodeTransformer._getGeneratorNestDepth(funcDef);
+		var genLocalName = "$generator" + _Util._getGeneratorNestDepth(funcDef);
 		var genLocal = new LocalVariable(new Token(genLocalName, false), genType);
 		funcDef.getLocals().push(genLocal);
 
@@ -1513,83 +1594,6 @@ class CodeTransformer {
 			});
 		});
 		return closures;
-	}
-
-	static function _getFunctionNestDepth (funcDef : MemberFunctionDefinition) : number {
-		var depth = 0;
-		var parent : MemberFunctionDefinition;
-		while ((parent = funcDef.getParent()) != null) {
-			depth++;
-			funcDef = parent;
-		}
-		return depth;
-	}
-
-	static function _getGeneratorNestDepth (funcDef : MemberFunctionDefinition) : number {
-		var depth = 0;
-		var parent : MemberFunctionDefinition;
-		while ((parent = funcDef.getParent()) != null) {
-			if (parent.isGenerator())
-				depth++;
-			funcDef = parent;
-		}
-		return depth;
-	}
-
-	var _numUniqVar = 0;
-
-	function _createFreshArgumentDeclaration (type : Type) : ArgumentDeclaration {
-		var id = this._numUniqVar++;
-		return new ArgumentDeclaration(new Token("$a" + id, true), type);
-	}
-
-	function _createFreshLocalVariable (type : Type) : LocalVariable {
-		var id = this._numUniqVar++;
-		return new LocalVariable(new Token("$a" + id, true), type);
-	}
-
-	function _createAnonymousFunction (parent : MemberFunctionDefinition, token : Token /* null for auto-gen */, args : ArgumentDeclaration[], returnType : Type) : MemberFunctionDefinition {
-		return this._createNamedFunction(parent, token, null, args, returnType);
-	}
-
-	function _createNamedFunction (parent : MemberFunctionDefinition, token : Token /* null for auto-gen */, nameToken : Token, args : ArgumentDeclaration[], returnType : Type) : MemberFunctionDefinition {
-		if (token == null) {
-			token = new Token("function", false);
-		}
-		var funcDef = new MemberFunctionDefinition(
-			token,
-			nameToken,
-			ClassDefinition.IS_STATIC,
-			returnType,
-			args,
-			[], // locals
-			[], // statements
-			[], // closures
-			null,
-			null
-		);
-		Util.linkFunction(funcDef, parent);
-		return funcDef;
-	}
-
-	function _createIdentityFunction (parent : MemberFunctionDefinition, type : Type) : FunctionExpression {
-		assert ! type.equals(Type.voidType);
-
-		var arg = this._createFreshArgumentDeclaration(type);
-		var identity = new MemberFunctionDefinition(
-			new Token("function", false),
-			null,	// name
-			ClassDefinition.IS_STATIC,
-			type,
-			[ arg ],
-			[],	// locals
-			[ new ReturnStatement(new Token("return", false), new LocalExpression(new Token(arg.getName().getValue(), true), arg)) ] : Statement[],
-			[],	// closures
-			null,	// lastToken
-			null
-		);
-		Util.linkFunction(identity, parent);
-		return new FunctionExpression(identity.getToken(), identity);
 	}
 
 }
