@@ -1403,6 +1403,15 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 		var genLocal = new LocalVariable(new Token("$generator", false), genType);
 		funcDef.getLocals().push(genLocal);
 
+		function findReturnLocal (funcDef : MemberFunctionDefinition) : LocalVariable {
+			var locals = funcDef.getLocals();
+			for (var i = 0; i < locals.length; ++i) {
+				if (locals[i].getName().getValue() == "$return")
+					return locals[i];
+			}
+			return null;
+		}
+
 		var cpsTransformer = new _CPSTransformCommand;
 		cpsTransformer.setCompiler(this._compiler);
 		cpsTransformer._doCPSTransform(funcDef, function (label : string, statements : Statement[]) : void {
@@ -1461,8 +1470,8 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 								[],
 								yieldingType),
 							new LocalExpression(
-								cpsTransformer._getTopReturnLocal().getName(),
-								cpsTransformer._getTopReturnLocal()))),
+								new Token("$return", true),
+								findReturnLocal(funcDef)))),
 					new ExpressionStatement(
 						new AssignmentExpression(
 							new Token("=", false),
