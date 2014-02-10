@@ -343,9 +343,6 @@ class JSXCommand {
 					case "generator-emulation":
 						tasks.push(function (mode : boolean) : () -> void {
 							return function () {
-								if (emitter instanceof JavaScriptEmitter) {
-									(emitter as JavaScriptEmitter).setES6Generator(! mode);
-								}
 								transformer.setGeneratorEmulationMode(mode);
 							};
 						}(mode));

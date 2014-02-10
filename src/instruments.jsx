@@ -1254,6 +1254,9 @@ class _GeneratorTransformer {
 
 	function _transformGenerator (funcDef : MemberFunctionDefinition) : void {
 		this._transformGeneratorCore(funcDef);
+
+		// drop IS_GENERATOR flag
+		funcDef.setFlags(funcDef.flags() & ~ClassDefinition.IS_GENERATOR);
 	}
 
 	function _transformGeneratorCore(funcDef : MemberFunctionDefinition) : void {
