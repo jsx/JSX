@@ -439,7 +439,7 @@ class JSXCommand {
 			}
 		}
 
-		transformer = new CodeTransformer(compiler, emitter);
+		transformer = new CodeTransformer(compiler);
 
 		optimizer = new Optimizer();
 

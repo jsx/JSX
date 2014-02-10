@@ -1423,16 +1423,14 @@ class _GeneratorTransformer {
 class CodeTransformer {
 
 	var _compiler : Compiler;
-	var _emitter : Emitter;
 
 	var _cpsTransformer : _CPSTransformer;
 	var _generatorTransformer : _GeneratorTransformer;
 
 	var _commands : string[];
 
-	function constructor (compiler : Compiler, emitter : Emitter) {
+	function constructor (compiler : Compiler) {
 		this._compiler = compiler;
-		this._emitter = emitter;
 
 		this._cpsTransformer = null;
 		this._generatorTransformer = null;
@@ -1477,10 +1475,6 @@ class CodeTransformer {
 
 	function getCompiler () : Compiler {
 		return this._compiler;
-	}
-
-	function getEmitter () : Emitter {
-		return this._emitter;
 	}
 
 	function performTransformation () : void {
