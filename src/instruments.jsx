@@ -984,8 +984,15 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 
 	static const IDENTIFIER = "cps";
 
+	var _transformYield : boolean;
+
 	function constructor () {
 		super(_CPSTransformCommand.IDENTIFIER);
+		this._transformYield = false;
+	}
+
+	function setTransformYield (flag : boolean) : void {
+		this._transformYield = flag;
 	}
 
 	function _functionIsTransformable (funcDef : MemberFunctionDefinition) : boolean {
@@ -996,7 +1003,7 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 		if (funcDef.getNameToken() != null && funcDef.name() == "constructor")
 			return false;
 		return funcDef.forEachStatement(function onStatement (statement) {
-			if (statement instanceof YieldStatement)
+			if (! this._transformYield && statement instanceof YieldStatement)
 				return false;
 			if (statement instanceof ForInStatement)
 				return false;
@@ -1403,6 +1410,13 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 		var genLocal = new LocalVariable(new Token("$generator", false), genType);
 		funcDef.getLocals().push(genLocal);
 
+		function getGlobalDispatchBody (funcDef : MemberFunctionDefinition) : Statement[] {
+			var funcStmt = funcDef.getStatements()[0] as FunctionStatement;
+			var whileStmt = funcStmt.getFuncDef().getStatements()[0] as WhileStatement;
+			var switchStmt = whileStmt.getStatements()[0] as SwitchStatement;
+			return switchStmt.getStatements();
+		}
+
 		function findReturnLocal (funcDef : MemberFunctionDefinition) : LocalVariable {
 			var locals = funcDef.getLocals();
 			for (var i = 0; i < locals.length; ++i) {
@@ -1414,7 +1428,11 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 
 		var cpsTransformer = new _CPSTransformCommand;
 		cpsTransformer.setCompiler(this._compiler);
-		cpsTransformer._doCPSTransform(funcDef, function (label : string, statements : Statement[]) : void {
+		cpsTransformer.setTransformYield(true);
+		cpsTransformer.transformFunction(funcDef);
+
+		var statements = getGlobalDispatchBody(funcDef);
+		for (var i = 0; i < statements.length; ++i) {
 			// replace yield statement
 			/*
 			  yield expr;
@@ -1422,12 +1440,11 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 			  break;
 
                           -> $generator.__value = expr;
-			     $generator.__next = $LABEL;
+			     $generator.__next = LABEL;
 			     return;
 			*/
-			if (3 <= statements.length && statements[statements.length - 3] instanceof YieldStatement) {
-				var idx = statements.length - 3;
-				statements.splice(idx, 3,
+			if (statements[i] instanceof YieldStatement) {
+				statements.splice(i, 3,
 					new ExpressionStatement(
 						new AssignmentExpression(
 							new Token("=", false),
@@ -1437,7 +1454,7 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 								new Token("__value", false),
 								[],
 								yieldingType.toNullableType()),
-							(statements[idx] as YieldStatement).getExpr())),
+							(statements[i] as YieldStatement).getExpr())),
 					new ExpressionStatement(
 						new AssignmentExpression(
 							new Token("=", false),
@@ -1447,8 +1464,9 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 								new Token("__next", true),
 								[],
 								Type.integerType.toNullableType()),
-							(statements[idx + 1] as ExpressionStatement).getExpr())),
+							(statements[i + 1] as ExpressionStatement).getExpr())),
 					new ReturnStatement(new Token("return", false), null));
+				i += 2;
 			}
 			// insert epilogue code
 			/*
@@ -1458,8 +1476,8 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 			     $generator.__next = -1;
 			     return;
 			*/
-			else if (statements.length == 1 && statements[statements.length - 1] instanceof ReturnStatement) {
-				statements.splice(statements.length - 1, 0,
+			else if (statements[i] instanceof ReturnStatement) {
+				statements.splice(i, 0,
 					new ExpressionStatement(
 						new AssignmentExpression(
 							new Token("=", false),
@@ -1482,8 +1500,9 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 								[],
 								Type.integerType.toNullableType()),
 							new IntegerLiteralExpression(new Token("-1", false)))));
+				i += 2;
 			}
-		});
+		}
 
 		// declare generator object
 		/*
