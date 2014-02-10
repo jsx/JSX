@@ -1521,15 +1521,9 @@ class CodeTransformer {
 	function setup (transformCommands : string[]) : Nullable.<string> {
 		this._commands = transformCommands;
 
-		// resolve dependencies
 		for (var i = 0; i < this._commands.length; ++i) {
 			switch (this._commands[i]) {
 			case "generator":
-				if (this._commands.slice(0, i).indexOf("cps") == -1) {
-					this._commands.splice(i, 0, "cps");
-					i++;
-				}
-				break;
 			case "cps":
 				// pass
 				break;
@@ -1582,6 +1576,7 @@ class CodeTransformer {
 
 	function _getAllClosures () : MemberFunctionDefinition[] {
 		var closures = new MemberFunctionDefinition[];
+		// deeper is first
 		this._compiler.forEachClassDef(function (parser, classDef) {
 			return classDef.forEachMember(function onMember(member) {
 				member.forEachClosure(function (funcDef) {
