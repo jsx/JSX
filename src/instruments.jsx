@@ -34,10 +34,10 @@ abstract class _StatementTransformer {
 
 	static var _statementCountMap = new Map.<number>;
 
-	var _transformer : CodeTransformer;
+	var _transformer : _CPSTransformer;
 	var _id : number;
 
-	function constructor (transformer : CodeTransformer, identifier : string) {
+	function constructor (transformer : _CPSTransformer, identifier : string) {
 		this._transformer = transformer;
 
 		if (_StatementTransformer._statementCountMap[identifier] == null) {
@@ -64,7 +64,7 @@ class _ConstructorInvocationStatementTransformer extends _StatementTransformer {
 
 	var _statement : ConstructorInvocationStatement;
 
-	function constructor (transformer : CodeTransformer, statement : ConstructorInvocationStatement) {
+	function constructor (transformer : _CPSTransformer, statement : ConstructorInvocationStatement) {
 		super(transformer, "CONSTRUCTOR-INVOCATION");
 		this._statement = statement;
 	}
@@ -83,7 +83,7 @@ class _ExpressionStatementTransformer extends _StatementTransformer {
 
 	var _statement : ExpressionStatement;
 
-	function constructor (transformer : CodeTransformer, statement : ExpressionStatement) {
+	function constructor (transformer : _CPSTransformer, statement : ExpressionStatement) {
 		super(transformer, "EXPRESSION");
 		this._statement = statement;
 	}
@@ -102,7 +102,7 @@ class _FunctionStatementTransformer extends _StatementTransformer {
 
 	var _statement : FunctionStatement;
 
-	function constructor (transformer : CodeTransformer, statement : FunctionStatement) {
+	function constructor (transformer : _CPSTransformer, statement : FunctionStatement) {
 		super(transformer, "FUNCTION");
 		this._statement = statement;
 	}
@@ -129,7 +129,7 @@ class _ReturnStatementTransformer extends _StatementTransformer {
 
 	var _statement : ReturnStatement;
 
-	function constructor (transformer : CodeTransformer, statement : ReturnStatement) {
+	function constructor (transformer : _CPSTransformer, statement : ReturnStatement) {
 		super(transformer, "RETURN");
 		this._statement = statement;
 	}
@@ -167,7 +167,7 @@ class _YieldStatementTransformer extends _StatementTransformer {
 
 	var _statement : YieldStatement;
 
-	function constructor (transformer : CodeTransformer, statement : YieldStatement) {
+	function constructor (transformer : _CPSTransformer, statement : YieldStatement) {
 		super(transformer, "YIELD");
 		this._statement = statement;
 	}
@@ -190,7 +190,7 @@ class _DeleteStatementTransformer extends _StatementTransformer {
 
 	var _statement : DeleteStatement;
 
-	function constructor (transformer : CodeTransformer, statement : DeleteStatement) {
+	function constructor (transformer : _CPSTransformer, statement : DeleteStatement) {
 		super(transformer, "DELETE");
 		this._statement = statement;
 	}
@@ -209,7 +209,7 @@ class _BreakStatementTransformer extends _StatementTransformer {
 
 	var _statement : BreakStatement;
 
-	function constructor (transformer : CodeTransformer, statement : BreakStatement) {
+	function constructor (transformer : _CPSTransformer, statement : BreakStatement) {
 		super(transformer, "BREAK");
 		this._statement = statement;
 	}
@@ -234,7 +234,7 @@ class _ContinueStatementTransformer extends _StatementTransformer {
 
 	var _statement : ContinueStatement;
 
-	function constructor (transformer : CodeTransformer, statement : ContinueStatement) {
+	function constructor (transformer : _CPSTransformer, statement : ContinueStatement) {
 		super(transformer, "CONTINUE");
 		this._statement = statement;
 	}
@@ -257,7 +257,7 @@ class _ContinueStatementTransformer extends _StatementTransformer {
 
 abstract class _LabellableStatementTransformer extends _StatementTransformer {
 
-	function constructor (transformer : CodeTransformer, identifier : string) {
+	function constructor (transformer : _CPSTransformer, identifier : string) {
 		super(transformer, identifier);
 	}
 
@@ -270,7 +270,7 @@ class _DoWhileStatementTransformer extends _LabellableStatementTransformer {
 
 	var _statement : DoWhileStatement;
 
-	function constructor (transformer : CodeTransformer, statement : DoWhileStatement) {
+	function constructor (transformer : _CPSTransformer, statement : DoWhileStatement) {
 		super(transformer, "DO-WHILE");
 		this._statement = statement;
 	}
@@ -329,7 +329,7 @@ class _ForInStatementTransformer extends _LabellableStatementTransformer {
 
 	var _statement : ForInStatement;
 
-	function constructor (transformer : CodeTransformer, statement : ForInStatement) {
+	function constructor (transformer : _CPSTransformer, statement : ForInStatement) {
 		super(transformer, "FOR-IN");
 		this._statement = statement;
 	}
@@ -355,7 +355,7 @@ class _ForStatementTransformer extends _LabellableStatementTransformer {
 
 	var _statement : ForStatement;
 
-	function constructor (transformer : CodeTransformer, statement : ForStatement) {
+	function constructor (transformer : _CPSTransformer, statement : ForStatement) {
 		super(transformer, "FOR");
 		this._statement = statement;
 	}
@@ -436,7 +436,7 @@ class _IfStatementTransformer extends _StatementTransformer {
 
 	var _statement : IfStatement;
 
-	function constructor (transformer : CodeTransformer, statement : IfStatement) {
+	function constructor (transformer : _CPSTransformer, statement : IfStatement) {
 		super(transformer, "IF");
 		this._statement = statement;
 	}
@@ -496,7 +496,7 @@ class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 
 	var _statement : SwitchStatement;
 
-	function constructor (transformer : CodeTransformer, statement : SwitchStatement) {
+	function constructor (transformer : _CPSTransformer, statement : SwitchStatement) {
 		super(transformer, "SWITCH");
 		this._statement = statement;
 		// create and register a stash
@@ -641,7 +641,7 @@ class _CaseStatementTransformer extends _StatementTransformer {
 
 	var _statement : CaseStatement;
 
-	function constructor (transformer : CodeTransformer, statement : CaseStatement) {
+	function constructor (transformer : _CPSTransformer, statement : CaseStatement) {
 		super(transformer, "CASE");
 		this._statement = statement;
 	}
@@ -660,7 +660,7 @@ class _DefaultStatementTransformer extends _StatementTransformer {
 
 	var _statement : DefaultStatement;
 
-	function constructor (transformer : CodeTransformer, statement : DefaultStatement) {
+	function constructor (transformer : _CPSTransformer, statement : DefaultStatement) {
 		super(transformer, "DEFAULT");
 		this._statement = statement;
 	}
@@ -679,7 +679,7 @@ class _WhileStatementTransformer extends _LabellableStatementTransformer {
 
 	var _statement : WhileStatement;
 
-	function constructor (transformer : CodeTransformer, statement : WhileStatement) {
+	function constructor (transformer : _CPSTransformer, statement : WhileStatement) {
 		super(transformer, "WHILE");
 		this._statement = statement;
 	}
@@ -738,7 +738,7 @@ class _TryStatementTransformer extends _StatementTransformer {
 
 	var _statement : TryStatement;
 
-	function constructor (transformer : CodeTransformer, statement : TryStatement) {
+	function constructor (transformer : _CPSTransformer, statement : TryStatement) {
 		super(transformer, "TRY");
 		this._statement = statement;
 	}
@@ -757,7 +757,7 @@ class _CatchStatementTransformer extends _StatementTransformer {
 
 	var _statement : CatchStatement;
 
-	function constructor (transformer : CodeTransformer, statement : CatchStatement) {
+	function constructor (transformer : _CPSTransformer, statement : CatchStatement) {
 		super(transformer, "CATCH");
 		this._statement = statement;
 	}
@@ -776,7 +776,7 @@ class _ThrowStatementTransformer extends _StatementTransformer {
 
 	var _statement : ThrowStatement;
 
-	function constructor (transformer : CodeTransformer, statement : ThrowStatement) {
+	function constructor (transformer : _CPSTransformer, statement : ThrowStatement) {
 		super(transformer, "THROW");
 		this._statement = statement;
 	}
@@ -795,7 +795,7 @@ class _AssertStatementTransformer extends _StatementTransformer {
 
 	var _statement : AssertStatement;
 
-	function constructor (transformer : CodeTransformer, statement : AssertStatement) {
+	function constructor (transformer : _CPSTransformer, statement : AssertStatement) {
 		super(transformer, "ASSERT");
 		this._statement = statement;
 	}
@@ -814,7 +814,7 @@ class _LogStatementTransformer extends _StatementTransformer {
 
 	var _statement : LogStatement;
 
-	function constructor (transformer : CodeTransformer, statement : LogStatement) {
+	function constructor (transformer : _CPSTransformer, statement : LogStatement) {
 		super(transformer, "LOG");
 		this._statement = statement;
 	}
@@ -833,7 +833,7 @@ class _DebuggerStatementTransformer extends _StatementTransformer {
 
 	var _statement : DebuggerStatement;
 
-	function constructor (transformer : CodeTransformer, statement : DebuggerStatement) {
+	function constructor (transformer : _CPSTransformer, statement : DebuggerStatement) {
 		super(transformer, "DEBUGGER");
 		this._statement = statement;
 	}
@@ -848,52 +848,14 @@ class _DebuggerStatementTransformer extends _StatementTransformer {
 
 }
 
-class CodeTransformer {
+class _CPSTransformer {
 
-	var _forceTransform : boolean;
-	var _transformExprs : boolean;
-	var _generatorEmulationMode : boolean;
+	static const ID = "cps";
 
-	var _compiler : Compiler;
-	var _emitter : Emitter;
+	var _transformer : CodeTransformer;
 
-	var _jsxGeneratorObject : TemplateClassDefinition;
-
-	function constructor () {
-		this._forceTransform = false;
-		this._transformExprs = true;
-		this._generatorEmulationMode = false;
-
-		this._jsxGeneratorObject = null;
-	}
-
-	function setup (compiler : Compiler, emitter : Emitter) : CodeTransformer {
-		this._compiler = compiler;
-		this._emitter = emitter;
-		var builtins = compiler.getBuiltinParsers()[0];
-
-		for (var i = 0; i < builtins._templateClassDefs.length; ++i) {
-			if (builtins._templateClassDefs[i].className() == "__jsx_generator_object") {
-				this._jsxGeneratorObject = builtins._templateClassDefs[i];
-				break;
-			}
-		}
-
-		assert this._jsxGeneratorObject != null;
-
-		return this;
-	}
-
-	function setForceTransform (force : boolean) : void {
-		this._forceTransform = force;
-	}
-
-	function setGeneratorEmulationMode (mode : boolean) : void {
-		this._generatorEmulationMode = mode;
-	}
-
-	function getEmitter () : Emitter {
-		return this._emitter;
+	function constructor (transformer : CodeTransformer) {
+		this._transformer = transformer;
 	}
 
 	function _functionIsTransformable (funcDef : MemberFunctionDefinition) : boolean {
@@ -912,50 +874,6 @@ class CodeTransformer {
 				return false;
 			return statement.forEachStatement(onStatement);
 		});
-	}
-
-	function _getAllClosures () : MemberFunctionDefinition[] {
-		var closures = new MemberFunctionDefinition[];
-		this._compiler.forEachClassDef(function (parser, classDef) {
-			return classDef.forEachMember(function onMember(member) {
-				member.forEachClosure(function (funcDef) {
-					return onMember(funcDef);
-				});
-				if (member instanceof MemberFunctionDefinition) {
-					closures.push(member as MemberFunctionDefinition);
-				}
-				return true;
-			});
-		});
-		return closures;
-	}
-
-	function performTransformation () : void {
-		if (this._forceTransform) {
-			this._getAllClosures().forEach((funcDef) -> {
-				if (this._functionIsTransformable(funcDef)) {
-					this._doCPSTransform(funcDef);
-				}
-			});
-		}
-		// transform generators
-		if (this._generatorEmulationMode || this._forceTransform) {
-			this._getAllClosures().forEach((funcDef) -> {
-				if (funcDef.isGenerator()) {
-					this._transformGenerator(funcDef);
-				}
-			});
-		}
-	}
-
-	function _transformGenerator (funcDef : MemberFunctionDefinition) : void {
-		this._transformGeneratorCore(funcDef);
-	}
-
-	var _transformingFuncDef : MemberFunctionDefinition = null;
-
-	function getTransformingFuncDef () : MemberFunctionDefinition {
-		return this._transformingFuncDef;
 	}
 
 	function _doCPSTransform (funcDef : MemberFunctionDefinition) : void {
@@ -1009,7 +927,7 @@ class CodeTransformer {
 
 		// create executor
 		var nextVar = new ArgumentDeclaration(new Token("$next", true), Type.integerType);
-		var executor = this._createNamedFunction(funcDef, null, new Token("$loop", true), [ nextVar ], Type.voidType);
+		var executor = this._transformer._createNamedFunction(funcDef, null, new Token("$loop", true), [ nextVar ], Type.voidType);
 		executor.setFuncLocal(loopVar);
 
 		// number labels
@@ -1122,182 +1040,10 @@ class CodeTransformer {
 				[ new IntegerLiteralExpression(new Token("0", false)) ] : Expression[])));
 	}
 
-	function _transformGeneratorCore(funcDef : MemberFunctionDefinition) : void {
-		var yieldingType = (funcDef.getReturnType().getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0];
+	var _transformingFuncDef : MemberFunctionDefinition = null;
 
-		// create a generator object
-		var genType = this._instantiateGeneratorType(yieldingType);
-		var genLocalName = "$generator" + CodeTransformer._getGeneratorNestDepth(funcDef);
-		var genLocal = new LocalVariable(new Token(genLocalName, false), genType);
-		funcDef.getLocals().push(genLocal);
-
-		this._doCPSTransform(funcDef, function (label : string, statements : Statement[]) : void {
-			// replace yield statement
-			/*
-			  yield expr;
-			  $next = LABEL;
-			  break;
-
-                          -> $generatorN.__value = expr;
-			     $generatorN.__next = $LABEL;
-			     return;
-			*/
-			if (3 <= statements.length && statements[statements.length - 3] instanceof YieldStatement) {
-				var idx = statements.length - 3;
-				statements.splice(idx, 3,
-					new ExpressionStatement(
-						new AssignmentExpression(
-							new Token("=", false),
-							new PropertyExpression(
-								new Token(".", false),
-								new LocalExpression(new Token(genLocalName, false), genLocal),
-								new Token("__value", false),
-								[],
-								yieldingType.toNullableType()),
-							(statements[idx] as YieldStatement).getExpr())),
-					new ExpressionStatement(
-						new AssignmentExpression(
-							new Token("=", false),
-							new PropertyExpression(
-								new Token(".", false),
-								new LocalExpression(new Token(genLocalName, false), genLocal),
-								new Token("__next", true),
-								[],
-								Type.integerType.toNullableType()),
-							(statements[idx + 1] as ExpressionStatement).getExpr())),
-					new ReturnStatement(new Token("return", false), null));
-			}
-			// insert epilogue code
-			/*
-			  return;
-
-			  -> $generatorN.__value = $returnM;
-			     $generatorN.__next = -1;
-			     return;
-			*/
-			else if (statements.length == 1 && statements[statements.length - 1] instanceof ReturnStatement) {
-				statements.splice(statements.length - 1, 0,
-					new ExpressionStatement(
-						new AssignmentExpression(
-							new Token("=", false),
-							new PropertyExpression(
-								new Token(".", false),
-								new LocalExpression(new Token(genLocalName, false), genLocal),
-								new Token("__value", false),
-								[],
-								yieldingType),
-							new LocalExpression(
-								this._getTopReturnLocal().getName(),
-								this._getTopReturnLocal()))),
-					new ExpressionStatement(
-						new AssignmentExpression(
-							new Token("=", false),
-							new PropertyExpression(
-								new Token(".", false),
-								new LocalExpression(new Token(genLocalName, false), genLocal),
-								new Token("__next", true),
-								[],
-								Type.integerType.toNullableType()),
-							new IntegerLiteralExpression(new Token("-1", false)))));
-			}
-		});
-
-		// declare generator object
-		/*
-		  var $generatorN = new __jsx_generator_object;
-		*/
-		var newExpr = new NewExpression(new Token("new", false), genType, []);
-		newExpr.analyze(new AnalysisContext([], null, null), null);
-		funcDef.getStatements().unshift(new ExpressionStatement(
-			new AssignmentExpression(
-				new Token("=", false),
-				new LocalExpression(new Token(genLocalName, false), genLocal),
-				newExpr)));
-
-		// replace entry point
-		/*
-		  $loop(0);
-		  return $returnN;
-
-		  -> $generatorN.__next = 0;
-		     $generatorN.__loop = $loop;
-		 */
-		var statements = funcDef.getStatements();
-		statements.splice(statements.length - 2, 2,
-			new ExpressionStatement(
-				new AssignmentExpression(
-					new Token("=", false),
-					new PropertyExpression(
-						new Token(".", false),
-						new LocalExpression(new Token(genLocalName, false), genLocal),
-						new Token("__next", true),
-						[],
-						Type.integerType.toNullableType()),
-					new IntegerLiteralExpression(new Token("0", false)))),
-			new ExpressionStatement(
-				new AssignmentExpression(
-					new Token("=", false),
-					new PropertyExpression(
-						new Token(".", false),
-						new LocalExpression(new Token(genLocalName, false), genLocal),
-						new Token("__loop", true),
-						[],
-						new StaticFunctionType(null, Type.voidType, [ Type.integerType ] : Type[], true)),
-					new LocalExpression(new Token("$loop", true), funcDef.getLocals()[funcDef.getLocals().length - 1]))));
-
-		// return the generator
-		statements.push(
-			new ReturnStatement(
-				new Token("return", false),
-				new LocalExpression(new Token("$generator", false), genLocal)));
-	}
-
-	function _instantiateGeneratorType (yieldingType : Type) : Type {
-		// instantiate generator
-		var genClassDef = this._jsxGeneratorObject.getParser().lookupTemplate(
-			[],	// errors
-			new TemplateInstantiationRequest(null, "__jsx_generator_object", [ yieldingType ] : Type[]),
-			(parser, classDef) -> null
-		);
-		assert genClassDef != null;
-
-		// semantic analysis
-		var createContext = function (parser : Parser) : AnalysisContext {
-			return new AnalysisContext(
-				[], // errors
-				parser,
-				function (parser : Parser, classDef : ClassDefinition) : ClassDefinition {
-					classDef.setAnalysisContextOfVariables(createContext(parser));
-					classDef.analyze(createContext(parser));
-					return classDef;
-				});
-		};
-		var parser = this._jsxGeneratorObject.getParser();
-		genClassDef.resolveTypes(createContext(parser));
-		genClassDef.analyze(createContext(parser));
-
-		return new ObjectType(genClassDef);
-	}
-
-	static function _getGeneratorNestDepth (funcDef : MemberFunctionDefinition) : number {
-		var depth = 0;
-		var parent : MemberFunctionDefinition;
-		while ((parent = funcDef.getParent()) != null) {
-			if (parent.isGenerator())
-				depth++;
-			funcDef = parent;
-		}
-		return depth;
-	}
-
-	static function _getFunctionNestDepth (funcDef : MemberFunctionDefinition) : number {
-		var depth = 0;
-		var parent : MemberFunctionDefinition;
-		while ((parent = funcDef.getParent()) != null) {
-			depth++;
-			funcDef = parent;
-		}
-		return depth;
+	function getTransformingFuncDef () : MemberFunctionDefinition {
+		return this._transformingFuncDef;
 	}
 
 	var _outputStatements = null : Statement[];
@@ -1357,18 +1103,6 @@ class CodeTransformer {
 
 	function _leaveFunction () : void {
 		this._returnLocals.pop();
-	}
-
-	var _numUniqVar = 0;
-
-	function _createFreshArgumentDeclaration (type : Type) : ArgumentDeclaration {
-		var id = this._numUniqVar++;
-		return new ArgumentDeclaration(new Token("$a" + id, true), type);
-	}
-
-	function _createFreshLocalVariable (type : Type) : LocalVariable {
-		var id = this._numUniqVar++;
-		return new LocalVariable(new Token("$a" + id, true), type);
 	}
 
 	function _getStatementTransformerFor (statement : Statement) : _StatementTransformer {
@@ -1492,6 +1226,307 @@ class CodeTransformer {
 	// 		return new _CommaExpressionTransformer(this, expr as CommaExpression);
 	// 	throw new Error("got unexpected type of expression: " + (expr != null ? JSON.stringify(expr.serialize()) : expr.toString()));
 	// }
+
+}
+
+class _GeneratorTransformer {
+
+	static const ID = "generator";
+
+	var _transformer : CodeTransformer;
+	var _cpsTransformer : _CPSTransformer;
+
+	var _jsxGeneratorObject : TemplateClassDefinition;
+
+	function constructor (transformer : CodeTransformer, cpsTransformer : _CPSTransformer) {
+		this._transformer = transformer;
+		this._cpsTransformer = cpsTransformer;
+
+		var builtins = transformer.getCompiler().getBuiltinParsers()[0];
+		for (var i = 0; i < builtins._templateClassDefs.length; ++i) {
+			if (builtins._templateClassDefs[i].className() == "__jsx_generator_object") {
+				this._jsxGeneratorObject = builtins._templateClassDefs[i];
+				break;
+			}
+		}
+		assert this._jsxGeneratorObject != null;
+	}
+
+	function _transformGenerator (funcDef : MemberFunctionDefinition) : void {
+		this._transformGeneratorCore(funcDef);
+	}
+
+	function _transformGeneratorCore(funcDef : MemberFunctionDefinition) : void {
+		var yieldingType = (funcDef.getReturnType().getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0];
+
+		// create a generator object
+		var genType = this._instantiateGeneratorType(yieldingType);
+		var genLocalName = "$generator" + CodeTransformer._getGeneratorNestDepth(funcDef);
+		var genLocal = new LocalVariable(new Token(genLocalName, false), genType);
+		funcDef.getLocals().push(genLocal);
+
+		this._cpsTransformer._doCPSTransform(funcDef, function (label : string, statements : Statement[]) : void {
+			// replace yield statement
+			/*
+			  yield expr;
+			  $next = LABEL;
+			  break;
+
+                          -> $generatorN.__value = expr;
+			     $generatorN.__next = $LABEL;
+			     return;
+			*/
+			if (3 <= statements.length && statements[statements.length - 3] instanceof YieldStatement) {
+				var idx = statements.length - 3;
+				statements.splice(idx, 3,
+					new ExpressionStatement(
+						new AssignmentExpression(
+							new Token("=", false),
+							new PropertyExpression(
+								new Token(".", false),
+								new LocalExpression(new Token(genLocalName, false), genLocal),
+								new Token("__value", false),
+								[],
+								yieldingType.toNullableType()),
+							(statements[idx] as YieldStatement).getExpr())),
+					new ExpressionStatement(
+						new AssignmentExpression(
+							new Token("=", false),
+							new PropertyExpression(
+								new Token(".", false),
+								new LocalExpression(new Token(genLocalName, false), genLocal),
+								new Token("__next", true),
+								[],
+								Type.integerType.toNullableType()),
+							(statements[idx + 1] as ExpressionStatement).getExpr())),
+					new ReturnStatement(new Token("return", false), null));
+			}
+			// insert epilogue code
+			/*
+			  return;
+
+			  -> $generatorN.__value = $returnM;
+			     $generatorN.__next = -1;
+			     return;
+			*/
+			else if (statements.length == 1 && statements[statements.length - 1] instanceof ReturnStatement) {
+				statements.splice(statements.length - 1, 0,
+					new ExpressionStatement(
+						new AssignmentExpression(
+							new Token("=", false),
+							new PropertyExpression(
+								new Token(".", false),
+								new LocalExpression(new Token(genLocalName, false), genLocal),
+								new Token("__value", false),
+								[],
+								yieldingType),
+							new LocalExpression(
+								this._cpsTransformer._getTopReturnLocal().getName(),
+								this._cpsTransformer._getTopReturnLocal()))),
+					new ExpressionStatement(
+						new AssignmentExpression(
+							new Token("=", false),
+							new PropertyExpression(
+								new Token(".", false),
+								new LocalExpression(new Token(genLocalName, false), genLocal),
+								new Token("__next", true),
+								[],
+								Type.integerType.toNullableType()),
+							new IntegerLiteralExpression(new Token("-1", false)))));
+			}
+		});
+
+		// declare generator object
+		/*
+		  var $generatorN = new __jsx_generator_object;
+		*/
+		var newExpr = new NewExpression(new Token("new", false), genType, []);
+		newExpr.analyze(new AnalysisContext([], null, null), null);
+		funcDef.getStatements().unshift(new ExpressionStatement(
+			new AssignmentExpression(
+				new Token("=", false),
+				new LocalExpression(new Token(genLocalName, false), genLocal),
+				newExpr)));
+
+		// replace entry point
+		/*
+		  $loop(0);
+		  return $returnN;
+
+		  -> $generatorN.__next = 0;
+		     $generatorN.__loop = $loop;
+		 */
+		var statements = funcDef.getStatements();
+		statements.splice(statements.length - 2, 2,
+			new ExpressionStatement(
+				new AssignmentExpression(
+					new Token("=", false),
+					new PropertyExpression(
+						new Token(".", false),
+						new LocalExpression(new Token(genLocalName, false), genLocal),
+						new Token("__next", true),
+						[],
+						Type.integerType.toNullableType()),
+					new IntegerLiteralExpression(new Token("0", false)))),
+			new ExpressionStatement(
+				new AssignmentExpression(
+					new Token("=", false),
+					new PropertyExpression(
+						new Token(".", false),
+						new LocalExpression(new Token(genLocalName, false), genLocal),
+						new Token("__loop", true),
+						[],
+						new StaticFunctionType(null, Type.voidType, [ Type.integerType ] : Type[], true)),
+					new LocalExpression(new Token("$loop", true), funcDef.getLocals()[funcDef.getLocals().length - 1]))));
+
+		// return the generator
+		statements.push(
+			new ReturnStatement(
+				new Token("return", false),
+				new LocalExpression(new Token("$generator", false), genLocal)));
+	}
+
+	function _instantiateGeneratorType (yieldingType : Type) : Type {
+		// instantiate generator
+		var genClassDef = this._jsxGeneratorObject.getParser().lookupTemplate(
+			[],	// errors
+			new TemplateInstantiationRequest(null, "__jsx_generator_object", [ yieldingType ] : Type[]),
+			(parser, classDef) -> null
+		);
+		assert genClassDef != null;
+
+		// semantic analysis
+		var createContext = function (parser : Parser) : AnalysisContext {
+			return new AnalysisContext(
+				[], // errors
+				parser,
+				function (parser : Parser, classDef : ClassDefinition) : ClassDefinition {
+					classDef.setAnalysisContextOfVariables(createContext(parser));
+					classDef.analyze(createContext(parser));
+					return classDef;
+				});
+		};
+		var parser = this._jsxGeneratorObject.getParser();
+		genClassDef.resolveTypes(createContext(parser));
+		genClassDef.analyze(createContext(parser));
+
+		return new ObjectType(genClassDef);
+	}
+
+}
+
+class CodeTransformer {
+
+	var _forceTransform : boolean;
+	var _transformExprs : boolean;
+	var _generatorEmulationMode : boolean;
+
+	var _compiler : Compiler;
+	var _emitter : Emitter;
+
+	var _cpsTransformer : _CPSTransformer;
+	var _generatorTransformer : _GeneratorTransformer;
+
+	function constructor () {
+		this._forceTransform = false;
+		this._transformExprs = true;
+		this._generatorEmulationMode = false;
+		this._cpsTransformer = null;
+		this._generatorTransformer = null;
+	}
+
+	function setup (compiler : Compiler, emitter : Emitter) : CodeTransformer {
+		this._compiler = compiler;
+		this._emitter = emitter;
+
+		this._cpsTransformer = new _CPSTransformer(this);
+		this._generatorTransformer = new _GeneratorTransformer(this, this._cpsTransformer);
+
+		return this;
+	}
+
+	function setForceTransform (force : boolean) : void {
+		this._forceTransform = force;
+	}
+
+	function setGeneratorEmulationMode (mode : boolean) : void {
+		this._generatorEmulationMode = mode;
+	}
+
+	function getCompiler () : Compiler {
+		return this._compiler;
+	}
+
+	function getEmitter () : Emitter {
+		return this._emitter;
+	}
+
+	function performTransformation () : void {
+		if (this._forceTransform) {
+			this._getAllClosures().forEach((funcDef) -> {
+				if (this._cpsTransformer._functionIsTransformable(funcDef)) {
+					this._cpsTransformer._doCPSTransform(funcDef);
+				}
+			});
+		}
+		// transform generators
+		if (this._generatorEmulationMode || this._forceTransform) {
+			this._getAllClosures().forEach((funcDef) -> {
+				if (funcDef.isGenerator()) {
+					this._generatorTransformer._transformGenerator(funcDef);
+				}
+			});
+		}
+	}
+
+	function _getAllClosures () : MemberFunctionDefinition[] {
+		var closures = new MemberFunctionDefinition[];
+		this._compiler.forEachClassDef(function (parser, classDef) {
+			return classDef.forEachMember(function onMember(member) {
+				member.forEachClosure(function (funcDef) {
+					return onMember(funcDef);
+				});
+				if (member instanceof MemberFunctionDefinition) {
+					closures.push(member as MemberFunctionDefinition);
+				}
+				return true;
+			});
+		});
+		return closures;
+	}
+
+	static function _getFunctionNestDepth (funcDef : MemberFunctionDefinition) : number {
+		var depth = 0;
+		var parent : MemberFunctionDefinition;
+		while ((parent = funcDef.getParent()) != null) {
+			depth++;
+			funcDef = parent;
+		}
+		return depth;
+	}
+
+	static function _getGeneratorNestDepth (funcDef : MemberFunctionDefinition) : number {
+		var depth = 0;
+		var parent : MemberFunctionDefinition;
+		while ((parent = funcDef.getParent()) != null) {
+			if (parent.isGenerator())
+				depth++;
+			funcDef = parent;
+		}
+		return depth;
+	}
+
+	var _numUniqVar = 0;
+
+	function _createFreshArgumentDeclaration (type : Type) : ArgumentDeclaration {
+		var id = this._numUniqVar++;
+		return new ArgumentDeclaration(new Token("$a" + id, true), type);
+	}
+
+	function _createFreshLocalVariable (type : Type) : LocalVariable {
+		var id = this._numUniqVar++;
+		return new LocalVariable(new Token("$a" + id, true), type);
+	}
 
 	function _createAnonymousFunction (parent : MemberFunctionDefinition, token : Token /* null for auto-gen */, args : ArgumentDeclaration[], returnType : Type) : MemberFunctionDefinition {
 		return this._createNamedFunction(parent, token, null, args, returnType);
