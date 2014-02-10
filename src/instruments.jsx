@@ -1429,8 +1429,8 @@ class CodeTransformer {
 
 	var _commands : string[];
 
-	function constructor (compiler : Compiler) {
-		this._compiler = compiler;
+	function constructor () {
+		this._compiler = null;
 
 		this._cpsTransformer = null;
 		this._generatorTransformer = null;
@@ -1458,23 +1458,25 @@ class CodeTransformer {
 			}
 		}
 
-		// setup transformers
-		try {
-			if (this._commands.indexOf("cps") != -1 || this._commands.indexOf("generator") != -1) {
-				this._cpsTransformer = new _CPSTransformer(this);
-			}
-			if (this._commands.indexOf("generator") != -1) {
-				this._generatorTransformer = new _GeneratorTransformer(this, this._cpsTransformer);
-			}
-		} catch (e : Error) {
-			return "transformer construction errored '" + e.message + "'";
-		}
-
 		return null;
 	}
 
 	function getCompiler () : Compiler {
 		return this._compiler;
+	}
+
+	function setCompiler (compiler : Compiler) : CodeTransformer {
+		this._compiler = compiler;
+
+		// setup transformers
+		if (this._commands.indexOf("cps") != -1 || this._commands.indexOf("generator") != -1) {
+			this._cpsTransformer = new _CPSTransformer(this);
+		}
+		if (this._commands.indexOf("generator") != -1) {
+			this._generatorTransformer = new _GeneratorTransformer(this, this._cpsTransformer);
+		}
+
+		return this;
 	}
 
 	function performTransformation () : void {

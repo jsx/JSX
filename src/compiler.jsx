@@ -422,7 +422,7 @@ class Compiler {
 
 	function _transform () : void {
 		if (this._transformer != null)
-			this._transformer.performTransformation();
+			this._transformer.setCompiler(this).performTransformation();
 	}
 
 	function _optimize () : void {
