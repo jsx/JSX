@@ -1249,9 +1249,8 @@ class _GeneratorTransformer {
 				break;
 			}
 		}
-		if (this._jsxGeneratorObject == null) {
-			throw new Error("logic flaw! internal built-in class '__jsx_generator_object' not found");
-		}
+
+		assert this._jsxGeneratorObject != null;
 	}
 
 	function _transformGenerator (funcDef : MemberFunctionDefinition) : void {
