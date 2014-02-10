@@ -1422,10 +1422,6 @@ class _GeneratorTransformer {
 
 class CodeTransformer {
 
-	var _forceTransform : boolean;
-	var _transformExprs : boolean;
-	var _generatorEmulationMode : boolean;
-
 	var _compiler : Compiler;
 	var _emitter : Emitter;
 
@@ -1438,9 +1434,6 @@ class CodeTransformer {
 		this._compiler = compiler;
 		this._emitter = emitter;
 
-		this._forceTransform = false;
-		this._transformExprs = true;
-		this._generatorEmulationMode = false;
 		this._cpsTransformer = null;
 		this._generatorTransformer = null;
 
@@ -1449,18 +1442,12 @@ class CodeTransformer {
 
 	function setup (transformCommands : string[]) : Nullable.<string> {
 		this._commands = transformCommands;
-		if (this._forceTransform) {
-			this._commands.push("cps");
-		}
-		if (this._generatorEmulationMode || this._forceTransform) {
-			this._commands.push("generator");
-		}
 
 		// resolve dependencies
 		for (var i = 0; i < this._commands.length; ++i) {
 			switch (this._commands[i]) {
 			case "generator":
-				if (this._commands[i].slice(0, i).indexOf("cps") == -1) {
+				if (this._commands.slice(0, i).indexOf("cps") == -1) {
 					this._commands.splice(i, 0, "cps");
 					i++;
 				}
@@ -1469,7 +1456,7 @@ class CodeTransformer {
 				// pass
 				break;
 			default:
-				return "unknown transformation command: " + cmd;
+				return "unknown transformation command: " + this._commands[i];
 			}
 		}
 
@@ -1486,14 +1473,6 @@ class CodeTransformer {
 		}
 
 		return null;
-	}
-
-	function setForceTransform (force : boolean) : void {
-		this._forceTransform = force;
-	}
-
-	function setGeneratorEmulationMode (mode : boolean) : void {
-		this._generatorEmulationMode = mode;
 	}
 
 	function getCompiler () : Compiler {

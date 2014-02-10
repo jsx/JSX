@@ -350,18 +350,22 @@ class JSXCommand {
 						}(mode));
 						break NEXTOPT;
 					case "generator-emulation":
-						tasks.push(function (mode : boolean) : () -> void {
-							return function () {
-								transformer.setGeneratorEmulationMode(mode);
-							};
-						}(mode));
+						if (mode) {
+							transformCommands.push("generator");
+						} else {
+							transformCommands = transformCommands.filter((cmd) -> {
+								return cmd != "generator";
+							});
+						}
 						break NEXTOPT;
 					case "cps-transform":
-						tasks.push(function (mode : boolean) : () -> void {
-							return function () {
-								transformer.setForceTransform(mode);
-							};
-						}(mode));
+						if (mode) {
+							transformCommands.push("cps");
+						} else {
+							transformCommands = transformCommands.filter((cmd) -> {
+								return cmd != "cps";
+							});
+						}
 						break NEXTOPT;
 					default:
 						break;
