@@ -1456,6 +1456,23 @@ class CodeTransformer {
 			this._commands.push("generator");
 		}
 
+		// resolve dependencies
+		for (var i = 0; i < this._commands.length; ++i) {
+			switch (this._commands[i]) {
+			case "generator":
+				if (this._commands[i].slice(0, i).indexOf("cps") == -1) {
+					this._commands.splice(i, 0, "cps");
+					i++;
+				}
+				break;
+			case "cps":
+				// pass
+				break;
+			default:
+				return "unknown transformation command: " + cmd;
+			}
+		}
+
 		// setup transformers
 		try {
 			if (this._commands.indexOf("cps") != -1 || this._commands.indexOf("generator") != -1) {
@@ -1465,7 +1482,7 @@ class CodeTransformer {
 				this._generatorTransformer = new _GeneratorTransformer(this, this._cpsTransformer);
 			}
 		} catch (e : Error) {
-			return e.message;
+			return "transformer construction errored '" + e.message + "'";
 		}
 
 		return null;
