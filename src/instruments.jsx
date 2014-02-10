@@ -1412,8 +1412,8 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 			  $next = LABEL;
 			  break;
 
-                          -> $generatorN.__value = expr;
-			     $generatorN.__next = $LABEL;
+                          -> $generator.__value = expr;
+			     $generator.__next = $LABEL;
 			     return;
 			*/
 			if (3 <= statements.length && statements[statements.length - 3] instanceof YieldStatement) {
@@ -1445,8 +1445,8 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 			/*
 			  return;
 
-			  -> $generatorN.__value = $returnM;
-			     $generatorN.__next = -1;
+			  -> $generator.__value = $return;
+			     $generator.__next = -1;
 			     return;
 			*/
 			else if (statements.length == 1 && statements[statements.length - 1] instanceof ReturnStatement) {
@@ -1478,7 +1478,7 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 
 		// declare generator object
 		/*
-		  var $generatorN = new __jsx_generator_object;
+		  var $generator = new __jsx_generator_object;
 		*/
 		var newExpr = new NewExpression(new Token("new", false), genType, []);
 		newExpr.analyze(new AnalysisContext([], null, null), null);
@@ -1491,10 +1491,10 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 		// replace entry point
 		/*
 		  $loop(0);
-		  return $returnN;
+		  return $return;
 
-		  -> $generatorN.__next = 0;
-		     $generatorN.__loop = $loop;
+		  -> $generator.__next = 0;
+		     $generator.__loop = $loop;
 		 */
 		var statements = funcDef.getStatements();
 		statements.splice(statements.length - 2, 2,
