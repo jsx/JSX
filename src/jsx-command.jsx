@@ -446,11 +446,15 @@ class JSXCommand {
 			return 1;
 		}
 
-		transformer.setup(transformCommands);
+		var err = transformer.setup(transformCommands);
+		if (err != null) {
+			platform.error(err);
+			return 1;
+		}
 
 		compiler.setTransformer(transformer);
 
-		var err = optimizer.setup(optimizeCommands);
+		err = optimizer.setup(optimizeCommands);
 		if (err != null) {
 			platform.error(err);
 			return 1;

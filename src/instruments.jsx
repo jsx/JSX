@@ -1249,7 +1249,9 @@ class _GeneratorTransformer {
 				break;
 			}
 		}
-		assert this._jsxGeneratorObject != null;
+		if (this._jsxGeneratorObject == null) {
+			throw new Error("logic flaw! internal built-in class '__jsx_generator_object' not found");
+		}
 	}
 
 	function _transformGenerator (funcDef : MemberFunctionDefinition) : void {
@@ -1445,7 +1447,7 @@ class CodeTransformer {
 		this._commands = null;
 	}
 
-	function setup (transformCommands : string[]) : CodeTransformer {
+	function setup (transformCommands : string[]) : Nullable.<string> {
 		this._commands = transformCommands;
 		if (this._forceTransform) {
 			this._commands.push("cps");
@@ -1455,14 +1457,18 @@ class CodeTransformer {
 		}
 
 		// setup transformers
-		if (this._commands.indexOf("cps") || this._commands.indexOf("generator")) {
-			this._cpsTransformer = new _CPSTransformer(this);
-		}
-		if (this._commands.indexOf("generator")) {
-			this._generatorTransformer = new _GeneratorTransformer(this, this._cpsTransformer);
+		try {
+			if (this._commands.indexOf("cps") || this._commands.indexOf("generator")) {
+				this._cpsTransformer = new _CPSTransformer(this);
+			}
+			if (this._commands.indexOf("generator")) {
+				this._generatorTransformer = new _GeneratorTransformer(this, this._cpsTransformer);
+			}
+		} catch (e : Error) {
+			return e.message;
 		}
 
-		return this;
+		return null;
 	}
 
 	function setForceTransform (force : boolean) : void {
