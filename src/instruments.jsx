@@ -1020,8 +1020,7 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 
 		var returnLocal : LocalVariable = null;
 		if (! Type.voidType.equals(funcDef.getReturnType())) {
-			var returnLocalName = "$return" + _Util._getFunctionNestDepth(funcDef);
-			returnLocal = new LocalVariable(new Token(returnLocalName, false), funcDef.getReturnType());
+			returnLocal = new LocalVariable(new Token("$return", false), funcDef.getReturnType());
 			funcDef.getLocals().push(returnLocal);
 			this._enterFunction(returnLocal);
 		}
@@ -1401,8 +1400,7 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 
 		// create a generator object
 		var genType = this._instantiateGeneratorType(yieldingType);
-		var genLocalName = "$generator" + _Util._getGeneratorNestDepth(funcDef);
-		var genLocal = new LocalVariable(new Token(genLocalName, false), genType);
+		var genLocal = new LocalVariable(new Token("$generator", false), genType);
 		funcDef.getLocals().push(genLocal);
 
 		var cpsTransformer = new _CPSTransformCommand;
@@ -1426,7 +1424,7 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 							new Token("=", false),
 							new PropertyExpression(
 								new Token(".", false),
-								new LocalExpression(new Token(genLocalName, false), genLocal),
+								new LocalExpression(new Token("$generator", false), genLocal),
 								new Token("__value", false),
 								[],
 								yieldingType.toNullableType()),
@@ -1436,7 +1434,7 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 							new Token("=", false),
 							new PropertyExpression(
 								new Token(".", false),
-								new LocalExpression(new Token(genLocalName, false), genLocal),
+								new LocalExpression(new Token("$generator", false), genLocal),
 								new Token("__next", true),
 								[],
 								Type.integerType.toNullableType()),
@@ -1458,7 +1456,7 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 							new Token("=", false),
 							new PropertyExpression(
 								new Token(".", false),
-								new LocalExpression(new Token(genLocalName, false), genLocal),
+								new LocalExpression(new Token("$generator", false), genLocal),
 								new Token("__value", false),
 								[],
 								yieldingType),
@@ -1470,7 +1468,7 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 							new Token("=", false),
 							new PropertyExpression(
 								new Token(".", false),
-								new LocalExpression(new Token(genLocalName, false), genLocal),
+								new LocalExpression(new Token("$generator", false), genLocal),
 								new Token("__next", true),
 								[],
 								Type.integerType.toNullableType()),
@@ -1487,7 +1485,7 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 		funcDef.getStatements().unshift(new ExpressionStatement(
 			new AssignmentExpression(
 				new Token("=", false),
-				new LocalExpression(new Token(genLocalName, false), genLocal),
+				new LocalExpression(new Token("$generator", false), genLocal),
 				newExpr)));
 
 		// replace entry point
@@ -1505,7 +1503,7 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 					new Token("=", false),
 					new PropertyExpression(
 						new Token(".", false),
-						new LocalExpression(new Token(genLocalName, false), genLocal),
+						new LocalExpression(new Token("$generator", false), genLocal),
 						new Token("__next", true),
 						[],
 						Type.integerType.toNullableType()),
@@ -1515,7 +1513,7 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 					new Token("=", false),
 					new PropertyExpression(
 						new Token(".", false),
-						new LocalExpression(new Token(genLocalName, false), genLocal),
+						new LocalExpression(new Token("$generator", false), genLocal),
 						new Token("__loop", true),
 						[],
 						new StaticFunctionType(null, Type.voidType, [ Type.integerType ] : Type[], true)),
