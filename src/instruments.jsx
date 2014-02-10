@@ -1017,12 +1017,10 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 		if (! this._functionIsTransformable(funcDef))
 			return;
 
-		this._doCPSTransform(funcDef, function (name, statements) {
-			// do nothing
-		});
+		this._doCPSTransform(funcDef);
 	}
 
-	function _doCPSTransform (funcDef : MemberFunctionDefinition, bbCallback : (string, Statement[]) -> void) : void {
+	function _doCPSTransform (funcDef : MemberFunctionDefinition) : void {
 		this._transformingFuncDef = funcDef;
 
 		var returnLocal : LocalVariable = null;
@@ -1050,7 +1048,7 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 		funcDef._statements = statements;
 
 		// replace goto statements with calls of closures
-		this._eliminateGotos(funcDef, bbCallback);
+		this._eliminateGotos(funcDef);
 
 		if (! Type.voidType.equals(funcDef.getReturnType())) {
 			funcDef._statements.push(new ReturnStatement(new Token("return", false), new LocalExpression(returnLocal.getName(), returnLocal)));
@@ -1058,7 +1056,7 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 		}
 	}
 
-	function _eliminateGotos (funcDef : MemberFunctionDefinition, bbCallback : (string, Statement[]) -> void) : void {
+	function _eliminateGotos (funcDef : MemberFunctionDefinition) : void {
 		var statements = funcDef.getStatements();
 
 		var loopVar = new LocalVariable(new Token("$loop", true), new StaticFunctionType(null, Type.voidType, [ Type.integerType ] : Type[], true));
@@ -1147,7 +1145,6 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 				}
 				body.push(statements[i]);
 			}
-			bbCallback(currentLabel.getName(), body);
 
 			// create a basic block
 			basicBlocks = basicBlocks.concat(makeBasicBlock(currentLabel.getName(), body));
