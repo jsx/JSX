@@ -1430,20 +1430,37 @@ class CodeTransformer {
 	var _cpsTransformer : _CPSTransformer;
 	var _generatorTransformer : _GeneratorTransformer;
 
-	function constructor () {
+	var _commands : string[];
+
+	function constructor (compiler : Compiler, emitter : Emitter) {
+		this._compiler = compiler;
+		this._emitter = emitter;
+
 		this._forceTransform = false;
 		this._transformExprs = true;
 		this._generatorEmulationMode = false;
 		this._cpsTransformer = null;
 		this._generatorTransformer = null;
+
+		this._commands = null;
 	}
 
-	function setup (compiler : Compiler, emitter : Emitter) : CodeTransformer {
-		this._compiler = compiler;
-		this._emitter = emitter;
+	function setup (transformCommands : string[]) : CodeTransformer {
+		this._commands = transformCommands;
+		if (this._forceTransform) {
+			this._commands.push("cps");
+		}
+		if (this._generatorEmulationMode || this._forceTransform) {
+			this._commands.push("generator");
+		}
 
-		this._cpsTransformer = new _CPSTransformer(this);
-		this._generatorTransformer = new _GeneratorTransformer(this, this._cpsTransformer);
+		// setup transformers
+		if (this._commands.indexOf("cps") || this._commands.indexOf("generator")) {
+			this._cpsTransformer = new _CPSTransformer(this);
+		}
+		if (this._commands.indexOf("generator")) {
+			this._generatorTransformer = new _GeneratorTransformer(this, this._cpsTransformer);
+		}
 
 		return this;
 	}
@@ -1465,21 +1482,24 @@ class CodeTransformer {
 	}
 
 	function performTransformation () : void {
-		if (this._forceTransform) {
-			this._getAllClosures().forEach((funcDef) -> {
-				if (this._cpsTransformer._functionIsTransformable(funcDef)) {
-					this._cpsTransformer._doCPSTransform(funcDef);
-				}
-			});
-		}
-		// transform generators
-		if (this._generatorEmulationMode || this._forceTransform) {
-			this._getAllClosures().forEach((funcDef) -> {
-				if (funcDef.isGenerator()) {
-					this._generatorTransformer._transformGenerator(funcDef);
-				}
-			});
-		}
+		this._commands.forEach((cmd) -> {
+			switch (cmd) {
+			case "cps":
+				this._getAllClosures().forEach((funcDef) -> {
+					if (this._cpsTransformer._functionIsTransformable(funcDef)) {
+						this._cpsTransformer._doCPSTransform(funcDef);
+					}
+				});
+				break;
+			case "generator":
+				this._getAllClosures().forEach((funcDef) -> {
+					if (funcDef.isGenerator()) {
+						this._generatorTransformer._transformGenerator(funcDef);
+					}
+				});
+				break;
+			}
+		});
 	}
 
 	function _getAllClosures () : MemberFunctionDefinition[] {
