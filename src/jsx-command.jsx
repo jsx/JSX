@@ -108,6 +108,7 @@ class JSXCommand {
 		var setBootstrapMode = function (sourceFile : string) : void {};
 		var runImmediately = false;
 		var optimizeCommands = new string[];
+		var transformCommands = new string[];
 		var opt, optarg;
 		while ((opt = getopt()) != null) {
 		NEXTOPT:
@@ -200,6 +201,14 @@ class JSXCommand {
 					} else {
 						optimizeCommands.push(command);
 					}
+				});
+				break;
+			case "--transform":
+				if ((optarg = getoptarg()) == null) {
+					return 1;
+				}
+				optarg.split(",").forEach((command) -> {
+					transformCommands.push(command);
 				});
 				break;
 			case "--disable-optimize":
@@ -341,21 +350,22 @@ class JSXCommand {
 						}(mode));
 						break NEXTOPT;
 					case "generator-emulation":
-						tasks.push(function (mode : boolean) : () -> void {
-							return function () {
-								if (emitter instanceof JavaScriptEmitter) {
-									(emitter as JavaScriptEmitter).setES6Generator(! mode);
-								}
-								transformer.setGeneratorEmulationMode(mode);
-							};
-						}(mode));
+						if (mode) {
+							transformCommands.push("generator");
+						} else {
+							transformCommands = transformCommands.filter((cmd) -> {
+								return cmd != "generator";
+							});
+						}
 						break NEXTOPT;
 					case "cps-transform":
-						tasks.push(function (mode : boolean) : () -> void {
-							return function () {
-								transformer.setForceTransform(mode);
-							};
-						}(mode));
+						if (mode) {
+							transformCommands.push("cps");
+						} else {
+							transformCommands = transformCommands.filter((cmd) -> {
+								return cmd != "cps";
+							});
+						}
 						break NEXTOPT;
 					default:
 						break;
@@ -429,9 +439,9 @@ class JSXCommand {
 			}
 		}
 
-		optimizer = new Optimizer();
-
 		transformer = new CodeTransformer();
+
+		optimizer = new Optimizer();
 
 		tasks.forEach(function(proc) { proc(); });
 
@@ -440,16 +450,21 @@ class JSXCommand {
 			return 1;
 		}
 
-		var err = optimizer.setup(optimizeCommands);
+		var err = transformer.setup(transformCommands);
 		if (err != null) {
 			platform.error(err);
 			return 1;
 		}
 
+		compiler.setTransformer(transformer);
+
+		err = optimizer.setup(optimizeCommands);
+		if (err != null) {
+			platform.error(err);
+			return 1;
+		}
 
 		compiler.setOptimizer(optimizer);
-
-		compiler.setTransformer(transformer);
 
 		var result = compiler.compile();
 
