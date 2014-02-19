@@ -455,6 +455,14 @@ class StringLiteralExpression extends LeafExpression {
 		return Type.stringType;
 	}
 
+	function tokenIsECMAConformant() : boolean {
+		return this._token.getValue().match(/^(?:"""|''')/) == null;
+	}
+
+	function getDecoded() : string {
+		return Util.decodeStringLiteral(this._token.getValue());
+	}
+
 }
 
 class RegExpLiteralExpression extends LeafExpression {

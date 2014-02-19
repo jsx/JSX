@@ -1768,7 +1768,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 					var foldedExpr = this._toFoldedExpr(member.getInitialValue(), member.getType());
 					if (foldedExpr != null) {
 						foldedExpr = this._toFoldedExpr(foldedExpr, propertyExpr.getType());
-						if (foldedExpr != null && !(foldedExpr instanceof StringLiteralExpression && Util.decodeStringLiteral((foldedExpr as StringLiteralExpression).getToken().getValue()).length > _FoldConstantCommand.LONG_STRING_LITERAL)) {
+						if (foldedExpr != null && !(foldedExpr instanceof StringLiteralExpression && (foldedExpr as StringLiteralExpression).getDecoded().length > _FoldConstantCommand.LONG_STRING_LITERAL)) {
 							this.log("folding property " + member.getNotation() + " at " + propertyExpr.getToken().getFilename() + ":" + propertyExpr.getToken().getLineNumber() as string);
 							replaceCb(foldedExpr);
 						}
@@ -1779,7 +1779,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 				if (propertyExpr.getExpr() instanceof StringLiteralExpression) {
 					if (propertyExpr.getIdentifierToken().getValue() == "length") {
 						replaceCb(new NumberLiteralExpression(new Token(
-							Util.decodeStringLiteral(propertyExpr.getExpr().getToken().getValue()).length as string
+							(propertyExpr.getExpr() as StringLiteralExpression).getDecoded().length as string
 						)));
 					}
 				}
@@ -1828,8 +1828,8 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 					new StringLiteralExpression(
 						new Token(
 							Util.encodeStringLiteral(
-								Util.decodeStringLiteral((firstExpr as StringLiteralExpression).getToken().getValue()) +
-								Util.decodeStringLiteral((secondExpr as StringLiteralExpression).getToken().getValue())),
+								(firstExpr as StringLiteralExpression).getDecoded() +
+								(secondExpr as StringLiteralExpression).getDecoded()),
 							false)));
 			}
 
@@ -1988,7 +1988,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 			switch(propertyExpr.getIdentifierToken().getValue()) {
 			case "charCodeAt":
 				this.log("folding " + member.getNotation());
-				var recvStr = Util.decodeStringLiteral(propertyExpr.getExpr().getToken().getValue());
+				var recvStr = (propertyExpr.getExpr() as StringLiteralExpression).getDecoded();
 				replaceCb(new NumberLiteralExpression(new Token(
 					recvStr.charCodeAt(argAsNumber(0)) as string)));
 				break;
@@ -2001,7 +2001,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 		var secondExpr = expr.getSecondExpr();
 		var isEqual = null : Nullable.<boolean>; // tri-state
 		if (firstExpr instanceof StringLiteralExpression && secondExpr instanceof StringLiteralExpression) {
-			isEqual = Util.decodeStringLiteral(firstExpr.getToken().getValue()) == Util.decodeStringLiteral(secondExpr.getToken().getValue());
+			isEqual = (firstExpr as StringLiteralExpression).getDecoded() == (secondExpr as StringLiteralExpression).getDecoded();
 		} else if (this._isIntegerOrNumberLiteralExpression(firstExpr) && this._isIntegerOrNumberLiteralExpression(secondExpr)) {
 			isEqual = firstExpr.getToken().getValue() as number == secondExpr.getToken().getValue() as number;
 		}
@@ -2190,13 +2190,13 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 				this.log("folding type cast: string literal as number");
 				replaceCb(
 					new NumberLiteralExpression(
-						new Token(Util.decodeStringLiteral(baseExpr.getToken().getValue()) as number as string, false)));
+						new Token((baseExpr as StringLiteralExpression).getDecoded() as number as string, false)));
 			}
 			else if (baseExpr instanceof IntegerLiteralExpression) {
 				this.log("folding type cast: int literal as number");
 				replaceCb(
 					new NumberLiteralExpression(
-						new Token(baseExpr.getToken().getValue() as number as string, false)));
+						new Token((baseExpr as StringLiteralExpression).getDecoded() as number as string, false)));
 			}
 		}
 		else if (expr.getType().equals(Type.integerType)) { // as int
@@ -2208,7 +2208,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 				this.log("folding type cast: string literal as int");
 				replaceCb(
 					new IntegerLiteralExpression(
-						new Token(Util.decodeStringLiteral(baseExpr.getToken().getValue()) as int as string, false)));
+						new Token((baseExpr as StringLiteralExpression).getDecoded() as int as string, false)));
 			}
 			else if (baseExpr instanceof NumberLiteralExpression) {
 				this.log("folding type cast: number literal as int");
@@ -2226,7 +2226,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 				this.log("folding type cast: string literal as boolean");
 				replaceCb(
 					new BooleanLiteralExpression(
-						new Token(Util.decodeStringLiteral(baseExpr.getToken().getValue()) as boolean as string, false)));
+						new Token((baseExpr as StringLiteralExpression).getDecoded() as boolean as string, false)));
 			}
 			else if (baseExpr instanceof NumberLiteralExpression) {
 				this.log("folding type cast: number literal as boolean");

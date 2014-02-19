@@ -220,6 +220,15 @@ class _Util {
 		return _Util._ecma262reserved.keys();
 	}
 
+	static function getECMA262StringLiteral(expr : StringLiteralExpression) : string {
+		if (expr.tokenIsECMAConformant()) {
+			// path for preserving the original representation (do not decode => encode)
+			return expr.getToken().getValue();
+		} else {
+			return Util.encodeStringLiteral(expr.getDecoded());
+		}
+	}
+
 	static function isArrayType(type : Type) : boolean {
 		return type.getClassDef() instanceof InstantiatedClassDefinition && (type.getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == "Array";
 	}
@@ -1641,7 +1650,7 @@ class _StringLiteralExpressionEmitter extends _ExpressionEmitter {
 
 	override function emit (outerOpPrecedence : number) : void {
 		var token = this._expr.getToken();
-		this._emitter._emit(Util.normalizeHeredoc(token.getValue()), token);
+		this._emitter._emit(_Util.getECMA262StringLiteral(this._expr), token);
 	}
 
 }
@@ -2630,7 +2639,7 @@ class _ArrayExpressionEmitter extends _OperatorExpressionEmitter {
 		// property access using . is 4x faster on safari than using [], see http://jsperf.com/access-using-dot-vs-array
 		var emitted = false;
 		if (secondExpr instanceof StringLiteralExpression) {
-			var propertyName = Util.decodeStringLiteral(secondExpr.getToken().getValue());
+			var propertyName = (secondExpr as StringLiteralExpression).getDecoded();
 			if (_Util.nameIsValidAsProperty(propertyName)) {
 				this._emitter._emit(".", this._expr.getToken());
 				this._emitter._emit(propertyName, secondExpr.getToken());
@@ -2768,10 +2777,9 @@ class _CallExpressionEmitter extends _OperatorExpressionEmitter {
 		var args = this._expr.getArguments();
 		if (args[2] instanceof ArrayLiteralExpression) {
 			this._emitter._getExpressionEmitterFor(args[0]).emit(_PropertyExpressionEmitter._operatorPrecedence);
-			if (args[1] instanceof StringLiteralExpression && _Util.nameIsValidAsProperty(Util.decodeStringLiteral(args[1].getToken().getValue()))) {
-
+			if (args[1] instanceof StringLiteralExpression && _Util.nameIsValidAsProperty((args[1] as StringLiteralExpression).getDecoded())) {
 				this._emitter._emit(".", calleeExpr.getToken());
-				this._emitter._emit(Util.decodeStringLiteral(args[1].getToken().getValue()), args[1].getToken());
+				this._emitter._emit((args[1] as StringLiteralExpression).getDecoded(), args[1].getToken());
 			}
 			else {
 				this._emitter._emit("[", calleeExpr.getToken());

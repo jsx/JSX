@@ -1157,7 +1157,7 @@ class SwitchStatement extends LabellableStatement {
 						}
 					}
 					else if (caseExpr instanceof StringLiteralExpression) {
-						var caseStr = Util.decodeStringLiteral(caseExpr.getToken().getValue());
+						var caseStr = (caseExpr as StringLiteralExpression).getDecoded();
 						if (caseMap.hasOwnProperty(caseStr)) {
 							context.errors.push(new CompileError(caseExpr.getToken(), "duplicate case value " + caseExpr.getToken().getValue()));
 							return false;
