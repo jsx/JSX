@@ -3979,9 +3979,10 @@ class JavaScriptEmitter implements Emitter {
 		var exprType = expr.getType();
 		// FIXME what happens if the op is /= or %= ?
 		if (lhsType.resolveIfNullable().equals(Type.integerType) && exprType.equals(Type.numberType)) {
-			if (expr instanceof NumberLiteralExpression
-				|| expr instanceof IntegerLiteralExpression) {
-				this._emit((expr.getToken().getValue() as int).toString(), expr.getToken());
+			if (expr instanceof NumberLiteralExpression) {
+				this._emit((expr as NumberLiteralExpression).getDecoded() as int as string, expr.getToken());
+			} else if (expr instanceof IntegerLiteralExpression) {
+				this._emit((expr as IntegerLiteralExpression).getDecoded() as string, expr.getToken());
 			} else {
 				this._emit("(", expr.getToken());
 				this._getExpressionEmitterFor(expr).emit(_BinaryNumberExpressionEmitter._operatorPrecedence["|"]);

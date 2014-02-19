@@ -133,11 +133,13 @@ class _Util {
 			if (expr instanceof NullExpression) {
 				return false;
 			} else if (expr instanceof BooleanLiteralExpression) {
-				return expr.getToken().getValue() == "true";
+				return (expr as BooleanLiteralExpression).getDecoded();
 			} else if (expr instanceof StringLiteralExpression) {
-				return (expr as StringLiteralExpression).getDecoded().length != 0;
-			} else if (expr instanceof NumberLiteralExpression || expr instanceof IntegerLiteralExpression) {
-				return (expr.getToken().getValue() as number) as boolean;
+				return (expr as StringLiteralExpression).getDecoded() as boolean;
+			} else if (expr instanceof NumberLiteralExpression) {
+				return (expr as NumberLiteralExpression).getDecoded() as boolean;
+			} else if (expr instanceof IntegerLiteralExpression) {
+				return (expr as IntegerLiteralExpression).getDecoded() as boolean;
 			} else if (expr instanceof MapLiteralExpression || expr instanceof ArrayLiteralExpression) {
 				return true;
 			}
@@ -156,6 +158,15 @@ class _Util {
 			}
 		}
 		return null;
+	}
+
+	static function decodeNumericLiteral(expr : Expression) : number {
+		assert expr instanceof NumberLiteralExpression || expr instanceof IntegerLiteralExpression;
+		if (expr instanceof NumberLiteralExpression) {
+			return (expr as NumberLiteralExpression).getDecoded();
+		} else {
+			return (expr as IntegerLiteralExpression).getDecoded();
+		}
 	}
 
 	static function optimizeBasicBlock (funcDef : MemberFunctionDefinition, optimizeExpressions : function(:Expression[]):void) : void {
@@ -1747,12 +1758,6 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 		expr.forEachExpression(function(expr, replaceCb) { return this._optimizeExpression(expr, replaceCb); });
 
 		// propagate const
-
-		function exprAsNumber(expr : Expression) : number {
-			assert this._isIntegerOrNumberLiteralExpression(expr);
-			return expr.getToken().getValue() as number;
-		}
-
 		if (expr instanceof PropertyExpression) {
 			var propertyExpr = expr as PropertyExpression;
 			var holderType = propertyExpr.getHolderType();
@@ -1798,12 +1803,12 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 			if (baseExpr instanceof IntegerLiteralExpression) {
 				this.log("folding operator (number) " + expr.getToken().getNotation());
 				replaceCb(new IntegerLiteralExpression(new Token(
-					calculateCb(exprAsNumber(baseExpr)) as string
+					calculateCb(_Util.decodeNumericLiteral(baseExpr)) as string
 				)));
 			} else if (baseExpr instanceof NumberLiteralExpression) {
 				this.log("folding operator (number) " + expr.getToken().getNotation());
 				replaceCb(new NumberLiteralExpression(new Token(
-					calculateCb(exprAsNumber(baseExpr)) as string
+					calculateCb(_Util.decodeNumericLiteral(baseExpr)) as string
 				)));
 			}
 
@@ -1813,7 +1818,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 			if (this._isIntegerOrNumberLiteralExpression(baseExpr)) {
 				this.log("folding operator " + expr.getToken().getNotation());
 				replaceCb(new IntegerLiteralExpression(new Token(
-					(~ exprAsNumber(baseExpr)) as string
+					(~ _Util.decodeNumericLiteral(baseExpr)) as string
 				)));
 			}
 		} else if (expr instanceof AdditiveExpression) {
@@ -1920,10 +1925,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 			return;
 		}
 
-		function argAsNumber(index : number) : number {
-			assert this._isIntegerOrNumberLiteralExpression(callExpr.getArguments()[index]);
-			return callExpr.getArguments()[index].getToken().getValue() as number;
-		}
+		var argExprs = callExpr.getArguments();
 
 		var member = null : MemberFunctionDefinition;
 		holderType.getClassDef().forEachMemberFunction(function (m) {
@@ -1945,27 +1947,27 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 				case "sqrt":
 					this.log("folding " + member.getNotation());
 					replaceCb(new NumberLiteralExpression(new Token(
-						Math.sqrt(argAsNumber(0)) as string)));
+						Math.sqrt(_Util.decodeNumericLiteral(argExprs[0])) as string)));
 					break;
 				case "log":
 					this.log("folding " + member.getNotation());
 					replaceCb(new NumberLiteralExpression(new Token(
-						Math.log(argAsNumber(0)) as string)));
+						Math.log(_Util.decodeNumericLiteral(argExprs[0])) as string)));
 					break;
 				case "pow":
 					this.log("folding " + member.getNotation());
 					replaceCb(new NumberLiteralExpression(new Token(
-						Math.pow(argAsNumber(0), argAsNumber(1)) as string)));
+						Math.pow(_Util.decodeNumericLiteral(argExprs[0]), _Util.decodeNumericLiteral(argExprs[1])) as string)));
 					break;
 				case "sin":
 					this.log("folding " + member.getNotation());
 					replaceCb(new NumberLiteralExpression(new Token(
-						Math.sin(argAsNumber(0)) as string)));
+						Math.sin(_Util.decodeNumericLiteral(argExprs[0])) as string)));
 					break;
 				case "cos":
 					this.log("folding " + member.getNotation());
 					replaceCb(new NumberLiteralExpression(new Token(
-						Math.cos(argAsNumber(0)) as string)));
+						Math.cos(_Util.decodeNumericLiteral(argExprs[0])) as string)));
 					break;
 				}
 			}
@@ -1974,8 +1976,8 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 				case "fromCharCode":
 					this.log("folding " + member.getNotation());
 					var s = "";
-					callExpr.getArguments().forEach((arg) -> {
-						s += String.fromCharCode(arg.getToken().getValue() as number);
+					argExprs.forEach((arg) -> {
+						s += String.fromCharCode(_Util.decodeNumericLiteral(arg));
 					});
 					replaceCb(new StringLiteralExpression(new Token(
 						Util.encodeStringLiteral(s))));
@@ -1990,7 +1992,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 				this.log("folding " + member.getNotation());
 				var recvStr = (propertyExpr.getExpr() as StringLiteralExpression).getDecoded();
 				replaceCb(new NumberLiteralExpression(new Token(
-					recvStr.charCodeAt(argAsNumber(0)) as string)));
+					recvStr.charCodeAt(_Util.decodeNumericLiteral(argExprs[0])) as string)));
 				break;
 			}
 		}
@@ -2003,7 +2005,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 		if (firstExpr instanceof StringLiteralExpression && secondExpr instanceof StringLiteralExpression) {
 			isEqual = (firstExpr as StringLiteralExpression).getDecoded() == (secondExpr as StringLiteralExpression).getDecoded();
 		} else if (this._isIntegerOrNumberLiteralExpression(firstExpr) && this._isIntegerOrNumberLiteralExpression(secondExpr)) {
-			isEqual = firstExpr.getToken().getValue() as number == secondExpr.getToken().getValue() as number;
+			isEqual = _Util.decodeNumericLiteral(firstExpr) == _Util.decodeNumericLiteral(secondExpr);
 		}
 		if (isEqual != null) {
 			var result = expr.getToken().getValue() == "==" ? isEqual as boolean : ! isEqual;
@@ -2022,10 +2024,10 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 
 		// if either operand is zero or one, then...
 		function exprIsZero(expr : Expression) : boolean {
-			return expr instanceof NumberLiteralExpression && expr.getToken().getValue() as number == 0;
+			return expr instanceof NumberLiteralExpression && (expr as NumberLiteralExpression).getDecoded() == 0;
 		}
 		function exprIsOne(expr : Expression) : boolean {
-			return expr instanceof NumberLiteralExpression && expr.getToken().getValue() as number == 1;
+			return expr instanceof NumberLiteralExpression && (expr as NumberLiteralExpression).getDecoded() == 1;
 		}
 		switch (expr.getToken().getValue()) {
 		case "+":
@@ -2107,7 +2109,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 	}
 
 	function _foldNumericBinaryExpressionAsInteger (expr : BinaryExpression, replaceCb : function(:Expression):void, calcCb : function(:int,:int):int) : void {
-		var value : number = calcCb(expr.getFirstExpr().getToken().getValue() as number, expr.getSecondExpr().getToken().getValue() as number);
+		var value : number = calcCb(_Util.decodeNumericLiteral(expr.getFirstExpr()), _Util.decodeNumericLiteral(expr.getSecondExpr()));
 		this.log(
 			"folding operator " + expr.getToken().getNotation() +
 			" to int: " + value as string);
@@ -2117,7 +2119,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 	}
 
 	function _foldNumericBinaryExpressionAsNumber (expr : BinaryExpression, replaceCb : function(:Expression):void, calcCb : function(:number,:number):number) : void {
-		var value = calcCb(expr.getFirstExpr().getToken().getValue() as number, expr.getSecondExpr().getToken().getValue() as number);
+		var value = calcCb(_Util.decodeNumericLiteral(expr.getFirstExpr()), _Util.decodeNumericLiteral(expr.getSecondExpr()));
 		this.log(
 			"folding operator " + expr.getToken().getNotation() +
 			" to number: " + value as string);
@@ -2125,7 +2127,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 	}
 
 	function _foldNumericBinaryExpressionAsBoolean (expr : BinaryExpression, replaceCb : function(:Expression):void, calcCb : function(:number,:number):boolean) : void {
-		var value = calcCb(expr.getFirstExpr().getToken().getValue() as number, expr.getSecondExpr().getToken().getValue() as number);
+		var value = calcCb(_Util.decodeNumericLiteral(expr.getFirstExpr()), _Util.decodeNumericLiteral(expr.getSecondExpr()));
 		this.log(
 			"folding operator " + expr.getToken().getNotation() +
 			" to boolean: " + value as string);
@@ -2158,7 +2160,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 		} else if (expr instanceof NumberLiteralExpression) {
 			if (type.resolveIfNullable().equals(Type.integerType)) {
 				// cast to integer
-				return new IntegerLiteralExpression(new Token((expr.getToken().getValue() as int) as string));
+				return new IntegerLiteralExpression(new Token(((expr as NumberLiteralExpression).getDecoded() as int) as string));
 			}
 			return expr;
 		} else if (expr instanceof StringLiteralExpression) {
@@ -2174,11 +2176,11 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 				this.log("folding type cast: string as string");
 				replaceCb(baseExpr);
 			}
-			else if (baseExpr instanceof BooleanLiteralExpression || baseExpr instanceof NumberLiteralExpression || baseExpr instanceof IntegerLiteralExpression) {
+			else if (baseExpr instanceof PrimitiveLiteralExpression) {
 				this.log("folding type cast: primitive literal as string");
 				replaceCb(
 					new StringLiteralExpression(
-						new Token(Util.encodeStringLiteral(baseExpr.getToken().getValue()), false)));
+						new Token(Util.encodeStringLiteral((baseExpr as PrimitiveLiteralExpression).toNormalizedString()), false)));
 			}
 		}
 		else if (expr.getType().equals(Type.numberType)) { // as number
@@ -2214,7 +2216,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 				this.log("folding type cast: number literal as int");
 				replaceCb(
 					new IntegerLiteralExpression(
-						new Token(baseExpr.getToken().getValue() as int as string, false)));
+						new Token((baseExpr as NumberLiteralExpression).getDecoded() as int as string, false)));
 			}
 		}
 		else if (expr.getType().equals(Type.booleanType)) { // as boolean
@@ -2232,13 +2234,13 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 				this.log("folding type cast: number literal as boolean");
 				replaceCb(
 					new BooleanLiteralExpression(
-						new Token(baseExpr.getToken().getValue() as number ? "true" : "false", false)));
+						new Token((baseExpr as NumberLiteralExpression).getDecoded() ? "true" : "false", false)));
 			}
 			else if (baseExpr instanceof IntegerLiteralExpression) {
 				this.log("folding type cast: integer literal as boolean");
 				replaceCb(
 					new BooleanLiteralExpression(
-						new Token(baseExpr.getToken().getValue() as int ? "true" : "false", false)));
+						new Token((baseExpr as IntegerLiteralExpression).getDecoded() ? "true" : "false", false)));
 			}
 		}
 	}
