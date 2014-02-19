@@ -135,7 +135,7 @@ class _Util {
 			} else if (expr instanceof BooleanLiteralExpression) {
 				return expr.getToken().getValue() == "true";
 			} else if (expr instanceof StringLiteralExpression) {
-				return expr.getToken().getValue().length > 2;
+				return (expr as StringLiteralExpression).getDecoded().length != 0;
 			} else if (expr instanceof NumberLiteralExpression || expr instanceof IntegerLiteralExpression) {
 				return (expr.getToken().getValue() as number) as boolean;
 			} else if (expr instanceof MapLiteralExpression || expr instanceof ArrayLiteralExpression) {
