@@ -459,7 +459,7 @@ class NumberLiteralExpression extends PrimitiveLiteralExpression {
 		return this.getDecoded() as string;
 	}
 
-	function tokenIsECMAConformant() : boolean {
+	function tokenIsECMA262Conformant() : boolean {
 		return true;
 	}
 
@@ -485,7 +485,7 @@ class LineMacroExpression extends NumberLiteralExpression {
 		return json;
 	}
 
-	override function tokenIsECMAConformant() : boolean {
+	override function tokenIsECMA262Conformant() : boolean {
 		return false;
 	}
 
@@ -524,7 +524,7 @@ class StringLiteralExpression extends PrimitiveLiteralExpression {
 		return this.getDecoded() as string;
 	}
 
-	function tokenIsECMAConformant() : boolean {
+	function tokenIsECMA262Conformant() : boolean {
 		return this._token.getValue().match(/^(?:"""|''')/) == null;
 	}
 
@@ -550,7 +550,7 @@ class FileMacroExpression extends StringLiteralExpression {
 		return json;
 	}
 
-	override function tokenIsECMAConformant() : boolean {
+	override function tokenIsECMA262Conformant() : boolean {
 		return false;
 	}
 

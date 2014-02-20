@@ -221,7 +221,7 @@ class _Util {
 	}
 
 	static function getECMA262NumberLiteral(expr : NumberLiteralExpression) : string {
-		if (expr.tokenIsECMAConformant()) {
+		if (expr.tokenIsECMA262Conformant()) {
 			// path for preserving the original representation (do not decode => encode)
 			return expr.getToken().getValue();
 		} else {
@@ -230,7 +230,7 @@ class _Util {
 	}
 
 	static function getECMA262StringLiteral(expr : StringLiteralExpression) : string {
-		if (expr.tokenIsECMAConformant()) {
+		if (expr.tokenIsECMA262Conformant()) {
 			// path for preserving the original representation (do not decode => encode)
 			return expr.getToken().getValue();
 		} else {
