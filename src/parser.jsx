@@ -2030,7 +2030,9 @@ class Parser {
 	function _objectTypeDeclaration (firstToken : Token, allowInner : boolean, autoCompleteMatchCb : function(:ClassDefinition):boolean) : ParsedObjectType {
 		var token;
 		if (firstToken == null) {
-			if ((token = this._expectIdentifier(function (self) { return self._getCompletionCandidatesOfTopLevel(autoCompleteMatchCb); })) == null)
+			if (this._classType != null && (token = this._expectOpt("__CLASS__")) != null) {
+				// ok
+			} else if ((token = this._expectIdentifier(function (self) { return self._getCompletionCandidatesOfTopLevel(autoCompleteMatchCb); })) == null)
 				return null;
 		} else {
 			token = firstToken;
@@ -2041,6 +2043,8 @@ class Parser {
 		} else if (token.getValue() == "Nullable" || token.getValue() == "MayBeUndefined") {
 			this._errors.push(new CompileError(token, "cannot use 'Nullable' (or MayBeUndefined) as a class name"));
 			return null;
+		} else if (token.getValue() == "__CLASS__") {
+			return this._classType;
 		}
 		// import part
 		var imprt = this.lookupImportAlias(token.getValue());
@@ -3256,7 +3260,7 @@ class Parser {
 
 	function _primaryExpr () : Expression {
 		var token;
-		if ((token = this._expectOpt([ "this", "undefined", "null", "false", "true", "[", "{", "(", "__FILE__", "__LINE__" ])) != null) {
+		if ((token = this._expectOpt([ "this", "undefined", "null", "false", "true", "[", "{", "(", "__FILE__", "__LINE__", "__CLASS__" ])) != null) {
 			switch (token.getValue()) {
 			case "this":
 				return new ThisExpression(token, null);
@@ -3282,6 +3286,8 @@ class Parser {
 				return new FileMacroExpression(token);
 			case "__LINE__":
 				return new LineMacroExpression(token);
+			case "__CLASS__":
+				return new ClassExpression(token, this._classType);
 			default:
 				throw new Error("logic flaw");
 			}
