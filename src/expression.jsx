@@ -459,8 +459,38 @@ class NumberLiteralExpression extends PrimitiveLiteralExpression {
 		return this.getDecoded() as string;
 	}
 
+	function tokenIsECMAConformant() : boolean {
+		return true;
+	}
+
 	function getDecoded() : number {
 		return this._token.getValue() as number;
+	}
+
+}
+
+class LineMacroExpression extends NumberLiteralExpression {
+
+	function constructor(token : Token) {
+		super(token);
+	}
+
+	override function clone() : LineMacroExpression {
+		return new LineMacroExpression(this._token);
+	}
+
+	override function serialize() : variant {
+		var json = super.serialize();
+		json[0] = "LineMacroExpression";
+		return json;
+	}
+
+	override function tokenIsECMAConformant() : boolean {
+		return false;
+	}
+
+	override function getDecoded() : number {
+		return this._token.getLineNumber();
 	}
 
 }
@@ -500,6 +530,32 @@ class StringLiteralExpression extends PrimitiveLiteralExpression {
 
 	function getDecoded() : string {
 		return Util.decodeStringLiteral(this._token.getValue());
+	}
+
+}
+
+class FileMacroExpression extends StringLiteralExpression {
+
+	function constructor(token : Token) {
+		super(token);
+	}
+
+	override function clone() : FileMacroExpression {
+		return new FileMacroExpression(this._token);
+	}
+
+	override function serialize() : variant {
+		var json = super.serialize();
+		json[0] = "FileMacroExpression";
+		return json;
+	}
+
+	override function tokenIsECMAConformant() : boolean {
+		return false;
+	}
+
+	override function getDecoded() : string {
+		return this._token.getFilename();
 	}
 
 }

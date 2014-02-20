@@ -220,6 +220,15 @@ class _Util {
 		return _Util._ecma262reserved.keys();
 	}
 
+	static function getECMA262NumberLiteral(expr : NumberLiteralExpression) : string {
+		if (expr.tokenIsECMAConformant()) {
+			// path for preserving the original representation (do not decode => encode)
+			return expr.getToken().getValue();
+		} else {
+			return expr.getDecoded() as string;
+		}
+	}
+
 	static function getECMA262StringLiteral(expr : StringLiteralExpression) : string {
 		if (expr.tokenIsECMAConformant()) {
 			// path for preserving the original representation (do not decode => encode)
@@ -1618,6 +1627,7 @@ class _IntegerLiteralExpressionEmitter extends _ExpressionEmitter {
 
 }
 
+// also emits LineMacroExpression
 class _NumberLiteralExpressionEmitter extends _ExpressionEmitter {
 
 	var _expr : NumberLiteralExpression;
@@ -1628,17 +1638,17 @@ class _NumberLiteralExpressionEmitter extends _ExpressionEmitter {
 	}
 
 	override function emit (outerOpPrecedence : number) : void {
-		var token = this._expr.getToken();
-		var str = token.getValue();
+		var str = _Util.getECMA262NumberLiteral(this._expr);
 		if (outerOpPrecedence == _PropertyExpressionEmitter._operatorPrecedence && str.indexOf(".") == -1) {
-			this._emitter._emit("(" + str + ")", token);
+			this._emitter._emit("(" + str + ")", this._expr.getToken());
 		} else {
-			this._emitter._emit("" + str, token);
+			this._emitter._emit("" + str, this._expr.getToken());
 		}
 	}
 
 }
 
+// also emits FileMacroExpression
 class _StringLiteralExpressionEmitter extends _ExpressionEmitter {
 
 	var _expr : StringLiteralExpression;
