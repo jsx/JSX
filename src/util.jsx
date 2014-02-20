@@ -483,7 +483,9 @@ class Util {
 	 * @see ECMA-262 5th, 7.8.4 String Literals
 	 */
 	static function decodeStringLiteral (literal : string) : string {
-		literal = Util.normalizeHeredoc(literal);
+		// FIXME decoding of multiline string literal should better not be 2-pass
+		literal = Util._normalizeHeredoc(literal);
+
 		var matched = literal.match(/^([\'\"]).*([\'\"])$/);
 		if (matched == null || matched[1] != matched[2])
 			throw new Error("input string is not quoted properly: " + literal);
@@ -539,7 +541,7 @@ class Util {
 	}
 
 	// converts """heredoc""" to an ordinary "string literal"
-	static function normalizeHeredoc(literal : string) : string {
+	static function _normalizeHeredoc(literal : string) : string {
 		if (! literal.match(/^(?:"""|''')/)) {
 			return literal;
 		}
