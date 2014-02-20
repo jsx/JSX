@@ -3256,7 +3256,7 @@ class Parser {
 
 	function _primaryExpr () : Expression {
 		var token;
-		if ((token = this._expectOpt([ "this", "undefined", "null", "false", "true", "[", "{", "(" ])) != null) {
+		if ((token = this._expectOpt([ "this", "undefined", "null", "false", "true", "[", "{", "(", "__FILE__", "__LINE__" ])) != null) {
 			switch (token.getValue()) {
 			case "this":
 				return new ThisExpression(token, null);
@@ -3278,6 +3278,10 @@ class Parser {
 				if (this._expect(")") == null)
 					return null;
 				return expr;
+			case "__FILE__":
+				return new FileMacroExpression(token);
+			case "__LINE__":
+				return new LineMacroExpression(token);
 			default:
 				throw new Error("logic flaw");
 			}
