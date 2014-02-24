@@ -1,5 +1,9 @@
 Revision history for the JSX software development kit
 
+0.9.79 2014-02-24 12:52:00+0900
+    [BUG FIXES]
+    - fix name conflict between --minify and property / method names with __export__ (#301)
+
 0.9.78 2014-02-20 16:28:00+0900
     [FEATURES]
     - introduce macros: __FILE__, __LINE__, __CLASS__
