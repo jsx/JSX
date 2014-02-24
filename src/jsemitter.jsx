@@ -765,6 +765,17 @@ class _Minifier {
 
 	function _minifyProperties() : void {
 		this._log("minifying properties");
+		var exportedPropertyNames = new string[];
+		this._classDefs.forEach(function (classDef) {
+			classDef.forEachMember(function (member) {
+				// check if it is an exported property (or member function)
+				if ((member.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_EXPORT)) == ClassDefinition.IS_EXPORT
+					&& ! (member instanceof MemberFunctionDefinition && member.name() == "constructor")) {
+					exportedPropertyNames.push(member.name());
+				}
+				return true;
+			});
+		});
 		this._propertyConversionTable = _Minifier._buildConversionTable(
 			this._propertyUseCount,
 			new _MinifiedNameGenerator(
@@ -782,7 +793,7 @@ class _Minifier {
 						});
 						return nativePropertyNames.keys();
 					})()
-				)));
+				).concat(exportedPropertyNames)));
 		for (var k in this._propertyConversionTable) {
 			this._log(" " + k + " => " + this._propertyConversionTable[k]);
 		}
