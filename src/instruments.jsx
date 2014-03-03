@@ -1072,6 +1072,33 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 			}
 		}
 
+		function getLabelOffset (label : string) : int {
+			for (var i = 0; i < statements.length; ++i) {
+				if (statements[i] instanceof LabelStatement && (statements[i] as LabelStatement).getName() == label) {
+					return i;
+				}
+			}
+			return -1;
+		}
+
+		// fold branches
+		for (var i = 0; i < statements.length - 1; ++i) {
+			if (statements[i] instanceof LabelStatement && statements[i + 1] instanceof GotoStatement) {
+				var srcLabel = statements[i] as LabelStatement;
+				var destLabel = (statements[i + 1] as GotoStatement).getLabel();
+				statements.splice(i, 2);
+
+				var destOffset = getLabelOffset(destLabel);
+				if (destOffset == -1) {
+					throw new Error("logic flaw");
+				}
+				statements.splice(destOffset, 0, srcLabel);
+				if (! (destOffset < i)) {
+					i--;
+				}
+			}
+		}
+
 	}
 
 	function _eliminateGotos (funcDef : MemberFunctionDefinition) : void {
