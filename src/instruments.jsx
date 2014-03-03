@@ -1081,7 +1081,7 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 			return -1;
 		}
 
-		// fold branches
+		// fold trivial branches
 		for (var i = 0; i < statements.length - 1; ++i) {
 			if (statements[i] instanceof LabelStatement && statements[i + 1] instanceof GotoStatement) {
 				var srcLabel = statements[i] as LabelStatement;
@@ -1098,6 +1098,34 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 				}
 			}
 		}
+
+		// fold duplicate labels
+		var labelRenames = new Map.<string>;
+		for (var i = 0; i < statements.length; ++i) {
+			if (statements[i] instanceof LabelStatement) {
+				var labels = new LabelStatement[];
+				for (var j = i; statements[j] instanceof LabelStatement; ++j) {
+					labels.push(statements[j] as LabelStatement);
+				}
+				var fusedLabel : Nullable.<string> = labels.reduce(function (fuse : Nullable.<string>, label) {
+					if (fuse != "") {
+						fuse += "_";
+					}
+					return fuse + label.getName();
+				}, "");
+				labels.forEach(function (label) {
+					labelRenames[label.getName()] = fusedLabel;
+				});
+				statements.splice(i, labels.length, new LabelStatement(fusedLabel));
+			}
+		}
+		Util.forEachStatement(function onStatement (statement) {
+			if (statement instanceof GotoStatement) {
+				var gotoStmt = statement as GotoStatement;
+				gotoStmt.setLabel(labelRenames[gotoStmt.getLabel()]);
+			}
+			return statement.forEachStatement(onStatement);
+		}, statements);
 
 	}
 
