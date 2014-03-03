@@ -1047,13 +1047,31 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 			new ReturnStatement(new Token("return", false), null));
 		funcDef._statements = statements;
 
-		// replace goto statements with calls of closures
+		// peep-hole optimization
+		this._eliminateDeadBranches(statements);
+
+		// replace goto statements with indirect threading
 		this._eliminateGotos(funcDef);
 
 		if (! Type.voidType.equals(funcDef.getReturnType())) {
 			funcDef._statements.push(new ReturnStatement(new Token("return", false), new LocalExpression(returnLocal.getName(), returnLocal)));
 			this._leaveFunction();
 		}
+	}
+
+	function _eliminateDeadBranches (statements : Statement[]) : void {
+
+		// removal of dead code after goto statement
+		for (var i = 0; i < statements.length; ++i) {
+			if (statements[i] instanceof GotoStatement) {
+				for (var j = i; j < statements.length; ++j) {
+					if (statements[j] instanceof LabelStatement)
+						break;
+				}
+				statements.splice(i + 1, j - i - 1);
+			}
+		}
+
 	}
 
 	function _eliminateGotos (funcDef : MemberFunctionDefinition) : void {
