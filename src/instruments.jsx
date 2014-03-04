@@ -2482,6 +2482,31 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 		throw new Error("got unexpected type of expression: " + (expr != null ? JSON.stringify(expr.serialize()) : expr.toString()));
 	}
 
+	static function _extractGlobalDispatchBody (funcDef : MemberFunctionDefinition) : Statement[] {
+		var funcStmt = funcDef.getStatements()[0] as FunctionStatement;
+		var whileStmt = funcStmt.getFuncDef().getStatements()[0] as WhileStatement;
+		var switchStmt = whileStmt.getStatements()[0] as SwitchStatement;
+		return switchStmt.getStatements();
+	}
+
+	static function _extractReturnLocal (funcDef : MemberFunctionDefinition) : LocalVariable {
+		var locals = funcDef.getLocals();
+		for (var i = 0; i < locals.length; ++i) {
+			if (locals[i].getName().getValue() == "$return")
+				return locals[i];
+		}
+		return null;
+	}
+
+	static function _extractNextLocal (funcDef : MemberFunctionDefinition) : LocalVariable {
+		var locals = funcDef.getLocals();
+		for (var i = 0; i < locals.length; ++i) {
+			if (locals[i].getName().getValue() == "$next")
+				return locals[i];
+		}
+		return null;
+	}
+
 }
 
 class _GeneratorTransformCommand extends _FunctionTransformCommand {
@@ -2526,29 +2551,13 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 		var genLocal = new LocalVariable(new Token("$generator", false), genType);
 		funcDef.getLocals().push(genLocal);
 
-		function getGlobalDispatchBody (funcDef : MemberFunctionDefinition) : Statement[] {
-			var funcStmt = funcDef.getStatements()[0] as FunctionStatement;
-			var whileStmt = funcStmt.getFuncDef().getStatements()[0] as WhileStatement;
-			var switchStmt = whileStmt.getStatements()[0] as SwitchStatement;
-			return switchStmt.getStatements();
-		}
-
-		function findReturnLocal (funcDef : MemberFunctionDefinition) : LocalVariable {
-			var locals = funcDef.getLocals();
-			for (var i = 0; i < locals.length; ++i) {
-				if (locals[i].getName().getValue() == "$return")
-					return locals[i];
-			}
-			return null;
-		}
-
 		var cpsTransformer = new _CPSTransformCommand;
 		cpsTransformer.setCompiler(this._compiler);
 		cpsTransformer.setTransformYield(true);
 		cpsTransformer.setTransformExprs(true);
 		cpsTransformer.transformFunction(funcDef);
 
-		var statements = getGlobalDispatchBody(funcDef);
+		var statements = _CPSTransformCommand._extractGlobalDispatchBody(funcDef);
 		for (var i = 0; i < statements.length; ++i) {
 			// replace yield statement
 			/*
@@ -2606,7 +2615,7 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 								yieldingType),
 							new LocalExpression(
 								new Token("$return", true),
-								findReturnLocal(funcDef)))),
+								_CPSTransformCommand._extractReturnLocal(funcDef)))),
 					new ExpressionStatement(
 						new AssignmentExpression(
 							new Token("=", false),
