@@ -348,7 +348,18 @@ class NullExpression extends LeafExpression {
 	}
 }
 
-class BooleanLiteralExpression extends LeafExpression {
+abstract class PrimitiveLiteralExpression extends LeafExpression {
+
+	function constructor(token : Token) {
+		super(token);
+	}
+
+	// equiv. to the JSX notation of: ```value as string```
+	abstract function toNormalizedString() : string;
+
+}
+
+class BooleanLiteralExpression extends PrimitiveLiteralExpression {
 
 	function constructor (token : Token) {
 		super(token);
@@ -373,9 +384,17 @@ class BooleanLiteralExpression extends LeafExpression {
 		return Type.booleanType;
 	}
 
+	override function toNormalizedString() : string {
+		return this._token.getValue();
+	}
+
+	function getDecoded() : boolean {
+		return this._token.getValue() != "false";
+	}
+
 }
 
-class IntegerLiteralExpression extends LeafExpression {
+class IntegerLiteralExpression extends PrimitiveLiteralExpression {
 
 	function constructor (token : Token) {
 		super(token);
@@ -400,10 +419,18 @@ class IntegerLiteralExpression extends LeafExpression {
 		return Type.integerType;
 	}
 
+	override function toNormalizedString() : string {
+		return this.getDecoded() as string;
+	}
+
+	function getDecoded() : int {
+		return this._token.getValue() as int;
+	}
+
 }
 
 
-class NumberLiteralExpression extends LeafExpression {
+class NumberLiteralExpression extends PrimitiveLiteralExpression {
 
 	function constructor (token : Token) {
 		super(token);
@@ -428,9 +455,47 @@ class NumberLiteralExpression extends LeafExpression {
 		return Type.numberType;
 	}
 
+	override function toNormalizedString() : string {
+		return this.getDecoded() as string;
+	}
+
+	function tokenIsECMA262Conformant() : boolean {
+		return true;
+	}
+
+	function getDecoded() : number {
+		return this._token.getValue() as number;
+	}
+
 }
 
-class StringLiteralExpression extends LeafExpression {
+class LineMacroExpression extends NumberLiteralExpression {
+
+	function constructor(token : Token) {
+		super(token);
+	}
+
+	override function clone() : LineMacroExpression {
+		return new LineMacroExpression(this._token);
+	}
+
+	override function serialize() : variant {
+		var json = super.serialize();
+		json[0] = "LineMacroExpression";
+		return json;
+	}
+
+	override function tokenIsECMA262Conformant() : boolean {
+		return false;
+	}
+
+	override function getDecoded() : number {
+		return this._token.getLineNumber();
+	}
+
+}
+
+class StringLiteralExpression extends PrimitiveLiteralExpression {
 
 	function constructor (token : Token) {
 		super(token);
@@ -453,6 +518,44 @@ class StringLiteralExpression extends LeafExpression {
 
 	override function getType () : Type {
 		return Type.stringType;
+	}
+
+	override function toNormalizedString() : string {
+		return this.getDecoded() as string;
+	}
+
+	function tokenIsECMA262Conformant() : boolean {
+		return this._token.getValue().match(/^(?:"""|''')/) == null;
+	}
+
+	function getDecoded() : string {
+		return Util.decodeStringLiteral(this._token.getValue());
+	}
+
+}
+
+class FileMacroExpression extends StringLiteralExpression {
+
+	function constructor(token : Token) {
+		super(token);
+	}
+
+	override function clone() : FileMacroExpression {
+		return new FileMacroExpression(this._token);
+	}
+
+	override function serialize() : variant {
+		var json = super.serialize();
+		json[0] = "FileMacroExpression";
+		return json;
+	}
+
+	override function tokenIsECMA262Conformant() : boolean {
+		return false;
+	}
+
+	override function getDecoded() : string {
+		return this._token.getFilename();
 	}
 
 }

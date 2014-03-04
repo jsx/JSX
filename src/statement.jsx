@@ -1145,27 +1145,24 @@ class SwitchStatement extends LabellableStatement {
 				}
 				else if (statement instanceof CaseStatement) {
 					var caseExpr = (statement as CaseStatement).getExpr();
-					if (   caseExpr instanceof IntegerLiteralExpression
-						|| caseExpr instanceof NumberLiteralExpression
-						|| caseExpr instanceof BooleanLiteralExpression ) {
-						if (caseMap.hasOwnProperty(caseExpr.getToken().getValue())) {
-							context.errors.push(new CompileError(caseExpr.getToken(), "duplicate case value " + caseExpr.getToken().getValue()));
-							return false;
-						}
-						else {
-							caseMap[caseExpr.getToken().getValue()] = true;
-						}
+					var caseStr : Nullable.<string>;
+					if (caseExpr instanceof IntegerLiteralExpression) {
+						caseStr = (caseExpr as IntegerLiteralExpression).getDecoded() as string;
+					} else if (caseExpr instanceof NumberLiteralExpression) {
+						caseStr = (caseExpr as NumberLiteralExpression).getDecoded() as string;
+					} else if (caseExpr instanceof BooleanLiteralExpression) {
+						caseStr = (caseExpr as BooleanLiteralExpression).getDecoded() as string;
+					} else if (caseExpr instanceof StringLiteralExpression) {
+						caseStr = (caseExpr as StringLiteralExpression).getDecoded() as string;
+					} else {
+						// might not be a constant, so the duplicates are not checked
+						caseStr = null;
 					}
-					else if (caseExpr instanceof StringLiteralExpression) {
-						var caseStr = Util.decodeStringLiteral(caseExpr.getToken().getValue());
-						if (caseMap.hasOwnProperty(caseStr)) {
-							context.errors.push(new CompileError(caseExpr.getToken(), "duplicate case value " + caseExpr.getToken().getValue()));
-							return false;
-						}
-						else {
-							caseMap[caseStr] = true;
-						}
+					if (caseStr != null && caseMap.hasOwnProperty(caseStr)) {
+						context.errors.push(new CompileError(caseExpr.getToken(), "duplicate case value " + caseExpr.getToken().getValue()));
+						return false;
 					}
+					caseMap[caseStr] = true;
 				}
 			}
 			if (context.getTopBlock().localVariableStatuses.isReachable())

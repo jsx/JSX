@@ -1,5 +1,20 @@
 Revision history for the JSX software development kit
 
+0.9.80 2014-03-04 13:27:00+0900
+    [FEATURES]
+    - introduce Array#each (#302)
+
+0.9.79 2014-02-24 12:52:00+0900
+    [BUG FIXES]
+    - fix name conflict between --minify and property / method names with __export__ (#301)
+
+0.9.78 2014-02-20 16:28:00+0900
+    [FEATURES]
+    - introduce macros: __FILE__, __LINE__, __CLASS__
+    - introduce es6-style arrow function (i.e. "=>") (#288)
+    [BUG FIXES]
+    - fix bugs in the const-folding optimizer (casting empty multi-line string literal to boolean / casting hexadecimal number literal to string)
+
 0.9.77 2014-02-07 13:20:00+0900
     [FEATURES]
     - ```int``` type has been changed to strict int32_t

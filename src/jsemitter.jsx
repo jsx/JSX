@@ -220,6 +220,24 @@ class _Util {
 		return _Util._ecma262reserved.keys();
 	}
 
+	static function getECMA262NumberLiteral(expr : NumberLiteralExpression) : string {
+		if (expr.tokenIsECMA262Conformant()) {
+			// path for preserving the original representation (do not decode => encode)
+			return expr.getToken().getValue();
+		} else {
+			return expr.getDecoded() as string;
+		}
+	}
+
+	static function getECMA262StringLiteral(expr : StringLiteralExpression) : string {
+		if (expr.tokenIsECMA262Conformant()) {
+			// path for preserving the original representation (do not decode => encode)
+			return expr.getToken().getValue();
+		} else {
+			return Util.encodeStringLiteral(expr.getDecoded());
+		}
+	}
+
 	static function isArrayType(type : Type) : boolean {
 		return type.getClassDef() instanceof InstantiatedClassDefinition && (type.getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == "Array";
 	}
@@ -747,6 +765,17 @@ class _Minifier {
 
 	function _minifyProperties() : void {
 		this._log("minifying properties");
+		var exportedPropertyNames = new string[];
+		this._classDefs.forEach(function (classDef) {
+			classDef.forEachMember(function (member) {
+				// check if it is an exported property (or member function)
+				if ((member.flags() & (ClassDefinition.IS_STATIC | ClassDefinition.IS_EXPORT)) == ClassDefinition.IS_EXPORT
+					&& ! (member instanceof MemberFunctionDefinition && member.name() == "constructor")) {
+					exportedPropertyNames.push(member.name());
+				}
+				return true;
+			});
+		});
 		this._propertyConversionTable = _Minifier._buildConversionTable(
 			this._propertyUseCount,
 			new _MinifiedNameGenerator(
@@ -764,7 +793,7 @@ class _Minifier {
 						});
 						return nativePropertyNames.keys();
 					})()
-				)));
+				).concat(exportedPropertyNames)));
 		for (var k in this._propertyConversionTable) {
 			this._log(" " + k + " => " + this._propertyConversionTable[k]);
 		}
@@ -1609,6 +1638,7 @@ class _IntegerLiteralExpressionEmitter extends _ExpressionEmitter {
 
 }
 
+// also emits LineMacroExpression
 class _NumberLiteralExpressionEmitter extends _ExpressionEmitter {
 
 	var _expr : NumberLiteralExpression;
@@ -1619,17 +1649,17 @@ class _NumberLiteralExpressionEmitter extends _ExpressionEmitter {
 	}
 
 	override function emit (outerOpPrecedence : number) : void {
-		var token = this._expr.getToken();
-		var str = token.getValue();
+		var str = _Util.getECMA262NumberLiteral(this._expr);
 		if (outerOpPrecedence == _PropertyExpressionEmitter._operatorPrecedence && str.indexOf(".") == -1) {
-			this._emitter._emit("(" + str + ")", token);
+			this._emitter._emit("(" + str + ")", this._expr.getToken());
 		} else {
-			this._emitter._emit("" + str, token);
+			this._emitter._emit("" + str, this._expr.getToken());
 		}
 	}
 
 }
 
+// also emits FileMacroExpression
 class _StringLiteralExpressionEmitter extends _ExpressionEmitter {
 
 	var _expr : StringLiteralExpression;
@@ -1641,7 +1671,7 @@ class _StringLiteralExpressionEmitter extends _ExpressionEmitter {
 
 	override function emit (outerOpPrecedence : number) : void {
 		var token = this._expr.getToken();
-		this._emitter._emit(Util.normalizeHeredoc(token.getValue()), token);
+		this._emitter._emit(_Util.getECMA262StringLiteral(this._expr), token);
 	}
 
 }
@@ -2630,7 +2660,7 @@ class _ArrayExpressionEmitter extends _OperatorExpressionEmitter {
 		// property access using . is 4x faster on safari than using [], see http://jsperf.com/access-using-dot-vs-array
 		var emitted = false;
 		if (secondExpr instanceof StringLiteralExpression) {
-			var propertyName = Util.decodeStringLiteral(secondExpr.getToken().getValue());
+			var propertyName = (secondExpr as StringLiteralExpression).getDecoded();
 			if (_Util.nameIsValidAsProperty(propertyName)) {
 				this._emitter._emit(".", this._expr.getToken());
 				this._emitter._emit(propertyName, secondExpr.getToken());
@@ -2730,7 +2760,9 @@ class _CallExpressionEmitter extends _OperatorExpressionEmitter {
 			return true;
 		if (this._emitIfJsEval(calleeExpr as PropertyExpression))
 			return true;
-		else if (this._emitCallsToMap(calleeExpr as PropertyExpression))
+		if (this._emitCallsToMap(calleeExpr as PropertyExpression))
+			return true;
+		if (this._emitIfArrayEach(calleeExpr as PropertyExpression))
 			return true;
 		return false;
 	}
@@ -2768,10 +2800,9 @@ class _CallExpressionEmitter extends _OperatorExpressionEmitter {
 		var args = this._expr.getArguments();
 		if (args[2] instanceof ArrayLiteralExpression) {
 			this._emitter._getExpressionEmitterFor(args[0]).emit(_PropertyExpressionEmitter._operatorPrecedence);
-			if (args[1] instanceof StringLiteralExpression && _Util.nameIsValidAsProperty(Util.decodeStringLiteral(args[1].getToken().getValue()))) {
-
+			if (args[1] instanceof StringLiteralExpression && _Util.nameIsValidAsProperty((args[1] as StringLiteralExpression).getDecoded())) {
 				this._emitter._emit(".", calleeExpr.getToken());
-				this._emitter._emit(Util.decodeStringLiteral(args[1].getToken().getValue()), args[1].getToken());
+				this._emitter._emit((args[1] as StringLiteralExpression).getDecoded(), args[1].getToken());
 			}
 			else {
 				this._emitter._emit("[", calleeExpr.getToken());
@@ -2820,6 +2851,22 @@ class _CallExpressionEmitter extends _OperatorExpressionEmitter {
 		default:
 			return false;
 		}
+	}
+
+	function _emitIfArrayEach(calleeExpr : PropertyExpression) : boolean {
+		if (calleeExpr.getType() instanceof StaticFunctionType)
+			return false;
+		var classDef = calleeExpr.getExpr().getType().getClassDef();
+		if (! (classDef instanceof InstantiatedClassDefinition))
+			return false;
+		if ((classDef as InstantiatedClassDefinition).getTemplateClassName() != "Array")
+			return false;
+		if (calleeExpr.getIdentifierToken().getValue() != "each")
+			return false;
+		assert this._expr.getArguments().length == 1;
+		this._emitter._emitCallArguments(
+			calleeExpr.getToken(), "$__jsx_each(", [ calleeExpr.getExpr(), this._expr.getArguments()[0] ], null);
+		return true;
 	}
 
 }
@@ -3971,9 +4018,10 @@ class JavaScriptEmitter implements Emitter {
 		var exprType = expr.getType();
 		// FIXME what happens if the op is /= or %= ?
 		if (lhsType.resolveIfNullable().equals(Type.integerType) && exprType.equals(Type.numberType)) {
-			if (expr instanceof NumberLiteralExpression
-				|| expr instanceof IntegerLiteralExpression) {
-				this._emit((expr.getToken().getValue() as int).toString(), expr.getToken());
+			if (expr instanceof NumberLiteralExpression) {
+				this._emit((expr as NumberLiteralExpression).getDecoded() as int as string, expr.getToken());
+			} else if (expr instanceof IntegerLiteralExpression) {
+				this._emit((expr as IntegerLiteralExpression).getDecoded() as string, expr.getToken());
 			} else {
 				this._emit("(", expr.getToken());
 				this._getExpressionEmitterFor(expr).emit(_BinaryNumberExpressionEmitter._operatorPrecedence["|"]);

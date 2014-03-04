@@ -2030,7 +2030,9 @@ class Parser {
 	function _objectTypeDeclaration (firstToken : Token, allowInner : boolean, autoCompleteMatchCb : function(:ClassDefinition):boolean) : ParsedObjectType {
 		var token;
 		if (firstToken == null) {
-			if ((token = this._expectIdentifier(function (self) { return self._getCompletionCandidatesOfTopLevel(autoCompleteMatchCb); })) == null)
+			if (this._classType != null && (token = this._expectOpt("__CLASS__")) != null) {
+				// ok
+			} else if ((token = this._expectIdentifier(function (self) { return self._getCompletionCandidatesOfTopLevel(autoCompleteMatchCb); })) == null)
 				return null;
 		} else {
 			token = firstToken;
@@ -2041,6 +2043,8 @@ class Parser {
 		} else if (token.getValue() == "Nullable" || token.getValue() == "MayBeUndefined") {
 			this._errors.push(new CompileError(token, "cannot use 'Nullable' (or MayBeUndefined) as a class name"));
 			return null;
+		} else if (token.getValue() == "__CLASS__") {
+			return this._classType;
 		}
 		// import part
 		var imprt = this.lookupImportAlias(token.getValue());
@@ -2125,7 +2129,7 @@ class Parser {
 			} while (token.getValue() == ",");
 		}
 		// parse return type
-		if (this._expect("->") == null)
+		if (this._expect(["->", "=>"]) == null)
 			return null;
 		var returnType = this._typeDeclaration(true);
 		if (returnType == null)
@@ -3001,22 +3005,12 @@ class Parser {
 	}
 
 	function _lhsExpr () : Expression {
-		var state = this._preserveState();
 		var expr;
-		var token = this._expectOpt([ "new", "super", "(", "function" ]);
+		var token = this._expectOpt([ "new", "super", "function" ]);
 		if (token != null) {
 			switch (token.getValue()) {
 			case "super":
 				return this._superExpr();
-			case "(":
-				expr = this._lambdaExpr(token);
-				if (expr == null) {
-					this._restoreState(state);
-					expr = this._primaryExpr();
-					if (expr == null)
-						return null;
-				}
-				break;
 			case "function":
 				expr = this._functionExpr(token);
 				break;
@@ -3027,7 +3021,9 @@ class Parser {
 				throw new Error("logic flaw");
 			}
 		} else {
-			expr = this._primaryExpr();
+			expr = this._arrowFunctionOpt();
+			if (expr == null)
+				expr = this._primaryExpr();
 		}
 		if (expr == null)
 			return null;
@@ -3111,16 +3107,40 @@ class Parser {
 		return new SuperExpression(token, identifier, args);
 	}
 
-	function _lambdaExpr (token : Token) : Expression {
-		var args = this._functionArgumentsExpr(false, false, false);
-		if (args == null)
+	function _arrowFunctionOpt () : FunctionExpression {
+		var state = this._preserveState();
+		var expr;
+		if ((expr = this._arrowFunction()) == null) {
+			this._restoreState(state);
 			return null;
+		}
+		return expr;
+	}
+
+	function _arrowFunction () : FunctionExpression {
+		if (this._expectOpt("(") != null) {
+			var args = this._functionArgumentsExpr(false, false, false);
+			if (args == null)
+				return null;
+		}
+		else {
+			var argName = this._expectIdentifier();
+			if (argName == null)
+				return null;
+			var argType : Type = null;
+			if (this._expectOpt(":") != null) {
+				if ((argType = this._typeDeclaration(false)) == null)
+					return null;
+			}
+			args = [ new ArgumentDeclaration(argName, argType, null) ];
+		}
 		var returnType = null : Type;
 		if (this._expectOpt(":") != null) {
 			if ((returnType = this._typeDeclaration(true)) == null)
 				return null;
 		}
-		if (this._expect("->") == null)
+		var token = this._expect(["->", "=>"]);
+		if (token == null)
 			return null;
 		var funcDef = this._functionBody(token, null, null, args, returnType, this._expectOpt("{") != null, false);
 		if (funcDef == null)
@@ -3240,7 +3260,7 @@ class Parser {
 
 	function _primaryExpr () : Expression {
 		var token;
-		if ((token = this._expectOpt([ "this", "undefined", "null", "false", "true", "[", "{", "(" ])) != null) {
+		if ((token = this._expectOpt([ "this", "undefined", "null", "false", "true", "[", "{", "(", "__FILE__", "__LINE__", "__CLASS__" ])) != null) {
 			switch (token.getValue()) {
 			case "this":
 				return new ThisExpression(token, null);
@@ -3262,6 +3282,12 @@ class Parser {
 				if (this._expect(")") == null)
 					return null;
 				return expr;
+			case "__FILE__":
+				return new FileMacroExpression(token);
+			case "__LINE__":
+				return new LineMacroExpression(token);
+			case "__CLASS__":
+				return new ClassExpression(token, this._classType);
 			default:
 				throw new Error("logic flaw");
 			}
