@@ -304,6 +304,19 @@ native final class Array.<T> {
 	 * <p>You can set the length property to truncate an array at any time. When you extend an array by changing its length property, the created elements are initialized to null.</p>
 	 */
 	var length : number;
+
+	/**
+	 * Calls callbackfn once for every element (from [0] to [length - 1])
+	 * in the array, in ascending order.
+	 *
+	 * @param callbackfn A function to call for each element.
+	 */
+	inline function each(callbackfn : function (value : Nullable.<T>) : void) : void {
+		var l = this.length;
+		for (var i = 0; i < l; ++i)
+			callbackfn(this[i]);
+	}
+
 }
 
 /**

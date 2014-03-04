@@ -81,6 +81,15 @@ function $__jsx_ippostdec(o, p) {
 	return v;
 }
 
+/**
+ * non-inlined version of Array#each
+ */
+function $__jsx_each(o, f) {
+	var l = o.length;
+	for (var i = 0; i < l; ++i)
+		f(o[i]);
+}
+
 /*
  * global functions, renamed to avoid conflict with local variable names
  */

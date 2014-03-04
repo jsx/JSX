@@ -2760,7 +2760,9 @@ class _CallExpressionEmitter extends _OperatorExpressionEmitter {
 			return true;
 		if (this._emitIfJsEval(calleeExpr as PropertyExpression))
 			return true;
-		else if (this._emitCallsToMap(calleeExpr as PropertyExpression))
+		if (this._emitCallsToMap(calleeExpr as PropertyExpression))
+			return true;
+		if (this._emitIfArrayEach(calleeExpr as PropertyExpression))
 			return true;
 		return false;
 	}
@@ -2849,6 +2851,22 @@ class _CallExpressionEmitter extends _OperatorExpressionEmitter {
 		default:
 			return false;
 		}
+	}
+
+	function _emitIfArrayEach(calleeExpr : PropertyExpression) : boolean {
+		if (calleeExpr.getType() instanceof StaticFunctionType)
+			return false;
+		var classDef = calleeExpr.getExpr().getType().getClassDef();
+		if (! (classDef instanceof InstantiatedClassDefinition))
+			return false;
+		if ((classDef as InstantiatedClassDefinition).getTemplateClassName() != "Array")
+			return false;
+		if (calleeExpr.getIdentifierToken().getValue() != "each")
+			return false;
+		assert this._expr.getArguments().length == 1;
+		this._emitter._emitCallArguments(
+			calleeExpr.getToken(), "$__jsx_each(", [ calleeExpr.getExpr(), this._expr.getArguments()[0] ], null);
+		return true;
 	}
 
 }
