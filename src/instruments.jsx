@@ -1047,13 +1047,86 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 			new ReturnStatement(new Token("return", false), null));
 		funcDef._statements = statements;
 
-		// replace goto statements with calls of closures
+		// peep-hole optimization
+		this._eliminateDeadBranches(statements);
+
+		// replace goto statements with indirect threading
 		this._eliminateGotos(funcDef);
 
 		if (! Type.voidType.equals(funcDef.getReturnType())) {
 			funcDef._statements.push(new ReturnStatement(new Token("return", false), new LocalExpression(returnLocal.getName(), returnLocal)));
 			this._leaveFunction();
 		}
+	}
+
+	function _eliminateDeadBranches (statements : Statement[]) : void {
+
+		// removal of dead code after goto statement
+		for (var i = 0; i < statements.length; ++i) {
+			if (statements[i] instanceof GotoStatement) {
+				for (var j = i; j < statements.length; ++j) {
+					if (statements[j] instanceof LabelStatement)
+						break;
+				}
+				statements.splice(i + 1, j - i - 1);
+			}
+		}
+
+		function getLabelOffset (label : string) : int {
+			for (var i = 0; i < statements.length; ++i) {
+				if (statements[i] instanceof LabelStatement && (statements[i] as LabelStatement).getName() == label) {
+					return i;
+				}
+			}
+			return -1;
+		}
+
+		// fold trivial branches
+		for (var i = 0; i < statements.length - 1; ++i) {
+			if (statements[i] instanceof LabelStatement && statements[i + 1] instanceof GotoStatement) {
+				var srcLabel = statements[i] as LabelStatement;
+				var destLabel = (statements[i + 1] as GotoStatement).getLabel();
+				statements.splice(i, 2);
+
+				var destOffset = getLabelOffset(destLabel);
+				if (destOffset == -1) {
+					throw new Error("logic flaw");
+				}
+				statements.splice(destOffset, 0, srcLabel);
+				if (! (destOffset < i)) {
+					i--;
+				}
+			}
+		}
+
+		// fold duplicate labels
+		var labelRenames = new Map.<string>;
+		for (var i = 0; i < statements.length; ++i) {
+			if (statements[i] instanceof LabelStatement) {
+				var labels = new LabelStatement[];
+				for (var j = i; statements[j] instanceof LabelStatement; ++j) {
+					labels.push(statements[j] as LabelStatement);
+				}
+				var fusedLabel : Nullable.<string> = labels.reduce(function (fuse : Nullable.<string>, label) {
+					if (fuse != "") {
+						fuse += "_";
+					}
+					return fuse + label.getName();
+				}, "");
+				labels.forEach(function (label) {
+					labelRenames[label.getName()] = fusedLabel;
+				});
+				statements.splice(i, labels.length, new LabelStatement(fusedLabel));
+			}
+		}
+		Util.forEachStatement(function onStatement (statement) {
+			if (statement instanceof GotoStatement) {
+				var gotoStmt = statement as GotoStatement;
+				gotoStmt.setLabel(labelRenames[gotoStmt.getLabel()]);
+			}
+			return statement.forEachStatement(onStatement);
+		}, statements);
+
 	}
 
 	function _eliminateGotos (funcDef : MemberFunctionDefinition) : void {
@@ -1108,8 +1181,24 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 				i = replaceGoto(statements, i);
 			} else if (stmt instanceof IfStatement) {
 				var ifStmt = stmt as IfStatement;
-				replaceGoto(ifStmt.getOnTrueStatements(), 0);
-				replaceGoto(ifStmt.getOnFalseStatements(), 0);
+				// * small optimize
+				// $next = (condExpr) ? trueBranch : falseBranch;
+				// break;
+				var trueBranch = ((ifStmt.getOnTrueStatements()[0]) as GotoStatement).getLabel();
+				var falseBranch = ((ifStmt.getOnFalseStatements()[0]) as GotoStatement).getLabel();
+				statements.splice(i, 1,
+					new ExpressionStatement(
+						new AssignmentExpression(
+							new Token("=", false),
+							new LocalExpression(new Token("$next", true), nextVar),
+							new ConditionalExpression(
+								new Token("?", false),
+								ifStmt.getExpr(),
+								new IntegerLiteralExpression(new Token("" + labelIndeces[trueBranch], false)),
+								new IntegerLiteralExpression(new Token("" + labelIndeces[falseBranch], false)),
+							Type.integerType))),
+					makeBreak());
+				i++;
 			} else if (stmt instanceof SwitchStatement) {
 				var switchStmt = stmt as SwitchStatement;
 				for (var j = 0; j < switchStmt.getStatements().length; ++j) {
@@ -1118,7 +1207,7 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 					}
 				}
 				statements.splice(i + 1, 0, makeBreak());
-				i = i + 1;
+				i++;
 			}
 		}
 

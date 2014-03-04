@@ -1768,6 +1768,10 @@ class GotoStatement extends Statement {
 		return this.label;
 	}
 
+	function setLabel (label : string) : void {
+		this.label = label;
+	}
+
 	override function getToken() : Token {
 		return null;
 	}
