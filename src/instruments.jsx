@@ -2543,7 +2543,15 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 		funcDef.setFlags(funcDef.flags() & ~ClassDefinition.IS_GENERATOR);
 	}
 
-	function _transformGeneratorCore(funcDef : MemberFunctionDefinition) : void {
+	function _performCPSTransformation (funcDef : MemberFunctionDefinition) : void {
+		var cpsTransformer = new _CPSTransformCommand;
+		cpsTransformer.setCompiler(this._compiler);
+		cpsTransformer.setTransformYield(true);
+		cpsTransformer.setTransformExprs(true);
+		cpsTransformer.transformFunction(funcDef);
+	}
+
+	function _transformGeneratorCore (funcDef : MemberFunctionDefinition) : void {
 		var yieldingType = (funcDef.getReturnType().getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0];
 
 		// create a generator object
@@ -2551,11 +2559,7 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 		var genLocal = new LocalVariable(new Token("$generator", false), genType);
 		funcDef.getLocals().push(genLocal);
 
-		var cpsTransformer = new _CPSTransformCommand;
-		cpsTransformer.setCompiler(this._compiler);
-		cpsTransformer.setTransformYield(true);
-		cpsTransformer.setTransformExprs(true);
-		cpsTransformer.transformFunction(funcDef);
+		this._performCPSTransformation(funcDef);
 
 		var statements = _CPSTransformCommand._extractGlobalDispatchBody(funcDef);
 		for (var i = 0; i < statements.length; ++i) {
