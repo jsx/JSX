@@ -115,10 +115,10 @@ abstract class _ExpressionTransformer {
 
 	static var _expressionCountMap = new Map.<number>;
 
-	var _transformer : CodeTransformer;
+	var _transformer : _CPSTransformCommand;
 	var _id : number;
 
-	function constructor (transformer : CodeTransformer, identifier : string) {
+	function constructor (transformer : _CPSTransformCommand, identifier : string) {
 		this._transformer = transformer;
 
 		if (_ExpressionTransformer._expressionCountMap[identifier] == null) {
@@ -139,7 +139,7 @@ abstract class _ExpressionTransformer {
 
 abstract class _MultiaryOperatorTransformer extends _ExpressionTransformer {
 
-	function constructor (transformer : CodeTransformer, identifier : string) {
+	function constructor (transformer : _CPSTransformCommand, identifier : string) {
 		super(transformer, identifier);
 	}
 
@@ -183,7 +183,7 @@ abstract class _MultiaryOperatorTransformer extends _ExpressionTransformer {
 
 		var newArgs = new ArgumentDeclaration[];
 		for (var i = 0; i < exprs.length; ++i) {
-			newArgs.push(this._transformer._createFreshArgumentDeclaration(exprs[i].getType()));
+			newArgs.push(_Util._createFreshArgumentDeclaration(exprs[i].getType()));
 		}
 		var newArgLocals = new Expression[];
 		for (var i = 0; i < exprs.length; ++i) {
@@ -195,7 +195,7 @@ abstract class _MultiaryOperatorTransformer extends _ExpressionTransformer {
 		var prevFuncDef = parent;
 
 		for (var i = 0; i < exprs.length; ++i) {
-			var funcDef = this._transformer._createAnonymousFunction(prevFuncDef, this.getExpression().getToken(), [ newArgs[i] ], returnType);
+			var funcDef = _Util._createAnonymousFunction(prevFuncDef, this.getExpression().getToken(), [ newArgs[i] ], returnType);
 			if (rootFuncDef == null) {
 				rootFuncDef = funcDef;
 			}
@@ -248,7 +248,7 @@ class _LeafExpressionTransformer extends _MultiaryOperatorTransformer {
 
 	var _expr : LeafExpression;
 
-	function constructor (transformer : CodeTransformer, expr : LeafExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : LeafExpression) {
 		super(transformer, "LEAF");
 		this._expr = expr;
 	}
@@ -272,7 +272,7 @@ class _ArrayLiteralExpressionTransformer extends _MultiaryOperatorTransformer {
 
 	var _expr : ArrayLiteralExpression;
 
-	function constructor (transformer : CodeTransformer, expr : ArrayLiteralExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : ArrayLiteralExpression) {
 		super(transformer, "ARRAY-LITERAL");
 		this._expr = expr;
 	}
@@ -297,7 +297,7 @@ class _MapLiteralExpressionTransformer extends _MultiaryOperatorTransformer {
 
 	var _expr : MapLiteralExpression;
 
-	function constructor (transformer : CodeTransformer, expr : MapLiteralExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : MapLiteralExpression) {
 		super(transformer, "MAP-LITERAL");
 		this._expr = expr;
 	}
@@ -325,7 +325,7 @@ class _FunctionExpressionTransformer extends _MultiaryOperatorTransformer {
 
 	var _expr : FunctionExpression;
 
-	function constructor (transformer : CodeTransformer, expr : FunctionExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : FunctionExpression) {
 		super(transformer, "FUNCTION");
 		this._expr = expr;
 	}
@@ -349,7 +349,7 @@ abstract class _UnaryExpressionTransformer extends _MultiaryOperatorTransformer 
 
 	var _expr : UnaryExpression;
 
-	function constructor (transformer : CodeTransformer, expr : UnaryExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : UnaryExpression) {
 		super(transformer, "UNARY");
 		this._expr = expr;
 	}
@@ -380,7 +380,7 @@ abstract class _UnaryExpressionTransformer extends _MultiaryOperatorTransformer 
 
 class _BitwiseNotExpressionTransformer extends _UnaryExpressionTransformer {
 
-	function constructor (transformer : CodeTransformer, expr : BitwiseNotExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : BitwiseNotExpression) {
 		super(transformer, expr);
 	}
 
@@ -392,7 +392,7 @@ class _BitwiseNotExpressionTransformer extends _UnaryExpressionTransformer {
 
 class _InstanceofExpressionTransformer extends _UnaryExpressionTransformer {
 
-	function constructor (transformer : CodeTransformer, expr : InstanceofExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : InstanceofExpression) {
 		super(transformer, expr);
 	}
 
@@ -404,7 +404,7 @@ class _InstanceofExpressionTransformer extends _UnaryExpressionTransformer {
 
 class _AsExpressionTransformer extends _UnaryExpressionTransformer {
 
-	function constructor (transformer : CodeTransformer, expr : AsExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : AsExpression) {
 		super(transformer, expr);
 	}
 
@@ -416,7 +416,7 @@ class _AsExpressionTransformer extends _UnaryExpressionTransformer {
 
 class _AsNoConvertExpressionTransformer extends _UnaryExpressionTransformer {
 
-	function constructor (transformer : CodeTransformer, expr : AsNoConvertExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : AsNoConvertExpression) {
 		super(transformer, expr);
 	}
 
@@ -428,7 +428,7 @@ class _AsNoConvertExpressionTransformer extends _UnaryExpressionTransformer {
 
 class _LogicalNotExpressionTransformer extends _UnaryExpressionTransformer {
 
-	function constructor (transformer : CodeTransformer, expr : LogicalNotExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : LogicalNotExpression) {
 		super(transformer, expr);
 	}
 
@@ -440,7 +440,7 @@ class _LogicalNotExpressionTransformer extends _UnaryExpressionTransformer {
 
 abstract class _IncrementExpressionTransformer extends _UnaryExpressionTransformer {
 
-	function constructor (transformer : CodeTransformer, expr : IncrementExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : IncrementExpression) {
 		super(transformer, expr);
 	}
 
@@ -499,7 +499,7 @@ abstract class _IncrementExpressionTransformer extends _UnaryExpressionTransform
 
 class _PostIncrementExpressionTransformer extends _IncrementExpressionTransformer {
 
-	function constructor (transformer : CodeTransformer, expr : IncrementExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : IncrementExpression) {
 		super(transformer, expr);
 	}
 
@@ -511,7 +511,7 @@ class _PostIncrementExpressionTransformer extends _IncrementExpressionTransforme
 
 class _PreIncrementExpressionTransformer extends _IncrementExpressionTransformer {
 
-	function constructor (transformer : CodeTransformer, expr : IncrementExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : IncrementExpression) {
 		super(transformer, expr);
 	}
 
@@ -525,7 +525,7 @@ class _PropertyExpressionTransformer extends _MultiaryOperatorTransformer {
 
 	var _expr : PropertyExpression;
 
-	function constructor (transformer : CodeTransformer, expr : PropertyExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : PropertyExpression) {
 		super(transformer, "PROPERTY");
 		this._expr = expr;
 	}
@@ -564,7 +564,7 @@ class _PropertyExpressionTransformer extends _MultiaryOperatorTransformer {
 
 class _TypeofExpressionTransformer extends _UnaryExpressionTransformer {
 
-	function constructor (transformer : CodeTransformer, expr : TypeofExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : TypeofExpression) {
 		super(transformer, expr);
 	}
 
@@ -576,7 +576,7 @@ class _TypeofExpressionTransformer extends _UnaryExpressionTransformer {
 
 class _SignExpressionTransformer extends _UnaryExpressionTransformer {
 
-	function constructor (transformer : CodeTransformer, expr : SignExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : SignExpression) {
 		super(transformer, expr);
 	}
 
@@ -590,7 +590,7 @@ abstract class _BinaryExpressionTransformer extends _MultiaryOperatorTransformer
 
 	var _expr : BinaryExpression;
 
-	function constructor (transformer : CodeTransformer, expr : BinaryExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : BinaryExpression) {
 		super(transformer, "BINARY");
 		this._expr = expr;
 	}
@@ -622,7 +622,7 @@ abstract class _BinaryExpressionTransformer extends _MultiaryOperatorTransformer
 
 class _AdditiveExpressionTransformer extends _BinaryExpressionTransformer {
 
-	function constructor (transformer : CodeTransformer, expr : AdditiveExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : AdditiveExpression) {
 		super(transformer, expr);
 	}
 
@@ -636,7 +636,7 @@ class _AdditiveExpressionTransformer extends _BinaryExpressionTransformer {
 
 class _ArrayExpressionTransformer extends _BinaryExpressionTransformer {
 
-	function constructor (transformer : CodeTransformer, expr : ArrayExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : ArrayExpression) {
 		super(transformer, expr);
 	}
 
@@ -652,7 +652,7 @@ class _AssignmentExpressionTransformer extends _MultiaryOperatorTransformer {
 
 	var _expr : AssignmentExpression;
 
-	function constructor (transformer : CodeTransformer, expr : AssignmentExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : AssignmentExpression) {
 		super(transformer, "ASSIGNMENT");
 		this._expr = expr;
 	}
@@ -730,7 +730,7 @@ class _FusedAssignmentExpressionTransformer extends _MultiaryOperatorTransformer
 
 	var _expr : FusedAssignmentExpression;
 
-	function constructor (transformer : CodeTransformer, expr : FusedAssignmentExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : FusedAssignmentExpression) {
 		super(transformer, "FUSED-ASSIGNMENT");
 		this._expr = expr;
 	}
@@ -806,7 +806,7 @@ class _FusedAssignmentExpressionTransformer extends _MultiaryOperatorTransformer
 
 class _BinaryNumberExpressionTransformer extends _BinaryExpressionTransformer {
 
-	function constructor (transformer : CodeTransformer, expr : BinaryNumberExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : BinaryNumberExpression) {
 		super(transformer, expr);
 	}
 
@@ -818,7 +818,7 @@ class _BinaryNumberExpressionTransformer extends _BinaryExpressionTransformer {
 
 class _EqualityExpressionTransformer extends _BinaryExpressionTransformer {
 
-	function constructor (transformer : CodeTransformer, expr : EqualityExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : EqualityExpression) {
 		super(transformer, expr);
 	}
 
@@ -830,7 +830,7 @@ class _EqualityExpressionTransformer extends _BinaryExpressionTransformer {
 
 class _InExpressionTransformer extends _BinaryExpressionTransformer {
 
-	function constructor (transformer : CodeTransformer, expr : InExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : InExpression) {
 		super(transformer, expr);
 	}
 
@@ -844,7 +844,7 @@ class _LogicalExpressionTransformer extends _ExpressionTransformer {
 
 	var _expr : LogicalExpression;
 
-	function constructor (transformer : CodeTransformer, expr : LogicalExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : LogicalExpression) {
 		super(transformer, "LOGICAL");
 		this._expr = expr;
 	}
@@ -873,13 +873,13 @@ a | function ($a) { var $C = C; return $a ? ($a as boolean) | $C : (b as boolean
 			assert (continuation.getType() as ResolvedFunctionType).getReturnType().equals(returnType);
 		}
 
-		var argVar = this._transformer._createFreshArgumentDeclaration(this._expr.getFirstExpr().getType());
-		var contFuncDef = this._transformer._createAnonymousFunction(parent, null, [ argVar ], returnType);
+		var argVar = _Util._createFreshArgumentDeclaration(this._expr.getFirstExpr().getType());
+		var contFuncDef = _Util._createAnonymousFunction(parent, null, [ argVar ], returnType);
 
 		// `var $C = C;`
 		var contVar : LocalVariable = null;
 		if (continuation != null) {
-			contVar = this._transformer._createFreshLocalVariable(continuation.getType());
+			contVar = _Util._createFreshLocalVariable(continuation.getType());
 			contFuncDef.getLocals().push(contVar);
 
 			var condStmt = new ExpressionStatement(
@@ -946,7 +946,7 @@ a | function ($a) { var $C = C; return $a ? ($a as boolean) | $C : (b as boolean
 
 class _ShiftExpressionTransformer extends _BinaryExpressionTransformer {
 
-	function constructor (transformer : CodeTransformer, expr : ShiftExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : ShiftExpression) {
 		super(transformer, expr);
 	}
 
@@ -960,7 +960,7 @@ class _ConditionalExpressionTransformer extends _ExpressionTransformer {
 
 	var _expr : ConditionalExpression;
 
-	function constructor (transformer : CodeTransformer, expr : ConditionalExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : ConditionalExpression) {
 		super(transformer, "CONDITIONAL");
 		this._expr = expr;
 	}
@@ -983,14 +983,14 @@ a | function ($a) { var $C = C; return $a ? b | $C : c | $C; }
 			assert (continuation.getType() as ResolvedFunctionType).getReturnType().equals(returnType);
 		}
 
-		var argVar = this._transformer._createFreshArgumentDeclaration(this._expr.getCondExpr().getType());
+		var argVar = _Util._createFreshArgumentDeclaration(this._expr.getCondExpr().getType());
 
-		var contFuncDef = this._transformer._createAnonymousFunction(parent, null, [ argVar ], returnType);
+		var contFuncDef = _Util._createAnonymousFunction(parent, null, [ argVar ], returnType);
 
 		// `var $C = C;`
 		var contVar : LocalVariable = null;
 		if (continuation != null) {
-			contVar = this._transformer._createFreshLocalVariable(continuation.getType());
+			contVar = _Util._createFreshLocalVariable(continuation.getType());
 			contFuncDef.getLocals().push(contVar);
 
 			var condStmt = new ExpressionStatement(
@@ -1043,7 +1043,7 @@ class _CallExpressionTransformer extends _MultiaryOperatorTransformer {
 
 	var _expr : CallExpression;
 
-	function constructor (transformer : CodeTransformer, expr : CallExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : CallExpression) {
 		super(transformer, "CALL");
 		this._expr = expr;
 	}
@@ -1068,7 +1068,7 @@ class _CallExpressionTransformer extends _MultiaryOperatorTransformer {
 			// method calls
 			var receiver = (this._expr.getExpr() as PropertyExpression).getExpr();
 			return [ receiver ].concat(this._expr.getArguments());
-		} else if (this._transformer.getEmitter().isSpecialCall(this._expr)) {
+		} else if (this._transformer._compiler.getEmitter().isSpecialCall(this._expr)) {
 			return this._expr.getArguments().concat([]);
 		} else {
 			return [ this._expr.getExpr() ].concat(this._expr.getArguments());
@@ -1082,7 +1082,7 @@ class _CallExpressionTransformer extends _MultiaryOperatorTransformer {
 				new Token("(", false),
 				new PropertyExpression(propertyExpr.getToken(), exprs[0], propertyExpr.getIdentifierToken(), propertyExpr.getTypeArguments(), propertyExpr.getType()),
 				exprs.slice(1));
-		} else if (this._transformer.getEmitter().isSpecialCall(this._expr)) {
+		} else if (this._transformer._compiler.getEmitter().isSpecialCall(this._expr)) {
 			return new CallExpression(new Token("(", false), this._expr.getExpr(), exprs);
 		} else {
 			return new CallExpression(new Token("(", false), exprs[0], exprs.slice(1));
@@ -1095,7 +1095,7 @@ class _SuperExpressionTransformer extends _MultiaryOperatorTransformer {
 
 	var _expr : SuperExpression;
 
-	function constructor (transformer : CodeTransformer, expr : SuperExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : SuperExpression) {
 		super(transformer, "SUPER");
 		this._expr = expr;
 	}
@@ -1120,7 +1120,7 @@ class _NewExpressionTransformer extends _MultiaryOperatorTransformer {
 
 	var _expr : NewExpression;
 
-	function constructor (transformer : CodeTransformer, expr : NewExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : NewExpression) {
 		super(transformer, "NEW");
 		this._expr = expr;
 	}
@@ -1145,7 +1145,7 @@ class _CommaExpressionTransformer extends _MultiaryOperatorTransformer {
 
 	var _expr : CommaExpression;
 
-	function constructor (transformer : CodeTransformer, expr : CommaExpression) {
+	function constructor (transformer : _CPSTransformCommand, expr : CommaExpression) {
 		super(transformer, "COMMA");
 		this._expr = expr;
 	}
@@ -1359,7 +1359,7 @@ class _DeleteStatementTransformer extends _StatementTransformer {
 
 		var _statement : DeleteStatement;
 
-		function constructor (transformer : CodeTransformer, statement : DeleteStatement) {
+		function constructor (transformer : _CPSTransformCommand, statement : DeleteStatement) {
 			super(transformer, statement.getExpr() as ArrayExpression);
 			this._statement = statement;
 		}
@@ -2096,14 +2096,20 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 	static const IDENTIFIER = "cps";
 
 	var _transformYield : boolean;
+	var _transformExprs : boolean;
 
 	function constructor () {
 		super(_CPSTransformCommand.IDENTIFIER);
 		this._transformYield = false;
+		this._transformExprs = false;
 	}
 
 	function setTransformYield (flag : boolean) : void {
 		this._transformYield = flag;
+	}
+
+	function setTransformExprs (flag : boolean) : void {
+		this._transformExprs = flag;
 	}
 
 	function _functionIsTransformable (funcDef : MemberFunctionDefinition) : boolean {
@@ -2539,6 +2545,7 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 		var cpsTransformer = new _CPSTransformCommand;
 		cpsTransformer.setCompiler(this._compiler);
 		cpsTransformer.setTransformYield(true);
+		cpsTransformer.setTransformExprs(true);
 		cpsTransformer.transformFunction(funcDef);
 
 		var statements = getGlobalDispatchBody(funcDef);
