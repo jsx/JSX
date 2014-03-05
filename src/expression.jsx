@@ -1513,6 +1513,55 @@ class SignExpression extends UnaryExpression {
 
 }
 
+class YieldExpression extends UnaryExpression {
+
+	var _yieldType : Type;
+
+	function constructor (operatorToken : Token, expr : Expression) {
+		this(operatorToken, expr, null);
+	}
+
+	function constructor (operatorToken : Token, expr : Expression, yieldType : Type) {
+		super(operatorToken, expr);
+		this._yieldType = yieldType;
+	}
+
+	override function clone () : YieldExpression {
+		return new YieldExpression(this._token, this._expr.clone(), this._yieldType);
+	}
+
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
+		if (! this._analyze(context))
+			return false;
+		var returnType = context.funcDef.getReturnType();
+		if (returnType == null) {
+			var yieldType = this._expr.getType();
+			context.funcDef.setReturnType(new ObjectType(Util.instantiateTemplate(context, this._token, "Generator", [ yieldType ])));
+		} else {
+			if (returnType instanceof ObjectType
+				&& returnType.getClassDef() instanceof InstantiatedClassDefinition
+				&& (returnType.getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == "Generator") {
+					yieldType = (returnType.getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0];
+			} else {
+				// return type is not an instance of Enumerable. the error will be reported by MemberFuncitonDefinition#analyze.
+				context.errors.push(new CompileError(this._token, "cannot convert 'Generator.<" + this._expr.getType().toString() + ">' to return type '" + returnType.toString() + "'"));
+				return false;
+			}
+		}
+		if (! this._expr.getType().isConvertibleTo(yieldType)) {
+			context.errors.push(new CompileError(this._token, "cannot convert '" + this._expr.getType().toString() + "' to yield type '" + yieldType.toString() + "'"));
+			return false;
+		}
+		this._yieldType = yieldType;
+		return true;
+	}
+
+	override function getType () : Type {
+		return this._yieldType;
+	}
+
+}
+
 // binary expressions
 
 abstract class BinaryExpression extends OperatorExpression {

@@ -2228,7 +2228,7 @@ class Parser {
 		}
 		// parse the statement
 		var token = this._expectOpt([
-			"{", "var", ";", "if", "do", "while", "for", "continue", "break", "return", "yield", "switch", "throw", "try", "assert", "log", "delete", "debugger", "function", "void", "const"
+			"{", "var", ";", "if", "do", "while", "for", "continue", "break", "return", "switch", "throw", "try", "assert", "log", "delete", "debugger", "function", "void", "const"
 		]);
 		if (label != null) {
 			if (! (token != null && token.getValue().match(/^(?:do|while|for|switch)$/) != null)) {
@@ -2260,8 +2260,6 @@ class Parser {
 				return this._breakStatement(token);
 			case "return":
 				return this._returnStatement(token);
-			case "yield":
-				return this._yieldStatement(token);
 			case "switch":
 				return this._switchStatement(token, label);
 			case "throw":
@@ -2538,21 +2536,6 @@ class Parser {
 		return true;
 	}
 
-	function _yieldStatement (token : Token) : boolean {
-		this._newExperimentalWarning(token);
-		if (! this._isGenerator) {
-			this._newError("invalid use of 'yield' keyword in non-generator function");
-			return false;
-		}
-		var expr = this._expr(false);
-		if (expr == null)
-			return false;
-		this._statements.push(new YieldStatement(token, expr));
-		if (this._expect(";") == null)
-			return false;
-		return true;
-	}
-
 	function _switchStatement (token : Token, label : Token) : Nullable.<boolean> {
 		if (this._expect("(") == null)
 			return false;
@@ -2816,6 +2799,22 @@ class Parser {
 		}
 		// failed to parse as lhs op assignExpr, try condExpr
 		this._restoreState(state);
+		return this._yieldExpr(noIn);
+	}
+
+	function _yieldExpr (noIn : boolean) : Expression {
+		var operatorToken;
+		if ((operatorToken = this._expectOpt("yield")) != null) {
+			this._newExperimentalWarning(operatorToken);
+			if (! this._isGenerator) {
+				this._newError("invalid use of 'yield' keyword in non-generator function");
+				return null;
+			}
+			var condExpr = this._condExpr(noIn);
+			if (condExpr == null)
+				return null;
+			return new YieldExpression(operatorToken, condExpr);
+		}
 		return this._condExpr(noIn);
 	}
 

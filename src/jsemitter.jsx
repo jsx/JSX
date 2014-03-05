@@ -1120,38 +1120,6 @@ class _ReturnStatementEmitter extends _StatementEmitter {
 
 }
 
-class _YieldStatementEmitter extends _StatementEmitter {
-
-	var _statement : YieldStatement;
-
-	function constructor (emitter : JavaScriptEmitter, statement : YieldStatement) {
-		super(emitter);
-		this._statement = statement;
-	}
-
-	override function emit () : void {
-		var expr = this._statement.getExpr();
-		if (expr != null) {
-			this._emitter._emit("yield ", null);
-			if (this._emitter._enableProfiler) {
-				this._emitter._emit("$__jsx_profiler.exit(", null);
-			}
-			this._emitter._emitRHSOfAssignment(this._statement.getExpr(), this._emitter._emittingFunction.getReturnType());
-			if (this._emitter._enableProfiler) {
-				this._emitter._emit(")", null);
-			}
-			this._emitter._emit(";\n", null);
-		} else {
-			if (this._emitter._enableProfiler) {
-				this._emitter._emit("yield $__jsx_profiler.exit();\n", this._statement.getToken());
-			} else {
-				this._emitter._emit("yield;\n", this._statement.getToken());
-			}
-		}
-	}
-
-}
-
 class _DeleteStatementEmitter extends _StatementEmitter {
 
 	var _statement : DeleteStatement;
@@ -3826,8 +3794,6 @@ class JavaScriptEmitter implements Emitter {
 			return new _FunctionStatementEmitter(this, statement as FunctionStatement);
 		else if (statement instanceof ReturnStatement)
 			return new _ReturnStatementEmitter(this, statement as ReturnStatement);
-		else if (statement instanceof YieldStatement)
-			return new _YieldStatementEmitter(this, statement as YieldStatement);
 		else if (statement instanceof DeleteStatement)
 			return new _DeleteStatementEmitter(this, statement as DeleteStatement);
 		else if (statement instanceof BreakStatement)
@@ -3908,6 +3874,8 @@ class JavaScriptEmitter implements Emitter {
 			return new _PropertyExpressionEmitter(this, expr as PropertyExpression);
 		else if (expr instanceof SignExpression)
 			return new _UnaryExpressionEmitter(this, expr as SignExpression);
+		else if (expr instanceof YieldExpression)
+			return new _UnaryExpressionEmitter(this, expr as YieldExpression);
 		else if (expr instanceof AdditiveExpression)
 			return new _AdditiveExpressionEmitter(this, expr as AdditiveExpression);
 		else if (expr instanceof ArrayExpression)
@@ -4125,6 +4093,8 @@ class JavaScriptEmitter implements Emitter {
 				{ "|=":         _FusedAssignmentExpressionEmitter._setOperatorPrecedence }
 			], [
 				{ "?":          _ConditionalExpressionEmitter._setOperatorPrecedence }
+			], [
+				{ "yield":	_UnaryExpressionEmitter._setOperatorPrecedence }
 			], [
 				{ ",":          _CommaExpressionEmitter._setOperatorPrecedence }
 			]

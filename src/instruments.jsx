@@ -586,6 +586,18 @@ class _SignExpressionTransformer extends _UnaryExpressionTransformer {
 
 }
 
+class _YieldExpressionTransformer extends _UnaryExpressionTransformer {
+
+	function constructor (transformer : _CPSTransformCommand, expr : YieldExpression) {
+		super(transformer, expr);
+	}
+
+	override function _clone (arg : Expression) : UnaryExpression {
+		return new YieldExpression(this._expr.getToken(), arg, this._expr.getType());
+	}
+
+}
+
 abstract class _BinaryExpressionTransformer extends _MultiaryOperatorTransformer {
 
 	var _expr : BinaryExpression;
@@ -1301,29 +1313,6 @@ class _ReturnStatementTransformer extends _StatementTransformer {
 			}
 		}
 		this._transformer._emit(new GotoStatement("$L_exit"));
-	}
-
-}
-
-class _YieldStatementTransformer extends _StatementTransformer {
-
-	var _statement : YieldStatement;
-
-	function constructor (transformer : _CPSTransformCommand, statement : YieldStatement) {
-		super(transformer, "YIELD");
-		this._statement = statement;
-	}
-
-	override function getStatement () : Statement {
-		return this._statement;
-	}
-
-	override function _replaceControlStructuresWithGotos () : void {
-		this._transformer._emit(this._statement);
-		// split the continuation
-		var label = "$L_yield_" + this.getID();
-		this._transformer._emit(new GotoStatement(label));
-		this._transformer._emit(new LabelStatement(label));
 	}
 
 }
@@ -2120,13 +2109,15 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 		if (funcDef.getNameToken() != null && funcDef.name() == "constructor")
 			return false;
 		return funcDef.forEachStatement(function onStatement (statement) {
-			if (! this._transformYield && statement instanceof YieldStatement)
-				return false;
 			if (statement instanceof ForInStatement)
 				return false;
 			if (statement instanceof TryStatement)
 				return false;
-			return statement.forEachStatement(onStatement);
+			return statement.forEachExpression(function onExpr (expr) {
+				if (! this._transformYield && expr instanceof YieldExpression)
+					return false;
+				return expr.forEachExpression(onExpr);
+			}) && statement.forEachStatement(onStatement);
 		});
 	}
 
@@ -2367,8 +2358,6 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 			return new _FunctionStatementTransformer(this, statement as FunctionStatement);
 		else if (statement instanceof ReturnStatement)
 			return new _ReturnStatementTransformer(this, statement as ReturnStatement);
-		else if (statement instanceof YieldStatement)
-			return new _YieldStatementTransformer(this, statement as YieldStatement);
 		else if (statement instanceof DeleteStatement)
 			return new _DeleteStatementTransformer(this, statement as DeleteStatement);
 		else if (statement instanceof BreakStatement)
@@ -2449,6 +2438,8 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 			return new _PropertyExpressionTransformer(this, expr as PropertyExpression);
 		else if (expr instanceof SignExpression)
 			return new _SignExpressionTransformer(this, expr as SignExpression);
+		else if (expr instanceof YieldExpression)
+			return new _YieldExpressionTransformer(this, expr as YieldExpression);
 		else if (expr instanceof AdditiveExpression)
 			return new _AdditiveExpressionTransformer(this, expr as AdditiveExpression);
 		else if (expr instanceof ArrayExpression)
@@ -2563,42 +2554,7 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 
 		var statements = _CPSTransformCommand._extractGlobalDispatchBody(funcDef);
 		for (var i = 0; i < statements.length; ++i) {
-			// replace yield statement
-			/*
-			  yield expr;
-			  $next = LABEL;
-			  break;
-
-                          -> $generator.__value = expr;
-			     $generator.__next = LABEL;
-			     return;
-			*/
-			if (statements[i] instanceof YieldStatement) {
-				statements.splice(i, 3,
-					new ExpressionStatement(
-						new AssignmentExpression(
-							new Token("=", false),
-							new PropertyExpression(
-								new Token(".", false),
-								new LocalExpression(new Token("$generator", false), genLocal),
-								new Token("__value", false),
-								[],
-								yieldingType.toNullableType()),
-							(statements[i] as YieldStatement).getExpr())),
-					new ExpressionStatement(
-						new AssignmentExpression(
-							new Token("=", false),
-							new PropertyExpression(
-								new Token(".", false),
-								new LocalExpression(new Token("$generator", false), genLocal),
-								new Token("__next", true),
-								[],
-								Type.integerType.toNullableType()),
-							(statements[i + 1] as ExpressionStatement).getExpr())),
-					new ReturnStatement(new Token("return", false), null));
-				i += 2;
-			}
-			// insert epilogue code
+			// insert return code
 			/*
 			  return;
 
@@ -2606,7 +2562,7 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 			     $generator.__next = -1;
 			     return;
 			*/
-			else if (statements[i] instanceof ReturnStatement) {
+			if (statements[i] instanceof ReturnStatement) {
 				statements.splice(i, 0,
 					new ExpressionStatement(
 						new AssignmentExpression(
