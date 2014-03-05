@@ -2294,24 +2294,8 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 				i = replaceGoto(statements, i);
 			} else if (stmt instanceof IfStatement) {
 				var ifStmt = stmt as IfStatement;
-				// * small optimize
-				// $next = (condExpr) ? trueBranch : falseBranch;
-				// break;
-				var trueBranch = ((ifStmt.getOnTrueStatements()[0]) as GotoStatement).getLabel();
-				var falseBranch = ((ifStmt.getOnFalseStatements()[0]) as GotoStatement).getLabel();
-				statements.splice(i, 1,
-					new ExpressionStatement(
-						new AssignmentExpression(
-							new Token("=", false),
-							new LocalExpression(new Token("$next", true), nextVar),
-							new ConditionalExpression(
-								new Token("?", false),
-								ifStmt.getExpr(),
-								new IntegerLiteralExpression(new Token("" + labelIndeces[trueBranch], false)),
-								new IntegerLiteralExpression(new Token("" + labelIndeces[falseBranch], false)),
-							Type.integerType))),
-					makeBreak());
-				i++;
+				replaceGoto(ifStmt.getOnTrueStatements(), 0);
+				replaceGoto(ifStmt.getOnFalseStatements(), 0);
 			} else if (stmt instanceof SwitchStatement) {
 				var switchStmt = stmt as SwitchStatement;
 				for (var j = 0; j < switchStmt.getStatements().length; ++j) {
@@ -2320,7 +2304,7 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 					}
 				}
 				statements.splice(i + 1, 0, makeBreak());
-				i++;
+				i = i + 1;
 			}
 		}
 
