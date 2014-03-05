@@ -311,7 +311,7 @@ native final class Array.<T> {
 	 *
 	 * @param callbackfn A function to call for each element.
 	 */
-	inline function each(callbackfn : function (value : Nullable.<T>) : void) : void {
+	inline function _forEach(callbackfn : function (value : Nullable.<T>) : void) : void {
 		var l = this.length;
 		for (var i = 0; i < l; ++i)
 			callbackfn(this[i]);
