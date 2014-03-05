@@ -1,5 +1,11 @@
 Revision history for the JSX software development kit
 
+0.9.81 2014-03-05 11:11:00+0900
+    [FEATURES]
+    - Array#each has been renamed to Array#_forEach (#302)
+    [BUG FIXES]
+    - fix bug in optimizer that prevented callbacks with local variables from being inline-expanded
+
 0.9.80 2014-03-04 13:27:00+0900
     [FEATURES]
     - introduce Array#each (#302)
