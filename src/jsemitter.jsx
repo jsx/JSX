@@ -2762,7 +2762,7 @@ class _CallExpressionEmitter extends _OperatorExpressionEmitter {
 			return true;
 		if (this._emitCallsToMap(calleeExpr as PropertyExpression))
 			return true;
-		if (this._emitIfArrayEach(calleeExpr as PropertyExpression))
+		if (this._emitCallsToArray(calleeExpr as PropertyExpression))
 			return true;
 		return false;
 	}
@@ -2853,7 +2853,7 @@ class _CallExpressionEmitter extends _OperatorExpressionEmitter {
 		}
 	}
 
-	function _emitIfArrayEach(calleeExpr : PropertyExpression) : boolean {
+	function _emitCallsToArray(calleeExpr : PropertyExpression) : boolean {
 		if (calleeExpr.getType() instanceof StaticFunctionType)
 			return false;
 		var classDef = calleeExpr.getExpr().getType().getClassDef();
@@ -2861,12 +2861,15 @@ class _CallExpressionEmitter extends _OperatorExpressionEmitter {
 			return false;
 		if ((classDef as InstantiatedClassDefinition).getTemplateClassName() != "Array")
 			return false;
-		if (calleeExpr.getIdentifierToken().getValue() != "each")
+		switch (calleeExpr.getIdentifierToken().getValue()) {
+		case "_forEach":
+			assert this._expr.getArguments().length == 1;
+			this._emitter._emitCallArguments(
+				calleeExpr.getToken(), "$__jsx_forEach(", [ calleeExpr.getExpr(), this._expr.getArguments()[0] ], null);
+			return true;
+		default:
 			return false;
-		assert this._expr.getArguments().length == 1;
-		this._emitter._emitCallArguments(
-			calleeExpr.getToken(), "$__jsx_each(", [ calleeExpr.getExpr(), this._expr.getArguments()[0] ], null);
-		return true;
+		}
 	}
 
 }

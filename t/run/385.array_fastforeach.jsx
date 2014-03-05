@@ -13,7 +13,7 @@ class _Main {
 		});
 		log output.join(",");
 		output.splice(0, output.length);
-		input.each((n) -> {
+		input._forEach((n) -> {
 			output.push(n != null ? n : -1);
 		});
 		log output.join(",");

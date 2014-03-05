@@ -84,7 +84,7 @@ function $__jsx_ippostdec(o, p) {
 /**
  * non-inlined version of Array#each
  */
-function $__jsx_each(o, f) {
+function $__jsx_forEach(o, f) {
 	var l = o.length;
 	for (var i = 0; i < l; ++i)
 		f(o[i]);
