@@ -1019,6 +1019,7 @@ native final class GeneratorFunction {
 
 native __fake__ class Generator.<T> {
 	function next () : IteratorResult.<T>;
+	function next (value : T) : IteratorResult.<T>;
 }
 
 native class __jsx_generator_object.<T> extends Generator.<T> {
@@ -1034,10 +1035,11 @@ native class __jsx_generator_object.<T> extends Generator.<T> {
   	this.__status = 0;	// SUSPENDED: 0, ACTIVE: 1, DEAD: 2
   }
 
-  __jsx_generator_object.prototype.next = function () {
+  __jsx_generator_object.prototype.next = function (value) {
   	switch (this.__status) {
   	case 0:
   		this.__status = 1;
+  		this.__value = value;
 
   		// go next!
   		this.__loop(this.__next);
