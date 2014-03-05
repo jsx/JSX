@@ -2478,6 +2478,11 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 		throw new Error("got unexpected type of expression: " + (expr != null ? JSON.stringify(expr.serialize()) : expr.toString()));
 	}
 
+	static function _extractGlobalDispatchFuncDef (funcDef : MemberFunctionDefinition) : MemberFunctionDefinition {
+		var funcStmt = funcDef.getStatements()[0] as FunctionStatement;
+		return funcStmt.getFuncDef();
+	}
+
 	static function _extractGlobalDispatchBody (funcDef : MemberFunctionDefinition) : Statement[] {
 		var funcStmt = funcDef.getStatements()[0] as FunctionStatement;
 		var whileStmt = funcStmt.getFuncDef().getStatements()[0] as WhileStatement;
@@ -2557,7 +2562,63 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 
 		this._performCPSTransformation(funcDef);
 
+		var cpsFuncDef = _CPSTransformCommand._extractGlobalDispatchFuncDef(funcDef);
 		var statements = _CPSTransformCommand._extractGlobalDispatchBody(funcDef);
+
+		// unfold CPS expressions
+		for (var i = 0; i < statements.length; ++i) {
+			var staticAssigns = new AssignmentExpression[];
+			Util.forEachStatement(function onStatement(statement) {
+				return statement.forEachExpression(function onExpr(expr, replaceCb) {
+					if (! (expr instanceof CallExpression))
+						return true;
+
+					function unfoldExpr (expr : Expression) : Expression {
+						if (expr instanceof CallExpression) {
+							var callExpr = expr as CallExpression;
+							assert callExpr.getArguments().length == 1;
+							assert callExpr.getExpr() instanceof FunctionExpression;
+
+							var funcExpr = callExpr.getExpr() as FunctionExpression;
+							assert funcExpr.getFuncDef().getArguments().length == 1;
+							var argVar = funcExpr.getFuncDef().getArguments()[0];
+							var localVar = new LocalVariable(argVar.getName(), argVar.getType());
+							cpsFuncDef.getLocals().push(localVar);
+
+							staticAssigns.push(
+								new AssignmentExpression(
+									new Token("=", false),
+									new LocalExpression(localVar.getName(), localVar),
+									callExpr.getArguments()[0]));
+
+							assert funcExpr.getFuncDef().getStatements().length == 1;
+							assert funcExpr.getFuncDef().getStatements()[0] instanceof ReturnStatement;
+							var retStmt = funcExpr.getFuncDef().getStatements()[0] as ReturnStatement;
+
+							assert retStmt.getExpr() != null;
+							return unfoldExpr(retStmt.getExpr());
+						}
+						else {
+							log expr;
+							assert expr instanceof LocalExpression;
+							var localExpr = expr as LocalExpression;
+							return new LocalExpression(localExpr.getToken(), new LocalVariable(localExpr.getToken(), localExpr.getType()));
+						}
+					}
+
+					replaceCb(unfoldExpr(expr));
+
+					return true;
+				}) && statement.forEachStatement(onStatement);
+			}, [ statements[i] ]);
+
+			for (var j = staticAssigns.length - 1; j >= 0; --j) {
+				statements.splice(i, 0, new ExpressionStatement(staticAssigns[j]));
+			}
+			i += staticAssigns.length;
+		}
+
+		// convert ReturnStatement
 		for (var i = 0; i < statements.length; ++i) {
 			// insert return code
 			/*
