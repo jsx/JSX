@@ -145,6 +145,9 @@ class A {
       "word" : "Promise"
    },
    {
+      "word" : "yield"
+   },
+   {
       "word" : "++"
    },
    {
