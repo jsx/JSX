@@ -2599,7 +2599,6 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 							return unfoldExpr(retStmt.getExpr());
 						}
 						else {
-							log expr;
 							assert expr instanceof LocalExpression;
 							var localExpr = expr as LocalExpression;
 							return new LocalExpression(localExpr.getToken(), new LocalVariable(localExpr.getToken(), localExpr.getType()));
