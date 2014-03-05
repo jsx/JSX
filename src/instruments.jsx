@@ -2617,8 +2617,69 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 			i += staticAssigns.length;
 		}
 
-		// convert ReturnStatement
+		var caseCnt = 0;
+		statements.forEach(function (statement) {
+			if (statement instanceof CaseStatement) {
+				caseCnt++;
+			}
+		});
+
+		// convert Yield and Return
 		for (var i = 0; i < statements.length; ++i) {
+			// insert return code
+			/*
+			  $aN = yield $aM;
+
+			  -> $generator.__value = $aM;
+			     $generator.__next = K;
+			     return;
+			  case K:
+			     $aN = $generator.__value;
+			*/
+			var exprStmt;
+			var assignExpr;
+			if (statements[i] instanceof ExpressionStatement && ((exprStmt = (statements[i] as ExpressionStatement)).getExpr() instanceof AssignmentExpression) && (assignExpr = (exprStmt.getExpr() as AssignmentExpression)).getSecondExpr() instanceof YieldExpression) {
+				var yieldExpr = assignExpr.getSecondExpr() as YieldExpression;
+				var caseLabel = caseCnt++;
+				statements.splice(i, 1,
+					new ExpressionStatement(
+						new AssignmentExpression(
+							new Token("=", false),
+							new PropertyExpression(
+								new Token(".", false),
+								new LocalExpression(new Token("$generator", false), genLocal),
+								new Token("__value", false),
+								[],
+								yieldingType),
+							yieldExpr.getExpr())),
+					new ExpressionStatement(
+						new AssignmentExpression(
+							new Token("=", false),
+							new PropertyExpression(
+								new Token(".", false),
+								new LocalExpression(new Token("$generator", false), genLocal),
+								new Token("__next", true),
+								[],
+								Type.integerType.toNullableType()),
+							new IntegerLiteralExpression(new Token("" + caseLabel, false)))),
+					new ReturnStatement(
+						new Token("return", false),
+						null),
+					new CaseStatement(
+						new Token("case", false),
+						new IntegerLiteralExpression(new Token("" + caseLabel, false))),
+					new ExpressionStatement(
+						new AssignmentExpression(
+							new Token("=", false),
+							assignExpr.getFirstExpr(),
+							new PropertyExpression(
+								new Token(".", false),
+								new LocalExpression(new Token("$generator", false), genLocal),
+								new Token("__value", true),
+								[],
+								yieldingType))));
+				i += 4;
+			}
 			// insert return code
 			/*
 			  return;
@@ -2627,7 +2688,7 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 			     $generator.__next = -1;
 			     return;
 			*/
-			if (statements[i] instanceof ReturnStatement) {
+			else if (statements[i] instanceof ReturnStatement) {
 				statements.splice(i, 0,
 					new ExpressionStatement(
 						new AssignmentExpression(
