@@ -1203,7 +1203,12 @@ abstract class _StatementTransformer {
 		if (this._transformer._transformExprs) {
 			var funcDef = this._transformer.getTransformingFuncDef();
 			this.getStatement().forEachExpression(function (expr, replaceCb) {
-				replaceCb(this._transformer._getExpressionTransformerFor(expr).doCPSTransform(funcDef, null, expr.getType()));
+				var id = _Util._createIdentityFunction(funcDef, expr.getType());
+				var expr;
+				if ((expr = this._transformer._getExpressionTransformerFor(expr).doCPSTransform(funcDef, id, expr.getType())) == null) {
+					throw new Error("fatal error in expression transformation");
+				}
+				replaceCb(expr);
 				return true;
 			});
 		}
