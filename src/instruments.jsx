@@ -1948,33 +1948,53 @@ class _TryStatementTransformer extends _StatementTransformer {
 		/*
 
 		try {
-			body;	// assumes no return or throw statements in body
+			body;	// assumes no return statements in body
 		} finally {
 			ensure;
 		}
 
 		goto $BEGIN_TRY_n;
 	$BEGIN_TRY_n;
+		goto $__push_finally__; // pseudo-instruction; push finally clause
+		goto $BEGIN_FINALLY_n;
 		body;
 		goto $BEGIN_FINALLY_n;
 	$BEGIN_FINALLY_n;
+		goto $__pop_finally__; // pseudo-instruction; pop finally clause
 		ensure;
-		goto $END_TRY_n;
+		goto $END_FINALLY_n;
+	$END_FINALLY_n;
+		goto $__branch_finally__; // pseudo-instruction; branch to continuation depending on condition
+		goto $__upper_finally_label__ or $L_exit;
+		goto $END_TRY_n
 	$END_TRY_n;
 
 		*/
+		this._transformer._enterTry(this);
+
 		var beginLabel = "$L_begin_try_" + this.getID();
 		this._transformer._emit(new GotoStatement(beginLabel));
 		this._transformer._emit(new LabelStatement(beginLabel));
+		this._transformer._emit(new GotoStatement("$__push_finally__"));
+		var finallyLabel = "$L_begin_finally_" + this.getID();
+		this._transformer._emit(new GotoStatement(finallyLabel));
 		this._statement.getTryStatements().forEach((statement) -> {
 			this._transformer._getStatementTransformerFor(statement).replaceControlStructuresWithGotos();
 		});
-		var finallyLabel = "$L_begin_finally_" + this.getID();
+
+		this._transformer._leaveTry();
+
 		this._transformer._emit(new GotoStatement(finallyLabel));
 		this._transformer._emit(new LabelStatement(finallyLabel));
+		this._transformer._emit(new GotoStatement("$__pop_finally__"));
 		this._statement.getFinallyStatements().forEach((statement) -> {
 			this._transformer._getStatementTransformerFor(statement).replaceControlStructuresWithGotos();
 		});
+		var endFinallyLabel = "$L_end_finally_" + this.getID();
+		this._transformer._emit(new GotoStatement(endFinallyLabel));
+		this._transformer._emit(new LabelStatement(endFinallyLabel));
+		this._transformer._emit(new GotoStatement("$__branch_finally__"));
+		this._transformer._emit(new GotoStatement(this._transformer._getUpperFinallyLabel()));
 		var endLabel = "$L_end_try_" + this.getID();
 		this._transformer._emit(new GotoStatement(endLabel));
 		this._transformer._emit(new LabelStatement(endLabel));
@@ -2139,6 +2159,9 @@ class CPSTransformCommand extends FunctionTransformCommand {
 		// resolve labels
 		this._resolveLabels(funcDef);
 
+		// convert pseudo instructions into normal statements
+		this._convertPseudoInstructions(funcDef);
+
 		// replace goto statements with indirect threading
 		this._eliminateGotos(funcDef);
 
@@ -2158,12 +2181,28 @@ class CPSTransformCommand extends FunctionTransformCommand {
 		);
 		vm.setFuncLocal(loopVar);
 
+		// exception handling
+		var finallyVar = new LocalVariable(new Token("$finally", true), this._instantiateArrayType(Type.integerType), false);
+		funcDef.getLocals().push(finallyVar);
+		var raisedVar = new LocalVariable(new Token("$raised", true), Type.booleanType, false);
+		funcDef.getLocals().push(raisedVar);
+		var errorVar = new LocalVariable(new Token("$error", true), Type.variantType, false);
+		funcDef.getLocals().push(errorVar);
+
 		// amend vm._statements; lift statements up to the VM
 		vm._statements = funcDef.getStatements();
 		Util.rebaseClosures(funcDef, vm);
 
 		// amend funcDef._statements; invoke the VM
 		funcDef._statements = [
+			new ExpressionStatement(
+				new AssignmentExpression(
+					new Token("=", false),
+					new LocalExpression(new Token("$finally", true), finallyVar),
+					new ArrayLiteralExpression(
+						new Token("[", false),
+						[],
+						Type.integerType))),
 			new FunctionStatement(
 				new Token("function", false), vm),
 			new ExpressionStatement(
@@ -2302,9 +2341,12 @@ class CPSTransformCommand extends FunctionTransformCommand {
 		Util.forEachStatement(function onStatement (statement) {
 			if (statement instanceof GotoStatement) {
 				var gotoStmt = statement as GotoStatement;
+				if (gotoStmt.getLabel().search(/^\$__/) != -1) {
+					return true;
+				}
 				var label = gotoStmt.getLabel();
 				if (! (label in labelIDs)) {
-					throw new Error("logic flaw! label not found");
+					throw new Error("logic flaw! label not found: " + label);
 				}
 				gotoStmt.setID(labelIDs[label]);
 			}
@@ -2312,10 +2354,78 @@ class CPSTransformCommand extends FunctionTransformCommand {
 		}, statements);
 	}
 
+	function _convertPseudoInstructions (funcDef : MemberFunctionDefinition) : void {
+		var statements = CPSTransformCommand._extractVMBody(funcDef);
+
+		var finallyVar = CPSTransformCommand._extractFinallyLocal(funcDef);
+		var raisedVar = CPSTransformCommand._extractRaisedLocal(funcDef);
+
+		// convert pseudo-instructions
+		for (var i = 0; i < statements.length; ++i) {
+			if (statements[i] instanceof GotoStatement && (statements[i] as GotoStatement).getLabel().search(/^\$__/) != -1) {
+				var gotoStmt = statements[i] as GotoStatement;
+				switch (gotoStmt.getLabel()) {
+				case '$__push_finally__':
+					var gotoBeginFinally = statements[i + 1] as GotoStatement;
+					statements.splice(i, 2,
+						new ExpressionStatement(
+							new CallExpression(
+								new Token("(", false),
+								new PropertyExpression(
+									new Token(".", false),
+									new LocalExpression(new Token("$finally", true), finallyVar),
+									new Token("push", true),
+									[],
+									new MemberFunctionType(
+										null,
+										finallyVar.getType(),
+										Type.integerType,
+										[ new VariableLengthArgumentType(Type.integerType.toNullableType()) ] : Type[],
+										false)),
+								[ new IntegerLiteralExpression(new Token("" + gotoBeginFinally.getID(), false)) ] : Expression[])));
+					break;
+				case '$__pop_finally__':
+					statements.splice(i, 1,
+						new ExpressionStatement(
+							new CallExpression(
+								new Token("(", false),
+								new PropertyExpression(
+									new Token(".", false),
+									new LocalExpression(new Token("$finally", true), finallyVar),
+									new Token("pop", true),
+									[],
+									new MemberFunctionType(
+										null,
+										finallyVar.getType(),
+										Type.integerType.toNullableType(),
+										[],
+										false)),
+								[])));
+					break;
+				case '$__branch_finally__':
+					var gotoUpFinally = statements[i + 1] as GotoStatement;
+					var gotoEndTry = statements[i + 2] as GotoStatement;
+					statements.splice(i, 3,
+						new IfStatement(
+							new Token("if", false),
+							new LocalExpression(new Token("$raised", true), raisedVar),
+							[ gotoUpFinally ] : Statement[],
+							[ gotoEndTry ] : Statement[]));
+					break;
+				default:
+					throw new Error('got unknown pseudo-instruction');
+				}
+			}
+		}
+	}
+
 	function _eliminateGotos (funcDef : MemberFunctionDefinition) : void {
 		var statements = CPSTransformCommand._extractVMBody(funcDef);
 
 		var nextVar = CPSTransformCommand._extractNextLocal(funcDef);
+		var finallyVar = CPSTransformCommand._extractFinallyLocal(funcDef);
+		var raisedVar = CPSTransformCommand._extractRaisedLocal(funcDef);
+		var errorVar = CPSTransformCommand._extractErrorLocal(funcDef);
 
 		function replaceGoto (statements : Statement[], index : int) : int {
 			assert statements[index] instanceof GotoStatement;
@@ -2364,21 +2474,127 @@ class CPSTransformCommand extends FunctionTransformCommand {
 			i = replaceBasicBlock(statements, index, i);
 		}
 
+		var eVar = new CaughtVariable(new Token("$e", true), Type.variantType);
+
 		// create while-switch loop
 		var switchStmt = new SwitchStatement(
 			new Token("switch", false),
 			null,
 			new LocalExpression(new Token("$next", true), nextVar),
 			statements);
-		var whileStmt = new WhileStatement(
+		var inferiorWhileStmt = new WhileStatement(
 			new Token("while", false),
 			null,
 			new BooleanLiteralExpression(new Token("true", false)),
 			[ switchStmt ] : Statement[]);
+		var tryStmt = new TryStatement(
+			new Token("try", false),
+			[
+				inferiorWhileStmt,
+			], [
+				new CatchStatement(
+					new Token("catch", false),
+					eVar,
+					[
+						new ExpressionStatement(
+							new AssignmentExpression(
+								new Token("=", false),
+								new LocalExpression(new Token("$raised", true), raisedVar),
+								new BooleanLiteralExpression(new Token("true", false)))),
+						new ExpressionStatement(
+							new AssignmentExpression(
+								new Token("=", false),
+								new LocalExpression(new Token("$error", true), errorVar),
+								new LocalExpression(new Token("$e", true), eVar))),
+						new ExpressionStatement(
+							new AssignmentExpression(
+								new Token("=", false),
+								new LocalExpression(new Token("$next", true), nextVar),
+								new ArrayExpression(
+									new Token("[", false),
+									new LocalExpression(new Token("$finally", true), finallyVar),
+									new BinaryNumberExpression(
+										new Token("-", false),
+										new PropertyExpression(
+											new Token(".", false),
+											new LocalExpression(new Token("$finally", true), finallyVar),
+											new Token("length", true),
+											[],
+											Type.numberType),
+										new IntegerLiteralExpression(new Token("1", false))),
+									Type.integerType)))
+					] : Statement[])
+			], [
+				new IfStatement(
+					new Token("if", false),
+					new LogicalExpression(
+						new Token("&&", false),
+						new EqualityExpression(
+							new Token("==", false),
+							new PropertyExpression(
+								new Token(".", false),
+								new LocalExpression(new Token("$finally", true), finallyVar),
+								new Token("length", true),
+								[],
+								Type.numberType),
+							new IntegerLiteralExpression(new Token("0", false))),
+						new LocalExpression(new Token("$raised", true), raisedVar)),
+					[ new ThrowStatement(new Token("throw", false), new LocalExpression(new Token("$error", true), errorVar)) ] : Statement[],
+					[])
+			] : Statement[]);
+		var superiorWhileStmt = new WhileStatement(
+			new Token("while", false),
+			null,
+			new BooleanLiteralExpression(new Token("true", false)),
+			[ tryStmt ] : Statement[]);
 
 		// set indirect threading loop to the VM
-		CPSTransformCommand._extractVM(funcDef)._statements = [ whileStmt ] : Statement[];
+		CPSTransformCommand._extractVM(funcDef)._statements = [ superiorWhileStmt ] : Statement[];
 
+	}
+
+	function _instantiateArrayType (type : Type) : Type {
+
+		var arrayClass = null : TemplateClassDefinition;
+
+		// find array class
+		var builtins = this._compiler.getBuiltinParsers()[0];
+		for (var i = 0; i < builtins._templateClassDefs.length; ++i) {
+			if (builtins._templateClassDefs[i].className() == "Array") {
+				arrayClass = builtins._templateClassDefs[i];
+				break;
+			}
+		}
+		if (arrayClass == null) {
+			throw new Error("logic flaw");
+		}
+
+		// instantiate array
+		var arrayClassDef = arrayClass.getParser().lookupTemplate(
+			[],	// errors
+			new TemplateInstantiationRequest(null, "Array", [ type ]),
+			(parser, classDef) -> null
+		);
+		if (arrayClassDef == null) {
+			throw new Error("logic flaw");
+		}
+
+		// semantic analysis
+		var createContext = function (parser : Parser) : AnalysisContext {
+			return new AnalysisContext(
+				[], // errors
+				parser,
+				function (parser : Parser, classDef : ClassDefinition) : ClassDefinition {
+					classDef.setAnalysisContextOfVariables(createContext(parser));
+					classDef.analyze(createContext(parser));
+					return classDef;
+				});
+		};
+		var parser = arrayClass.getParser();
+		arrayClassDef.resolveTypes(createContext(parser));
+		arrayClassDef.analyze(createContext(parser));
+
+		return new ObjectType(arrayClassDef);
 	}
 
 	var _outputStatements = null : Statement[];
@@ -2460,6 +2676,23 @@ class CPSTransformCommand extends FunctionTransformCommand {
 
 	function _getTransformingFuncDef () : MemberFunctionDefinition {
 		return this._funcDefs[this._funcDefs.length - 1];
+	}
+
+	var _tryStack = new _TryStatementTransformer[];
+
+	function _getUpperFinallyLabel () : string {
+		if (this._tryStack.length == 0) {
+			return "$L_exit";
+		}
+		return "$L_begin_finally_" + this._tryStack[this._tryStack.length - 1].getID();
+	}
+
+	function _enterTry (transformer : _TryStatementTransformer) : void {
+		this._tryStack.push(transformer);
+	}
+
+	function _leaveTry () : void {
+		this._tryStack.pop();
 	}
 
 	function _getStatementTransformerFor (statement : Statement) : _StatementTransformer {
@@ -2587,19 +2820,21 @@ class CPSTransformCommand extends FunctionTransformCommand {
 	}
 
 	static function _extractVM (funcDef : MemberFunctionDefinition) : MemberFunctionDefinition {
-		var funcStmt = funcDef.getStatements()[0] as FunctionStatement;
+		var funcStmt = funcDef.getStatements()[1] as FunctionStatement;
 		return funcStmt.getFuncDef();
 	}
 
 	static function _extractVMBody (funcDef : MemberFunctionDefinition) : Statement[] {
-		var funcStmt = funcDef.getStatements()[0] as FunctionStatement;
+		var funcStmt = funcDef.getStatements()[1] as FunctionStatement;
 		return funcStmt.getFuncDef().getStatements();
 	}
 
 	static function _extractVMDispatchBody (funcDef : MemberFunctionDefinition) : Statement[] {
-		var funcStmt = funcDef.getStatements()[0] as FunctionStatement;
-		var whileStmt = funcStmt.getFuncDef().getStatements()[0] as WhileStatement;
-		var switchStmt = whileStmt.getStatements()[0] as SwitchStatement;
+		var funcStmt = funcDef.getStatements()[1] as FunctionStatement;
+		var superiorWhileStmt = funcStmt.getFuncDef().getStatements()[0] as WhileStatement;
+		var tryStmt = superiorWhileStmt.getStatements()[0] as TryStatement;
+		var inferiorWhileStmt = tryStmt.getTryStatements()[0] as WhileStatement;
+		var switchStmt = inferiorWhileStmt.getStatements()[0] as SwitchStatement;
 		return switchStmt.getStatements();
 	}
 
@@ -2622,6 +2857,18 @@ class CPSTransformCommand extends FunctionTransformCommand {
 
 	static function _extractLoopLocal (funcDef : MemberFunctionDefinition) : LocalVariable {
 		return CPSTransformCommand._extractLocal(funcDef, "$loop");
+	}
+
+	static function _extractFinallyLocal (funcDef : MemberFunctionDefinition) : LocalVariable {
+		return CPSTransformCommand._extractLocal(funcDef, "$finally");
+	}
+
+	static function _extractRaisedLocal (funcDef : MemberFunctionDefinition) : LocalVariable {
+		return CPSTransformCommand._extractLocal(funcDef, "$raised");
+	}
+
+	static function _extractErrorLocal (funcDef : MemberFunctionDefinition) : LocalVariable {
+		return CPSTransformCommand._extractLocal(funcDef, "$error");
 	}
 
 }
@@ -2696,6 +2943,9 @@ class GeneratorTransformCommand extends FunctionTransformCommand {
 			Util.forEachStatement(function onStatement(statement) {
 				return statement.forEachExpression(function onExpr(expr, replaceCb) {
 					if (! (expr instanceof CallExpression))
+						return true;
+
+					if (! ((expr as CallExpression).getExpr() instanceof FunctionExpression))
 						return true;
 
 					function unfoldExpr (expr : Expression) : Expression {
