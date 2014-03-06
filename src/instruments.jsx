@@ -2613,6 +2613,15 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 		return null;
 	}
 
+	static function _extractLoopLocal (funcDef : MemberFunctionDefinition) : LocalVariable {
+		var locals = funcDef.getLocals();
+		for (var i = 0; i < locals.length; ++i) {
+			if (locals[i].getName().getValue() == "$loop")
+				return locals[i];
+		}
+		return null;
+	}
+
 }
 
 class _GeneratorTransformCommand extends _FunctionTransformCommand {
@@ -2862,7 +2871,7 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 						new Token("__loop", true),
 						[],
 						new StaticFunctionType(null, Type.voidType, [ Type.integerType ] : Type[], true)),
-					new LocalExpression(new Token("$loop", true), funcDef.getLocals()[funcDef.getLocals().length - 1]))));
+					new LocalExpression(new Token("$loop", true), _CPSTransformCommand._extractLoopLocal(funcDef)))));
 
 		// return the generator
 		statements.push(
