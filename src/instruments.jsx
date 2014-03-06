@@ -2170,7 +2170,7 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 
 		var returnLocal : LocalVariable = null;
 		if (! Type.voidType.equals(funcDef.getReturnType())) {
-			returnLocal = new LocalVariable(new Token("$return", false), funcDef.getReturnType());
+			returnLocal = new LocalVariable(new Token("$return", true), funcDef.getReturnType());
 			funcDef.getLocals().push(returnLocal);
 			this._enterFunction(returnLocal);
 		}
@@ -2289,7 +2289,7 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 		var labelIndeces = new Map.<int>;
 		for (var i = 0, c = 0; i < statements.length; ++i) {
 			if (statements[i] instanceof LabelStatement) {
-				var name =(statements[i] as LabelStatement).getName();
+				var name = (statements[i] as LabelStatement).getName();
 				labelIndeces[name] = c++;
 			}
 		}
