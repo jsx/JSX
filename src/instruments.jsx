@@ -2091,7 +2091,7 @@ class CPSTransformCommand extends FunctionTransformCommand {
 		funcDef._statements = statements;
 
 		// peep-hole optimization
-		this._eliminateDeadBranches(statements);
+		//this._eliminateDeadBranches(statements);
 
 		// replace goto statements with indirect threading
 		this._eliminateGotos(funcDef);
