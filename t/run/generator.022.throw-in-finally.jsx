@@ -2,7 +2,6 @@
 --enable-generator-emulation
 */
 /*EXPECTED
-throw from finally
 ok
 */
 class _Main {
