@@ -1914,7 +1914,39 @@ class _TryStatementTransformer extends _StatementTransformer {
 	}
 
 	override function _replaceControlStructuresWithGotos () : void {
-		throw new Error("logic flaw");
+		/*
+
+		try {
+			body;	// assumes no return or throw statements in body
+		} finally {
+			ensure;
+		}
+
+		goto $BEGIN_TRY_n;
+	$BEGIN_TRY_n;
+		body;
+		goto $BEGIN_FINALLY_n;
+	$BEGIN_FINALLY_n;
+		ensure;
+		goto $END_TRY_n;
+	$END_TRY_n;
+
+		*/
+		var beginLabel = "$L_begin_try_" + this.getID();
+		this._transformer._emit(new GotoStatement(beginLabel));
+		this._transformer._emit(new LabelStatement(beginLabel));
+		this._statement.getTryStatements().forEach((statement) -> {
+			this._transformer._getStatementTransformerFor(statement).replaceControlStructuresWithGotos();
+		});
+		var finallyLabel = "$L_begin_finally_" + this.getID();
+		this._transformer._emit(new GotoStatement(finallyLabel));
+		this._transformer._emit(new LabelStatement(finallyLabel));
+		this._statement.getFinallyStatements().forEach((statement) -> {
+			this._transformer._getStatementTransformerFor(statement).replaceControlStructuresWithGotos();
+		});
+		var endLabel = "$L_end_try_" + this.getID();
+		this._transformer._emit(new GotoStatement(endLabel));
+		this._transformer._emit(new LabelStatement(endLabel));
 	}
 
 }
@@ -2116,7 +2148,7 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 		return funcDef.forEachStatement(function onStatement (statement) {
 			if (statement instanceof ForInStatement)
 				return false;
-			if (statement instanceof TryStatement)
+			if (statement instanceof CatchStatement)
 				return false;
 			return statement.forEachExpression(function onExpr (expr) {
 				if (! this._transformYield && expr instanceof YieldExpression)
