@@ -2211,7 +2211,7 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 		funcDef._statements = statements;
 
 		// peep-hole optimization
-		//this._eliminateDeadBranches(statements);
+		this._eliminateDeadBranches(statements);
 
 		// replace goto statements with indirect threading
 		this._eliminateGotos(funcDef);
@@ -2224,9 +2224,17 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 
 	function _eliminateDeadBranches (statements : Statement[]) : void {
 
+		function isPseudoStatement (statement : Statement) : boolean {
+			return statement instanceof GotoStatement && (statement as GotoStatement).getLabel().search(/\$__/) != -1;
+		}
+
 		// removal of dead code after goto statement
 		for (var i = 0; i < statements.length; ++i) {
-			if (statements[i] instanceof GotoStatement) {
+			if (isPseudoStatement(statements[i])) {
+				if ((statements[i] as GotoStatement).getLabel() == "$__branch_finally__")
+					i += 2;
+			}
+			else if (statements[i] instanceof GotoStatement) {
 				for (var j = i; j < statements.length; ++j) {
 					if (statements[j] instanceof LabelStatement)
 						break;
@@ -2246,7 +2254,7 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 
 		// fold trivial branches
 		for (var i = 0; i < statements.length - 1; ++i) {
-			if (statements[i] instanceof LabelStatement && statements[i + 1] instanceof GotoStatement) {
+			if (statements[i] instanceof LabelStatement && statements[i + 1] instanceof GotoStatement && ! isPseudoStatement(statements[i + 1])) {
 				var srcLabel = statements[i] as LabelStatement;
 				var destLabel = (statements[i + 1] as GotoStatement).getLabel();
 				statements.splice(i, 2);
@@ -2283,7 +2291,7 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 			}
 		}
 		Util.forEachStatement(function onStatement (statement) {
-			if (statement instanceof GotoStatement) {
+			if (statement instanceof GotoStatement && ! isPseudoStatement(statement)) {
 				var gotoStmt = statement as GotoStatement;
 				gotoStmt.setLabel(labelRenames[gotoStmt.getLabel()]);
 			}
