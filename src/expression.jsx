@@ -1683,10 +1683,13 @@ class ArrayExpression extends BinaryExpression {
 		this._type = null;
 	}
 
+	function constructor (operatorToken : Token, expr1 : Expression, expr2 : Expression, type : Type) {
+		super(operatorToken, expr1, expr2);
+		this._type = type;
+	}
+
 	override function clone () : ArrayExpression {
-		var ret = new ArrayExpression(this._token, this._expr1.clone(), this._expr2.clone());
-		ret._type = this._type;
-		return ret;
+		return new ArrayExpression(this._token, this._expr1.clone(), this._expr2.clone(), this._type);
 	}
 
 	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
