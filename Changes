@@ -1,5 +1,9 @@
 Revision history for the JSX software development kit
 
+0.9.82 2014-03-06 12:07:00+0900
+    [FEATURES]
+    - inline optimizer tries to expand static functions passed as callbacks
+
 0.9.81 2014-03-05 11:11:00+0900
     [FEATURES]
     - Array#each has been renamed to Array#_forEach (#302)
