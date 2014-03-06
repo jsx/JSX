@@ -3101,27 +3101,34 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 
 	function _createVarsAndInit (callerFuncDef : MemberFunctionDefinition, calleeFuncDef : MemberFunctionDefinition, argsAndThisAndLocals : Expression[], initArgExpr : (Expression) -> void) : void {
 
-        function exprIsInlineable(expr : Expression) : boolean {
-            return (function onExpr(expr : Expression) : boolean {
-                if (expr instanceof LocalExpression) {
-                    return false;
-                } else if (expr instanceof FunctionExpression) {
-                    return true;
-                } else if (expr instanceof LeafExpression
-                    || expr instanceof LogicalNotExpression
-                    || expr instanceof BitwiseNotExpression
-                    || expr instanceof SignExpression
-                    || expr instanceof AdditiveExpression
-                    || expr instanceof EqualityExpression
-                    || expr instanceof ShiftExpression
-                    || expr instanceof MapLiteralExpression
-                    || expr instanceof ArrayLiteralExpression) {
-                    return expr.forEachExpression(onExpr);
-                } else {
-                    return false;
-                }
-            }(expr));
-        }
+		function exprIsInlineableFor(expr : Expression) : number {
+			if (expr instanceof LocalExpression) {
+				return -1;
+			} else if (expr instanceof FunctionExpression) {
+				return 1;
+			} else if (expr instanceof PropertyExpression
+				&& (expr as PropertyExpression).getExpr() instanceof ClassExpression
+				&& ! (expr as PropertyExpression).getType().isAssignable()) {
+				return Infinity;
+			} else if (expr instanceof LeafExpression
+				|| expr instanceof LogicalNotExpression
+				|| expr instanceof BitwiseNotExpression
+				|| expr instanceof SignExpression
+				|| expr instanceof AdditiveExpression
+				|| expr instanceof EqualityExpression
+				|| expr instanceof ShiftExpression
+				|| expr instanceof MapLiteralExpression
+				|| expr instanceof ArrayLiteralExpression) {
+				var min = 1;
+				expr.forEachExpression(function (expr) {
+					min = Math.min(min, exprIsInlineableFor(expr));
+					return min > 0;
+				});
+				return min;
+			} else {
+				return -1;
+			}
+		}
 
 		function createVarWithInit(funcDef : MemberFunctionDefinition, type : Type, baseName : string, initExpr : Expression) : LocalExpression {
 			var tempVar = this.createVar(funcDef, type, baseName);
@@ -3137,7 +3144,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		if ((calleeFuncDef.flags() & ClassDefinition.IS_STATIC) == 0) {
 			var thisIdx = argsAndThisAndLocals.length - 1;
 			var recvExpr = argsAndThisAndLocals[thisIdx];
-			if (! (recvExpr instanceof LeafExpression || (argUsed["this"] <= 1 && exprIsInlineable(recvExpr)))) {
+			if (! (recvExpr instanceof LeafExpression || (argUsed["this"] <= exprIsInlineableFor(recvExpr)))) {
 				argsAndThisAndLocals[thisIdx] = createVarWithInit(callerFuncDef, new ObjectType(calleeFuncDef.getClassDef()), "this", recvExpr);
 			}
 		}
@@ -3146,7 +3153,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		for (var i = 0; i < formalArgs.length; ++i) {
 			var numberOfUsed = argUsed[formalArgs[i].getName().getValue()];
 			var argExpr = argsAndThisAndLocals[i];
-			if (! (argExpr instanceof LeafExpression || (numberOfUsed <= 1 && exprIsInlineable(argExpr)))) {
+			if (! (argExpr instanceof LeafExpression || (numberOfUsed <= exprIsInlineableFor(argExpr)))) {
 				argsAndThisAndLocals[i] = createVarWithInit(callerFuncDef, formalArgs[i].getType(), formalArgs[i].getName().getValue(), argExpr);
 			}
 		}
