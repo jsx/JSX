@@ -6,6 +6,7 @@ try begin
 42
 try end
 finally
+after finally
 true
 */
 class _Main {
@@ -19,6 +20,7 @@ class _Main {
 			} finally {
 				log "finally";
 			}
+			log "after finally";
 		}
 
 		var g = foo();
