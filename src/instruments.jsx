@@ -1414,9 +1414,9 @@ class GeneratorTransformCommand extends FunctionTransformCommand {
 		super(compiler, GeneratorTransformCommand.IDENTIFIER);
 	}
 
-	override function performTransformation () : void {
+	override function setup(errors : CompileError[]) : void {
+		super.setup(errors);
 
-		// setup
 		var builtins = this._compiler.getBuiltinParsers()[0];
 		for (var i = 0; i < builtins._templateClassDefs.length; ++i) {
 			if (builtins._templateClassDefs[i].className() == "__jsx_generator_object") {
@@ -1426,9 +1426,6 @@ class GeneratorTransformCommand extends FunctionTransformCommand {
 		}
 
 		assert this._jsxGeneratorObject != null;
-
-		// doit
-		super.performTransformation();
 	}
 
 	override function transformFunction (funcDef : MemberFunctionDefinition) : void {

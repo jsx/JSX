@@ -51,12 +51,13 @@ class Compiler {
 	var _fileCache : Map.<string>;
 	var _searchPaths : string[];
 	var _builtinParsers : Parser[];
+	var _userEnvironment : Map.<string>;
 	var _emitter : Emitter;
 
 	function constructor (platform : Platform) {
 		this._platform = platform;
 		this._mode = Compiler.MODE_COMPILE;
-		this._transformCommands = new TransformCommand[];
+		this._transformCommands = [] : Array.<TransformCommand>;
 		this._optimizer = null;
 		this._warningFilters = [] : Array.<function(:CompileWarning):Nullable.<boolean>>;
 		this._warningAsError = false;
@@ -66,6 +67,7 @@ class Compiler {
 		// load the built-in classes
 		this.addSourceFile(null, this._platform.getRoot() + "/lib/built-in.jsx");
 		this._builtinParsers = this._parsers.concat(new Parser[]); // shallow clone
+		this._userEnvironment = new Map.<string>;
 	}
 
 	function addSearchPath (path : string) : void {
@@ -126,6 +128,10 @@ class Compiler {
 
 	function getBuiltinParsers () : Parser[] {
 		return this._builtinParsers;
+	}
+
+	function getUserEnvironment() : Map.<string> {
+		return this._userEnvironment;
 	}
 
 	function addSourceFile (token : Token, path : string) : Parser {
@@ -192,7 +198,9 @@ class Compiler {
 			return true;
 		}
 		// transformation
-		this._transform();
+		this._transform(errors);
+		if (! this._handleErrors(errors))
+			return false;
 		// optimization
 		this._optimize();
 		// TODO peep-hole and dead store optimizations, etc.
@@ -432,10 +440,20 @@ class Compiler {
 		});
 	}
 
-	function _transform () : void {
-		this._transformCommands.forEach((cmd) -> {
+	function _transform (errors : CompileError[]) : void {
+		function doit(cmd : TransformCommand) : boolean {
+			cmd.setup(errors);
 			cmd.performTransformation();
-		});
+			return errors.length == 0;
+		}
+		// apply the registered transformations
+		for (var i = 0; i < this._transformCommands.length; ++i) {
+			if (! doit(this._transformCommands[i]))
+				return;
+		}
+		// apply the fixed transformations
+		if (! doit(new FixedExpressionTransformCommand(this)))
+			return;
 	}
 
 	function _optimize () : void {

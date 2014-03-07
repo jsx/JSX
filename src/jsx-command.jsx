@@ -49,6 +49,7 @@ class JSXCommand {
 			"                             supported RUNENV is node, commonjs and web.\n" +
 			"  --run                      runs _Main.main(:string[]):void after compiling\n" +
 			"  --test                     runs _Test#test*():void after compiling\n" +
+			"  --define name=var          defines compile-time constant as a property of JSX.ENV\n" +
 			"  --output file              output file (default:stdout)\n" +
 			"  --input-filename file      specifies the root path for searching imports (used when the source-file is \"-\" (stdin))\n" +
 			"  --mode (compile|parse|doc) specifies compilation mode (default:compile)\n" +
@@ -162,6 +163,17 @@ class JSXCommand {
 					return new CompletionRequest((a[0] as number), (a[1] as number) - 1);
 				}();
 				compiler.setMode(Compiler.MODE_COMPLETE);
+				break;
+			case "--define":
+				if ((optarg = getoptarg()) == null) {
+					return 1;
+				}
+				var a = optarg.split(/=/, 2);
+				if (a.length != 2) {
+					platform.error("invalid environment variable (not defined as name=var): " + optarg);
+					return 1;
+				}
+				compiler.getUserEnvironment()[a[0]] = a[1];
 				break;
 			case "--target":
 				if ((optarg = getoptarg()) == null) {
