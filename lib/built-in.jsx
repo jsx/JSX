@@ -1457,6 +1457,11 @@ native final class JSX {
 	static const DEBUG = true;
 
 	/**
+	 * List of compile-time constants passed in by <code>jsx --define name=var</code>
+	 */
+	static const ENV : Map.<string>;
+
+	/**
 	 * Returns whether or not the profiler is running.
 	 * The profiler is enabled by <code>--profile</code> option.
 	 *
