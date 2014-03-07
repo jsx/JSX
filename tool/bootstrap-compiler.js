@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// generatedy by JSX compiler 0.9.82 (2014-03-07 17:05:50 +0900; c560f5123c6b0bcebe1e33ce4ed9f6c765576989)
+// generatedy by JSX compiler 0.9.83 (2014-03-07 19:06:44 +0900; bf8546af13dba4c1a7f25a164301606e02ac301e)
 var JSX = {};
 (function (JSX) {
 /**
@@ -4957,7 +4957,7 @@ function JSXCommand() {
 
 $__jsx_extend([JSXCommand], Object);
 function JSXCommand$help$() {
-	return "JSX compiler version " + Meta.VERSION_STRING + "\n" + "\n" + "Usage: jsx [options] source-file\n" + "\n" + "Options:\n" + "  --add-search-path path     adds a path to library search paths\n" + "  --executable RUNENV        adds launcher to call _Main.main(:string[]):void\n" + "                             supported RUNENV is node, commonjs and web.\n" + "  --run                      runs _Main.main(:string[]):void after compiling\n" + "  --test                     runs _Test#test*():void after compiling\n" + "  --output file              output file (default:stdout)\n" + "  --input-filename file      specifies the root path for searching imports (used when the source-file is \"-\" (stdin))\n" + "  --mode (compile|parse|doc) specifies compilation mode (default:compile)\n" + "  --target (javascript|c++)  specifies target language (default:javascript)\n" + "  --release                  disables run-time type checking and enables optimizations (" + Optimizer$getReleaseOptimizationCommands$().join(",") + ")\n" + "  --profile                  enables the profiler (experimental)\n" + "  --optimize cmd1,cmd2,...   enables optimization commands\n" + "  --warn type1,type2,...     enables warnings (all, unused, experimental, deprecated, none)\n" + "  --disable-type-check       disables run-time type checking\n" + "  --minify                   compresses the target JavaScript code\n" + "  --enable-source-map        enables source map debugging info\n" + "  --complete line:column     shows code completion at line:column\n" + "  --version                  displays the version and compiler identifier and exits\n" + "  --version-number           displays the version as number and exits\n" + "  --help                     displays this help and exits\n" + "\n" + "Env:\n" + "  JSX_OPTS   options of jsx(1)\n" + "  JSX_RUNJS  JavaScript engine used by --run and --test\n" + "";
+	return "JSX compiler version " + Meta.VERSION_STRING + "\n" + "\n" + "Usage: jsx [options] source-file\n" + "\n" + "Options:\n" + "  --add-search-path path     adds a path to library search paths\n" + "  --executable RUNENV        adds launcher to call _Main.main(:string[]):void\n" + "                             supported RUNENV is node, commonjs and web.\n" + "  --run                      runs _Main.main(:string[]):void after compiling\n" + "  --test                     runs _Test#test*():void after compiling\n" + "  --define name=var          defines compile-time constant as a property of JSX.ENV\n" + "  --output file              output file (default:stdout)\n" + "  --input-filename file      specifies the root path for searching imports (used when the source-file is \"-\" (stdin))\n" + "  --mode (compile|parse|doc) specifies compilation mode (default:compile)\n" + "  --target (javascript|c++)  specifies target language (default:javascript)\n" + "  --release                  disables run-time type checking and enables optimizations (" + Optimizer$getReleaseOptimizationCommands$().join(",") + ")\n" + "  --profile                  enables the profiler (experimental)\n" + "  --optimize cmd1,cmd2,...   enables optimization commands\n" + "  --warn type1,type2,...     enables warnings (all, unused, experimental, deprecated, none)\n" + "  --disable-type-check       disables run-time type checking\n" + "  --minify                   compresses the target JavaScript code\n" + "  --enable-source-map        enables source map debugging info\n" + "  --complete line:column     shows code completion at line:column\n" + "  --version                  displays the version and compiler identifier and exits\n" + "  --version-number           displays the version as number and exits\n" + "  --help                     displays this help and exits\n" + "\n" + "Env:\n" + "  JSX_OPTS   options of jsx(1)\n" + "  JSX_RUNJS  JavaScript engine used by --run and --test\n" + "";
 };
 
 JSXCommand.help$ = JSXCommand$help$;
@@ -4980,6 +4980,7 @@ function JSXCommand$main$LPlatform$AS(platform, args) {
 	var transformCommands;
 	var opt;
 	var optarg;
+	var a;
 	var switchOpt;
 	var mode;
 	var sourceFile;
@@ -5079,6 +5080,17 @@ function JSXCommand$main$LPlatform$AS(platform, args) {
 				return new CompletionRequest(+a[0], +a[1] - 1);
 			})();
 			compiler.setMode$N(Compiler.MODE_COMPLETE);
+			break;
+		case "--define":
+			if ((optarg = getoptarg()) == null) {
+				return 1;
+			}
+			a = optarg.split(/=/, 2);
+			if (a.length !== 2) {
+				platform.error$S("invalid environment variable (not defined as name=var): " + optarg);
+				return 1;
+			}
+			compiler.getUserEnvironment$()[a[0]] = a[1];
 			break;
 		case "--target":
 			if ((optarg = getoptarg()) == null) {
@@ -20738,14 +20750,23 @@ _FoldConstantCommand.prototype._foldCallExpression$LCallExpression$F$LExpression
 
 
 _FoldConstantCommand.prototype._foldEqualityExpression$LEqualityExpression$F$LExpression$V$ = function (expr, replaceCb) {
+	var $this = this;
 	var firstExpr;
 	var secondExpr;
 	var isEqual;
+	var isNullVsPrimitiveLiteral;
 	var result;
 	firstExpr = expr.getFirstExpr$();
 	secondExpr = expr.getSecondExpr$();
 	isEqual = null;
-	if (firstExpr instanceof StringLiteralExpression && secondExpr instanceof StringLiteralExpression) {
+	function isNullVsPrimitiveLiteral(x, y) {
+		return x instanceof NullExpression && y instanceof PrimitiveLiteralExpression;
+	}
+	if (firstExpr instanceof NullExpression && secondExpr instanceof NullExpression) {
+		isEqual = true;
+	} else if (isNullVsPrimitiveLiteral(firstExpr, secondExpr) || isNullVsPrimitiveLiteral(secondExpr, firstExpr)) {
+		isEqual = false;
+	} else if (firstExpr instanceof StringLiteralExpression && secondExpr instanceof StringLiteralExpression) {
 		isEqual = firstExpr.getDecoded$() === secondExpr.getDecoded$();
 	} else if (this._isIntegerOrNumberLiteralExpression$LExpression$(firstExpr) && this._isIntegerOrNumberLiteralExpression$LExpression$(secondExpr)) {
 		isEqual = _Util$0$decodeNumericLiteral$LExpression$(firstExpr) === _Util$0$decodeNumericLiteral$LExpression$(secondExpr);
@@ -22768,12 +22789,13 @@ _TailRecursionOptimizeCommand.prototype._replaceTailCallStatement$LMemberFunctio
 function Compiler(platform) {
 	this._searchPaths = null;
 	this._builtinParsers = null;
+	this._userEnvironment = null;
 	this._emitter = null;
 	this._npmModulesParsed = {};
 	this._packageJsonCache = {};
 	this._platform = platform;
 	this._mode = Compiler.MODE_COMPILE;
-	this._transformCommands = [];
+	this._transformCommands = [  ];
 	this._optimizer = null;
 	this._warningFilters = [  ];
 	this._warningAsError = false;
@@ -22782,6 +22804,7 @@ function Compiler(platform) {
 	this._searchPaths = [ this._platform.getRoot$() + "/lib/common" ];
 	this.addSourceFile$LToken$S(null, this._platform.getRoot$() + "/lib/built-in.jsx");
 	this._builtinParsers = this._parsers.concat([]);
+	this._userEnvironment = {};
 };
 
 $__jsx_extend([Compiler], Object);
@@ -22861,6 +22884,11 @@ Compiler.prototype.getBuiltinParsers$ = function () {
 };
 
 
+Compiler.prototype.getUserEnvironment$ = function () {
+	return this._userEnvironment;
+};
+
+
 Compiler.prototype.addSourceFile$LToken$S = function (token, path) {
 	return this.addSourceFile$LToken$SLCompletionRequest$(token, path, null);
 };
@@ -22934,7 +22962,10 @@ Compiler.prototype.compile$ = function () {
 	case Compiler.MODE_DOC:
 		return true;
 	}
-	this._transform$();
+	this._transform$ALCompileError$(errors);
+	if (! this._handleErrors$ALCompileError$(errors)) {
+		return false;
+	}
 	this._optimize$();
 	this._generateCode$ALCompileError$(errors);
 	if (! this._handleErrors$ALCompileError$(errors)) {
@@ -23196,11 +23227,23 @@ Compiler.prototype._analyze$ALCompileError$ = function (errors) {
 };
 
 
-Compiler.prototype._transform$ = function () {
+Compiler.prototype._transform$ALCompileError$ = function (errors) {
 	var $this = this;
-	this._transformCommands.forEach((function (cmd) {
+	var doit;
+	var i;
+	function doit(cmd) {
+		cmd.setup$ALCompileError$(errors);
 		cmd.performTransformation$();
-	}));
+		return errors.length === 0;
+	}
+	for (i = 0; i < this._transformCommands.length; ++i) {
+		if (! doit(this._transformCommands[i])) {
+			return;
+		}
+	}
+	if (! doit(new FixedExpressionTransformCommand(this))) {
+		return;
+	}
 };
 
 
@@ -25110,11 +25153,22 @@ _DebuggerStatementTransformer.prototype._replaceControlStructuresWithGotos$ = fu
 
 
 function TransformCommand(compiler, identifier) {
+	this.errors = null;
 	this._compiler = compiler;
 	this._identifier = identifier;
 };
 
 $__jsx_extend([TransformCommand], Object);
+TransformCommand.prototype.setup$ALCompileError$ = function (errors) {
+	this.errors = errors;
+};
+
+
+TransformCommand.prototype.getCompiler$ = function () {
+	return this._compiler;
+};
+
+
 function FunctionTransformCommand(compiler, identifier) {
 	TransformCommand.call(this, compiler, identifier);
 };
@@ -25153,9 +25207,10 @@ function GeneratorTransformCommand(compiler) {
 };
 
 $__jsx_extend([GeneratorTransformCommand], FunctionTransformCommand);
-GeneratorTransformCommand.prototype.performTransformation$ = function () {
+GeneratorTransformCommand.prototype.setup$ALCompileError$ = function (errors) {
 	var builtins;
 	var i;
+	TransformCommand.prototype.setup$ALCompileError$.call(this, errors);
 	builtins = this._compiler.getBuiltinParsers$()[0];
 	for (i = 0; i < builtins._templateClassDefs.length; ++i) {
 		if (builtins._templateClassDefs[i].className$() === "__jsx_generator_object") {
@@ -25163,7 +25218,6 @@ GeneratorTransformCommand.prototype.performTransformation$ = function () {
 			break;
 		}
 	}
-	FunctionTransformCommand.prototype.performTransformation$.call(this);
 };
 
 
@@ -25628,6 +25682,112 @@ CPSTransformCommand.prototype._getStatementTransformerFor$LStatement$ = function
 	throw new Error("got unexpected type of statement: " + JSON.stringify(statement.serialize$()));
 };
 
+
+function ExpressionTransformCommand(compiler, identifier) {
+	TransformCommand.call(this, compiler, identifier);
+};
+
+$__jsx_extend([ExpressionTransformCommand], TransformCommand);
+ExpressionTransformCommand.prototype.performTransformation$ = function () {
+	var $this = this;
+	var touchMemberFunction;
+	var touchMemberVariable;
+	function touchMemberFunction(member) {
+		member.forEachStatement$F$LStatement$B$((function (stmt) {
+			return $this.touchStatement$LStatement$(stmt);
+		}));
+	}
+	function touchMemberVariable(member) {
+		var expr;
+		expr = member.getInitialValue$();
+		if (expr != null) {
+			$this.touchExpression$LExpression$F$LExpression$V$(expr, (function (expr) {
+				return member.setInitialValue$LExpression$(expr);
+			}));
+		}
+	}
+	this._compiler.forEachClassDef$F$LParser$LClassDefinition$B$((function (parser, classDef) {
+		if (! (classDef instanceof TemplateClassDefinition)) {
+			classDef.forEachMember$F$LMemberDefinition$B$((function (member) {
+				if (! (classDef instanceof TemplateFunctionDefinition)) {
+					if (member instanceof MemberFunctionDefinition) {
+						touchMemberFunction(member);
+					} else {
+						if (! (member instanceof MemberVariableDefinition)) {
+							debugger;
+							throw new Error("[src/transformer.jsx:113:42] assertion failure\n                            assert member instanceof MemberVariableDefinition;\n                                          ^^^^^^^^^^\n");
+						}
+						touchMemberVariable(member);
+					}
+				}
+				return true;
+			}));
+		}
+		return true;
+	}));
+};
+
+
+ExpressionTransformCommand.prototype.touchStatement$LStatement$ = function (stmt) {
+	var $this = this;
+	if (stmt instanceof FunctionStatement) {
+		stmt.getFuncDef$().forEachStatement$F$LStatement$B$((function (stmt) {
+			return $this.touchStatement$LStatement$(stmt);
+		}));
+	}
+	stmt.forEachStatement$F$LStatement$B$((function (stmt) {
+		return $this.touchStatement$LStatement$(stmt);
+	}));
+	stmt.forEachExpression$F$LExpression$F$LExpression$V$B$((function (expr, replaceCb) {
+		return $this.touchExpression$LExpression$F$LExpression$V$(expr, replaceCb);
+	}));
+	return true;
+};
+
+
+ExpressionTransformCommand.prototype.touchExpression$LExpression$F$LExpression$V$ = function (expr, replaceCb) {
+	var $this = this;
+	if (expr instanceof FunctionExpression) {
+		expr.getFuncDef$().forEachStatement$F$LStatement$B$((function (stmt) {
+			return $this.touchStatement$LStatement$(stmt);
+		}));
+	}
+	expr.forEachExpression$F$LExpression$F$LExpression$V$B$((function (expr, replaceCb) {
+		return $this.touchExpression$LExpression$F$LExpression$V$(expr, replaceCb);
+	}));
+	return true;
+};
+
+
+function FixedExpressionTransformCommand(compiler) {
+	ExpressionTransformCommand.call(this, compiler, FixedExpressionTransformCommand.IDENTIFIER);
+};
+
+$__jsx_extend([FixedExpressionTransformCommand], ExpressionTransformCommand);
+FixedExpressionTransformCommand.prototype.touchExpression$LExpression$F$LExpression$V$ = function (expr, replaceCb) {
+	var envName;
+	var envVar;
+	if (expr instanceof ArrayExpression && expr.getFirstExpr$() instanceof PropertyExpression && FixedExpressionTransformCommand$_refersToJSXENV$LPropertyExpression$(expr.getFirstExpr$()) && expr.getSecondExpr$() instanceof StringLiteralExpression) {
+		envName = expr.getSecondExpr$().getDecoded$();
+		envVar = this.getCompiler$().getUserEnvironment$()[envName];
+		if (envVar != null) {
+			replaceCb(new StringLiteralExpression(new Token$2(Util$encodeStringLiteral$S(envVar), false)));
+		} else {
+			replaceCb(new NullExpression(new Token$2("null", false), new NullableType(Type.stringType)));
+		}
+		return true;
+	} else if (expr instanceof PropertyExpression && FixedExpressionTransformCommand$_refersToJSXENV$LPropertyExpression$(expr)) {
+		this.errors.push(new CompileError(expr.getToken$(), "JSX.ENV can only be accessed via: JSX.ENV[\"string-literal\"]"));
+	}
+	return ExpressionTransformCommand.prototype.touchExpression$LExpression$F$LExpression$V$.call(this, expr, replaceCb);
+};
+
+
+function FixedExpressionTransformCommand$_refersToJSXENV$LPropertyExpression$(expr) {
+	return expr.getExpr$() instanceof ClassExpression && expr.getExpr$().getToken$().getValue$() === "JSX" && expr.getIdentifierToken$().getValue$() === "ENV";
+};
+
+FixedExpressionTransformCommand._refersToJSXENV$LPropertyExpression$ = FixedExpressionTransformCommand$_refersToJSXENV$LPropertyExpression$;
 
 function Util$x2EArgumentTypeRequest(argTypes, typeArgs) {
 	this.argTypes = argTypes;
@@ -26150,10 +26310,10 @@ $__jsx_lazy_init(NodePlatform, "_isColorSupported", function () {
 		return false;
 	})();
 });
-Meta.VERSION_STRING = "0.9.82";
-Meta.VERSION_NUMBER = 0.009082;
-Meta.LAST_COMMIT_HASH = "c560f5123c6b0bcebe1e33ce4ed9f6c765576989";
-Meta.LAST_COMMIT_DATE = "2014-03-07 17:05:50 +0900";
+Meta.VERSION_STRING = "0.9.83";
+Meta.VERSION_NUMBER = 0.009083;
+Meta.LAST_COMMIT_HASH = "bf8546af13dba4c1a7f25a164301606e02ac301e";
+Meta.LAST_COMMIT_DATE = "2014-03-07 19:06:44 +0900";
 $__jsx_lazy_init(Meta, "IDENTIFIER", function () {
 	return Meta.VERSION_STRING + " (" + Meta.LAST_COMMIT_DATE + "; " + Meta.LAST_COMMIT_HASH + ")";
 });
@@ -26303,6 +26463,7 @@ $__jsx_lazy_init(_StatementTransformer, "_statementCountMap", function () {
 });
 GeneratorTransformCommand.IDENTIFIER = "generator";
 CPSTransformCommand.IDENTIFIER = "cps";
+FixedExpressionTransformCommand.IDENTIFIER = "fixed";
 _SwitchStatementTransformer$x2ECaseStash.ID = "CASE-ID";
 _SwitchStatementTransformer$x2ECaseStash.count = 0;
 
@@ -26969,7 +27130,11 @@ var $__jsx_classMap = {
 		TransformCommand: TransformCommand,
 		TransformCommand$LCompiler$S: TransformCommand,
 		FunctionTransformCommand: FunctionTransformCommand,
-		FunctionTransformCommand$LCompiler$S: FunctionTransformCommand
+		FunctionTransformCommand$LCompiler$S: FunctionTransformCommand,
+		ExpressionTransformCommand: ExpressionTransformCommand,
+		ExpressionTransformCommand$LCompiler$S: ExpressionTransformCommand,
+		FixedExpressionTransformCommand: FixedExpressionTransformCommand,
+		FixedExpressionTransformCommand$LCompiler$: FixedExpressionTransformCommand
 	}
 };
 
