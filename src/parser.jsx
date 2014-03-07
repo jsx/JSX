@@ -3207,7 +3207,7 @@ class Parser {
 		}
 		var funcLocal : LocalVariable = null;
 		if (name != null) {
-			funcLocal = new LocalVariable(name, type);
+			funcLocal = new LocalVariable(name, type, false); // FIXME should be constant?
 		}
 
 		var funcDef = this._functionBody(token, name, funcLocal, args, returnType, true, isGenerator);

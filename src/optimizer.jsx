@@ -402,7 +402,7 @@ abstract class _OptimizeCommand {
 		}
 		for (var i = 0; nameExists(baseName + "$" + i as string); ++i)
 			;
-		var newLocal = new LocalVariable(new Token(baseName + "$" + i as string, false), type);
+		var newLocal = new LocalVariable(new Token(baseName + "$" + i as string, false), type, false);
 		locals.push(newLocal);
 		this.log("rewriting " + baseName + " to " + newLocal.getName().getValue());
 		return newLocal;

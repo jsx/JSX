@@ -62,7 +62,7 @@ class _Util {
 
 	static function _createFreshLocalVariable (type : Type) : LocalVariable {
 		var id = _Util._numUniqVar++;
-		return new LocalVariable(new Token("$a" + id, true), type);
+		return new LocalVariable(new Token("$a" + id, true), type, false);
 	}
 
 	static function _createAnonymousFunction (parent : MemberFunctionDefinition, token : Token /* null for auto-gen */, args : ArgumentDeclaration[], returnType : Type) : MemberFunctionDefinition {
@@ -1025,7 +1025,7 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 
 		var returnLocal : LocalVariable = null;
 		if (! Type.voidType.equals(funcDef.getReturnType())) {
-			returnLocal = new LocalVariable(new Token("$return", false), funcDef.getReturnType());
+			returnLocal = new LocalVariable(new Token("$return", false), funcDef.getReturnType(), false);
 			funcDef.getLocals().push(returnLocal);
 			this._enterFunction(returnLocal);
 		}
@@ -1132,7 +1132,7 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 	function _eliminateGotos (funcDef : MemberFunctionDefinition) : void {
 		var statements = funcDef.getStatements();
 
-		var loopVar = new LocalVariable(new Token("$loop", true), new StaticFunctionType(null, Type.voidType, [ Type.integerType ] : Type[], true));
+		var loopVar = new LocalVariable(new Token("$loop", true), new StaticFunctionType(null, Type.voidType, [ Type.integerType ] : Type[], true), false);
 		funcDef.getLocals().push(loopVar);
 
 		// create executor
@@ -1493,7 +1493,7 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 
 		// create a generator object
 		var genType = this._instantiateGeneratorType(yieldingType);
-		var genLocal = new LocalVariable(new Token("$generator", false), genType);
+		var genLocal = new LocalVariable(new Token("$generator", false), genType, false);
 		funcDef.getLocals().push(genLocal);
 
 		function getGlobalDispatchBody (funcDef : MemberFunctionDefinition) : Statement[] {
