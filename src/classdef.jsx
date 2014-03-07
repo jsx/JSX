@@ -1379,7 +1379,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 					// ok
 				} else {
 					// clone
-					newFuncLocal = new LocalVariable(funcLocal.getName(), funcLocal.getType());
+					newFuncLocal = new LocalVariable(funcLocal.getName(), funcLocal.getType(), funcLocal.isConstant());
 					getStash(funcLocal).newLocal = newFuncLocal;
 				}
 				funcLocal = newFuncLocal;
@@ -1395,7 +1395,7 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 					// in case local is a name of a function statement and the function statement already cloned
 					return newLocal;
 				}
-				newLocal = new LocalVariable(local.getName(), local.getType());
+				newLocal = new LocalVariable(local.getName(), local.getType(), local.isConstant());
 				getStash(local).newLocal = newLocal;
 				return newLocal;
 			});
