@@ -99,7 +99,6 @@ class JSXCommand {
 		var tasks = new Array.<() -> void>;
 
 		var optimizer : Optimizer = null;
-		var transformer : CodeTransformer = null;
 		var completionRequest : CompletionRequest = null;
 		var emitter : Emitter = null;
 		var outputFile : Nullable.<string> = null;
@@ -439,8 +438,6 @@ class JSXCommand {
 			}
 		}
 
-		transformer = new CodeTransformer();
-
 		optimizer = new Optimizer();
 
 		tasks.forEach(function(proc) { proc(); });
@@ -450,13 +447,11 @@ class JSXCommand {
 			return 1;
 		}
 
-		var err = transformer.setup(transformCommands);
+		var err = compiler.setTransformCommands(transformCommands);
 		if (err != null) {
 			platform.error(err);
 			return 1;
 		}
-
-		compiler.setTransformer(transformer);
 
 		err = optimizer.setup(optimizeCommands);
 		if (err != null) {

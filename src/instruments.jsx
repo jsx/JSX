@@ -26,6 +26,7 @@ import "./classdef.jsx";
 import "./expression.jsx";
 import "./statement.jsx";
 import "./parser.jsx";
+import "./transformer.jsx";
 import "./type.jsx";
 import "./util.jsx";
 import "./emitter.jsx";
@@ -115,10 +116,10 @@ abstract class _StatementTransformer {
 
 	static var _statementCountMap = new Map.<number>;
 
-	var _transformer : _CPSTransformCommand;
+	var _transformer : CPSTransformCommand;
 	var _id : number;
 
-	function constructor (transformer : _CPSTransformCommand, identifier : string) {
+	function constructor (transformer : CPSTransformCommand, identifier : string) {
 		this._transformer = transformer;
 
 		if (_StatementTransformer._statementCountMap[identifier] == null) {
@@ -145,7 +146,7 @@ class _ConstructorInvocationStatementTransformer extends _StatementTransformer {
 
 	var _statement : ConstructorInvocationStatement;
 
-	function constructor (transformer : _CPSTransformCommand, statement : ConstructorInvocationStatement) {
+	function constructor (transformer : CPSTransformCommand, statement : ConstructorInvocationStatement) {
 		super(transformer, "CONSTRUCTOR-INVOCATION");
 		this._statement = statement;
 	}
@@ -164,7 +165,7 @@ class _ExpressionStatementTransformer extends _StatementTransformer {
 
 	var _statement : ExpressionStatement;
 
-	function constructor (transformer : _CPSTransformCommand, statement : ExpressionStatement) {
+	function constructor (transformer : CPSTransformCommand, statement : ExpressionStatement) {
 		super(transformer, "EXPRESSION");
 		this._statement = statement;
 	}
@@ -183,7 +184,7 @@ class _FunctionStatementTransformer extends _StatementTransformer {
 
 	var _statement : FunctionStatement;
 
-	function constructor (transformer : _CPSTransformCommand, statement : FunctionStatement) {
+	function constructor (transformer : CPSTransformCommand, statement : FunctionStatement) {
 		super(transformer, "FUNCTION");
 		this._statement = statement;
 	}
@@ -210,7 +211,7 @@ class _ReturnStatementTransformer extends _StatementTransformer {
 
 	var _statement : ReturnStatement;
 
-	function constructor (transformer : _CPSTransformCommand, statement : ReturnStatement) {
+	function constructor (transformer : CPSTransformCommand, statement : ReturnStatement) {
 		super(transformer, "RETURN");
 		this._statement = statement;
 	}
@@ -248,7 +249,7 @@ class _YieldStatementTransformer extends _StatementTransformer {
 
 	var _statement : YieldStatement;
 
-	function constructor (transformer : _CPSTransformCommand, statement : YieldStatement) {
+	function constructor (transformer : CPSTransformCommand, statement : YieldStatement) {
 		super(transformer, "YIELD");
 		this._statement = statement;
 	}
@@ -271,7 +272,7 @@ class _DeleteStatementTransformer extends _StatementTransformer {
 
 	var _statement : DeleteStatement;
 
-	function constructor (transformer : _CPSTransformCommand, statement : DeleteStatement) {
+	function constructor (transformer : CPSTransformCommand, statement : DeleteStatement) {
 		super(transformer, "DELETE");
 		this._statement = statement;
 	}
@@ -290,7 +291,7 @@ class _BreakStatementTransformer extends _StatementTransformer {
 
 	var _statement : BreakStatement;
 
-	function constructor (transformer : _CPSTransformCommand, statement : BreakStatement) {
+	function constructor (transformer : CPSTransformCommand, statement : BreakStatement) {
 		super(transformer, "BREAK");
 		this._statement = statement;
 	}
@@ -315,7 +316,7 @@ class _ContinueStatementTransformer extends _StatementTransformer {
 
 	var _statement : ContinueStatement;
 
-	function constructor (transformer : _CPSTransformCommand, statement : ContinueStatement) {
+	function constructor (transformer : CPSTransformCommand, statement : ContinueStatement) {
 		super(transformer, "CONTINUE");
 		this._statement = statement;
 	}
@@ -338,7 +339,7 @@ class _ContinueStatementTransformer extends _StatementTransformer {
 
 abstract class _LabellableStatementTransformer extends _StatementTransformer {
 
-	function constructor (transformer : _CPSTransformCommand, identifier : string) {
+	function constructor (transformer : CPSTransformCommand, identifier : string) {
 		super(transformer, identifier);
 	}
 
@@ -351,7 +352,7 @@ class _DoWhileStatementTransformer extends _LabellableStatementTransformer {
 
 	var _statement : DoWhileStatement;
 
-	function constructor (transformer : _CPSTransformCommand, statement : DoWhileStatement) {
+	function constructor (transformer : CPSTransformCommand, statement : DoWhileStatement) {
 		super(transformer, "DO-WHILE");
 		this._statement = statement;
 	}
@@ -410,7 +411,7 @@ class _ForInStatementTransformer extends _LabellableStatementTransformer {
 
 	var _statement : ForInStatement;
 
-	function constructor (transformer : _CPSTransformCommand, statement : ForInStatement) {
+	function constructor (transformer : CPSTransformCommand, statement : ForInStatement) {
 		super(transformer, "FOR-IN");
 		this._statement = statement;
 	}
@@ -436,7 +437,7 @@ class _ForStatementTransformer extends _LabellableStatementTransformer {
 
 	var _statement : ForStatement;
 
-	function constructor (transformer : _CPSTransformCommand, statement : ForStatement) {
+	function constructor (transformer : CPSTransformCommand, statement : ForStatement) {
 		super(transformer, "FOR");
 		this._statement = statement;
 	}
@@ -517,7 +518,7 @@ class _IfStatementTransformer extends _StatementTransformer {
 
 	var _statement : IfStatement;
 
-	function constructor (transformer : _CPSTransformCommand, statement : IfStatement) {
+	function constructor (transformer : CPSTransformCommand, statement : IfStatement) {
 		super(transformer, "IF");
 		this._statement = statement;
 	}
@@ -577,7 +578,7 @@ class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 
 	var _statement : SwitchStatement;
 
-	function constructor (transformer : _CPSTransformCommand, statement : SwitchStatement) {
+	function constructor (transformer : CPSTransformCommand, statement : SwitchStatement) {
 		super(transformer, "SWITCH");
 		this._statement = statement;
 		// create and register a stash
@@ -722,7 +723,7 @@ class _CaseStatementTransformer extends _StatementTransformer {
 
 	var _statement : CaseStatement;
 
-	function constructor (transformer : _CPSTransformCommand, statement : CaseStatement) {
+	function constructor (transformer : CPSTransformCommand, statement : CaseStatement) {
 		super(transformer, "CASE");
 		this._statement = statement;
 	}
@@ -741,7 +742,7 @@ class _DefaultStatementTransformer extends _StatementTransformer {
 
 	var _statement : DefaultStatement;
 
-	function constructor (transformer : _CPSTransformCommand, statement : DefaultStatement) {
+	function constructor (transformer : CPSTransformCommand, statement : DefaultStatement) {
 		super(transformer, "DEFAULT");
 		this._statement = statement;
 	}
@@ -760,7 +761,7 @@ class _WhileStatementTransformer extends _LabellableStatementTransformer {
 
 	var _statement : WhileStatement;
 
-	function constructor (transformer : _CPSTransformCommand, statement : WhileStatement) {
+	function constructor (transformer : CPSTransformCommand, statement : WhileStatement) {
 		super(transformer, "WHILE");
 		this._statement = statement;
 	}
@@ -819,7 +820,7 @@ class _TryStatementTransformer extends _StatementTransformer {
 
 	var _statement : TryStatement;
 
-	function constructor (transformer : _CPSTransformCommand, statement : TryStatement) {
+	function constructor (transformer : CPSTransformCommand, statement : TryStatement) {
 		super(transformer, "TRY");
 		this._statement = statement;
 	}
@@ -838,7 +839,7 @@ class _CatchStatementTransformer extends _StatementTransformer {
 
 	var _statement : CatchStatement;
 
-	function constructor (transformer : _CPSTransformCommand, statement : CatchStatement) {
+	function constructor (transformer : CPSTransformCommand, statement : CatchStatement) {
 		super(transformer, "CATCH");
 		this._statement = statement;
 	}
@@ -857,7 +858,7 @@ class _ThrowStatementTransformer extends _StatementTransformer {
 
 	var _statement : ThrowStatement;
 
-	function constructor (transformer : _CPSTransformCommand, statement : ThrowStatement) {
+	function constructor (transformer : CPSTransformCommand, statement : ThrowStatement) {
 		super(transformer, "THROW");
 		this._statement = statement;
 	}
@@ -876,7 +877,7 @@ class _AssertStatementTransformer extends _StatementTransformer {
 
 	var _statement : AssertStatement;
 
-	function constructor (transformer : _CPSTransformCommand, statement : AssertStatement) {
+	function constructor (transformer : CPSTransformCommand, statement : AssertStatement) {
 		super(transformer, "ASSERT");
 		this._statement = statement;
 	}
@@ -895,7 +896,7 @@ class _LogStatementTransformer extends _StatementTransformer {
 
 	var _statement : LogStatement;
 
-	function constructor (transformer : _CPSTransformCommand, statement : LogStatement) {
+	function constructor (transformer : CPSTransformCommand, statement : LogStatement) {
 		super(transformer, "LOG");
 		this._statement = statement;
 	}
@@ -914,7 +915,7 @@ class _DebuggerStatementTransformer extends _StatementTransformer {
 
 	var _statement : DebuggerStatement;
 
-	function constructor (transformer : _CPSTransformCommand, statement : DebuggerStatement) {
+	function constructor (transformer : CPSTransformCommand, statement : DebuggerStatement) {
 		super(transformer, "DEBUGGER");
 		this._statement = statement;
 	}
@@ -929,65 +930,14 @@ class _DebuggerStatementTransformer extends _StatementTransformer {
 
 }
 
-abstract class _TransformCommand {
-
-	var _identifier : string;
-	var _compiler : Compiler;
-
-	function constructor (identifier : string) {
-		this._identifier = identifier;
-		this._compiler = null;
-	}
-
-	function setCompiler (compiler : Compiler) : void {
-		this._compiler = compiler;
-	}
-
-	abstract function performTransformation () : void;
-
-}
-
-abstract class _FunctionTransformCommand extends _TransformCommand {
-
-	function constructor (identifier : string) {
-		super(identifier);
-	}
-
-	override function performTransformation () : void {
-		this._getAllClosures().forEach((funcDef) -> {
-			this.transformFunction(funcDef);
-		});
-	}
-
-	abstract function transformFunction (funcDef : MemberFunctionDefinition) : void;
-
-	function _getAllClosures () : MemberFunctionDefinition[] {
-		var closures = new MemberFunctionDefinition[];
-		// deeper is first
-		this._compiler.forEachClassDef(function (parser, classDef) {
-			return classDef.forEachMember(function onMember(member) {
-				member.forEachClosure(function (funcDef) {
-					return onMember(funcDef);
-				});
-				if (member instanceof MemberFunctionDefinition) {
-					closures.push(member as MemberFunctionDefinition);
-				}
-				return true;
-			});
-		});
-		return closures;
-	}
-
-}
-
-class _CPSTransformCommand extends _FunctionTransformCommand {
+class CPSTransformCommand extends FunctionTransformCommand {
 
 	static const IDENTIFIER = "cps";
 
 	var _transformYield : boolean;
 
-	function constructor () {
-		super(_CPSTransformCommand.IDENTIFIER);
+	function constructor (compiler : Compiler) {
+		super(compiler, CPSTransformCommand.IDENTIFIER);
 		this._transformYield = false;
 	}
 
@@ -1454,20 +1404,20 @@ class _CPSTransformCommand extends _FunctionTransformCommand {
 
 }
 
-class _GeneratorTransformCommand extends _FunctionTransformCommand {
+class GeneratorTransformCommand extends FunctionTransformCommand {
 
 	static const IDENTIFIER = "generator";
 
 	var _jsxGeneratorObject : TemplateClassDefinition;
 
-	function constructor () {
-		super(_GeneratorTransformCommand.IDENTIFIER);
+	function constructor (compiler : Compiler) {
+		super(compiler, GeneratorTransformCommand.IDENTIFIER);
 	}
 
-	override function setCompiler (compiler : Compiler) : void {
-		super.setCompiler(compiler);
+	override function performTransformation () : void {
 
-		var builtins = compiler.getBuiltinParsers()[0];
+		// setup
+		var builtins = this._compiler.getBuiltinParsers()[0];
 		for (var i = 0; i < builtins._templateClassDefs.length; ++i) {
 			if (builtins._templateClassDefs[i].className() == "__jsx_generator_object") {
 				this._jsxGeneratorObject = builtins._templateClassDefs[i];
@@ -1476,6 +1426,9 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 		}
 
 		assert this._jsxGeneratorObject != null;
+
+		// doit
+		super.performTransformation();
 	}
 
 	override function transformFunction (funcDef : MemberFunctionDefinition) : void {
@@ -1512,8 +1465,7 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 			return null;
 		}
 
-		var cpsTransformer = new _CPSTransformCommand;
-		cpsTransformer.setCompiler(this._compiler);
+		var cpsTransformer = new CPSTransformCommand(this._compiler);
 		cpsTransformer.setTransformYield(true);
 		cpsTransformer.transformFunction(funcDef);
 
@@ -1665,48 +1617,6 @@ class _GeneratorTransformCommand extends _FunctionTransformCommand {
 		genClassDef.analyze(createContext(parser));
 
 		return new ObjectType(genClassDef);
-	}
-
-}
-
-class CodeTransformer {
-
-	var _commands : _TransformCommand[];
-
-	function constructor () {
-		this._commands = new _TransformCommand[];
-	}
-
-	function setup (cmds : string[]) : Nullable.<string> {
-
-		for (var i = 0; i < cmds.length; ++i) {
-			var cmd = cmds[i];
-			switch (cmd) {
-			case "generator":
-				this._commands.push(new _GeneratorTransformCommand()); break;
-			case "cps":
-				this._commands.push(new _CPSTransformCommand()); break;
-			default:
-				return "unknown transformation command: " + cmd;
-			}
-		}
-		return null;
-	}
-
-	function setCompiler (compiler : Compiler) : CodeTransformer {
-
-		// setup transform commands
-		this._commands.forEach((cmd) -> {
-			cmd.setCompiler(compiler);
-		});
-
-		return this;
-	}
-
-	function performTransformation () : void {
-		this._commands.forEach((cmd) -> {
-			cmd.performTransformation();
-		});
 	}
 
 }

@@ -31,6 +31,7 @@ import "./optimizer.jsx";
 import "./completion.jsx";
 import "./instruments.jsx";
 import "./statement.jsx";
+import "./transformer.jsx";
 
 
 class Compiler {
@@ -42,7 +43,7 @@ class Compiler {
 
 	var _platform : Platform;
 	var _mode : number;
-	var _transformer : CodeTransformer;
+	var _transformCommands : TransformCommand[];
 	var _optimizer : Optimizer;
 	var _warningFilters : Array.<function(:CompileWarning):Nullable.<boolean>>;
 	var _warningAsError : boolean;
@@ -55,7 +56,7 @@ class Compiler {
 	function constructor (platform : Platform) {
 		this._platform = platform;
 		this._mode = Compiler.MODE_COMPILE;
-		this._transformer = null;
+		this._transformCommands = new TransformCommand[];
 		this._optimizer = null;
 		this._warningFilters = [] : Array.<function(:CompileWarning):Nullable.<boolean>>;
 		this._warningAsError = false;
@@ -92,8 +93,19 @@ class Compiler {
 		this._emitter = emitter;
 	}
 
-	function setTransformer (transformer : CodeTransformer) : void {
-		this._transformer = transformer;
+	function setTransformCommands(cmds : string[]) : Nullable.<string> {
+		for (var i = 0; i < cmds.length; ++i) {
+			var cmd = cmds[i];
+			switch (cmd) {
+			case "generator":
+				this._transformCommands.push(new GeneratorTransformCommand(this)); break;
+			case "cps":
+				this._transformCommands.push(new CPSTransformCommand(this)); break;
+			default:
+				return "unknown transformation command: " + cmd;
+			}
+		}
+		return null;
 	}
 
 	function setOptimizer (optimizer : Optimizer) : void {
@@ -421,8 +433,9 @@ class Compiler {
 	}
 
 	function _transform () : void {
-		if (this._transformer != null)
-			this._transformer.setCompiler(this).performTransformation();
+		this._transformCommands.forEach((cmd) -> {
+			cmd.performTransformation();
+		});
 	}
 
 	function _optimize () : void {
