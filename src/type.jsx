@@ -42,7 +42,7 @@ abstract class Type {
 	abstract function isAssignable() : boolean;
 	abstract function isConvertibleTo(type : Type) : boolean;
 	abstract function getClassDef() : ClassDefinition;
-	abstract function instantiate (instantiationContext : InstantiationContext) : Type;
+	abstract function instantiate (instantiationContext : InstantiationContext, allowVoid : boolean) : Type;
 
 	function equals (x : Type) : boolean {
 		return this == x;
@@ -192,7 +192,8 @@ abstract class Type {
 
 class VoidType extends Type {
 
-	override function instantiate (instantiationContext : InstantiationContext) : VoidType {
+	override function instantiate (instantiationContext : InstantiationContext, allowVoid : boolean) : VoidType {
+		assert allowVoid;
 		return this;
 	}
 
@@ -216,7 +217,7 @@ class VoidType extends Type {
 
 class NullType extends Type {
 
-	override function instantiate (instantiationContext : InstantiationContext) : NullType {
+	override function instantiate (instantiationContext : InstantiationContext, allowVoid : boolean) : NullType {
 		return this;
 	}
 
@@ -242,7 +243,7 @@ class NullType extends Type {
 
 abstract class PrimitiveType extends Type {
 
-	override function instantiate (instantiationContext : InstantiationContext) : Type {
+	override function instantiate (instantiationContext : InstantiationContext, allowVoid : boolean) : Type {
 		return this;
 	}
 
@@ -331,7 +332,7 @@ class StringType extends PrimitiveType {
 // any type
 class VariantType extends Type {
 
-	override function instantiate (instantiationContext : InstantiationContext) : VariantType {
+	override function instantiate (instantiationContext : InstantiationContext, allowVoid : boolean) : VariantType {
 		return this;
 	}
 
@@ -365,8 +366,8 @@ class NullableType extends Type {
 		this._baseType = type instanceof NullableType ? (type as NullableType)._baseType : type;
 	}
 
-	override function instantiate (instantiationContext : InstantiationContext) : Type {
-		var baseType = this._baseType.resolveIfNullable().instantiate(instantiationContext);
+	override function instantiate (instantiationContext : InstantiationContext, allowVoid : boolean) : Type {
+		var baseType = this._baseType.resolveIfNullable().instantiate(instantiationContext, allowVoid);
 		return baseType.toNullableType();
 	}
 
@@ -412,8 +413,8 @@ class VariableLengthArgumentType extends Type {
 		this._baseType = type;
 	}
 
-	override function instantiate (instantiationContext : InstantiationContext) : VariableLengthArgumentType {
-		var baseType = this._baseType.instantiate(instantiationContext);
+	override function instantiate (instantiationContext : InstantiationContext, allowVoid : boolean) : VariableLengthArgumentType {
+		var baseType = this._baseType.instantiate(instantiationContext, allowVoid);
 		return new VariableLengthArgumentType(baseType);
 	}
 
@@ -459,7 +460,7 @@ class ObjectType extends Type {
 		this._classDef = classDef;
 	}
 
-	override function instantiate (instantiationContext : InstantiationContext) : Type {
+	override function instantiate (instantiationContext : InstantiationContext, allowVoid : boolean) : Type {
 		throw new Error("logic flaw; ObjectType is created during semantic analysis, after template instantiation");
 	}
 
@@ -542,19 +543,24 @@ class ParsedObjectType extends ObjectType {
 		return this._typeArguments;
 	}
 
-	override function instantiate (instantiationContext : InstantiationContext) : Type {
+	override function instantiate (instantiationContext : InstantiationContext, allowVoid : boolean) : Type {
 		var enclosingType = this._qualifiedName.getEnclosingType();
 		if (enclosingType == null && this._typeArguments.length == 0) {
 			var actualType = instantiationContext.typemap[this._qualifiedName.getToken().getValue()];
-			if (actualType != null)
+			if (actualType != null) {
+				// FIXME check Nullable.<void> as well
+				if (! allowVoid && actualType.equals(Type.voidType)) {
+					instantiationContext.errors.push(new CompileError(this.getToken(), "the type cannot be instantiated as void in this context"));
+				}
 				return actualType;
+			}
 			if (this._classDef == null)
 				instantiationContext.objectTypesUsed.push(this);
 			return this;
 		}
 		var qualifiedName = this._qualifiedName;
 		if (enclosingType != null) {
-			var actualEnclosingType = this._qualifiedName.getEnclosingType().instantiate(instantiationContext) as ParsedObjectType;
+			var actualEnclosingType = this._qualifiedName.getEnclosingType().instantiate(instantiationContext, true) as ParsedObjectType;
 			if (! this._qualifiedName.getEnclosingType().equals(actualEnclosingType)) {
 				qualifiedName = new QualifiedName(this._qualifiedName.getToken(), actualEnclosingType);
 			}
@@ -562,16 +568,18 @@ class ParsedObjectType extends ObjectType {
 		var typeArgs = new Type[];
 		for (var i = 0; i < this._typeArguments.length; ++i) {
 			if (this._typeArguments[i] instanceof ParsedObjectType && (this._typeArguments[i] as ParsedObjectType).getTypeArguments().length != 0) {
-				var actualType = this._typeArguments[i].instantiate(instantiationContext);
+				var actualType = this._typeArguments[i].instantiate(instantiationContext, true);
 			} else {
 				actualType = instantiationContext.typemap[this._typeArguments[i].toString()];
 			}
 			typeArgs[i] = actualType != null ? actualType : this._typeArguments[i];
-			// special handling for (Array|Map).<T> (T should not be NullableType)
-			if (typeArgs[i] instanceof NullableType) {
-				var templateClassName = qualifiedName.getToken().getValue();
-				if (templateClassName == "Array" || templateClassName == "Map") {
+			// special handling for (Array|Map).<T> (T should not be NullableType nor void)
+			var templateClassName = qualifiedName.getToken().getValue();
+			if (templateClassName == "Array" || templateClassName == "Map") {
+				if (typeArgs[i] instanceof NullableType) {
 					typeArgs[i] = (typeArgs[i] as NullableType).getBaseType();
+				} else if (typeArgs[i].equals(Type.voidType)) {
+					instantiationContext.errors.push(new CompileError(this.getToken(), "cannot instantiate " + templateClassName + ".<T> with T=void"));
 				}
 			}
 		}
@@ -624,7 +632,7 @@ abstract class FunctionType extends Type {
 		return FunctionType._classDef;
 	}
 
-	override function instantiate (instantiationContext : InstantiationContext) : FunctionType {
+	override function instantiate (instantiationContext : InstantiationContext, allowVoid : boolean) : FunctionType {
 		throw new Error("logic flaw");
 	}
 }
@@ -904,13 +912,13 @@ class StaticFunctionType extends ResolvedFunctionType {
 		super(token, returnType, argTypes, isAssignable);
 	}
 
-	override function instantiate (instantiationContext : InstantiationContext) : StaticFunctionType {
-		var returnType = this._returnType.instantiate(instantiationContext);
+	override function instantiate (instantiationContext : InstantiationContext, allowVoid : boolean) : StaticFunctionType {
+		var returnType = this._returnType.instantiate(instantiationContext, true);
 		if (returnType == null)
 			return null;
 		var argTypes = new Type[];
 		for (var i = 0; i < this._argTypes.length; ++i)
-			if ((argTypes[i] = this._argTypes[i].instantiate(instantiationContext)) == null)
+			if ((argTypes[i] = this._argTypes[i].instantiate(instantiationContext, true)) == null)
 				return null;
 		return new StaticFunctionType(this._token, returnType, argTypes, this._isAssignable);
 	}
@@ -1053,7 +1061,7 @@ class TemplateFunctionType extends ResolvedFunctionType {
 
 		var instantiationContext = new InstantiationContext([], this._funcDef.getResolvedTypemap());
 		for (var i = 0; i < numberOfArgs; ++i) {
-			argTypes[i] = argTypes[i].instantiate(instantiationContext);
+			argTypes[i] = argTypes[i].instantiate(instantiationContext, true);
 		}
 		assert instantiationContext.errors.length == 0;
 

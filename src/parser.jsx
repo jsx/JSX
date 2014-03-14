@@ -1923,7 +1923,7 @@ class Parser {
 		}
 		// in type argument
 		do {
-			var type = this._typeDeclaration(false);
+			var type = this._typeDeclaration(true);
 			if (type == null)
 				return null;
 			types.push(type);
@@ -2097,9 +2097,15 @@ class Parser {
 
 	function _templateTypeDeclaration (qualifiedName : QualifiedName, typeArgs : Type[]) : ParsedObjectType {
 		var className = qualifiedName.getToken().getValue();
-		if ((className == "Array" || className == "Map") && typeArgs[0] instanceof NullableType) {
-			this._newError("cannot declare " + className + ".<Nullable.<T>>, should be " + className + ".<T>");
-			return null;
+		if (className == "Array" || className == "Map") {
+			if (typeArgs[0] instanceof NullableType) {
+				this._newError("cannot declare " + className + ".<Nullable.<T>>, should be " + className + ".<T>");
+				return null;
+			}
+			if (typeArgs[0].equals(Type.voidType)) {
+				this._newError("cannot declare " + className + ".<T> with T=void");
+				return null;
+			}
 		}
 		// return object type
 		var objectType = new ParsedObjectType(qualifiedName, typeArgs);

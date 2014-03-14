@@ -50,54 +50,54 @@ abstract class Expression implements Stashable {
 			if (expr instanceof NullExpression) {
 				var srcType = expr.getType();
 				if (srcType != null) {
-					(expr as NullExpression).setType(srcType.instantiate(instantiationContext));
+					(expr as NullExpression).setType(srcType.instantiate(instantiationContext, false));
 				}
 			} else if (expr instanceof NewExpression) {
 				var srcType = expr.getType();
 				if (srcType != null) {
-					(expr as NewExpression).setType(srcType.instantiate(instantiationContext));
+					(expr as NewExpression).setType(srcType.instantiate(instantiationContext, false));
 				}
 			} else if (expr instanceof PropertyExpression) {
 				var propertyExpr = expr as PropertyExpression;
 				var srcType = expr.getType();
 				if (srcType != null) {
-					propertyExpr.setType(srcType.instantiate(instantiationContext));
+					propertyExpr.setType(srcType.instantiate(instantiationContext, false));
 				}
 				var srcTypes = propertyExpr.getTypeArguments();
 				if (srcTypes != null) {
-					propertyExpr.setTypeArguments(srcTypes.map.<Type>((type) -> type.instantiate(instantiationContext)));
+					propertyExpr.setTypeArguments(srcTypes.map.<Type>((type) -> type.instantiate(instantiationContext, false)));
 				}
 			} else if (expr instanceof ArrayLiteralExpression) {
 				var srcType = expr.getType();
 				if (srcType != null) {
-					(expr as ArrayLiteralExpression).setType(srcType.instantiate(instantiationContext));
+					(expr as ArrayLiteralExpression).setType(srcType.instantiate(instantiationContext, false));
 				}
 			} else if (expr instanceof MapLiteralExpression) {
 				var srcType = expr.getType();
 				if (srcType != null) {
-					(expr as MapLiteralExpression).setType(srcType.instantiate(instantiationContext));
+					(expr as MapLiteralExpression).setType(srcType.instantiate(instantiationContext, false));
 				}
 			} else if (expr instanceof AsExpression) {
 				var srcType = expr.getType();
 				if (srcType != null) {
-					(expr as AsExpression).setType(srcType.instantiate(instantiationContext));
+					(expr as AsExpression).setType(srcType.instantiate(instantiationContext, false));
 				}
 			} else if (expr instanceof AsNoConvertExpression) {
 				var srcType = expr.getType();
 				if (srcType != null) {
-					(expr as AsNoConvertExpression).setType(srcType.instantiate(instantiationContext));
+					(expr as AsNoConvertExpression).setType(srcType.instantiate(instantiationContext, false));
 				}
 			} else if (expr instanceof ClassExpression) {
 				var srcType = expr.getType();
 				if (srcType != null) {
-					(expr as ClassExpression).setType(srcType.instantiate(instantiationContext));
+					(expr as ClassExpression).setType(srcType.instantiate(instantiationContext, false));
 				}
 			} else if (expr instanceof LocalExpression) {
 				// update local to the instantiated one
 				(expr as LocalExpression).setLocal((expr as LocalExpression).getLocal().getInstantiated());
 			} else if (expr instanceof InstanceofExpression) {
 				var instanceofExpr = expr as InstanceofExpression;
-				instanceofExpr.setExpectedType(instanceofExpr.getExpectedType().instantiate(instantiationContext));
+				instanceofExpr.setExpectedType(instanceofExpr.getExpectedType().instantiate(instantiationContext, false));
 			}
 			return expr.forEachExpression(onExpr);
 		}
