@@ -25,7 +25,7 @@ class _Main {
 
 		// `T yield U` type declaration is a sugar for Generator.<U,T>
 		var gen1 : int yield string;
-		var gen2 : Generator.<string,int>;
+		var gen2 : Generator.<int,string>;
 
 		gen1 = _Main.foo(0);
 		gen2 = gen1;
