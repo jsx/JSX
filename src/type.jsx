@@ -579,7 +579,7 @@ class ParsedObjectType extends ObjectType {
 				if (typeArgs[i] instanceof NullableType) {
 					typeArgs[i] = (typeArgs[i] as NullableType).getBaseType();
 				} else if (typeArgs[i].equals(Type.voidType)) {
-					instantiationContext.errors.push(new CompileError(this.getToken(), "the type cannot be instantiated as void in this context"));
+					instantiationContext.errors.push(new CompileError(this.getToken(), "cannot instantiate " + templateClassName + ".<T> with T=void"));
 				}
 			}
 		}
