@@ -594,7 +594,7 @@ class _YieldExpressionTransformer extends _UnaryExpressionTransformer {
 	}
 
 	override function _clone (arg : Expression) : UnaryExpression {
-		return new YieldExpression(this._expr.getToken(), arg, this._expr.getType());
+		return new YieldExpression(this._expr.getToken(), arg, (this._expr as YieldExpression).getSeedType(), (this._expr as YieldExpression).getGenType());
 	}
 
 }
@@ -2555,12 +2555,22 @@ class GeneratorTransformCommand extends FunctionTransformCommand {
 	}
 
 	function _transformGeneratorCore (funcDef : MemberFunctionDefinition) : void {
-		var yieldingType = (funcDef.getReturnType().getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0];
+		var generatorClassDef = funcDef.getReturnType().getClassDef() as InstantiatedClassDefinition;
+
+		var seedType : Type = null;
+		var genType : Type = null;
+		if (generatorClassDef.getTypeArguments().length == 2) {
+			seedType = generatorClassDef.getTypeArguments()[0];
+			genType = generatorClassDef.getTypeArguments()[1];
+		}
+		else {
+			throw new Error("logic flaw!");
+		}
 
 		// create a generator object
-		var genType = this._instantiateGeneratorType(yieldingType);
-		var genLocal = new LocalVariable(new Token("$generator", false), genType, false);
-		funcDef.getLocals().push(genLocal);
+		var jsxGenType = this._instantiateJSXGeneratorType(seedType, genType);
+		var jsxGenLocal = new LocalVariable(new Token("$generator", false), jsxGenType, false);
+		funcDef.getLocals().push(jsxGenLocal);
 
 		this._performCPSTransformation(funcDef);
 
@@ -2636,7 +2646,7 @@ class GeneratorTransformCommand extends FunctionTransformCommand {
 			     $generator.__next = K;
 			     return;
 			  case K:
-			     $aN = $generator.__value;
+			     $aN = $generator.__seed;
 			*/
 			var exprStmt;
 			var assignExpr;
@@ -2649,17 +2659,17 @@ class GeneratorTransformCommand extends FunctionTransformCommand {
 							new Token("=", false),
 							new PropertyExpression(
 								new Token(".", false),
-								new LocalExpression(new Token("$generator", false), genLocal),
+								new LocalExpression(new Token("$generator", false), jsxGenLocal),
 								new Token("__value", false),
 								[],
-								yieldingType),
+								genType.toNullableType()),
 							yieldExpr.getExpr())),
 					new ExpressionStatement(
 						new AssignmentExpression(
 							new Token("=", false),
 							new PropertyExpression(
 								new Token(".", false),
-								new LocalExpression(new Token("$generator", false), genLocal),
+								new LocalExpression(new Token("$generator", false), jsxGenLocal),
 								new Token("__next", true),
 								[],
 								Type.integerType.toNullableType()),
@@ -2676,10 +2686,10 @@ class GeneratorTransformCommand extends FunctionTransformCommand {
 							assignExpr.getFirstExpr(),
 							new PropertyExpression(
 								new Token(".", false),
-								new LocalExpression(new Token("$generator", false), genLocal),
-								new Token("__value", true),
+								new LocalExpression(new Token("$generator", false), jsxGenLocal),
+								new Token("__seed", true),
 								[],
-								yieldingType))));
+								seedType.toNullableType()))));
 				i += 4;
 			}
 			// insert return code
@@ -2697,10 +2707,10 @@ class GeneratorTransformCommand extends FunctionTransformCommand {
 							new Token("=", false),
 							new PropertyExpression(
 								new Token(".", false),
-								new LocalExpression(new Token("$generator", false), genLocal),
+								new LocalExpression(new Token("$generator", false), jsxGenLocal),
 								new Token("__value", false),
 								[],
-								yieldingType),
+								genType.toNullableType()),
 							new LocalExpression(
 								new Token("$return", true),
 								CPSTransformCommand._extractReturnLocal(funcDef)))),
@@ -2709,7 +2719,7 @@ class GeneratorTransformCommand extends FunctionTransformCommand {
 							new Token("=", false),
 							new PropertyExpression(
 								new Token(".", false),
-								new LocalExpression(new Token("$generator", false), genLocal),
+								new LocalExpression(new Token("$generator", false), jsxGenLocal),
 								new Token("__next", true),
 								[],
 								Type.integerType.toNullableType()),
@@ -2722,12 +2732,12 @@ class GeneratorTransformCommand extends FunctionTransformCommand {
 		/*
 		  var $generator = new __jsx_generator_object;
 		*/
-		var newExpr = new NewExpression(new Token("new", false), genType, []);
+		var newExpr = new NewExpression(new Token("new", false), jsxGenType, []);
 		newExpr.analyze(new AnalysisContext([], null, null), null);
 		funcDef.getStatements().unshift(new ExpressionStatement(
 			new AssignmentExpression(
 				new Token("=", false),
-				new LocalExpression(new Token("$generator", false), genLocal),
+				new LocalExpression(new Token("$generator", false), jsxGenLocal),
 				newExpr)));
 
 		// replace entry point
@@ -2745,7 +2755,7 @@ class GeneratorTransformCommand extends FunctionTransformCommand {
 					new Token("=", false),
 					new PropertyExpression(
 						new Token(".", false),
-						new LocalExpression(new Token("$generator", false), genLocal),
+						new LocalExpression(new Token("$generator", false), jsxGenLocal),
 						new Token("__next", true),
 						[],
 						Type.integerType.toNullableType()),
@@ -2755,7 +2765,7 @@ class GeneratorTransformCommand extends FunctionTransformCommand {
 					new Token("=", false),
 					new PropertyExpression(
 						new Token(".", false),
-						new LocalExpression(new Token("$generator", false), genLocal),
+						new LocalExpression(new Token("$generator", false), jsxGenLocal),
 						new Token("__loop", true),
 						[],
 						new StaticFunctionType(null, Type.voidType, [ Type.integerType ] : Type[], true)),
@@ -2765,14 +2775,14 @@ class GeneratorTransformCommand extends FunctionTransformCommand {
 		statements.push(
 			new ReturnStatement(
 				new Token("return", false),
-				new LocalExpression(new Token("$generator", false), genLocal)));
+				new LocalExpression(new Token("$generator", false), jsxGenLocal)));
 	}
 
-	function _instantiateGeneratorType (yieldingType : Type) : Type {
+	function _instantiateJSXGeneratorType (seedType : Type, genType : Type) : Type {
 		// instantiate generator
 		var genClassDef = this._jsxGeneratorObject.getParser().lookupTemplate(
 			[],	// errors
-			new TemplateInstantiationRequest(null, "__jsx_generator_object", [ yieldingType ] : Type[]),
+			new TemplateInstantiationRequest(null, "__jsx_generator_object", [ seedType, genType ]),
 			(parser, classDef) -> null
 		);
 		assert genClassDef != null;

@@ -2363,9 +2363,6 @@ class Parser {
 		if (returnType == null) {
 			return false;
 		}
-		if (isGenerator) {
-			returnType = this._registerGenObjTypeOf(returnType);
-		}
 		if (this._expect("{") == null)
 			return false;
 

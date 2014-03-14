@@ -1515,19 +1515,21 @@ class SignExpression extends UnaryExpression {
 
 class YieldExpression extends UnaryExpression {
 
-	var _yieldType : Type;
+	var _seedType : Type;
+	var _genType : Type;
 
 	function constructor (operatorToken : Token, expr : Expression) {
-		this(operatorToken, expr, null);
+		this(operatorToken, expr, null, null);
 	}
 
-	function constructor (operatorToken : Token, expr : Expression, yieldType : Type) {
+	function constructor (operatorToken : Token, expr : Expression, seedType : Type, genType : Type) {
 		super(operatorToken, expr);
-		this._yieldType = yieldType;
+		this._seedType = seedType;
+		this._genType = genType;
 	}
 
 	override function clone () : YieldExpression {
-		return new YieldExpression(this._token, this._expr.clone(), this._yieldType);
+		return new YieldExpression(this._token, this._expr.clone(), this._seedType, this._genType);
 	}
 
 	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
@@ -1535,29 +1537,39 @@ class YieldExpression extends UnaryExpression {
 			return false;
 		var returnType = context.funcDef.getReturnType();
 		if (returnType == null) {
-			var yieldType = this._expr.getType();
-			context.funcDef.setReturnType(new ObjectType(Util.instantiateTemplate(context, this._token, "Generator", [ yieldType ])));
+			// Since the single parameter version `Generator.<GenT>` is not supported yet, we cannot deduce seed and gen types here.
+			context.errors.push(new CompileError(this._token, "cannot deduce yield expression type"));
+			return false;
 		} else {
 			if (returnType instanceof ObjectType
 				&& returnType.getClassDef() instanceof InstantiatedClassDefinition
 				&& (returnType.getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == "Generator") {
-					yieldType = (returnType.getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0];
+					this._seedType = (returnType.getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0];
+					var genType = (returnType.getClassDef() as InstantiatedClassDefinition).getTypeArguments()[1];
 			} else {
 				// return type is not an instance of Enumerable. the error will be reported by MemberFuncitonDefinition#analyze.
-				context.errors.push(new CompileError(this._token, "cannot convert 'Generator.<" + this._expr.getType().toString() + ">' to return type '" + returnType.toString() + "'"));
+				context.errors.push(new CompileError(this._token, "cannot convert 'Generator' to return type '" + returnType.toString() + "'"));
 				return false;
 			}
 		}
-		if (! this._expr.getType().isConvertibleTo(yieldType)) {
-			context.errors.push(new CompileError(this._token, "cannot convert '" + this._expr.getType().toString() + "' to yield type '" + yieldType.toString() + "'"));
+		if (! this._expr.getType().isConvertibleTo(genType)) {
+			context.errors.push(new CompileError(this._token, "cannot convert '" + this._expr.getType().toString() + "' to yield type '" + genType.toString() + "'"));
 			return false;
 		}
-		this._yieldType = yieldType;
+		this._genType = genType;
 		return true;
 	}
 
 	override function getType () : Type {
-		return this._yieldType;
+		return this._seedType.toNullableType();
+	}
+
+	function getSeedType () : Type {
+		return this._seedType;
+	}
+
+	function getGenType () : Type {
+		return this._genType;
 	}
 
 }

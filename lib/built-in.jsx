@@ -1017,29 +1017,31 @@ native final class GeneratorFunction {
   }
 })()""";
 
-native __fake__ class Generator.<T> {
-	function next () : IteratorResult.<T>;
-	function next (value : T) : IteratorResult.<T>;
+native __fake__ class Generator.<SeedT,GenT> {
+	function next () : IteratorResult.<GenT>;
+	function next (seed : Nullable.<SeedT>) : IteratorResult.<GenT>;
 }
 
-native class __jsx_generator_object.<T> extends Generator.<T> {
+native class __jsx_generator_object.<SeedT,GenT> extends Generator.<SeedT,GenT> {
 	var __next : int;
 	var __loop : (int) -> void;
-	var __value : Nullable.<T>;
+	var __seed : Nullable.<SeedT>;
+	var __value : Nullable.<GenT>;
 } = """
 (function () {
   function __jsx_generator_object() {
   	this.__next = 0;
   	this.__loop = null;
+	this.__seed = null;
   	this.__value = undefined;
   	this.__status = 0;	// SUSPENDED: 0, ACTIVE: 1, DEAD: 2
   }
 
-  __jsx_generator_object.prototype.next = function (value) {
+  __jsx_generator_object.prototype.next = function (seed) {
   	switch (this.__status) {
   	case 0:
   		this.__status = 1;
-  		this.__value = value;
+  		this.__seed = seed;
 
   		// go next!
   		this.__loop(this.__next);
