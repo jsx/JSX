@@ -363,6 +363,8 @@ class NullableType extends Type {
 	function constructor (type : Type) {
 		if (type.equals(Type.variantType))
 			throw new Error("logic flaw, cannot create Nullable.<variant>");
+		if (type.equals(Type.voidType))
+			throw new Error("logic flaw, cannot create Nullable.<void>");
 		this._baseType = type instanceof NullableType ? (type as NullableType)._baseType : type;
 	}
 
@@ -548,7 +550,6 @@ class ParsedObjectType extends ObjectType {
 		if (enclosingType == null && this._typeArguments.length == 0) {
 			var actualType = instantiationContext.typemap[this._qualifiedName.getToken().getValue()];
 			if (actualType != null) {
-				// FIXME check Nullable.<void> as well
 				if (! allowVoid && actualType.equals(Type.voidType)) {
 					instantiationContext.errors.push(new CompileError(this.getToken(), "the type cannot be instantiated as void in this context"));
 				}
