@@ -1596,7 +1596,7 @@ class Parser {
 			}
 			for (var i = 0; i < this._outerClass.templateInners.length; ++i) {
 				if (this._outerClass.templateInners[i].className() == className.getValue()) {
-					this._errors.push(new CompileError(className, "a non-template inner class with the same name has been already declared"));
+					this._errors.push(new CompileError(className, "a template inner class with the same name has been already declared"));
 					success = false;
 					break;
 				}
