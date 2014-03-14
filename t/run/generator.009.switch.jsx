@@ -10,7 +10,7 @@
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function * foo (n : number) : number {
+		function * foo (n : number) : Generator.<number,number> {
 			while (true) {
 				switch (n) {
 				case 1:

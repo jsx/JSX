@@ -9,7 +9,7 @@
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function * sum () : number {
+		function * sum () : Generator.<number,number> {
 			var a = 0;
 			while (true) {
 				a += yield a;

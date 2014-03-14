@@ -8,7 +8,7 @@
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function * foo () : number {
+		function * foo () : Generator.<number,number> {
 			yield 1;
 			yield 2;
 			yield 3;

@@ -11,7 +11,7 @@
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function * incr () : number {
+		function * incr () : Generator.<number,number> {
 			var i = 0;
 			while ((yield i++) != 0)
 				;

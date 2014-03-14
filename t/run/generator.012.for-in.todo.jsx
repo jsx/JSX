@@ -10,7 +10,7 @@ end
 class _Main {
 	static function main (args : string[]) : void {
 
-		function * foo (ary : Map.<string>) : string {
+		function * foo (ary : Map.<string>) : Generator.<string,string> {
 			for (var i in ary) {
 				yield i;
 			}
