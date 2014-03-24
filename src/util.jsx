@@ -153,7 +153,7 @@ class Util {
 		return false;
 	}
 
-	static function isNativeClass(type : Type) : boolean {
+	static function rootIsNativeClass(type : Type) : boolean {
 		if (type instanceof ObjectType) {
 			var classDef = type.getClassDef();
 			return ! classDef.forEachClassToBase(function (classDef) {
@@ -172,7 +172,7 @@ class Util {
 			return false;
 		if (lhsExpr instanceof PropertyExpression) {
 			var holderExpr = (lhsExpr as PropertyExpression).getExpr();
-			if (Util.isNativeClass(holderExpr.getType()) && !Util.isBuiltInClass(holderExpr.getType())) {
+			if (Util.rootIsNativeClass(holderExpr.getType()) && !Util.isBuiltInClass(holderExpr.getType())) {
 				return true;
 			}
 			if (holderExpr instanceof ThisExpression
@@ -182,7 +182,7 @@ class Util {
 			}
 		} else if (lhsExpr instanceof ArrayExpression) {
 			var arrayExpr = lhsExpr as ArrayExpression;
-			if (Util.isNativeClass(arrayExpr.getFirstExpr().getType()) && !Util.isBuiltInClass(arrayExpr.getFirstExpr().getType())) {
+			if (Util.rootIsNativeClass(arrayExpr.getFirstExpr().getType()) && !Util.isBuiltInClass(arrayExpr.getFirstExpr().getType())) {
 				return true;
 			}
 			if (arrayExpr.getFirstExpr() instanceof LocalExpression

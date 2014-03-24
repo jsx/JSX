@@ -82,13 +82,13 @@ class _Util {
 			}
 			else if (expr instanceof PropertyExpression) {
 				var type = (expr as PropertyExpression).getExpr().getType();
-				if (!(Util.isBuiltInClass(type) || !Util.isNativeClass(type))) {
+				if (!(Util.isBuiltInClass(type) || !Util.rootIsNativeClass(type))) {
 					return false;
 				}
 			}
 			else if (expr instanceof ArrayExpression) {
 				var type = (expr as ArrayExpression).getFirstExpr().getType();
-				if (!(Util.isBuiltInClass(type) || !Util.isNativeClass(type))) {
+				if (!(Util.isBuiltInClass(type) || !Util.rootIsNativeClass(type))) {
 
 					return false;
 				}
@@ -2524,7 +2524,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 				var assignmentExpr = expr as AssignmentExpression;
 				var firstExpr      = assignmentExpr.getFirstExpr();
 				if (isFirstLevelPropertyAccess(firstExpr)
-					&& ! Util.isNativeClass((firstExpr as PropertyExpression).getExpr().getType())) {
+					&& ! Util.rootIsNativeClass((firstExpr as PropertyExpression).getExpr().getType())) {
 					var propertyName = (firstExpr as PropertyExpression).getIdentifierToken().getValue();
 					onExpr(assignmentExpr.getSecondExpr(), null);
 					if (lastAssignExpr[propertyName]
@@ -3365,7 +3365,7 @@ class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 			if (expr instanceof PropertyExpression) {
 				var propertyExpr = expr as PropertyExpression;
 				var receiverType = propertyExpr.getExpr().getType();
-				if (Util.isNativeClass(receiverType)) {
+				if (Util.rootIsNativeClass(receiverType)) {
 					return null;
 				}
 				var base = getCacheKey(propertyExpr.getExpr());
@@ -3600,7 +3600,7 @@ class _UnboxOptimizeCommand extends _FunctionOptimizeCommand implements _Structu
 		if (! (local.getType() instanceof ObjectType)) {
 			return false;
 		}
-		if (Util.isNativeClass(local.getType())) {
+		if (Util.rootIsNativeClass(local.getType())) {
 			return false;
 		}
 		// determine if the local can be unboxed
