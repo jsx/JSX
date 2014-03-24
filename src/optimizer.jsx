@@ -376,22 +376,6 @@ abstract class _OptimizeCommand {
 
 	abstract function performOptimization () : void;
 
-	function getStash (stashable : Stashable) : Stash {
-		var stash = stashable.getStash(this._identifier);
-		if (stash == null) {
-			stash = stashable.setStash(this._identifier, this._createStash());
-		}
-		return stash;
-	}
-
-	function _createStash () : Stash {
-		throw new Error("if you are going to use the stash, you need to override this function");
-	}
-
-	function resetStash (stashable : Stashable) : void {
-		stashable.setStash(this._identifier, null);
-	}
-
 	function createVar (funcDef : MemberFunctionDefinition, type : Type, baseName : string) : LocalVariable {
 		var locals = funcDef.getLocals();
 		function nameExists (n : string) : boolean {
@@ -415,6 +399,28 @@ abstract class _OptimizeCommand {
 	function setupCommand (command : _OptimizeCommand) : _OptimizeCommand {
 		command.setup(this._optimizer);
 		return command;
+	}
+
+}
+
+mixin _StructuredStashAccessor.<T> {
+
+	// 20140324 kazuho FIXME - suprisingly this "abstract var" does not work since the property is defined in the base class of the class using the mix-in
+	// abstract var _identifier : string;
+
+	function getStash(stashable : Stashable) : T {
+		var identifier = (this as Object as _OptimizeCommand)._identifier;
+		var stash = stashable.getStash(identifier) as T;
+		if (stash == null) {
+			stash = new T;
+			stashable.setStash(identifier, stash);
+		}
+		return stash;
+	}
+
+	function resetStash(stashable : Stashable) : void {
+		var identifier = (this as Object as _OptimizeCommand)._identifier;
+		stashable.setStash(identifier, null);
 	}
 
 }
@@ -460,7 +466,7 @@ abstract class _FunctionOptimizeCommand extends _OptimizeCommand {
 
 }
 
-class _LinkTimeOptimizationCommand extends _OptimizeCommand {
+class _LinkTimeOptimizationCommand extends _OptimizeCommand implements _StructuredStashAccessor.<_LinkTimeOptimizationCommand.Stash> {
 	static const IDENTIFIER = "lto";
 
 	class Stash extends Stash {
@@ -481,24 +487,20 @@ class _LinkTimeOptimizationCommand extends _OptimizeCommand {
 		super(_LinkTimeOptimizationCommand.IDENTIFIER);
 	}
 
-	override function _createStash () : Stash {
-		return new _LinkTimeOptimizationCommand.Stash();
-	}
-
 	override function performOptimization () : void {
 		// set extendedBy for every class
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
 			if (classDef.extendType() != null)
-				(this.getStash(classDef.extendType().getClassDef()) as _LinkTimeOptimizationCommand.Stash).extendedBy.push(classDef);
+				this.getStash(classDef.extendType().getClassDef()).extendedBy.push(classDef);
 			for (var i = 0; i < classDef.implementTypes().length; ++i)
-				(this.getStash(classDef.implementTypes()[i].getClassDef()) as _LinkTimeOptimizationCommand.Stash).extendedBy.push(classDef);
+				this.getStash(classDef.implementTypes()[i].getClassDef()).extendedBy.push(classDef);
 			return true;
 		});
 		// mark classes / functions that are not derived / overridden / exported as final
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
 
 			if ((classDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN | ClassDefinition.IS_NATIVE | ClassDefinition.IS_FINAL | ClassDefinition.IS_EXPORT)) == 0
-				&& (this.getStash(classDef) as _LinkTimeOptimizationCommand.Stash).extendedBy.length == 0) {
+				&& this.getStash(classDef).extendedBy.length == 0) {
 
 					// found a class that is not extended, mark it and its functions as final
 					this.log("marking class as final: " + classDef.className());
@@ -519,7 +521,7 @@ class _LinkTimeOptimizationCommand extends _OptimizeCommand {
 							// mark functions that are not being overridden as final
 							if (funcDef.getStatements() == null)
 								throw new Error("a non-native, non-abstract function with out function body?");
-							var overrides = this._getOverrides(classDef, (this.getStash(classDef) as _LinkTimeOptimizationCommand.Stash).extendedBy, funcDef.name(), funcDef.getArgumentTypes());
+							var overrides = this._getOverrides(classDef, this.getStash(classDef).extendedBy, funcDef.name(), funcDef.getArgumentTypes());
 							if (overrides.length == 0) {
 								this.log("marking function as final: " + funcDef.getNotation());
 								funcDef.setFlags(funcDef.flags() | ClassDefinition.IS_FINAL);
@@ -550,7 +552,7 @@ class _LinkTimeOptimizationCommand extends _OptimizeCommand {
 	}
 
 	function _getOverridesByClass (srcClassDef : ClassDefinition, classDef : ClassDefinition, name : string, argTypes : Type[]) : MemberFunctionDefinition[] {
-		var overrides = this._getOverrides(srcClassDef, (this.getStash(classDef) as _LinkTimeOptimizationCommand.Stash).extendedBy, name, argTypes);
+		var overrides = this._getOverrides(srcClassDef, this.getStash(classDef).extendedBy, name, argTypes);
 		function addOverride (funcDef : MemberFunctionDefinition) : boolean {
 			if (funcDef.name() == name
 				&& (funcDef.flags() & ClassDefinition.IS_ABSTRACT) == 0
@@ -574,7 +576,7 @@ class _LinkTimeOptimizationCommand extends _OptimizeCommand {
 
 }
 
-class _StripOptimizeCommand extends _OptimizeCommand {
+class _StripOptimizeCommand extends _OptimizeCommand implements _StructuredStashAccessor.<_StripOptimizeCommand._Stash> {
 	static const IDENTIFIER = "strip";
 
 	class _Stash extends Stash {
@@ -592,13 +594,9 @@ class _StripOptimizeCommand extends _OptimizeCommand {
 		super(_StripOptimizeCommand.IDENTIFIER);
 	}
 
-	override function _createStash() : Stash {
-		return new _StripOptimizeCommand._Stash();
-	}
-
 	function _touchStatic(member : MemberDefinition) : void {
 		assert (member.flags() & ClassDefinition.IS_STATIC) != 0;
-		var stash = this.getStash(member) as _StripOptimizeCommand._Stash;
+		var stash = this.getStash(member);
 		if (stash.touched)
 			return;
 		this.log("touched " + member.getNotation());
@@ -607,7 +605,7 @@ class _StripOptimizeCommand extends _OptimizeCommand {
 	}
 
 	function _touchInstance(classDef : ClassDefinition) : void {
-		var stash = this.getStash(classDef) as _StripOptimizeCommand._Stash;
+		var stash = this.getStash(classDef);
 		if (stash.touched)
 			return;
 		this.log("touched " + classDef.className());
@@ -643,7 +641,7 @@ class _StripOptimizeCommand extends _OptimizeCommand {
 	function _touchConstructor(funcDef : MemberFunctionDefinition) : void {
 		assert funcDef.name() == "constructor";
 		assert (funcDef.flags() & ClassDefinition.IS_STATIC) == 0;
-		var stash = this.getStash(funcDef) as _StripOptimizeCommand._Stash;
+		var stash = this.getStash(funcDef);
 		if (stash.touched)
 			return;
 		this.log("touched " + funcDef.getNotation());
@@ -748,14 +746,14 @@ class _StripOptimizeCommand extends _OptimizeCommand {
 			if ((member.flags() & ClassDefinition.IS_EXPORT) != 0) {
 				return true;
 			}
-			var isTouched = (this.getStash(member) as _StripOptimizeCommand._Stash).touched;
+			var isTouched = this.getStash(member).touched;
 			if ((member.flags() & ClassDefinition.IS_STATIC) != 0) {
 				return isTouched;
 			} else if (member instanceof MemberFunctionDefinition) {
 				if (member.name() == "constructor") {
 					return isTouched;
 				} else {
-					if ((this.getStash(member.getClassDef()) as _StripOptimizeCommand._Stash).touched
+					if (this.getStash(member.getClassDef()).touched
 						&& this._methodsAlive.hasOwnProperty(member.name())) {
 						var listOfArgTypes = this._methodsAlive[member.name()];
 						for (var i = 0; i != listOfArgTypes.length; ++i) {
@@ -817,11 +815,11 @@ class _StripOptimizeCommand extends _OptimizeCommand {
 				var preserve = true;
 				if ((classDefs[i].flags() & ClassDefinition.IS_NATIVE) != 0
 					&& classDefs[i].getNativeSource() != null
-					&& ! (this.getStash(classDefs[i]) as _StripOptimizeCommand._Stash).touched
+					&& ! this.getStash(classDefs[i]).touched
 					&& classDefs[i].forEachMember(function (member) {
 						if ((member.flags() & ClassDefinition.IS_STATIC) == 0)
 							return true;
-						return ! (this.getStash(member) as _StripOptimizeCommand._Stash).touched;
+						return ! this.getStash(member).touched;
 					})) {
 					preserve = false;
 				}
@@ -992,7 +990,7 @@ class _NoLogCommand extends _FunctionOptimizeCommand {
 }
 
 
-class _DetermineCalleeCommand extends _FunctionOptimizeCommand {
+class _DetermineCalleeCommand extends _FunctionOptimizeCommand implements _StructuredStashAccessor.<_DetermineCalleeCommand.Stash> {
 	static const IDENTIFIER = "determine-callee";
 
 	class Stash extends Stash {
@@ -1015,10 +1013,6 @@ class _DetermineCalleeCommand extends _FunctionOptimizeCommand {
 
 	function constructor () {
 		super(_DetermineCalleeCommand.IDENTIFIER);
-	}
-
-	override function _createStash () : Stash {
-		return new _DetermineCalleeCommand.Stash();
 	}
 
 	override function optimizeFunction (funcDef : MemberFunctionDefinition) : boolean {
@@ -1083,7 +1077,7 @@ class _DetermineCalleeCommand extends _FunctionOptimizeCommand {
 	}
 
 	function _setCallingFuncDef (stashable : Stashable, funcDef : MemberFunctionDefinition) : void {
-		(this.getStash(stashable) as _DetermineCalleeCommand.Stash).callingFuncDef = funcDef;
+		this.getStash(stashable).callingFuncDef = funcDef;
 	}
 
 	static function findCallingFunctionInClass (classDef : ClassDefinition, funcName : string, argTypes : Type[], isStatic : boolean) : MemberFunctionDefinition {
@@ -1116,7 +1110,7 @@ class _DetermineCalleeCommand extends _FunctionOptimizeCommand {
 
 }
 
-class _StaticizeOptimizeCommand extends _OptimizeCommand {
+class _StaticizeOptimizeCommand extends _OptimizeCommand implements _StructuredStashAccessor.<_StaticizeOptimizeCommand.Stash> {
 
 	static const IDENTIFIER = "staticize";
 
@@ -1140,10 +1134,6 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 			return new _StaticizeOptimizeCommand.Stash(this);
 		}
 
-	}
-
-	override function _createStash () : Stash {
-		return new _StaticizeOptimizeCommand.Stash();
 	}
 
 	override function performOptimization () : void {
@@ -1229,7 +1219,7 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 
 		// rename
 		var newName = this._newStaticFunctionName(classDef, funcDef.name(), ([ new ObjectType(classDef) ] : Type[]).concat((funcDef.getType() as ResolvedFunctionType).getArgumentTypes()), true);
-		(this.getStash(funcDef) as _StaticizeOptimizeCommand.Stash).altName = newName;
+		this.getStash(funcDef).altName = newName;
 		staticFuncDef._nameToken = new Token(newName, true);
 
 		// update flags
@@ -1280,7 +1270,7 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 							var funcDef = this._findFunctionInClassTree(receiverType.getClassDef(), propertyExpr.getIdentifierToken().getValue(), (propertyExpr.getType() as ResolvedFunctionType).getArgumentTypes(), false);
 							// funcDef is staticized
 							var newName;
-							if (funcDef != null && (newName = (this.getStash(funcDef) as _StaticizeOptimizeCommand.Stash).altName) != null) {
+							if (funcDef != null && (newName = this.getStash(funcDef).altName) != null) {
 								// found, rewrite
 								onExpr(propertyExpr.getExpr(), function (expr) {
 									propertyExpr.setExpr(expr);
@@ -1305,7 +1295,7 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 				var classDef = superExpr.getFunctionType().getObjectType().getClassDef();
 				funcDef = this._findFunctionInClassTree(classDef, superExpr.getName().getValue(), (superExpr.getFunctionType() as ResolvedFunctionType).getArgumentTypes(), false);
 				// funcDef is staticized
-				if (funcDef != null && (newName = (this.getStash(funcDef) as _StaticizeOptimizeCommand.Stash).altName) != null) {
+				if (funcDef != null && (newName = this.getStash(funcDef).altName) != null) {
 					// found, rewrite
 					Util.forEachExpression(onExpr, superExpr.getArguments());
 					var thisVar : Expression;
@@ -1351,7 +1341,7 @@ class _StaticizeOptimizeCommand extends _OptimizeCommand {
 /**
  * Converts POD objects into Map objects + static methods.
  */
-class _UnclassifyOptimizationCommand extends _OptimizeCommand {
+class _UnclassifyOptimizationCommand extends _OptimizeCommand implements _StructuredStashAccessor.<_UnclassifyOptimizationCommand.Stash> {
 
 	static const IDENTIFIER = "unclassify";
 
@@ -1375,10 +1365,6 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 			return new _UnclassifyOptimizationCommand.Stash(this);
 		}
 
-	}
-
-	override function _createStash () : Stash {
-		return new _UnclassifyOptimizationCommand.Stash();
 	}
 
 	override function performOptimization () : void {
@@ -1495,7 +1481,7 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 					var inliner = this._createInliner(funcDef);
 					this.log(funcDef.getNotation() + " is" + (inliner ? "" : " not") + " inlineable");
 					if (inliner) {
-						(this.getStash(funcDef) as _UnclassifyOptimizationCommand.Stash).inliner = inliner;
+						this.getStash(funcDef).inliner = inliner;
 						hasInlineableCtor = true;
 					}
 				}
@@ -1681,7 +1667,7 @@ class _UnclassifyOptimizationCommand extends _OptimizeCommand {
 
 // propagates constants
 
-class _FoldConstantCommand extends _FunctionOptimizeCommand {
+class _FoldConstantCommand extends _FunctionOptimizeCommand implements _StructuredStashAccessor.<_FoldConstantCommand.Stash> {
 	static const IDENTIFIER = "fold-const";
 
 	static const LONG_STRING_LITERAL = 64;
@@ -1706,10 +1692,6 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 
 	function constructor () {
 		super(_FoldConstantCommand.IDENTIFIER);
-	}
-
-	override function _createStash () : Stash {
-		return new _FoldConstantCommand.Stash();
 	}
 
 	override function optimizeFunction (funcDef : MemberFunctionDefinition) : boolean {
@@ -2118,7 +2100,7 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand {
 	}
 
 	function _foldStaticConst (member : MemberVariableDefinition) : void {
-		var stash = this.getStash(member) as _FoldConstantCommand.Stash;
+		var stash = this.getStash(member);
 		// optimize only once
 		if (stash.isOptimized)
 			return;
@@ -2614,7 +2596,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 }
 
 
-class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
+class _InlineOptimizeCommand extends _FunctionOptimizeCommand implements _StructuredStashAccessor.<_InlineOptimizeCommand.Stash> {
 	static const IDENTIFIER = "inline";
 
 	// NOTE: 30-40 looks good according to v8bench
@@ -2645,12 +2627,8 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 		super(_InlineOptimizeCommand.IDENTIFIER);
 	}
 
-	override function _createStash () : Stash {
-		return new _InlineOptimizeCommand.Stash();
-	}
-
 	override function optimizeFunction (funcDef : MemberFunctionDefinition) : boolean {
-		var stash = this.getStash(funcDef) as _InlineOptimizeCommand.Stash;
+		var stash = this.getStash(funcDef);
 		// we need to the check here since functions might recurse
 		if (stash.isOptimized)
 			return true;
@@ -2921,7 +2899,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand {
 	}
 
 	function _functionIsInlineable (funcDef : MemberFunctionDefinition) : boolean {
-		var stash = this.getStash(funcDef) as _InlineOptimizeCommand.Stash;
+		var stash = this.getStash(funcDef);
 		if (stash.isInlineable == null) {
 			stash.isInlineable = (function () : boolean {
 				// only inline function that are short, has no branches (last statement may be a return)
@@ -3578,7 +3556,7 @@ class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
  * e.g. <code>var p = new Point(10, 20); log p.x; log p.y;</code>
  * into <code>var p$x = 10, p$y = 20; log p$x; log p$y;</code>
  */
-class _UnboxOptimizeCommand extends _FunctionOptimizeCommand {
+class _UnboxOptimizeCommand extends _FunctionOptimizeCommand implements _StructuredStashAccessor.<_UnboxOptimizeCommand.Stash> {
 	static const IDENTIFIER = "unbox";
 
 	class Stash extends Stash {
@@ -3599,10 +3577,6 @@ class _UnboxOptimizeCommand extends _FunctionOptimizeCommand {
 
 	function constructor () {
 		super(_UnboxOptimizeCommand.IDENTIFIER);
-	}
-
-	override function _createStash () : Stash {
-		return new _UnboxOptimizeCommand.Stash();
 	}
 
 	override function optimizeFunction (funcDef : MemberFunctionDefinition) : boolean {
@@ -3700,7 +3674,7 @@ class _UnboxOptimizeCommand extends _FunctionOptimizeCommand {
 			return false;
 		}
 		var ctor = _DetermineCalleeCommand.getCallingFuncDef(newExpr);
-		var stash = this.getStash(ctor) as _UnboxOptimizeCommand.Stash;
+		var stash = this.getStash(ctor);
 		if (stash.canUnbox != null) {
 			return stash.canUnbox;
 		}
@@ -3985,7 +3959,7 @@ class _ArrayLengthOptimizeCommand extends _FunctionOptimizeCommand {
  * Set JSX.DEBUG = false, where `if (JSX.DEBUG) { ... }` blocks will be
  * removed by "dce" optimization command.
  */
-class _NoDebugCommand extends _OptimizeCommand {
+class _NoDebugCommand extends _OptimizeCommand implements _StructuredStashAccessor.<_NoDebugCommand.Stash> {
 	static const IDENTIFIER = "no-debug";
 
 	class Stash extends Stash {
@@ -4002,12 +3976,8 @@ class _NoDebugCommand extends _OptimizeCommand {
 		super(_NoDebugCommand.IDENTIFIER);
 	}
 
-	override function _createStash () : _NoDebugCommand.Stash {
-		return new _NoDebugCommand.Stash();
-	}
-
 	override function performOptimization () : void {
-		var stash = this.getStash(this.getCompiler().getEmitter()) as _NoDebugCommand.Stash;
+		var stash = this.getStash(this.getCompiler().getEmitter());
 		stash.debugValue = false;
 
 		this.getCompiler().forEachClassDef(function (parser, classDef) {
