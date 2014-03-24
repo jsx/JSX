@@ -2485,6 +2485,17 @@ class NewExpression extends OperatorExpression {
 	}
 
 	override function _doHasSideEffects(preCheckCb : (Expression) -> Nullable.<boolean>) : boolean {
+		var classDef = this._type.getClassDef();
+		var className = classDef.className().replace(/\.<.*/, ""); // fast way to convert name to built-in
+		switch (className) {
+		case "Object":
+		case "Map":
+			assert this._args.length == 0;
+			return false;
+		case "Array":
+			assert this._args.length <= 1; // jsx does not suport new Array with >=2 args
+			return false;
+		}
 		return true;
 	}
 
