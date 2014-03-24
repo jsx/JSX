@@ -66,35 +66,18 @@ class _Util {
 	}
 
 	static function exprHasSideEffects (expr : Expression) : boolean {
-		return !(function onExpr (expr : Expression) : boolean {
-			if ( _Util.exprIsAssignment(expr)
-					|| expr instanceof NewExpression
-					|| expr instanceof SuperExpression) {
-				return false;
-			}
-			else if (expr instanceof CallExpression) {
+		return expr.hasSideEffects(function precheck(expr) {
+			if (expr instanceof CallExpression) {
 				var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(expr);
 				if (callingFuncDef != null && (callingFuncDef.flags() & ClassDefinition.IS_PURE) != 0) {
-					// fall through (check receiver and arguments)
-				} else {
-					return false;
+					// is calling a pure function, check the arguments
+					return ! expr.forEachExpression(function (expr) {
+						return ! expr.hasSideEffects(precheck);
+					});
 				}
 			}
-			else if (expr instanceof PropertyExpression) {
-				var type = (expr as PropertyExpression).getExpr().getType();
-				if (!(Util.isBuiltInClass(type) || !Util.isNativeClass(type))) {
-					return false;
-				}
-			}
-			else if (expr instanceof ArrayExpression) {
-				var type = (expr as ArrayExpression).getFirstExpr().getType();
-				if (!(Util.isBuiltInClass(type) || !Util.isNativeClass(type))) {
-
-					return false;
-				}
-			}
-			return expr.forEachExpression(onExpr);
-		}(expr));
+			return null;
+		});
 	}
 
 	static function conditionIsConstant (expr : Expression) : Nullable.<boolean> {
@@ -2524,7 +2507,7 @@ class _DeadCodeEliminationOptimizeCommand extends _FunctionOptimizeCommand {
 				var assignmentExpr = expr as AssignmentExpression;
 				var firstExpr      = assignmentExpr.getFirstExpr();
 				if (isFirstLevelPropertyAccess(firstExpr)
-					&& ! Util.isNativeClass((firstExpr as PropertyExpression).getExpr().getType())) {
+					&& ! Util.rootIsNativeClass((firstExpr as PropertyExpression).getExpr().getType())) {
 					var propertyName = (firstExpr as PropertyExpression).getIdentifierToken().getValue();
 					onExpr(assignmentExpr.getSecondExpr(), null);
 					if (lastAssignExpr[propertyName]
@@ -2783,7 +2766,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand implements _Struct
 			}
 
 		} else if (expr instanceof AssignmentExpression
-			   && ! Util.lhsHasSideEffects((expr as AssignmentExpression).getFirstExpr())
+			&& ! (expr as AssignmentExpression).getFirstExpr().hasSideEffects()
 			&& (expr as AssignmentExpression).getSecondExpr() instanceof CallExpression) {
 
 			// inline if the statement is an assignment of a single call expression into a local variable
@@ -3365,7 +3348,7 @@ class _LCSEOptimizeCommand extends _FunctionOptimizeCommand {
 			if (expr instanceof PropertyExpression) {
 				var propertyExpr = expr as PropertyExpression;
 				var receiverType = propertyExpr.getExpr().getType();
-				if (Util.isNativeClass(receiverType)) {
+				if (Util.rootIsNativeClass(receiverType)) {
 					return null;
 				}
 				var base = getCacheKey(propertyExpr.getExpr());
@@ -3600,7 +3583,7 @@ class _UnboxOptimizeCommand extends _FunctionOptimizeCommand implements _Structu
 		if (! (local.getType() instanceof ObjectType)) {
 			return false;
 		}
-		if (Util.isNativeClass(local.getType())) {
+		if (Util.rootIsNativeClass(local.getType())) {
 			return false;
 		}
 		// determine if the local can be unboxed
