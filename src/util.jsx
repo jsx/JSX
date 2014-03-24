@@ -167,32 +167,6 @@ class Util {
 		return false;
 	}
 
-	static function lhsHasSideEffects (lhsExpr : Expression) : boolean {
-		if (lhsExpr instanceof LocalExpression)
-			return false;
-		if (lhsExpr instanceof PropertyExpression) {
-			var holderExpr = (lhsExpr as PropertyExpression).getExpr();
-			if (Util.rootIsNativeClass(holderExpr.getType()) && !Util.isBuiltInClass(holderExpr.getType())) {
-				return true;
-			}
-			if (holderExpr instanceof ThisExpression
-				|| holderExpr instanceof LocalExpression
-				|| holderExpr.isClassSpecifier()) {
-				return false;
-			}
-		} else if (lhsExpr instanceof ArrayExpression) {
-			var arrayExpr = lhsExpr as ArrayExpression;
-			if (Util.rootIsNativeClass(arrayExpr.getFirstExpr().getType()) && !Util.isBuiltInClass(arrayExpr.getFirstExpr().getType())) {
-				return true;
-			}
-			if (arrayExpr.getFirstExpr() instanceof LocalExpression
-				&& arrayExpr.getSecondExpr() instanceof LeafExpression) {
-				return false;
-			}
-		}
-		return true;
-	}
-
 	static function instantiateTemplate (context : AnalysisContext, token : Token, className : string, typeArguments : Type[]) : ClassDefinition {
 		return context.parser.lookupTemplate(context.errors, new TemplateInstantiationRequest(token, className, typeArguments), context.postInstantiationCallback);
 	}

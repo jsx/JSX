@@ -66,35 +66,18 @@ class _Util {
 	}
 
 	static function exprHasSideEffects (expr : Expression) : boolean {
-		return !(function onExpr (expr : Expression) : boolean {
-			if ( _Util.exprIsAssignment(expr)
-					|| expr instanceof NewExpression
-					|| expr instanceof SuperExpression) {
-				return false;
-			}
-			else if (expr instanceof CallExpression) {
+		return expr.hasSideEffects(function precheck(expr) {
+			if (expr instanceof CallExpression) {
 				var callingFuncDef = _DetermineCalleeCommand.getCallingFuncDef(expr);
 				if (callingFuncDef != null && (callingFuncDef.flags() & ClassDefinition.IS_PURE) != 0) {
-					// fall through (check receiver and arguments)
-				} else {
-					return false;
+					// is calling a pure function, check the arguments
+					return ! expr.forEachExpression(function (expr) {
+						return ! expr.hasSideEffects(precheck);
+					});
 				}
 			}
-			else if (expr instanceof PropertyExpression) {
-				var type = (expr as PropertyExpression).getExpr().getType();
-				if (!(Util.isBuiltInClass(type) || !Util.rootIsNativeClass(type))) {
-					return false;
-				}
-			}
-			else if (expr instanceof ArrayExpression) {
-				var type = (expr as ArrayExpression).getFirstExpr().getType();
-				if (!(Util.isBuiltInClass(type) || !Util.rootIsNativeClass(type))) {
-
-					return false;
-				}
-			}
-			return expr.forEachExpression(onExpr);
-		}(expr));
+			return null;
+		});
 	}
 
 	static function conditionIsConstant (expr : Expression) : Nullable.<boolean> {
@@ -2783,7 +2766,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand implements _Struct
 			}
 
 		} else if (expr instanceof AssignmentExpression
-			   && ! Util.lhsHasSideEffects((expr as AssignmentExpression).getFirstExpr())
+			&& ! (expr as AssignmentExpression).getFirstExpr().hasSideEffects()
 			&& (expr as AssignmentExpression).getSecondExpr() instanceof CallExpression) {
 
 			// inline if the statement is an assignment of a single call expression into a local variable

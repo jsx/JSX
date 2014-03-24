@@ -2067,7 +2067,7 @@ class _PreIncrementExpressionEmitter extends _UnaryExpressionEmitter {
 	override function emit(outerOpPrecedence : number) : void {
 		var opToken = this._expr.getToken();
 		if (this._expr.getType().resolveIfNullable().equals(Type.integerType)) {
-			if (Util.lhsHasSideEffects(this._expr.getExpr())) {
+			if (this._expr.getExpr().hasSideEffects()) {
 				_Util.emitFusedIntOpWithSideEffects(this._emitter, opToken.getValue() == "++" ? "$__jsx_ipadd" : "$__jsx_ipdec", this._expr.getExpr(), function (outerPred) {
 					this._emitter._emit("1", opToken);
 				}, 0);
@@ -2108,7 +2108,7 @@ class _PostIncrementExpressionEmitter extends _UnaryExpressionEmitter {
 	override function emit (outerOpPrecedence : number) : void {
 		var opToken = this._expr.getToken();
 		if (this._expr.getType().resolveIfNullable().equals(Type.integerType)) {
-			if (Util.lhsHasSideEffects(this._expr.getExpr())) {
+			if (this._expr.getExpr().hasSideEffects()) {
 				_Util.emitFusedIntOpWithSideEffects(this._emitter, opToken.getValue() == "++" ? "$__jsx_ippostinc" : "$__jsx_ippostdec", this._expr.getExpr(), function (outerPred) {
 					this._emitter._emit("1", opToken);
 				}, 0);
@@ -2141,7 +2141,7 @@ class _PostIncrementExpressionEmitter extends _UnaryExpressionEmitter {
 
 	static function needsTempVarFor(expr : PostIncrementExpression) : boolean {
 		return expr.getType().resolveIfNullable().equals(Type.integerType)
-			&& ! Util.lhsHasSideEffects(expr.getExpr());
+			&& ! expr.getExpr().hasSideEffects();
 	}
 
 }
@@ -2399,7 +2399,7 @@ class _FusedAssignmentExpressionEmitter extends _OperatorExpressionEmitter {
 		var coreOp = this._expr.getToken().getValue().charAt(0);
 		if (_FusedAssignmentExpressionEmitter._fusedIntHelpers[coreOp] != null
 			&& this._expr.getFirstExpr().getType().resolveIfNullable().equals(Type.integerType)) {
-			if (Util.lhsHasSideEffects(this._expr.getFirstExpr())) {
+			if (this._expr.getFirstExpr().hasSideEffects()) {
 				_Util.emitFusedIntOpWithSideEffects(this._emitter, _FusedAssignmentExpressionEmitter._fusedIntHelpers[coreOp], this._expr.getFirstExpr(), function (outerPred) {
 					this._emitter._emitWithNullableGuard(this._expr.getSecondExpr(), outerPred);
 				}, outerOpPrecedence);

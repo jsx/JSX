@@ -145,6 +145,23 @@ abstract class Expression implements Stashable {
 		return true;
 	}
 
+	final function hasSideEffects() : boolean {
+		return this.hasSideEffects(function (expr) { return null; });
+	}
+
+	final function hasSideEffects(preCheckCb : (Expression) -> Nullable.<boolean>) : boolean {
+		var r = preCheckCb(this);
+		if (r != null)
+			return r;
+		return this._doHasSideEffects(preCheckCb);
+	}
+
+	function _doHasSideEffects(preCheckCb : (Expression) -> Nullable.<boolean>) : boolean {
+		return ! this.forEachExpression(function (expr) {
+			return ! expr.hasSideEffects(preCheckCb);
+		});
+	}
+
 	static function getDefaultValueExpressionOf (type : Type) : Expression {
 		if (type.equals(Type.booleanType))
 			return new BooleanLiteralExpression(new Token("false", false));
@@ -1237,6 +1254,10 @@ abstract class IncrementExpression extends UnaryExpression {
 		return this._expr.getType().resolveIfNullable();
 	}
 
+	override function _doHasSideEffects(preCheckCb : (Expression) -> Nullable.<boolean>) : boolean {
+		return true;
+	}
+
 	abstract function _getClassName () : string;
 
 }
@@ -1436,6 +1457,16 @@ class PropertyExpression extends UnaryExpression {
 			return false;
 		}
 		return true;
+	}
+
+	override function _doHasSideEffects(preCheckCb : (Expression) -> Nullable.<boolean>) : boolean {
+		if (this.isClassSpecifier()) {
+			return false;
+		}
+		if (! Util.isBuiltInClass(this._expr.getType()) && Util.rootIsNativeClass(this._expr.getType())) {
+			return true;
+		}
+		return super._doHasSideEffects(preCheckCb);
 	}
 
 	function deduceByArgumentTypes (context : AnalysisContext, operatorToken : Token, argTypes : Type[], isStatic : boolean) : ResolvedFunctionType {
@@ -1695,6 +1726,13 @@ class ArrayExpression extends BinaryExpression {
 		return Expression.assertIsAssignable(context, token, this._type, type);
 	}
 
+	override function _doHasSideEffects(preCheckCb : (Expression) -> Nullable.<boolean>) : boolean {
+		if (! Util.isBuiltInClass(this._expr1.getType()) && Util.rootIsNativeClass(this._expr1.getType())) {
+			return true;
+		}
+		return super._doHasSideEffects(preCheckCb);
+	}
+
 }
 
 class AssignmentExpression extends BinaryExpression {
@@ -1828,6 +1866,10 @@ class AssignmentExpression extends BinaryExpression {
 		return this._expr1.getType();
 	}
 
+	override function _doHasSideEffects(preCheckCb : (Expression) -> Nullable.<boolean>) : boolean {
+		return true;
+	}
+
 }
 
 class FusedAssignmentExpression extends BinaryExpression {
@@ -1859,6 +1901,10 @@ class FusedAssignmentExpression extends BinaryExpression {
 
 	override function getType () : Type {
 		return this._expr1.getType();
+	}
+
+	override function _doHasSideEffects(preCheckCb : (Expression) -> Nullable.<boolean>) : boolean {
+		return true;
 	}
 
 }
@@ -2254,6 +2300,10 @@ class CallExpression extends OperatorExpression {
 		return true;
 	}
 
+	override function _doHasSideEffects(preCheckCb : (Expression) -> Nullable.<boolean>) : boolean {
+		return true;
+	}
+
 }
 
 class SuperExpression extends OperatorExpression {
@@ -2335,6 +2385,10 @@ class SuperExpression extends OperatorExpression {
 	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
 		if (! Util.forEachExpression(cb, this._args))
 			return false;
+		return true;
+	}
+
+	override function _doHasSideEffects(preCheckCb : (Expression) -> Nullable.<boolean>) : boolean {
 		return true;
 	}
 
@@ -2427,6 +2481,10 @@ class NewExpression extends OperatorExpression {
 	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
 		if (! Util.forEachExpression(cb, this._args))
 			return false;
+		return true;
+	}
+
+	override function _doHasSideEffects(preCheckCb : (Expression) -> Nullable.<boolean>) : boolean {
 		return true;
 	}
 
