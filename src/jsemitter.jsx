@@ -3741,13 +3741,17 @@ class JavaScriptEmitter implements Emitter {
 
 	function _emitStaticMemberVariable (variable : MemberVariableDefinition) : void {
 		var initialValue = variable.getInitialValue();
-		if (initialValue != null
-			&& ! (initialValue instanceof NullExpression
-				|| initialValue instanceof BooleanLiteralExpression
-				|| initialValue instanceof IntegerLiteralExpression
-				|| initialValue instanceof NumberLiteralExpression
-				|| initialValue instanceof StringLiteralExpression
-				|| initialValue instanceof RegExpLiteralExpression)) {
+		// static vars that refer to other static vars should be initialized lazily
+		if (initialValue != null && initialValue.hasSideEffects(function (expr) {
+			if (expr instanceof PropertyExpression) {
+				var holderExpr = (expr as PropertyExpression).getExpr();
+				if (holderExpr instanceof ClassExpression
+					|| (holderExpr instanceof PropertyExpression && (holderExpr as PropertyExpression).isClassSpecifier())) {
+					return true;
+				}
+			}
+			return null;
+		})) {
 			// use deferred initialization
 			this._emit("$__jsx_lazy_init(", variable.getNameToken());
 			this._emit(this._namer.getNameOfClass(variable.getClassDef()) + ", \"" + this._namer.getNameOfStaticVariable(variable.getClassDef(), variable.name()) + "\", function () {\n", variable.getNameToken());
