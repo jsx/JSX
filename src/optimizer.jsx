@@ -1677,6 +1677,26 @@ class _FoldConstantCommand extends _FunctionOptimizeCommand implements _Structur
 		super(_FoldConstantCommand.IDENTIFIER);
 	}
 
+	override function performOptimization () : void {
+		super.performOptimization();
+		this.getCompiler().forEachClassDef(function (parser, classDef) {
+			if (classDef instanceof TemplateClassDefinition
+				|| (classDef.flags() & ClassDefinition.IS_NATIVE) != 0) {
+				return true;
+			}
+			classDef.forEachMemberVariable(function (varDef) {
+				if ((varDef.flags() & ClassDefinition.IS_STATIC) != 0
+					&& varDef.getInitialValue() != null) {
+					this.log("starting optimization of " + varDef.getNotation());
+					this._optimizeExpression(varDef.getInitialValue(), function (expr) { varDef.setInitialValue(expr); });
+					this.log("finished optimization of " + varDef.getNotation());
+				}
+				return true;
+			});
+			return true;
+		});
+	}
+
 	override function optimizeFunction (funcDef : MemberFunctionDefinition) : boolean {
 		funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
 			statement.forEachStatement(onStatement);
