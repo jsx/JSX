@@ -278,6 +278,17 @@ class _Util {
 		emitter._emit(")", expr.getToken());
 	}
 
+	static function getNewExpressionInliner(expr : NewExpression) : function(:NewExpression):Expression[] {
+		var classDef = expr.getType().getClassDef();
+		var ctor = expr.getConstructor();
+		var argTypes = ctor.getArgumentTypes();
+		var callingFuncDef = Util.findFunctionInClass(classDef, "constructor", argTypes, false);
+		assert callingFuncDef != null, "logic flow for " + expr.getType().toString();
+
+		var stash = callingFuncDef.getStash("unclassify");
+		return stash ? (stash as _UnclassifyOptimizationCommand.Stash).inliner : null;
+	}
+
 }
 
 class _TempVarLister {
@@ -2915,29 +2926,20 @@ class _NewExpressionEmitter extends _OperatorExpressionEmitter {
 	}
 
 	override function emit (outerOpPrecedence : number) : void {
-		function getInliner(funcDef : MemberFunctionDefinition) : function(:NewExpression):Expression[] {
-			var stash = funcDef.getStash("unclassify");
-			return stash ? (stash as _UnclassifyOptimizationCommand.Stash).inliner : null;
-		}
-
 		assert this._expr.getConstructor() != null, "logic flow: new " + this._expr.getType().toString(); // didn't call analize()?
-
+		var inliner = _Util.getNewExpressionInliner(this._expr);
 		var classDef = this._expr.getType().getClassDef();
-		var ctor = this._expr.getConstructor();
-		var argTypes = ctor.getArgumentTypes();
-		var callingFuncDef = Util.findFunctionInClass(classDef, "constructor", argTypes, false);
-		assert callingFuncDef != null, "logic flow for " + this._expr.getType().toString();
-		var inliner = getInliner(callingFuncDef);
 		if (inliner) {
 			this._emitAsObjectLiteral(classDef, inliner(this._expr));
 		} else if (_Util.isArrayType(this._expr.getType())
-			&& argTypes.length == 0) {
+			&& this._expr.getArguments().length == 0) {
 			this._emitter._emit("[]", this._expr.getToken());
 		} else if (
 			classDef instanceof InstantiatedClassDefinition
 			&& (classDef as InstantiatedClassDefinition).getTemplateClassName() == "Map") {
 			this._emitter._emit("{}", this._expr.getToken());
 		} else {
+			var argTypes = this._expr.getConstructor().getArgumentTypes();
 			this._emitter._emitCallArguments(
 				this._expr.getToken(),
 				"new " + this._emitter.getNamer().getNameOfConstructor(classDef, argTypes) + "(",
@@ -3748,6 +3750,10 @@ class JavaScriptEmitter implements Emitter {
 				if (holderExpr instanceof ClassExpression
 					|| (holderExpr instanceof PropertyExpression && (holderExpr as PropertyExpression).isClassSpecifier())) {
 					return true;
+				}
+			} else if (expr instanceof NewExpression) {
+				if (_Util.getNewExpressionInliner(expr as NewExpression) != null) {
+					return false;
 				}
 			}
 			return null;
