@@ -17,12 +17,13 @@ class Async {
     };
   }
 
-  static function run(coro : () -> Generator.<(variant)->void>) : void {
+  // FIXME: Once use of `void` in template parameter is permitted, replace `int` with `void`.
+  static function run(coro : () -> Generator.<int, (variant)->void>) : void {
     Async.go(coro());
   }
 
   static function go(v : variant) : void {
-    var g = v as Generator.<(variant)->void>;
+    var g = v as Generator.<int, (variant)->void>;
 
     var data = g.next();
     if (data.done) {
@@ -35,7 +36,7 @@ class Async {
 
 class _Main {
   static function main(args : string[]) : void {
-    Async.run(function * () {
+    Async.run(function * () : Generator.<int, (variant)->void> {
       log "H";
       yield Async.sleep(100);
       log "e";
