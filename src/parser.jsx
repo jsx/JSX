@@ -1956,6 +1956,14 @@ class Parser {
 			}
 			typeDecl = this._registerArrayTypeOf(token, typeDecl);
 		}
+		// yield
+		while (this._expectOpt("yield") != null) {
+			var genType = this._typeDeclaration(true);
+			if (genType == null) {
+				return null;
+			}
+			typeDecl = this._registerGeneratorTypeOf(typeDecl, genType);
+		}
 		return typeDecl;
 	}
 
@@ -2187,10 +2195,10 @@ class Parser {
 		return arrayType;
 	}
 
-	function _registerGenObjTypeOf (elementType : Type) : ParsedObjectType {
-		var genObjType = new ParsedObjectType(new QualifiedName(new Token("Generator", true)), [ elementType ]);
-		this._objectTypesUsed.push(genObjType);
-		return genObjType;
+	function _registerGeneratorTypeOf (seedType : Type, genType : Type) : ParsedObjectType {
+		var generatorType = new ParsedObjectType(new QualifiedName(new Token("Generator", true)), [ seedType, genType ]);
+		this._objectTypesUsed.push(generatorType);
+		return generatorType;
 	}
 
 	function _initializeBlock () : Token {
