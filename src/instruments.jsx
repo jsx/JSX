@@ -2407,7 +2407,6 @@ class CPSTransformCommand extends FunctionTransformCommand {
 			new Token("try", false),
 			[
 				inferiorWhileStmt,
-				new BreakStatement(new Token("break", false), null)
 			], [
 				new CatchStatement(
 					new Token("catch", false),
