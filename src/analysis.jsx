@@ -282,7 +282,7 @@ class LocalVariable implements Stashable {
 	}
 
 	function _instantiate (instantiationContext : InstantiationContext) : LocalVariable {
-		var type = this._type != null ? this._type.instantiate(instantiationContext) : null;
+		var type = this._type != null ? this._type.instantiate(instantiationContext, false) : null;
 		return new LocalVariable(this._name, type, this._isConstant);
 	}
 
@@ -303,7 +303,7 @@ class CaughtVariable extends LocalVariable {
 	}
 
 	override function _instantiate (instantiationContext : InstantiationContext) : CaughtVariable {
-		return new CaughtVariable(this._name, this._type.instantiate(instantiationContext));
+		return new CaughtVariable(this._name, this._type.instantiate(instantiationContext, false));
 	}
 
 	override function instantiateAndPush (instantiationContext : InstantiationContext) : CaughtVariable {
@@ -333,7 +333,7 @@ class ArgumentDeclaration extends LocalVariable {
 	}
 
 	override function _instantiate (instantiationContext : InstantiationContext) : ArgumentDeclaration {
-		var type = this._type != null ? this._type.instantiate(instantiationContext) : null;
+		var type = this._type != null ? this._type.instantiate(instantiationContext, false) : null;
 		return new ArgumentDeclaration(this._name, type, this._defaultValue);
 	}
 
