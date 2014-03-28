@@ -2,9 +2,9 @@
 --enable-generator-emulation
 */
 /*EXPECTED
-0
 1
 2
+3
 */
 class _Main {
 
@@ -27,11 +27,11 @@ class _Main {
 		var gen1 : int yield string;
 		var gen2 : Generator.<int,string>;
 
-		gen1 = _Main.foo(0);
-		gen2 = gen1;
-		log gen2.next(1).value;
-		log gen2.next(2).value;
-		log gen2.next(3).value;
+		gen1 = gen2 = _Main.foo(0);
+		gen1.next();
+		log gen1.next(1).value;
+		log gen1.next(2).value;
+		log gen1.next(3).value;
 
 	}
 }
