@@ -1980,7 +1980,7 @@ class Parser {
 	function _nullableTypeDeclaration () : Type {
 		if (this._expect(".") == null || this._expect("<") == null)
 			return null;
-		var baseType = this._typeDeclaration(false);
+		var baseType = this._typeDeclaration(true);
 		if (baseType == null)
 			return null;
 		if (this._expect(">") == null)
