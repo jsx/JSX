@@ -6,9 +6,11 @@
 3
 6
 10
+15
 */
 class _Main {
 	static function main (args : string[]) : void {
+
 		function * sum () : Generator.<number,number> {
 			var a = 0;
 			while (true) {
@@ -17,9 +19,11 @@ class _Main {
 		}
 
 		var g = sum();
-		g.next();	// initial run
-		for (var i = 1; i < 5; ++i) {
-			log g.next(i).value;
-		}
+		g.next();// initial run
+		log g.next(1).value;
+		log g.next(2).value;
+		log g.next(3).value;
+		log g.next(4).value;
+		log g.next(5).value;
 	}
 }

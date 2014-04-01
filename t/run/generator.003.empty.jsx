@@ -2,13 +2,14 @@
 --enable-generator-emulation
 */
 /*EXPECTED
+{ value: undefined, done: true }
 */
 
 class _Main {
-
 	static function main (args : string[]) : void {
 
-		var g : int yield int yield int = (function * () : Generator.<int,Generator.<int,int>> {})();
+		var g = (function * () : Generator.<int,string> {})();
 
+		log g.next();
 	}
 }

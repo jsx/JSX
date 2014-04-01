@@ -2,36 +2,32 @@
 --enable-generator-emulation
 */
 /*EXPECTED
-1
-2
-3
 */
+
+
+// you can use `T yield U` syntax wherever type declaration may appear
+
 class _Main {
 
-	// you can use T yield U syntax anywhere type declaration may appear
-	static function foo (init : int) : int yield string {
+	var m1 : int yield string;
 
-		function * foo (n : int) : int yield string {
-			while (true) {
-				n = yield (n as string);
-			}
-		}
+	function m2 (a : int yield string) : void {
+		return;
+	}
 
-		return foo(init);
-
+	function m3 () : int yield string {
+		return this.m1;
 	}
 
 	static function main (args : string[]) : void {
 
-		// `T yield U` type declaration is a sugar for Generator.<U,T>
-		var gen1 : int yield string;
-		var gen2 : Generator.<int,string>;
+		var m4 : int yield string = null;
 
-		gen1 = gen2 = _Main.foo(0);
-		gen1.next();
-		log gen1.next(1).value;
-		log gen1.next(2).value;
-		log gen1.next(3).value;
+		var m5 : Generator.<int, string> = null;
+
+		// m4 and m5 are compatible
+		m5 = m4;
+		m4 = m5;
 
 	}
 }

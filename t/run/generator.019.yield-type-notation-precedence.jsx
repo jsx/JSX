@@ -2,23 +2,19 @@
 --enable-generator-emulation
 */
 /*EXPECTED
-[ '1', '2', '3' ]
 */
 class _Main {
 
 	static function main (args : string[]) : void {
 
-		function * foo (n : int) : Generator.<int,string[]> {
-			while (true) {
-				n = yield (n as string).split("");
-			}
-		}
+		// int yield (int[])
+		var g1 : int yield int[] = (function * () : Generator.<int,int[]> {})();
 
-		// `int yield string[]` should be parsed like `(int) yield (string[])`
+		// (int) -> (int yield int)
+		var g2 : (int) -> int yield int = function (a : int) { return (function * () : int yield int {})(); };
 
-		var a : int yield string[] = foo(123);
-
-		log a.next().value;
+		// int yield ((int) -> int)
+		var g3 : int yield (int) -> int = (function * () : Generator.<int,(int)->int> {})();
 
 	}
 }
