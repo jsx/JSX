@@ -63,7 +63,7 @@ abstract class Type {
 	}
 
 	function toNullableType (force : boolean) : Type {
-		if (force || this instanceof PrimitiveType) {
+		if (force || this instanceof PrimitiveType || this.equals(Type.voidType)) {
 			return new NullableType(this);
 		}
 		return this;
@@ -202,7 +202,7 @@ class VoidType extends Type {
 	}
 
 	override function isConvertibleTo (type : Type) : boolean {
-		return false;
+		return type.equals(Type.voidType);
 	}
 
 	override function getClassDef () : ClassDefinition {
@@ -363,13 +363,11 @@ class NullableType extends Type {
 	function constructor (type : Type) {
 		if (type.equals(Type.variantType))
 			throw new Error("logic flaw, cannot create Nullable.<variant>");
-		if (type.equals(Type.voidType))
-			throw new Error("logic flaw, cannot create Nullable.<void>");
 		this._baseType = type instanceof NullableType ? (type as NullableType)._baseType : type;
 	}
 
 	override function instantiate (instantiationContext : InstantiationContext, allowVoid : boolean) : Type {
-		var baseType = this._baseType.resolveIfNullable().instantiate(instantiationContext, allowVoid);
+		var baseType = this._baseType.resolveIfNullable().instantiate(instantiationContext, true);
 		return baseType.toNullableType();
 	}
 
