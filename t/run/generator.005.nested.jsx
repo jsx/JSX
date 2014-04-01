@@ -9,9 +9,9 @@
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function * foo () : Generator.<number,number> {
+		function * foo () : Generator.<void,number> {
 			yield 1;
-			function * bar () : Generator.<number,number> {
+			function * bar () : Generator.<void,number> {
 				yield 2;
 				yield 3;
 			}

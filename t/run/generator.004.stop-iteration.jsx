@@ -6,7 +6,7 @@ ok
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function * foo () : Generator.<number,number> {
+		function * foo () : Generator.<void,number> {
 			yield 1;
 			yield 2;
 			yield 3;

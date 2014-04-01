@@ -1936,25 +1936,13 @@ class Parser {
 
 	function _typeDeclaration (allowVoid : boolean) : Type {
 		var token;
+		var typeDecl : Type;
 		if ((token = this._expectOpt("void")) != null) {
-			if (! allowVoid) {
-				this._newError("'void' cannot be used here", token);
+			typeDecl = Type.voidType;
+		} else {
+			typeDecl = this._typeDeclarationNoVoidNoYield();
+			if (typeDecl == null)
 				return null;
-			}
-			return Type.voidType;
-		}
-		var typeDecl = this._typeDeclarationNoArrayNoVoid();
-		if (typeDecl == null)
-			return null;
-		// []
-		while (this._expectOpt("[") != null) {
-			if ((token = this._expect("]")) == null)
-				return null;
-			if (typeDecl instanceof NullableType) {
-				this._newError("Nullable.<T> cannot be an array, should be: T[]");
-				return null;
-			}
-			typeDecl = this._registerArrayTypeOf(token, typeDecl);
 		}
 		// yield
 		while (this._expectOpt("yield") != null) {
@@ -1964,10 +1952,32 @@ class Parser {
 			}
 			typeDecl = this._registerGeneratorTypeOf(typeDecl, genType);
 		}
+		if (! allowVoid && typeDecl.equals(Type.voidType)) {
+			this._newError("'void' cannot be used here", token);
+			return null;
+		}
 		return typeDecl;
 	}
 
-	function _typeDeclarationNoArrayNoVoid () : Type {
+	function _typeDeclarationNoVoidNoYield () : Type {
+		var typeDecl = this._typeDeclarationNoArrayNoVoidNoYield();
+		if (typeDecl == null)
+			return null;
+		// []
+		while (this._expectOpt("[") != null) {
+			var token;
+			if ((token = this._expect("]")) == null)
+				return null;
+			if (typeDecl instanceof NullableType) {
+				this._newError("Nullable.<T> cannot be an array, should be: T[]");
+				return null;
+			}
+			typeDecl = this._registerArrayTypeOf(token, typeDecl);
+		}
+		return typeDecl;
+	}
+
+	function _typeDeclarationNoArrayNoVoidNoYield () : Type {
 		var token = this._expectOpt([ "MayBeUndefined", "Nullable", "variant" ]);
 		if (token == null) {
 			return this._primaryTypeDeclaration();
@@ -3068,7 +3078,7 @@ class Parser {
 	}
 
 	function _newExpr (newToken : Token) : Expression {
-		var type = this._typeDeclarationNoArrayNoVoid();
+		var type = this._typeDeclarationNoArrayNoVoidNoYield();
 		if (type == null)
 			return null;
 		// handle [] (if it has an length parameter, that's the last)

@@ -10,7 +10,7 @@
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function * fib () : Generator.<number,number> {
+		function * fib () : Generator.<void,number> {
 			var a = 0, b = 1;
 			while (true) {
 				var t = a;

@@ -1568,7 +1568,6 @@ class YieldExpression extends UnaryExpression {
 			return false;
 		var returnType = context.funcDef.getReturnType();
 		if (returnType == null) {
-			// Since the single parameter version `Generator.<GenT>` is not supported yet, we cannot deduce seed and gen types here.
 			context.errors.push(new CompileError(this._token, "cannot deduce yield expression type"));
 			return false;
 		} else {
@@ -1578,7 +1577,7 @@ class YieldExpression extends UnaryExpression {
 					this._seedType = (returnType.getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0];
 					var genType = (returnType.getClassDef() as InstantiatedClassDefinition).getTypeArguments()[1];
 			} else {
-				// return type is not an instance of Enumerable. the error will be reported by MemberFuncitonDefinition#analyze.
+				// return type is not an instance of 'Generator'. the error will be reported by MemberFuncitonDefinition#analyze.
 				context.errors.push(new CompileError(this._token, "cannot convert 'Generator' to return type '" + returnType.toString() + "'"));
 				return false;
 			}

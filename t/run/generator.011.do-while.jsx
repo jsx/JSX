@@ -11,7 +11,7 @@ end
 class _Main {
 	static function main (args : string[]) : void {
 
-		function * iota (n : number) : Generator.<number,number> {
+		function * iota (n : number) : Generator.<void,number> {
 			var i = 0;
 			do {
 				yield i;

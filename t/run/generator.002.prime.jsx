@@ -10,7 +10,7 @@
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function * prime () : Generator.<number,number> {
+		function * prime () : Generator.<void,number> {
 			NEXT:
 			for (var n = 2; true; ++n) {
 				for (var m = 2; m * m <= n; ++m) {
