@@ -120,7 +120,7 @@ class ConstructorInvocationStatement extends Statement {
 		}
 		return new ConstructorInvocationStatement(
 			this._token,
-			this._ctorClassType.instantiate(instantiationContext),
+			this._ctorClassType.instantiate(instantiationContext, false),
 			Util.cloneArray(this._args),
 			null);
 	}

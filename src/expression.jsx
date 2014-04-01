@@ -50,54 +50,54 @@ abstract class Expression implements Stashable {
 			if (expr instanceof NullExpression) {
 				var srcType = expr.getType();
 				if (srcType != null) {
-					(expr as NullExpression).setType(srcType.instantiate(instantiationContext));
+					(expr as NullExpression).setType(srcType.instantiate(instantiationContext, false));
 				}
 			} else if (expr instanceof NewExpression) {
 				var srcType = expr.getType();
 				if (srcType != null) {
-					(expr as NewExpression).setType(srcType.instantiate(instantiationContext));
+					(expr as NewExpression).setType(srcType.instantiate(instantiationContext, false));
 				}
 			} else if (expr instanceof PropertyExpression) {
 				var propertyExpr = expr as PropertyExpression;
 				var srcType = expr.getType();
 				if (srcType != null) {
-					propertyExpr.setType(srcType.instantiate(instantiationContext));
+					propertyExpr.setType(srcType.instantiate(instantiationContext, false));
 				}
 				var srcTypes = propertyExpr.getTypeArguments();
 				if (srcTypes != null) {
-					propertyExpr.setTypeArguments(srcTypes.map.<Type>((type) -> type.instantiate(instantiationContext)));
+					propertyExpr.setTypeArguments(srcTypes.map.<Type>((type) -> type.instantiate(instantiationContext, false)));
 				}
 			} else if (expr instanceof ArrayLiteralExpression) {
 				var srcType = expr.getType();
 				if (srcType != null) {
-					(expr as ArrayLiteralExpression).setType(srcType.instantiate(instantiationContext));
+					(expr as ArrayLiteralExpression).setType(srcType.instantiate(instantiationContext, false));
 				}
 			} else if (expr instanceof MapLiteralExpression) {
 				var srcType = expr.getType();
 				if (srcType != null) {
-					(expr as MapLiteralExpression).setType(srcType.instantiate(instantiationContext));
+					(expr as MapLiteralExpression).setType(srcType.instantiate(instantiationContext, false));
 				}
 			} else if (expr instanceof AsExpression) {
 				var srcType = expr.getType();
 				if (srcType != null) {
-					(expr as AsExpression).setType(srcType.instantiate(instantiationContext));
+					(expr as AsExpression).setType(srcType.instantiate(instantiationContext, false));
 				}
 			} else if (expr instanceof AsNoConvertExpression) {
 				var srcType = expr.getType();
 				if (srcType != null) {
-					(expr as AsNoConvertExpression).setType(srcType.instantiate(instantiationContext));
+					(expr as AsNoConvertExpression).setType(srcType.instantiate(instantiationContext, false));
 				}
 			} else if (expr instanceof ClassExpression) {
 				var srcType = expr.getType();
 				if (srcType != null) {
-					(expr as ClassExpression).setType(srcType.instantiate(instantiationContext));
+					(expr as ClassExpression).setType(srcType.instantiate(instantiationContext, false));
 				}
 			} else if (expr instanceof LocalExpression) {
 				// update local to the instantiated one
 				(expr as LocalExpression).setLocal((expr as LocalExpression).getLocal().getInstantiated());
 			} else if (expr instanceof InstanceofExpression) {
 				var instanceofExpr = expr as InstanceofExpression;
-				instanceofExpr.setExpectedType(instanceofExpr.getExpectedType().instantiate(instantiationContext));
+				instanceofExpr.setExpectedType(instanceofExpr.getExpectedType().instantiate(instantiationContext, false));
 			}
 			return expr.forEachExpression(onExpr);
 		}
@@ -143,6 +143,23 @@ abstract class Expression implements Stashable {
 			return false;
 		}
 		return true;
+	}
+
+	final function hasSideEffects() : boolean {
+		return this.hasSideEffects(function (expr) { return null; });
+	}
+
+	final function hasSideEffects(preCheckCb : (Expression) -> Nullable.<boolean>) : boolean {
+		var r = preCheckCb(this);
+		if (r != null)
+			return r;
+		return this._doHasSideEffects(preCheckCb);
+	}
+
+	function _doHasSideEffects(preCheckCb : (Expression) -> Nullable.<boolean>) : boolean {
+		return ! this.forEachExpression(function (expr) {
+			return ! expr.hasSideEffects(preCheckCb);
+		});
 	}
 
 	static function getDefaultValueExpressionOf (type : Type) : Expression {
@@ -1237,6 +1254,10 @@ abstract class IncrementExpression extends UnaryExpression {
 		return this._expr.getType().resolveIfNullable();
 	}
 
+	override function _doHasSideEffects(preCheckCb : (Expression) -> Nullable.<boolean>) : boolean {
+		return true;
+	}
+
 	abstract function _getClassName () : string;
 
 }
@@ -1436,6 +1457,16 @@ class PropertyExpression extends UnaryExpression {
 			return false;
 		}
 		return true;
+	}
+
+	override function _doHasSideEffects(preCheckCb : (Expression) -> Nullable.<boolean>) : boolean {
+		if (this.isClassSpecifier()) {
+			return false;
+		}
+		if (! Util.isBuiltInClass(this._expr.getType()) && Util.rootIsNativeClass(this._expr.getType())) {
+			return true;
+		}
+		return super._doHasSideEffects(preCheckCb);
 	}
 
 	function deduceByArgumentTypes (context : AnalysisContext, operatorToken : Token, argTypes : Type[], isStatic : boolean) : ResolvedFunctionType {
@@ -1756,6 +1787,13 @@ class ArrayExpression extends BinaryExpression {
 		return Expression.assertIsAssignable(context, token, this._type, type);
 	}
 
+	override function _doHasSideEffects(preCheckCb : (Expression) -> Nullable.<boolean>) : boolean {
+		if (! Util.isBuiltInClass(this._expr1.getType()) && Util.rootIsNativeClass(this._expr1.getType())) {
+			return true;
+		}
+		return super._doHasSideEffects(preCheckCb);
+	}
+
 }
 
 class AssignmentExpression extends BinaryExpression {
@@ -1889,6 +1927,10 @@ class AssignmentExpression extends BinaryExpression {
 		return this._expr1.getType();
 	}
 
+	override function _doHasSideEffects(preCheckCb : (Expression) -> Nullable.<boolean>) : boolean {
+		return true;
+	}
+
 }
 
 class FusedAssignmentExpression extends BinaryExpression {
@@ -1920,6 +1962,10 @@ class FusedAssignmentExpression extends BinaryExpression {
 
 	override function getType () : Type {
 		return this._expr1.getType();
+	}
+
+	override function _doHasSideEffects(preCheckCb : (Expression) -> Nullable.<boolean>) : boolean {
+		return true;
 	}
 
 }
@@ -2315,6 +2361,10 @@ class CallExpression extends OperatorExpression {
 		return true;
 	}
 
+	override function _doHasSideEffects(preCheckCb : (Expression) -> Nullable.<boolean>) : boolean {
+		return true;
+	}
+
 }
 
 class SuperExpression extends OperatorExpression {
@@ -2396,6 +2446,10 @@ class SuperExpression extends OperatorExpression {
 	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
 		if (! Util.forEachExpression(cb, this._args))
 			return false;
+		return true;
+	}
+
+	override function _doHasSideEffects(preCheckCb : (Expression) -> Nullable.<boolean>) : boolean {
 		return true;
 	}
 
@@ -2488,6 +2542,21 @@ class NewExpression extends OperatorExpression {
 	override function forEachExpression (cb : function(:Expression,:function(:Expression):void):boolean) : boolean {
 		if (! Util.forEachExpression(cb, this._args))
 			return false;
+		return true;
+	}
+
+	override function _doHasSideEffects(preCheckCb : (Expression) -> Nullable.<boolean>) : boolean {
+		var classDef = this._type.getClassDef();
+		var className = classDef.className().replace(/\.<.*/, ""); // fast way to convert name to built-in
+		switch (className) {
+		case "Object":
+		case "Map":
+			assert this._args.length == 0;
+			return false;
+		case "Array":
+			assert this._args.length <= 1; // jsx does not suport new Array with >=2 args
+			return false;
+		}
 		return true;
 	}
 

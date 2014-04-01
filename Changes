@@ -1,5 +1,10 @@
 Revision history for the JSX software development kit
 
+0.9.84 2014-03-25 11:18:00+0900
+    [FEATURES]
+    - allow use of ```void``` as a template argument
+    - improvements in the const-folding optimizer
+
 0.9.83 2014-03-07 19:02:00+0900
     [FEATURES]
     - compile-time constants; passed in via --define name=var / accepted as JSX.ENV["string-literal"] (#304)

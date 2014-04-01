@@ -1596,7 +1596,7 @@ class Parser {
 			}
 			for (var i = 0; i < this._outerClass.templateInners.length; ++i) {
 				if (this._outerClass.templateInners[i].className() == className.getValue()) {
-					this._errors.push(new CompileError(className, "a non-template inner class with the same name has been already declared"));
+					this._errors.push(new CompileError(className, "a template inner class with the same name has been already declared"));
 					success = false;
 					break;
 				}
@@ -1923,7 +1923,7 @@ class Parser {
 		}
 		// in type argument
 		do {
-			var type = this._typeDeclaration(false);
+			var type = this._typeDeclaration(true);
 			if (type == null)
 				return null;
 			types.push(type);
@@ -1988,7 +1988,7 @@ class Parser {
 	function _nullableTypeDeclaration () : Type {
 		if (this._expect(".") == null || this._expect("<") == null)
 			return null;
-		var baseType = this._typeDeclaration(false);
+		var baseType = this._typeDeclaration(true);
 		if (baseType == null)
 			return null;
 		if (this._expect(">") == null)
@@ -2105,9 +2105,15 @@ class Parser {
 
 	function _templateTypeDeclaration (qualifiedName : QualifiedName, typeArgs : Type[]) : ParsedObjectType {
 		var className = qualifiedName.getToken().getValue();
-		if ((className == "Array" || className == "Map") && typeArgs[0] instanceof NullableType) {
-			this._newError("cannot declare " + className + ".<Nullable.<T>>, should be " + className + ".<T>");
-			return null;
+		if (className == "Array" || className == "Map") {
+			if (typeArgs[0] instanceof NullableType) {
+				this._newError("cannot declare " + className + ".<Nullable.<T>>, should be " + className + ".<T>");
+				return null;
+			}
+			if (typeArgs[0].equals(Type.voidType)) {
+				this._newError("cannot declare " + className + ".<T> with T=void");
+				return null;
+			}
 		}
 		// return object type
 		var objectType = new ParsedObjectType(qualifiedName, typeArgs);

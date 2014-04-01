@@ -1010,8 +1010,7 @@ native final class GeneratorFunction {
 } = """
 (function () {
   try {
-    eval('import {GeneratorFunction} from "std:iteration"');
-    return GeneratorFunction;
+    return Function('import {GeneratorFunction} from "std:iteration"; return GeneratorFunction')();
   } catch (e) {
     return function GeneratorFunction () {};
   }
