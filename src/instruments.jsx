@@ -1958,19 +1958,22 @@ class _TryStatementTransformer extends _StatementTransformer {
 		goto $__push_local_jump__; // pseudo-instruction; push finally clause
 		goto $BEGIN_FINALLY_n;
 		body;
+		goto $END_TRY_n;
+	$END_TRY_n;
 		goto $BEGIN_FINALLY_n;
 	$BEGIN_FINALLY_n;
 		goto $__pop_local_jump__; // pseudo-instruction; pop finally clause
 		ensure;
+		if ($raised) {
+		    throw $error;
+		}
 		goto $END_FINALLY_n;
 	$END_FINALLY_n;
-		goto $__branch_finally__; // pseudo-instruction; branch to continuation depending on condition
-		goto $__upper_finally_label__ or $L_exit;
-		goto $END_TRY_n
-	$END_TRY_n;
 
 		*/
-		this._transformer._enterTry(this);
+		var funcDef = this._transformer._getTransformingFuncDef();
+		var raisedLocal = CPSTransformCommand._extractRaisedLocal(funcDef);
+		var errorLocal = CPSTransformCommand._extractErrorLocal(funcDef);
 
 		var beginLabel = "$L_begin_try_" + this.getID();
 		this._transformer._emit(new GotoStatement(beginLabel));
@@ -1982,7 +1985,9 @@ class _TryStatementTransformer extends _StatementTransformer {
 			this._transformer._getStatementTransformerFor(statement).replaceControlStructuresWithGotos();
 		});
 
-		this._transformer._leaveTry();
+		var endLabel = "$L_end_try_" + this.getID();
+		this._transformer._emit(new GotoStatement(endLabel));
+		this._transformer._emit(new LabelStatement(endLabel));
 
 		this._transformer._emit(new GotoStatement(finallyLabel));
 		this._transformer._emit(new LabelStatement(finallyLabel));
@@ -1990,14 +1995,19 @@ class _TryStatementTransformer extends _StatementTransformer {
 		this._statement.getFinallyStatements().forEach((statement) -> {
 			this._transformer._getStatementTransformerFor(statement).replaceControlStructuresWithGotos();
 		});
+
 		var endFinallyLabel = "$L_end_finally_" + this.getID();
-		this._transformer._emit(new GotoStatement(endFinallyLabel));
+		this._transformer._getStatementTransformerFor(new IfStatement(
+			new Token("if", false),
+			new LocalExpression(raisedLocal.getName(), raisedLocal),
+			[
+				new ThrowStatement(
+					new Token("throw", false),
+					new LocalExpression(errorLocal.getName(), errorLocal))
+			],
+			[])
+		).replaceControlStructuresWithGotos();
 		this._transformer._emit(new LabelStatement(endFinallyLabel));
-		this._transformer._emit(new GotoStatement("$__branch_finally__"));
-		this._transformer._emit(new GotoStatement(this._transformer._getUpperFinallyLabel()));
-		var endLabel = "$L_end_try_" + this.getID();
-		this._transformer._emit(new GotoStatement(endLabel));
-		this._transformer._emit(new LabelStatement(endLabel));
 	}
 
 }
@@ -2181,13 +2191,9 @@ class CPSTransformCommand extends FunctionTransformCommand {
 		);
 		vm.setFuncLocal(loopVar);
 
-		// exception handling
+		// handling local jumps
 		var localJumpsVar = new LocalVariable(new Token("$localJumps", true), this._instantiateArrayType(Type.integerType), false);
 		funcDef.getLocals().push(localJumpsVar);
-		var raisedVar = new LocalVariable(new Token("$raised", true), Type.booleanType, false);
-		funcDef.getLocals().push(raisedVar);
-		var errorVar = new LocalVariable(new Token("$error", true), Type.variantType, false);
-		funcDef.getLocals().push(errorVar);
 
 		// amend vm._statements; lift statements up to the VM
 		vm._statements = funcDef.getStatements();
@@ -2254,9 +2260,6 @@ class CPSTransformCommand extends FunctionTransformCommand {
 		for (var i = 0; i < statements.length; ++i) {
 			if (isPseudoStatement(statements[i])) {
 				switch ((statements[i] as GotoStatement).getLabel()) {
-				case "$__branch_finally__":
-					i += 2;
-					break;
 				case "$__push_local_jump__":
 					i += 1;
 					break;
@@ -2401,16 +2404,6 @@ class CPSTransformCommand extends FunctionTransformCommand {
 										[],
 										false)),
 								[])));
-					break;
-				case '$__branch_finally__':
-					var gotoUpFinally = statements[i + 1] as GotoStatement;
-					var gotoEndTry = statements[i + 2] as GotoStatement;
-					statements.splice(i, 3,
-						new IfStatement(
-							new Token("if", false),
-							new LocalExpression(new Token("$raised", true), raisedVar),
-							[ gotoUpFinally ] : Statement[],
-							[ gotoEndTry ] : Statement[]));
 					break;
 				default:
 					throw new Error('got unknown pseudo-instruction');
@@ -2660,9 +2653,15 @@ class CPSTransformCommand extends FunctionTransformCommand {
 		this._funcDefs.push(funcDef);
 
 		if (! Type.voidType.equals(funcDef.getReturnType())) {
-			var returnLocal = new LocalVariable(new Token("$return", false), funcDef.getReturnType(), false);
+			var returnLocal = new LocalVariable(new Token("$return", true), funcDef.getReturnType(), false);
 			funcDef.getLocals().push(returnLocal);
 		}
+
+		var raisedVar = new LocalVariable(new Token("$raised", true), Type.booleanType, false);
+		funcDef.getLocals().push(raisedVar);
+
+		var errorVar = new LocalVariable(new Token("$error", true), Type.variantType, false);
+		funcDef.getLocals().push(errorVar);
 	}
 
 	function _leaveFunction () : void {
@@ -2676,23 +2675,6 @@ class CPSTransformCommand extends FunctionTransformCommand {
 
 	function _getTransformingFuncDef () : MemberFunctionDefinition {
 		return this._funcDefs[this._funcDefs.length - 1];
-	}
-
-	var _tryStack = new _TryStatementTransformer[];
-
-	function _getUpperFinallyLabel () : string {
-		if (this._tryStack.length == 0) {
-			return "$L_exit";
-		}
-		return "$L_begin_finally_" + this._tryStack[this._tryStack.length - 1].getID();
-	}
-
-	function _enterTry (transformer : _TryStatementTransformer) : void {
-		this._tryStack.push(transformer);
-	}
-
-	function _leaveTry () : void {
-		this._tryStack.pop();
 	}
 
 	function _getStatementTransformerFor (statement : Statement) : _StatementTransformer {
