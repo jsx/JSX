@@ -1926,17 +1926,23 @@ class _TryStatementTransformer extends _StatementTransformer {
 		goto $BEGIN_TRY_n;
 	$BEGIN_TRY_n;
 		goto $__push_finally__; // pseudo-instruction; push finally clause
+		goto $BEGIN_FINALLY_n;
 		body;
+		goto $END_TRY_n;
+	$END_TRY_n;
 		goto $BEGIN_FINALLY_n;
 	$BEGIN_FINALLY_n;
 		goto $__pop_finally__; // pseudo-instruction; pop finally clause
 		ensure;
-		goto $END_FINALLY_n;
-	$END_FINALLY_n;
+		// if ($raised) {
+		//     goto $__upper_finally_label__ or $L_exit;
+		// } else {
+		//     goto $END_FINALLY_n;
+		// }
 		goto $__branch_finally__; // pseudo-instruction; branch to continuation depending on condition
 		goto $__upper_finally_label__ or $L_exit;
-		goto $END_TRY_n
-	$END_TRY_n;
+		goto $END_FINALLY_n;
+	$END_FINALLY_n;
 
 		*/
 		this._transformer._enterTry(this);
@@ -1945,27 +1951,30 @@ class _TryStatementTransformer extends _StatementTransformer {
 		this._transformer._emit(new GotoStatement(beginLabel));
 		this._transformer._emit(new LabelStatement(beginLabel));
 		this._transformer._emit(new GotoStatement("$__push_finally__"));
+		var finallyLabel = "$L_begin_finally_" + this.getID();
+		this._transformer._emit(new GotoStatement(finallyLabel));
 		this._statement.getTryStatements().forEach((statement) -> {
 			this._transformer._getStatementTransformerFor(statement).replaceControlStructuresWithGotos();
 		});
 
 		this._transformer._leaveTry();
 
-		var finallyLabel = "$L_begin_finally_" + this.getID();
+		var endLabel = "$L_end_try_" + this.getID();
+		this._transformer._emit(new GotoStatement(endLabel));
+		this._transformer._emit(new LabelStatement(endLabel));
+
 		this._transformer._emit(new GotoStatement(finallyLabel));
 		this._transformer._emit(new LabelStatement(finallyLabel));
 		this._transformer._emit(new GotoStatement("$__pop_finally__"));
 		this._statement.getFinallyStatements().forEach((statement) -> {
 			this._transformer._getStatementTransformerFor(statement).replaceControlStructuresWithGotos();
 		});
+
 		var endFinallyLabel = "$L_end_finally_" + this.getID();
-		this._transformer._emit(new GotoStatement(endFinallyLabel));
-		this._transformer._emit(new LabelStatement(endFinallyLabel));
 		this._transformer._emit(new GotoStatement("$__branch_finally__"));
 		this._transformer._emit(new GotoStatement(this._transformer._getUpperFinallyLabel()));
-		var endLabel = "$L_end_try_" + this.getID();
-		this._transformer._emit(new GotoStatement(endLabel));
-		this._transformer._emit(new LabelStatement(endLabel));
+		this._transformer._emit(new GotoStatement(endFinallyLabel));
+		this._transformer._emit(new LabelStatement(endFinallyLabel));
 	}
 
 }
@@ -2161,8 +2170,14 @@ class CPSTransformCommand extends FunctionTransformCommand {
 		// removal of dead code after goto statement
 		for (var i = 0; i < statements.length; ++i) {
 			if (isPseudoStatement(statements[i])) {
-				if ((statements[i] as GotoStatement).getLabel() == "$__branch_finally__")
+				switch ((statements[i] as GotoStatement).getLabel()) {
+				case "$__branch_finally__":
 					i += 2;
+					break;
+				case "$__push_finally__":
+					i += 1;
+					break;
+				}
 			}
 			else if (statements[i] instanceof GotoStatement) {
 				for (var j = i; j < statements.length; ++j) {
@@ -2264,9 +2279,8 @@ class CPSTransformCommand extends FunctionTransformCommand {
 				var gotoStmt = statements[i] as GotoStatement;
 				switch (gotoStmt.getLabel()) {
 				case '$__push_finally__':
-					var tryID = (statements[i - 1] as LabelStatement).getName().match(/\$L_begin_try_(.+)/)[1];
-					var finallyLabel = "$L_begin_finally_" + tryID;
-					statements.splice(i, 1,
+					var gotoBeginFinally = statements[i + 1] as GotoStatement;
+					statements.splice(i, 2,
 						new ExpressionStatement(
 							new CallExpression(
 								new Token("(", false),
@@ -2281,7 +2295,8 @@ class CPSTransformCommand extends FunctionTransformCommand {
 										Type.integerType,
 										[ new VariableLengthArgumentType(Type.integerType.toNullableType()) ] : Type[],
 										false)),
-								[ new IntegerLiteralExpression(new Token("" + labelIndeces[finallyLabel], false)) ] : Expression[])));
+								[ new IntegerLiteralExpression(new Token("" + labelIndeces[gotoBeginFinally.getLabel()], false)) ] : Expression[])));
+					i += 1;
 					break;
 				case '$__pop_finally__':
 					statements.splice(i, 1,
@@ -2303,13 +2318,13 @@ class CPSTransformCommand extends FunctionTransformCommand {
 					break;
 				case '$__branch_finally__':
 					var gotoUpFinally = statements[i + 1] as GotoStatement;
-					var gotoEndTry = statements[i + 2] as GotoStatement;
+					var gotoEndFinally = statements[i + 2] as GotoStatement;
 					statements.splice(i, 3,
 						new IfStatement(
 							new Token("if", false),
 							new LocalExpression(new Token("$raised", true), raisedVar),
 							[ gotoUpFinally ] : Statement[],
-							[ gotoEndTry ] : Statement[]));
+							[ gotoEndFinally ] : Statement[]));
 					i += 2;
 					break;
 				default:
