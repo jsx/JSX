@@ -426,7 +426,7 @@ class JSXCommand {
 				return 1;
 			}
 			if (compiler.compile()) {
-				new DocumentGenerator(compiler, platform.getRoot() + "/src/doc", outputFile)
+				new DocumentGenerator(compiler, platform.getRoot() + "/etc/doc-template", outputFile)
 					.setResourceFiles(["style.css"])
 					.setPathFilter(function (sourcePath) {
 						if (sourcePath.indexOf("system:") == 0) {
