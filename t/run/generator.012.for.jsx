@@ -1,6 +1,3 @@
-/*JSX_OPTS
---enable-generator-emulation
-*/
 /*EXPECTED
 { value: 1, done: false }
 { value: 2, done: false }

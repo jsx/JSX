@@ -18,6 +18,18 @@ sub difflet {
     note($d->compare($got, $expected));
 }
 
+sub node_supports_generator {
+    my $node = $ENV{JSX_RUNJS} || "node";
+    open my $fh, "-|", "$node --version"
+        or die "failed to invoke node:$!";
+    my $output = do { local $/; <$fh> };
+    close $fh;
+    die "node --version exitted abnormally:$?"
+        if $? != 0;
+
+    return $output =~ /v0.([0-9]+)/ && $1 >= 11;
+}
+
 sub bench {
     my ($f) = @_;
     require Time::HiRes;
@@ -75,7 +87,9 @@ sub get_shebang {
 }
 
 sub run_compiled {
-    my ($filename, $src) = @_;
+    my ($filename, $src, $node_opts) = @_;
+
+    $node_opts ||= '';
 
     require File::Temp;
 
@@ -99,7 +113,7 @@ EOT
 
     # execute compiled node
     my $js = $ENV{JSX_RUNJS} || "node";
-    open my $fh, "-|", "$js $temp"
+    open my $fh, "-|", "$js $node_opts $temp"
         or die "failed to invoke node:$!";
     local $/;
     my $output = <$fh>;
@@ -120,14 +134,30 @@ sub compile_and_run {
             if $ENV{JSX_OPTS};
     }
 
-    plan tests => 1;
-
     defined(my $expected = get_section($file, "EXPECTED"))
         or die "could not find EXPECTED in file:$file\n";
+    $expected =~ s/\s+$//;
 
     my $jssetup = get_section($file, "JS_SETUP") || "";
 
     $opts ||= "";
+
+    if ($file =~ m{/generator\.}) {
+        plan tests => 2;
+        SKIP: {
+            skip "skipping native generator test (node does not support harmony)", 1
+                unless node_supports_generator();
+            _compile_and_run($file, "--harmony", $opts, $jssetup, $expected, 1);
+        }
+        _compile_and_run($file, "", "$opts --enable-generator-emulation", $jssetup, $expected, 0);
+    } else {
+        plan tests => 1;
+        _compile_and_run($file, "", $opts, $jssetup, $expected, 0);
+    }
+}
+
+sub _compile_and_run {
+    my ($file, $node_opts, $opts, $jssetup, $expected) = @_;
 
     # compile (FIXME support C++)
     my($ok, $src, $logs) = jsx("$opts $file");
@@ -137,12 +167,11 @@ sub compile_and_run {
         return;
     };
     # run
-    defined (my $output = run_compiled($file, $jssetup . $src)) or do {
+    defined (my $output = run_compiled($file, $jssetup . $src, $node_opts)) or do {
         fail "failed to execute compiled script";
         return;
     };
     $output   =~ s/\s+$//;
-    $expected =~ s/\s+$//;
 
     # compare the results
     is $output, $expected, $file or do {

@@ -1,6 +1,3 @@
-/*JSX_OPTS
---enable-generator-emulation
-*/
 /*EXPECTED
 */
 class _Main {
