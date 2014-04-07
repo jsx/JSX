@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /***
  * JSX development server started by `make server`
  * includes JSX compiler for web (try/build/jsx-compiler.js).
@@ -22,6 +23,21 @@ try {
 }
 catch(e) {
 	console.warn("Unexpected node.js version (>=0.6.0 required), because: %s", e.toString());
+}
+
+function homeDir() {
+	if (process.env.HOME) {
+		return process.env.HOME;
+	}
+	return process.env.USERPROFILE;
+}
+
+function mkdir(dir) {
+	try {
+		fs.mkdirSync(dir);
+	} catch (e) {
+		// FIXME ignore EEXIST only, but how?
+	}
 }
 
 function finish(response, uri, status, content_type, content) {
@@ -83,11 +99,10 @@ function serveFile(response, uri, filename) {
 }
 
 function saveProfile(request, response) {
-	var profileDir = "web/.profile";
-
 	response.setHeader("Access-Control-Allow-Origin", "*");
 	response.setHeader("Access-Control-Allow-Methods", "POST,PUT,GET,OPTIONS");
 	response.setHeader("Access-Control-Allow-Headers", "Content-Type,*");
+	console.log(request.method);
 	if (request.method != "POST" || request.method == "PUT") {
 		response.end();
 		return;
@@ -128,35 +143,38 @@ function saveProfile(request, response) {
 			return;
 		}
 		// save
-		try {
-			fs.mkdirSync(profileDir);
-		} catch (e) {
-			// FIXME ignore EEXIST only, but how?
-		}
+		var home = homeDir();
+		mkdir(path.join(home, '.jsx'));
+		mkdir(path.join(home, '.jsx', 'profile'));
 		var id = YYYYmmddHHMMSS();
+		console.log(id);
 
-		fs.writeFileSync(profileDir + "/" + id + ".json", JSON.stringify(json));
+		fs.writeFileSync(path.join(home, '.jsx', 'profile', id + '.json'), JSON.stringify(json));
 		// send response
 		response.writeHead(200, "OK", {
-			"Location" : "http://" + request.headers.host + "/web/profiler.html?" + id,
+			"Location" : "http://" + request.headers.host + "/index.html?" + id,
 			"Content-Type": "text/plain"
 		});
-		response.write("saved profile at http://" + request.headers.host + "/web/profiler.html?" + id);
+		response.write("saved profile at http://" + request.headers.host + "/index.html?" + id);
 		response.end();
 
-		console.info("[I] saved profile at http://" + request.headers.host + "/web/profiler.html?" + id);
+		console.info("[I] saved profile at http://" + request.headers.host + "/index.html?" + id);
 	});
 }
 
 function listProfileResults(request, response) {
-	var results = fs.readdirSync("web/.profile").filter(function (file) {
-		return /\d{4}-\d{2}-\d{2}-\d{4}/.test(file);
-	}).map(function (file) {
-		return file.replace(/\.\w+$/, "");
-	}).sort(function (a, b) {
-		return b.localeCompare(a)
-	});
-
+	var home = homeDir();
+	var profileDir = path.join(home, '.jsx', 'profile');
+	var results = [];
+	if (fs.existsSync(profileDir)) {
+		results = fs.readdirSync(profileDir).filter(function (file) {
+			return /\d{4}-\d{2}-\d{2}-\d{6}/.test(file);
+		}).map(function (file) {
+			return file.replace(/\.\w+$/, "");
+		}).sort(function (a, b) {
+			return b.localeCompare(a)
+		});
+	}
 	response.writeHead(200, "OK", {
 		"Content-Type": "application/json"
 	});
@@ -165,43 +183,32 @@ function listProfileResults(request, response) {
 }
 
 function main(args) {
-	var port = args[0] || "5000";
+	var port = args[0] || "2012";
 
 	var httpd = http.createServer(function(request, response) {
 		var uri = url.parse(request.url).pathname;
-
 		if(uri === "/") {
-			response.writeHead(301, {
-				Location: "try/"
-			});
-			response.end();
-			return;
+			uri = 'index.html';
 		}
 
 		// profiler stuff
+		var filepath;
 		if (/^\/post-profile\/?$/.test(uri)) {
+			console.log("save-profile");
 			return saveProfile(request, response);
 		}
 		else if (/\/\.profile\/results\.json$/.test(uri)) {
+			console.log("list-profile");
 			return listProfileResults(request, response);
 		}
-
-		var filename = path.join(process.cwd(), uri);
-
-		if(/(?:\.html|\/)$/.test(filename)) {
-			child_process.execFile(
-				"perl", ["web/build.pl"],
-				function(error, stdout, stderr) {
-					if(error) {
-						finish(response, uri, 500, "text/plain", error + "\n");
-						return;
-					}
-					serveFile(response, uri, filename);
-			});
+		else if (/\/\.profile\/\d{4}-\d{2}-\d{2}-\d{6}\.json/.test(uri)) {
+			filepath = path.resolve(homeDir(), '.jsx', 'profile', uri.match(/\d{4}-\d{2}-\d{2}-\d{6}.json/)[0]);
 		}
-		else {
-			serveFile(response, uri, filename);
+		else if (uri[0] === '/') {
+			uri = uri.slice(1);
+			filepath = path.resolve(__dirname, '..', 'etc', 'profiler', uri);
 		}
+		serveFile(response, uri, filepath);
 	});
 	httpd.listen(parseInt(port, 10));
 
