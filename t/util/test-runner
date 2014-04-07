@@ -147,17 +147,17 @@ sub compile_and_run {
         SKIP: {
             skip "skipping native generator test (node does not support harmony)", 1
                 unless node_supports_generator();
-            _compile_and_run($file, "--harmony", $opts, $jssetup, $expected, 1);
+            _compile_and_run("$file (native generator)", $file, "--harmony", $opts, $jssetup, $expected, 1);
         }
-        _compile_and_run($file, "", "$opts --enable-generator-emulation", $jssetup, $expected, 0);
+        _compile_and_run("$file (generator emulation)", $file, "", "$opts --enable-generator-emulation", $jssetup, $expected, 0);
     } else {
         plan tests => 1;
-        _compile_and_run($file, "", $opts, $jssetup, $expected, 0);
+        _compile_and_run($file, $file, "", $opts, $jssetup, $expected, 0);
     }
 }
 
 sub _compile_and_run {
-    my ($file, $node_opts, $opts, $jssetup, $expected) = @_;
+    my ($name, $file, $node_opts, $opts, $jssetup, $expected) = @_;
 
     # compile (FIXME support C++)
     my($ok, $src, $logs) = jsx("$opts $file");
@@ -174,7 +174,7 @@ sub _compile_and_run {
     $output   =~ s/\s+$//;
 
     # compare the results
-    is $output, $expected, $file or do {
+    is $output, $expected, $name or do {
         difflet([split /\n/, $output], [split /\n/, $expected]);
     };
 }
