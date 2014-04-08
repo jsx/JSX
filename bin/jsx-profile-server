@@ -205,8 +205,7 @@ function main(args) {
 			filepath = path.resolve(outputFolder, uri.match(/\d{4}-\d{2}-\d{2}-\d{6}.json/)[0]);
 		}
 		else if (uri[0] === '/') {
-			uri = uri.slice(1);
-			filepath = path.resolve(__dirname, '..', 'etc', 'profiler', uri);
+			filepath = path.resolve(__dirname, '..', 'etc', 'profiler', uri.slice(1));
 		}
 		serveFile(response, uri, filepath);
 	});
