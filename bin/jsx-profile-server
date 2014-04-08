@@ -40,7 +40,7 @@ function mkdir(dir) {
 	}
 }
 
-function finish(response, uri, status, content_type, content) {
+function finish(response, uri, status, content_type, content, encoding) {
 	var len = content.length;
 
 	var headers = {
@@ -72,7 +72,7 @@ function finish(response, uri, status, content_type, content) {
 	console.log("%s %s %s %s (%s bytes)", (new Date()).toISOString(), status, headers["Content-Type"] || "(unknown type)", uri, len);
 
 	response.writeHead(status, headers);
-	response.write(content, "binary");
+	response.write(content, encoding ? encoding : "utf-8");
 	response.end();
 }
 
@@ -93,12 +93,12 @@ function serveFile(response, uri, filename) {
 				return;
 			}
 
-			finish(response, uri, 200, undefined, content);
+			finish(response, uri, 200, undefined, content, "binary");
 		});
 	});
 }
 
-function saveProfile(request, response, outputFolder) {
+function saveProfile(request, response, uri, outputFolder) {
 	response.setHeader("Access-Control-Allow-Origin", "*");
 	response.setHeader("Access-Control-Allow-Methods", "POST,PUT,GET,OPTIONS");
 	response.setHeader("Access-Control-Allow-Headers", "Content-Type,*");
@@ -134,30 +134,22 @@ function saveProfile(request, response, outputFolder) {
 		try {
 			var json = JSON.parse(body);
 		} catch (e) {
-			response.writeHead(400, "Bad Request", {
-				"Content-Type": "text/plain"
-			});
-			response.write("POST data is corrupt: " + e.toString());
-			response.end();
+			finish(response, uri, 400, "text/plain", "POST data is corrupt: " + e.toString() + "\n");
 			return;
 		}
 		// save
 		var id = YYYYmmddHHMMSS();
 
 		fs.writeFileSync(path.join(outputFolder, id + '.json'), JSON.stringify(json));
-		// send response
-		response.writeHead(200, "OK", {
-			"Location" : "http://" + request.headers.host + "/?" + id,
-			"Content-Type": "text/plain"
-		});
-		response.write("saved profile at http://" + request.headers.host + "/?" + id);
-		response.end();
 
 		console.info("[I] saved profile at http://" + request.headers.host + "/?" + id);
+
+		response.setHeader("Location", "http://" + request.headers.host + "/?" + id);
+		finish(response, uri, 200, "text/plain", "saved profile at http://" + request.headers.host + "/?" + id);
 	});
 }
 
-function listProfileResults(request, response, outputFolder) {
+function listProfileResults(request, response, uri, outputFolder) {
 	var results = [];
 	if (fs.existsSync(outputFolder)) {
 		results = fs.readdirSync(outputFolder).filter(function (file) {
@@ -168,11 +160,7 @@ function listProfileResults(request, response, outputFolder) {
 			return b.localeCompare(a);
 		});
 	}
-	response.writeHead(200, "OK", {
-		"Content-Type": "application/json"
-	});
-	response.write(JSON.stringify(results), "utf8");
-	response.end();
+	finish(response, uri, 200, "application/json", JSON.stringify(results));
 }
 
 function main(args) {
@@ -194,12 +182,10 @@ function main(args) {
 		// profiler stuff
 		var filepath;
 		if (/^\/post-profile\/?$/.test(uri)) {
-			console.log("save-profile");
-			return saveProfile(request, response, outputFolder);
+			return saveProfile(request, response, uri, outputFolder);
 		}
 		else if (/\/\.profile\/results\.json$/.test(uri)) {
-			console.log("list-profile");
-			return listProfileResults(request, response, outputFolder);
+			return listProfileResults(request, response, uri, outputFolder);
 		}
 		else if (/\/\.profile\/\d{4}-\d{2}-\d{2}-\d{6}\.json/.test(uri)) {
 			filepath = path.resolve(outputFolder, uri.match(/\d{4}-\d{2}-\d{2}-\d{6}.json/)[0]);
