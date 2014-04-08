@@ -184,11 +184,12 @@ function main(args) {
 		if (/^\/post-profile\/?$/.test(uri)) {
 			return saveProfile(request, response, uri, outputFolder);
 		}
-		else if (/\/\.profile\/results\.json$/.test(uri)) {
-			return listProfileResults(request, response, uri, outputFolder);
-		}
-		else if (/\/\.profile\/\d{4}-\d{2}-\d{2}-\d{6}\.json/.test(uri)) {
-			filepath = path.resolve(outputFolder, uri.match(/\d{4}-\d{2}-\d{2}-\d{6}.json/)[0]);
+		else if (/^\/\.profile\//.test(uri)) {
+			var basename = uri.substring("/.profile/".length);
+			if (basename == "results.json") {
+				return listProfileResults(request, response, uri, outputFolder);
+			}
+			filepath = path.resolve(outputFolder, basename);
 		}
 		else if (uri[0] === '/') {
 			filepath = path.resolve(__dirname, '..', 'etc', 'profiler', uri.slice(1));
