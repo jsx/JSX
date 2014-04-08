@@ -98,11 +98,10 @@ function serveFile(response, uri, filename) {
 	});
 }
 
-function saveProfile(request, response) {
+function saveProfile(request, response, outputFolder) {
 	response.setHeader("Access-Control-Allow-Origin", "*");
 	response.setHeader("Access-Control-Allow-Methods", "POST,PUT,GET,OPTIONS");
 	response.setHeader("Access-Control-Allow-Headers", "Content-Type,*");
-	console.log(request.method);
 	if (request.method != "POST" || request.method == "PUT") {
 		response.end();
 		return;
@@ -143,36 +142,30 @@ function saveProfile(request, response) {
 			return;
 		}
 		// save
-		var home = homeDir();
-		mkdir(path.join(home, '.jsx'));
-		mkdir(path.join(home, '.jsx', 'profile'));
 		var id = YYYYmmddHHMMSS();
-		console.log(id);
 
-		fs.writeFileSync(path.join(home, '.jsx', 'profile', id + '.json'), JSON.stringify(json));
+		fs.writeFileSync(path.join(outputFolder, id + '.json'), JSON.stringify(json));
 		// send response
 		response.writeHead(200, "OK", {
-			"Location" : "http://" + request.headers.host + "/index.html?" + id,
+			"Location" : "http://" + request.headers.host + "/?" + id,
 			"Content-Type": "text/plain"
 		});
-		response.write("saved profile at http://" + request.headers.host + "/index.html?" + id);
+		response.write("saved profile at http://" + request.headers.host + "/?" + id);
 		response.end();
 
-		console.info("[I] saved profile at http://" + request.headers.host + "/index.html?" + id);
+		console.info("[I] saved profile at http://" + request.headers.host + "/?" + id);
 	});
 }
 
-function listProfileResults(request, response) {
-	var home = homeDir();
-	var profileDir = path.join(home, '.jsx', 'profile');
+function listProfileResults(request, response, outputFolder) {
 	var results = [];
-	if (fs.existsSync(profileDir)) {
-		results = fs.readdirSync(profileDir).filter(function (file) {
+	if (fs.existsSync(outputFolder)) {
+		results = fs.readdirSync(outputFolder).filter(function (file) {
 			return /\d{4}-\d{2}-\d{2}-\d{6}/.test(file);
 		}).map(function (file) {
 			return file.replace(/\.\w+$/, "");
 		}).sort(function (a, b) {
-			return b.localeCompare(a)
+			return b.localeCompare(a);
 		});
 	}
 	response.writeHead(200, "OK", {
@@ -184,25 +177,32 @@ function listProfileResults(request, response) {
 
 function main(args) {
 	var port = args[0] || "2012";
+	var outputFolder;
+	if (args[1]) {
+		outputFolder = args[1];
+	} else {
+		var home = homeDir();
+		mkdir(path.join(home, '.jsx'));
+		mkdir(path.join(home, '.jsx', 'profile'));
+		outputFolder = path.join(home, '.jsx', 'profile');
+	}
+	console.log("Profile results are stored in: " + outputFolder);
 
 	var httpd = http.createServer(function(request, response) {
 		var uri = url.parse(request.url).pathname;
-		if(uri === "/") {
-			uri = 'index.html';
-		}
 
 		// profiler stuff
 		var filepath;
 		if (/^\/post-profile\/?$/.test(uri)) {
 			console.log("save-profile");
-			return saveProfile(request, response);
+			return saveProfile(request, response, outputFolder);
 		}
 		else if (/\/\.profile\/results\.json$/.test(uri)) {
 			console.log("list-profile");
-			return listProfileResults(request, response);
+			return listProfileResults(request, response, outputFolder);
 		}
 		else if (/\/\.profile\/\d{4}-\d{2}-\d{2}-\d{6}\.json/.test(uri)) {
-			filepath = path.resolve(homeDir(), '.jsx', 'profile', uri.match(/\d{4}-\d{2}-\d{2}-\d{6}.json/)[0]);
+			filepath = path.resolve(outputFolder, uri.match(/\d{4}-\d{2}-\d{2}-\d{6}.json/)[0]);
 		}
 		else if (uri[0] === '/') {
 			uri = uri.slice(1);
