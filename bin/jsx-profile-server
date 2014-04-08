@@ -191,7 +191,7 @@ function main(args) {
 			}
 			filepath = path.resolve(outputFolder, basename);
 		}
-		else if (uri[0] === '/') {
+		else {
 			filepath = path.resolve(__dirname, '..', 'etc', 'profiler', uri.slice(1));
 		}
 		serveFile(response, uri, filepath);
