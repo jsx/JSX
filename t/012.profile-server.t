@@ -12,7 +12,7 @@ my $server = Test::TCP->new(
     code => sub {
         my($port) = @_;
 
-        my $server = "node web/server.js $port";
+        my $server = "bin/jsx-profile-server $port .";
         note "[server] ", $server;
         exec($server);
     },
@@ -33,11 +33,11 @@ ok $url, "returned url";
 my $json = do {
     my($file) = $url =~ /\?(\S+)$/;
 
-    open my $fh, "web/.profile/$file.json";
+    open my $fh, "./$file.json";
     local $/;
     my $s = <$fh>;
     close $fh;
-    unlink "web/.profile/$file.json";
+    unlink "./$file.json";
     $s;
 };
 ok $json, "json file exists";
