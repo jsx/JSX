@@ -30,7 +30,8 @@
   ],
   "bin": {
     "jsx": "./bin/jsx",
-    "jsx-with-server": "./bin/jsx-with-server"
+    "jsx-with-server": "./bin/jsx-with-server",
+    "jsx-profile-server": "./bin/jsx-profile-server"
   },
   "directories": {
     "bin": "./bin",
