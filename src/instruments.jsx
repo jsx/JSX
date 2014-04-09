@@ -2265,11 +2265,11 @@ class CPSTransformCommand extends FunctionTransformCommand {
 		executor.setFuncLocal(loopVar);
 
 		// number labels
-		var labelIndeces = new Map.<int>;
+		var labelID = new Map.<int>;
 		for (var i = 0, c = 0; i < statements.length; ++i) {
 			if (statements[i] instanceof LabelStatement) {
 				var name = (statements[i] as LabelStatement).getName();
-				labelIndeces[name] = c++;
+				labelID[name] = c++;
 			}
 		}
 
@@ -2295,7 +2295,7 @@ class CPSTransformCommand extends FunctionTransformCommand {
 										Type.integerType,
 										[ new VariableLengthArgumentType(Type.integerType.toNullableType()) ] : Type[],
 										false)),
-								[ new IntegerLiteralExpression(new Token("" + labelIndeces[gotoBeginFinally.getLabel()], false)) ] : Expression[])));
+								[ new IntegerLiteralExpression(new Token("" + labelID[gotoBeginFinally.getLabel()], false)) ] : Expression[])));
 					i += 1;
 					break;
 				case '$__pop_local_jump__':
@@ -2336,8 +2336,8 @@ class CPSTransformCommand extends FunctionTransformCommand {
 		function makeJump (gotoStmt : GotoStatement) : Statement {
 			var name = gotoStmt.getLabel();
 			var index;
-			if ((index = labelIndeces[name]) == null) {
-				throw new Error("logic flaw! label not found");
+			if ((index = labelID[name]) == null) {
+				throw new Error("logic flaw! label not found: " + name);
 			}
 			return new ExpressionStatement(
 				new AssignmentExpression(
@@ -2384,7 +2384,7 @@ class CPSTransformCommand extends FunctionTransformCommand {
 			statements.unshift(
 				new CaseStatement(
 					new Token("case", false),
-					new IntegerLiteralExpression(new Token("" + labelIndeces[label], false))));
+					new IntegerLiteralExpression(new Token("" + labelID[label], false))));
 			return statements;
 		}
 
