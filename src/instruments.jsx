@@ -1955,12 +1955,12 @@ class _TryStatementTransformer extends _StatementTransformer {
 
 		goto $BEGIN_TRY_n;
 	$BEGIN_TRY_n;
-		goto $__push_finally__; // pseudo-instruction; push finally clause
+		goto $__push_local_jump__; // pseudo-instruction; push finally clause
 		goto $BEGIN_FINALLY_n;
 		body;
 		goto $BEGIN_FINALLY_n;
 	$BEGIN_FINALLY_n;
-		goto $__pop_finally__; // pseudo-instruction; pop finally clause
+		goto $__pop_local_jump__; // pseudo-instruction; pop finally clause
 		ensure;
 		goto $END_FINALLY_n;
 	$END_FINALLY_n;
@@ -1975,7 +1975,7 @@ class _TryStatementTransformer extends _StatementTransformer {
 		var beginLabel = "$L_begin_try_" + this.getID();
 		this._transformer._emit(new GotoStatement(beginLabel));
 		this._transformer._emit(new LabelStatement(beginLabel));
-		this._transformer._emit(new GotoStatement("$__push_finally__"));
+		this._transformer._emit(new GotoStatement("$__push_local_jump__"));
 		var finallyLabel = "$L_begin_finally_" + this.getID();
 		this._transformer._emit(new GotoStatement(finallyLabel));
 		this._statement.getTryStatements().forEach((statement) -> {
@@ -1986,7 +1986,7 @@ class _TryStatementTransformer extends _StatementTransformer {
 
 		this._transformer._emit(new GotoStatement(finallyLabel));
 		this._transformer._emit(new LabelStatement(finallyLabel));
-		this._transformer._emit(new GotoStatement("$__pop_finally__"));
+		this._transformer._emit(new GotoStatement("$__pop_local_jump__"));
 		this._statement.getFinallyStatements().forEach((statement) -> {
 			this._transformer._getStatementTransformerFor(statement).replaceControlStructuresWithGotos();
 		});
@@ -2182,8 +2182,8 @@ class CPSTransformCommand extends FunctionTransformCommand {
 		vm.setFuncLocal(loopVar);
 
 		// exception handling
-		var finallyVar = new LocalVariable(new Token("$finally", true), this._instantiateArrayType(Type.integerType), false);
-		funcDef.getLocals().push(finallyVar);
+		var localJumpsVar = new LocalVariable(new Token("$localJumps", true), this._instantiateArrayType(Type.integerType), false);
+		funcDef.getLocals().push(localJumpsVar);
 		var raisedVar = new LocalVariable(new Token("$raised", true), Type.booleanType, false);
 		funcDef.getLocals().push(raisedVar);
 		var errorVar = new LocalVariable(new Token("$error", true), Type.variantType, false);
@@ -2198,7 +2198,7 @@ class CPSTransformCommand extends FunctionTransformCommand {
 			new ExpressionStatement(
 				new AssignmentExpression(
 					new Token("=", false),
-					new LocalExpression(new Token("$finally", true), finallyVar),
+					new LocalExpression(new Token("$localJumps", true), localJumpsVar),
 					new ArrayLiteralExpression(
 						new Token("[", false),
 						[],
@@ -2257,7 +2257,7 @@ class CPSTransformCommand extends FunctionTransformCommand {
 				case "$__branch_finally__":
 					i += 2;
 					break;
-				case "$__push_finally__":
+				case "$__push_local_jump__":
 					i += 1;
 					break;
 				}
@@ -2357,7 +2357,7 @@ class CPSTransformCommand extends FunctionTransformCommand {
 	function _convertPseudoInstructions (funcDef : MemberFunctionDefinition) : void {
 		var statements = CPSTransformCommand._extractVMBody(funcDef);
 
-		var finallyVar = CPSTransformCommand._extractFinallyLocal(funcDef);
+		var localJumpsVar = CPSTransformCommand._extractLocalJumpsLocal(funcDef);
 		var raisedVar = CPSTransformCommand._extractRaisedLocal(funcDef);
 
 		// convert pseudo-instructions
@@ -2365,7 +2365,7 @@ class CPSTransformCommand extends FunctionTransformCommand {
 			if (statements[i] instanceof GotoStatement && (statements[i] as GotoStatement).getLabel().search(/^\$__/) != -1) {
 				var gotoStmt = statements[i] as GotoStatement;
 				switch (gotoStmt.getLabel()) {
-				case '$__push_finally__':
+				case '$__push_local_jump__':
 					var gotoBeginFinally = statements[i + 1] as GotoStatement;
 					statements.splice(i, 2,
 						new ExpressionStatement(
@@ -2373,30 +2373,30 @@ class CPSTransformCommand extends FunctionTransformCommand {
 								new Token("(", false),
 								new PropertyExpression(
 									new Token(".", false),
-									new LocalExpression(new Token("$finally", true), finallyVar),
+									new LocalExpression(new Token("$localJumps", true), localJumpsVar),
 									new Token("push", true),
 									[],
 									new MemberFunctionType(
 										null,
-										finallyVar.getType(),
+										localJumpsVar.getType(),
 										Type.integerType,
 										[ new VariableLengthArgumentType(Type.integerType.toNullableType()) ] : Type[],
 										false)),
 								[ new IntegerLiteralExpression(new Token("" + gotoBeginFinally.getID(), false)) ] : Expression[])));
 					break;
-				case '$__pop_finally__':
+				case '$__pop_local_jump__':
 					statements.splice(i, 1,
 						new ExpressionStatement(
 							new CallExpression(
 								new Token("(", false),
 								new PropertyExpression(
 									new Token(".", false),
-									new LocalExpression(new Token("$finally", true), finallyVar),
+									new LocalExpression(new Token("$localJumps", true), localJumpsVar),
 									new Token("pop", true),
 									[],
 									new MemberFunctionType(
 										null,
-										finallyVar.getType(),
+										localJumpsVar.getType(),
 										Type.integerType.toNullableType(),
 										[],
 										false)),
@@ -2423,7 +2423,7 @@ class CPSTransformCommand extends FunctionTransformCommand {
 		var statements = CPSTransformCommand._extractVMBody(funcDef);
 
 		var nextVar = CPSTransformCommand._extractNextLocal(funcDef);
-		var finallyVar = CPSTransformCommand._extractFinallyLocal(funcDef);
+		var localJumpsVar = CPSTransformCommand._extractLocalJumpsLocal(funcDef);
 		var raisedVar = CPSTransformCommand._extractRaisedLocal(funcDef);
 		var errorVar = CPSTransformCommand._extractErrorLocal(funcDef);
 
@@ -2512,12 +2512,12 @@ class CPSTransformCommand extends FunctionTransformCommand {
 								new LocalExpression(new Token("$next", true), nextVar),
 								new ArrayExpression(
 									new Token("[", false),
-									new LocalExpression(new Token("$finally", true), finallyVar),
+									new LocalExpression(new Token("$localJumps", true), localJumpsVar),
 									new BinaryNumberExpression(
 										new Token("-", false),
 										new PropertyExpression(
 											new Token(".", false),
-											new LocalExpression(new Token("$finally", true), finallyVar),
+											new LocalExpression(new Token("$localJumps", true), localJumpsVar),
 											new Token("length", true),
 											[],
 											Type.numberType),
@@ -2533,7 +2533,7 @@ class CPSTransformCommand extends FunctionTransformCommand {
 							new Token("==", false),
 							new PropertyExpression(
 								new Token(".", false),
-								new LocalExpression(new Token("$finally", true), finallyVar),
+								new LocalExpression(new Token("$localJumps", true), localJumpsVar),
 								new Token("length", true),
 								[],
 								Type.numberType),
@@ -2859,8 +2859,8 @@ class CPSTransformCommand extends FunctionTransformCommand {
 		return CPSTransformCommand._extractLocal(funcDef, "$loop");
 	}
 
-	static function _extractFinallyLocal (funcDef : MemberFunctionDefinition) : LocalVariable {
-		return CPSTransformCommand._extractLocal(funcDef, "$finally");
+	static function _extractLocalJumpsLocal (funcDef : MemberFunctionDefinition) : LocalVariable {
+		return CPSTransformCommand._extractLocal(funcDef, "$localJumps");
 	}
 
 	static function _extractRaisedLocal (funcDef : MemberFunctionDefinition) : LocalVariable {
