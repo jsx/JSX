@@ -2587,6 +2587,11 @@ class GeneratorTransformCommand extends FunctionTransformCommand {
 
 					function unfoldExpr (expr : Expression) : Expression {
 						if (expr instanceof CallExpression) {
+							/** Expected AST structure:
+							 *
+							 * (function ($aXX) { ... })(primitiveExpr)
+							 *
+							 */
 							var callExpr = expr as CallExpression;
 							assert callExpr.getArguments().length == 1;
 							assert callExpr.getExpr() instanceof FunctionExpression;
@@ -2597,11 +2602,32 @@ class GeneratorTransformCommand extends FunctionTransformCommand {
 							var localVar = new LocalVariable(argVar.getName(), argVar.getType(), false);
 							cpsFuncDef.getLocals().push(localVar);
 
+							/**
+							 * (function ($aXX) { ... })(primitiveExpr)
+							 *
+							 * -> $aXX = primitiveExpr
+							 *    ...
+							 */
 							staticAssigns.push(
 								new AssignmentExpression(
 									new Token("=", false),
 									new LocalExpression(localVar.getName(), localVar),
 									callExpr.getArguments()[0]));
+
+							funcExpr.getFuncDef().forEachStatement(function onStmt (stmt) {
+								return stmt.forEachExpression(function onExpr (expr) {
+									if (expr instanceof LocalExpression) {
+										var local = (expr as LocalExpression).getLocal();
+										if (local == argVar) {
+											(expr as LocalExpression).setLocal(localVar);
+										}
+									}
+									if (expr instanceof FunctionExpression) {
+										(expr as FunctionExpression).getFuncDef().forEachStatement(onStmt);
+									}
+									return expr.forEachExpression(onExpr);
+								}) && stmt.forEachStatement(onStmt);
+							});
 
 							assert funcExpr.getFuncDef().getStatements().length == 1;
 							assert funcExpr.getFuncDef().getStatements()[0] instanceof ReturnStatement;
@@ -2610,10 +2636,12 @@ class GeneratorTransformCommand extends FunctionTransformCommand {
 							assert retStmt.getExpr() != null;
 							return unfoldExpr(retStmt.getExpr());
 						}
+						else if (expr instanceof LocalExpression) {
+							assert ! ((expr as LocalExpression).getLocal() instanceof ArgumentDeclaration);
+							return expr;
+						}
 						else {
-							assert expr instanceof LocalExpression;
-							var localExpr = expr as LocalExpression;
-							return new LocalExpression(localExpr.getToken(), new LocalVariable(localExpr.getToken(), localExpr.getType(), false));
+							throw new Error('logic flaw!');
 						}
 					}
 
