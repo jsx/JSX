@@ -188,3 +188,44 @@ class FixedExpressionTransformCommand extends ExpressionTransformCommand {
 	}
 
 }
+
+abstract class StatementTransformCommand extends TransformCommand {
+
+	function constructor(compiler : Compiler, identifier : string) {
+		super(compiler, identifier);
+	}
+
+	override function performTransformation() : void {
+		function touchMemberFunction(member : MemberFunctionDefinition) : void {
+			member.forEachStatement((stmt, replaceCb) -> this.touchStatement(stmt, replaceCb));
+		}
+
+		this._compiler.forEachClassDef(function (parser, classDef) {
+			if (! (classDef instanceof TemplateClassDefinition)) {
+				classDef.forEachMember(function (member) {
+					if (! (classDef instanceof TemplateFunctionDefinition)) {
+						if (member instanceof MemberFunctionDefinition) {
+							touchMemberFunction(member as MemberFunctionDefinition);
+						}
+					}
+					return true;
+				});
+			}
+			return true;
+		});
+	}
+
+	function touchStatement(stmt : Statement, replaceCb : (Statement) -> void) : boolean {
+		if (stmt instanceof FunctionStatement) {
+			(stmt as FunctionStatement).getFuncDef().forEachStatement((stmt, replaceCb) -> {
+				return this.touchStatement(stmt, replaceCb);
+			});
+		}
+		// the default
+		stmt.forEachStatement((stmt, replaceCb) -> {
+			return this.touchStatement(stmt, replaceCb);
+		});
+		return true;
+	}
+
+}

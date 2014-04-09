@@ -2007,6 +2007,9 @@ class MemberFunctionDefinition extends MemberDefinition implements Block {
 		return Util.forEachStatement(cb, this._statements);
 	}
 
+	function forEachStatement (cb : function(:Statement,:function(:Statement):void):boolean) : boolean {
+		return Util.forEachStatement(cb, this._statements);
+	}
 }
 
 class InstantiatedMemberFunctionDefinition extends MemberFunctionDefinition {
