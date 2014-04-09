@@ -298,10 +298,20 @@ class Util {
 	}
 
 	static function forEachStatement (cb : function(:Statement):boolean, statements : Statement[]) : boolean {
+		return Util.forEachStatement(function(stmt, _) { return cb(stmt); }, statements);
+	}
+
+	static function forEachStatement (cb : function(:Statement,:function(:Statement):void):boolean, statements : Statement[]) : boolean {
 		if (statements != null)
-			for (var i = 0; i < statements.length; ++i)
-				if (! cb(statements[i]))
+			for (var i = 0; i < statements.length; ++i) {
+				if (! cb(statements[i], function (statements : Statement[], index : number) : function(:Statement):void {
+					return function (stmt : Statement) : void {
+						statements[index] = stmt;
+					};
+				}(statements, i))) {
 					return false;
+				}
+			}
 		return true;
 	}
 
