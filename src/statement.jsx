@@ -1458,10 +1458,6 @@ class CatchStatement extends Statement implements Block {
 	}
 
 	override function doAnalyze (context : AnalysisContext) : boolean {
-		if ((context.funcDef.flags() & ClassDefinition.IS_GENERATOR) != 0) {
-			context.errors.push(new CompileError(this._token, "invalid use of try block inside generator"));
-			return false;
-		}
 		// check the catch type
 		var catchType = this.getLocal().getType();
 		if (! (catchType instanceof ObjectType || catchType.equals(Type.variantType))) {

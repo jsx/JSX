@@ -1949,18 +1949,34 @@ class _TryStatementTransformer extends _StatementTransformer {
 
 		try {
 			body;	// assumes no return statements in body
+		} catch (e : variant) {
+			rescue;
 		} finally {
 			ensure;
 		}
 
 		goto $BEGIN_TRY_n;
+
 	$BEGIN_TRY_n;
 		goto $__push_local_jump__; // pseudo-instruction; push finally clause
 		goto $BEGIN_FINALLY_n;
+		goto $__push_local_jump__; // pseudo-instruction; push catch clause
+		goto $BEGIN_CATCH_n;
 		body;
 		goto $END_TRY_n;
 	$END_TRY_n;
+		goto $BEGIN_CATCH_n; // the control enters into CATCH clause even if no error was raised.
+
+	$BEGIN_CATCH_n;
+		goto $__pop_local_jump__; // pseudo-instruction; pop catch clause
+		if ($raised) {
+			$raised = false;
+			rescue;
+		}
+		goto $END_CATCH_n;
+	$END_CATCH_n;
 		goto $BEGIN_FINALLY_n;
+
 	$BEGIN_FINALLY_n;
 		goto $__pop_local_jump__; // pseudo-instruction; pop finally clause
 		ensure;
@@ -1968,6 +1984,7 @@ class _TryStatementTransformer extends _StatementTransformer {
 		    throw $error;
 		}
 		goto $END_FINALLY_n;
+
 	$END_FINALLY_n;
 
 		*/
@@ -1975,20 +1992,65 @@ class _TryStatementTransformer extends _StatementTransformer {
 		var raisedLocal = CPSTransformCommand._extractRaisedLocal(funcDef);
 		var errorLocal = CPSTransformCommand._extractErrorLocal(funcDef);
 
+		// try
 		var beginLabel = "$L_begin_try_" + this.getID();
 		this._transformer._emit(new GotoStatement(beginLabel));
 		this._transformer._emit(new LabelStatement(beginLabel));
 		this._transformer._emit(new GotoStatement("$__push_local_jump__"));
 		var finallyLabel = "$L_begin_finally_" + this.getID();
 		this._transformer._emit(new GotoStatement(finallyLabel));
+		this._transformer._emit(new GotoStatement("$__push_local_jump__"));
+		var catchLabel = "$L_begin_catch_" + this.getID();
+		this._transformer._emit(new GotoStatement(catchLabel));
 		this._statement.getTryStatements().forEach((statement) -> {
 			this._transformer._getStatementTransformerFor(statement).replaceControlStructuresWithGotos();
 		});
-
 		var endLabel = "$L_end_try_" + this.getID();
 		this._transformer._emit(new GotoStatement(endLabel));
 		this._transformer._emit(new LabelStatement(endLabel));
 
+		// catch
+		var catchStmt = this._statement.getCatchStatements()[0];
+		catchStmt.forEachStatement(function onStmt (stmt) {
+			return stmt.forEachExpression(function onExpr (expr, replaceCb) {
+				if (expr instanceof LocalExpression) {
+					var local = (expr as LocalExpression).getLocal();
+					if (local == catchStmt.getLocal()) {
+						var expr = new AsNoConvertExpression(
+							new Token("as", false),
+							new LocalExpression(
+								errorLocal.getName(),
+								errorLocal),
+							local.getType());
+						replaceCb(expr);
+						return true;
+					}
+				}
+				return expr.forEachExpression(onExpr);
+			}) && stmt.forEachStatement(onStmt);
+		});
+
+		this._transformer._emit(new GotoStatement(catchLabel));
+		this._transformer._emit(new LabelStatement(catchLabel));
+		this._transformer._emit(new GotoStatement("$__pop_local_jump__"));
+		this._transformer._getStatementTransformerFor(
+			new IfStatement(
+				new Token("if", false),
+				new LocalExpression(raisedLocal.getName(), raisedLocal),
+				[
+					new ExpressionStatement(
+						new AssignmentExpression(
+							new Token("=", false),
+							new LocalExpression(raisedLocal.getName(), raisedLocal),
+							new BooleanLiteralExpression(new Token("false", false))))
+				] : Statement[].concat(catchStmt.getStatements()),
+				[])
+		).replaceControlStructuresWithGotos();
+		var endCatchLabel = "$L_end_catch_" + this.getID();
+		this._transformer._emit(new GotoStatement(endCatchLabel));
+		this._transformer._emit(new LabelStatement(endCatchLabel));
+
+		// finally
 		this._transformer._emit(new GotoStatement(finallyLabel));
 		this._transformer._emit(new LabelStatement(finallyLabel));
 		this._transformer._emit(new GotoStatement("$__pop_local_jump__"));
@@ -2138,8 +2200,6 @@ class CPSTransformCommand extends FunctionTransformCommand {
 		return funcDef.forEachStatement(function onStatement (statement) {
 			if (statement instanceof ForInStatement)
 				return false;
-			if (statement instanceof CatchStatement)
-				return false;
 			return statement.forEachExpression(function onExpr (expr) {
 				if (! this._transformYield && expr instanceof YieldExpression)
 					return false;
@@ -2151,6 +2211,11 @@ class CPSTransformCommand extends FunctionTransformCommand {
 	override function transformFunction (funcDef : MemberFunctionDefinition) : void {
 		if (! this._functionIsTransformable(funcDef))
 			return;
+
+		// depends on normalize-try transform command
+		var cmd = new NormalizeTryStatementTransformCommand(this._compiler);
+		cmd.setup([]);
+		cmd.transformFunction(funcDef);
 
 		this._doCPSTransform(funcDef);
 	}
@@ -2891,6 +2956,7 @@ class GeneratorTransformCommand extends FunctionTransformCommand {
 
 	function _performCPSTransformation (funcDef : MemberFunctionDefinition) : void {
 		var cpsTransformer = new CPSTransformCommand(this._compiler);
+		cpsTransformer.setup([]);
 		cpsTransformer.setTransformYield(true);
 		cpsTransformer.setTransformExprs(true);
 		cpsTransformer.transformFunction(funcDef);
