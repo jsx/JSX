@@ -46,8 +46,6 @@ abstract class Platform {
 
 	abstract function execute(sourceFileName : Nullable.<string>, jsSource : string, argv : string[]) : void;
 
-	abstract function runCompilationServer(arg : variant) : number;
-
 	function log (s : string) : void {
 		console.log(s);
 	}

@@ -326,11 +326,6 @@ class JSXCommand {
 						optimizeCommands.push("strip");
 				});
 				break;
-			case "--compilation-server":
-				if ((optarg = getoptarg()) == null) {
-					return 1;
-				}
-				return platform.runCompilationServer(optarg);
 			case "--version":
 				platform.log(Meta.IDENTIFIER);
 				return 0;
