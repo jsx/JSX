@@ -2,34 +2,15 @@
 use strict;
 use warnings;
 use Test::More;
-use File::Temp qw(tempdir);
-
-use tool::Util;
-
 
 my @files = glob 't/run/*.jsx';
 
-plan tests => 4 * scalar @files;
+plan tests => 2 * scalar @files;
 
-{
-    local $ENV{JSX_HOME} = tempdir(".jsx.mode-parse-XXXXXXXX", CLEANUP => 1);
-
-    require tool::RunCompilationServer;
-    require "tool/jsx.pl"; # App::jsx
-
-    my $port = do {
-        open my $fh, "<", "$ENV{JSX_HOME}/port" or die $!;
-        <$fh>;
-    };
-
-    foreach my $file(@files) {
-        local $TODO = "todo" if $file =~ / \.todo\. /xms;
-
-        my $res = App::jsx::request($port, "--mode", "parse", $file);
-
-        ok !$res->{invalid_response}, "--mode parse $file";
-        is $res->{statusCode}, 0, "statusCode for $file";
-        is $res->{stderr}, "", "stderr for $file";
-        ok $res->{stdout}, "stdout for $file"
-    }
+foreach my $file(@files) {
+    local $TODO = "todo" if $file =~ / \.todo\. /xms;
+    my $json = `bin/jsx --mode parse $file`;
+    is $?, 0, "bin/jsx --mode parse $file";
+    ok $json;
 }
+
