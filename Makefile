@@ -17,8 +17,8 @@ deps:
 
 compiler: meta src/doc.jsx
 	$(MAKE) compiler-core
-	cp -f "$$PWD/tool/jsx.pl" bin/jsx-with-server
-
+	# jsx-with-server no longer provides additional functionality against bin/jsx but exists for compatibility
+	cp -f bin/jsx bin/jsx-with-server
 
 compiler-core:
 	node $(BOOTSTRAP_COMPILER) $(COMPILER_COMPILE_OPTS) --output $(COMPILER_TARGET) src/jsx-node-front.jsx
