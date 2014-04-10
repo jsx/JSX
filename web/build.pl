@@ -36,8 +36,6 @@ use Time::HiRes    qw();
 
 our $g = info("build JSX web interface");
 
-require tool::RunCompilationServer;
-
 my $clean = (grep { $_ eq "--clean" } @ARGV); # clean build
 
 my $web_root = ROOT;
