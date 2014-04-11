@@ -1,6 +1,3 @@
-/*JSX_OPTS
---enable-generator-emulation
-*/
 /*EXPECTED
 a 1
 b 1
@@ -14,7 +11,7 @@ c 3
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function * g(prefix : string) : string {
+		function * g(prefix : string) : Generator.<void,string> {
 			yield prefix + "1";
 			yield prefix + "2";
 			yield prefix + "3";

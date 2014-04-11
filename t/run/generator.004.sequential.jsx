@@ -1,6 +1,3 @@
-/*JSX_OPTS
---enable-generator-emulation
-*/
 /*EXPECTED
 1
 2
@@ -8,7 +5,7 @@
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function * foo () : number {
+		function * foo () : Generator.<void,number> {
 			yield 1;
 			yield 2;
 			yield 3;

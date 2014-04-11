@@ -1,6 +1,3 @@
-/*JSX_OPTS
---enable-generator-emulation
-*/
 /*EXPECTED
 1
 1
@@ -10,7 +7,7 @@
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function * fib () : number {
+		function * fib () : Generator.<void,number> {
 			var a = 0, b = 1;
 			while (true) {
 				var t = a;

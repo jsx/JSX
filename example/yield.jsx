@@ -17,12 +17,12 @@ class Async {
     };
   }
 
-  static function run(coro : () -> Generator.<(variant)->void>) : void {
+  static function run(coro : () -> void yield (variant)->void) : void {
     Async.go(coro());
   }
 
   static function go(v : variant) : void {
-    var g = v as Generator.<(variant)->void>;
+    var g = v as Generator.<void, (variant)->void>;
 
     var data = g.next();
     if (data.done) {
@@ -35,7 +35,7 @@ class Async {
 
 class _Main {
   static function main(args : string[]) : void {
-    Async.run(function * () {
+    Async.run(function * () : void yield (variant)->void {
       log "H";
       yield Async.sleep(100);
       log "e";

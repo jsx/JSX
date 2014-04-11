@@ -1,6 +1,3 @@
-/*JSX_OPTS
---enable-generator-emulation
-*/
 /*EXPECTED
 1
 2
@@ -9,7 +6,7 @@
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function * makeDouble (seed : number) : number {
+		function * makeDouble (seed : number) : Generator.<void,number> {
 			var t = seed;
 			while (true) {
 				yield t;
