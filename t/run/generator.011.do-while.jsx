@@ -1,6 +1,3 @@
-/*JSX_OPTS
---enable-generator-emulation
-*/
 /*EXPECTED
 0
 1
@@ -11,7 +8,7 @@ end
 class _Main {
 	static function main (args : string[]) : void {
 
-		function * iota (n : number) : number {
+		function * iota (n : number) : Generator.<void,number> {
 			var i = 0;
 			do {
 				yield i;

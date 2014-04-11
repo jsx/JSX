@@ -1,6 +1,3 @@
-/*JSX_OPTS
---enable-generator-emulation
-*/
 /*EXPECTED
 1
 1
@@ -10,7 +7,7 @@
 */
 class _Main {
 	static function main (args : string[]) : void {
-		function * foo (n : number) : number {
+		function * foo (n : number) : Generator.<void,number> {
 			while (true) {
 				switch (n) {
 				case 1:

@@ -1936,18 +1936,36 @@ class Parser {
 
 	function _typeDeclaration (allowVoid : boolean) : Type {
 		var token;
+		var typeDecl : Type;
 		if ((token = this._expectOpt("void")) != null) {
-			if (! allowVoid) {
-				this._newError("'void' cannot be used here", token);
+			typeDecl = Type.voidType;
+		} else {
+			typeDecl = this._typeDeclarationNoVoidNoYield();
+			if (typeDecl == null)
+				return null;
+		}
+		// yield
+		while (this._expectOpt("yield") != null) {
+			var genType = this._typeDeclaration(true);
+			if (genType == null) {
 				return null;
 			}
-			return Type.voidType;
+			typeDecl = this._registerGeneratorTypeOf(typeDecl, genType);
 		}
-		var typeDecl = this._typeDeclarationNoArrayNoVoid();
+		if (! allowVoid && typeDecl.equals(Type.voidType)) {
+			this._newError("'void' cannot be used here", token);
+			return null;
+		}
+		return typeDecl;
+	}
+
+	function _typeDeclarationNoVoidNoYield () : Type {
+		var typeDecl = this._typeDeclarationNoArrayNoVoidNoYield();
 		if (typeDecl == null)
 			return null;
 		// []
 		while (this._expectOpt("[") != null) {
+			var token;
 			if ((token = this._expect("]")) == null)
 				return null;
 			if (typeDecl instanceof NullableType) {
@@ -1959,7 +1977,7 @@ class Parser {
 		return typeDecl;
 	}
 
-	function _typeDeclarationNoArrayNoVoid () : Type {
+	function _typeDeclarationNoArrayNoVoidNoYield () : Type {
 		var token = this._expectOpt([ "MayBeUndefined", "Nullable", "variant" ]);
 		if (token == null) {
 			return this._primaryTypeDeclaration();
@@ -2193,10 +2211,10 @@ class Parser {
 		return arrayType;
 	}
 
-	function _registerGenObjTypeOf (elementType : Type) : ParsedObjectType {
-		var genObjType = new ParsedObjectType(new QualifiedName(new Token("Generator", true)), [ elementType ]);
-		this._objectTypesUsed.push(genObjType);
-		return genObjType;
+	function _registerGeneratorTypeOf (seedType : Type, genType : Type) : ParsedObjectType {
+		var generatorType = new ParsedObjectType(new QualifiedName(new Token("Generator", true)), [ seedType, genType ]);
+		this._objectTypesUsed.push(generatorType);
+		return generatorType;
 	}
 
 	function _initializeBlock () : Token {
@@ -2234,7 +2252,7 @@ class Parser {
 		}
 		// parse the statement
 		var token = this._expectOpt([
-			"{", "var", ";", "if", "do", "while", "for", "continue", "break", "return", "yield", "switch", "throw", "try", "assert", "log", "delete", "debugger", "function", "void", "const"
+			"{", "var", ";", "if", "do", "while", "for", "continue", "break", "return", "switch", "throw", "try", "assert", "log", "delete", "debugger", "function", "void", "const"
 		]);
 		if (label != null) {
 			if (! (token != null && token.getValue().match(/^(?:do|while|for|switch)$/) != null)) {
@@ -2266,8 +2284,6 @@ class Parser {
 				return this._breakStatement(token);
 			case "return":
 				return this._returnStatement(token);
-			case "yield":
-				return this._yieldStatement(token);
 			case "switch":
 				return this._switchStatement(token, label);
 			case "throw":
@@ -2370,9 +2386,6 @@ class Parser {
 		var returnType = this._typeDeclaration(true);
 		if (returnType == null) {
 			return false;
-		}
-		if (isGenerator) {
-			returnType = this._registerGenObjTypeOf(returnType);
 		}
 		if (this._expect("{") == null)
 			return false;
@@ -2539,21 +2552,6 @@ class Parser {
 		if (expr == null)
 			return false;
 		this._statements.push(new ReturnStatement(token, expr));
-		if (this._expect(";") == null)
-			return false;
-		return true;
-	}
-
-	function _yieldStatement (token : Token) : boolean {
-		this._newExperimentalWarning(token);
-		if (! this._isGenerator) {
-			this._newError("invalid use of 'yield' keyword in non-generator function");
-			return false;
-		}
-		var expr = this._expr(false);
-		if (expr == null)
-			return false;
-		this._statements.push(new YieldStatement(token, expr));
 		if (this._expect(";") == null)
 			return false;
 		return true;
@@ -2822,6 +2820,22 @@ class Parser {
 		}
 		// failed to parse as lhs op assignExpr, try condExpr
 		this._restoreState(state);
+		return this._yieldExpr(noIn);
+	}
+
+	function _yieldExpr (noIn : boolean) : Expression {
+		var operatorToken;
+		if ((operatorToken = this._expectOpt("yield")) != null) {
+			this._newExperimentalWarning(operatorToken);
+			if (! this._isGenerator) {
+				this._newError("invalid use of 'yield' keyword in non-generator function");
+				return null;
+			}
+			var condExpr = this._condExpr(noIn);
+			if (condExpr == null)
+				return null;
+			return new YieldExpression(operatorToken, condExpr);
+		}
 		return this._condExpr(noIn);
 	}
 
@@ -3064,7 +3078,7 @@ class Parser {
 	}
 
 	function _newExpr (newToken : Token) : Expression {
-		var type = this._typeDeclarationNoArrayNoVoid();
+		var type = this._typeDeclarationNoArrayNoVoidNoYield();
 		if (type == null)
 			return null;
 		// handle [] (if it has an length parameter, that's the last)

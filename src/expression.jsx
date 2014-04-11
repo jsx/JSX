@@ -1544,6 +1544,70 @@ class SignExpression extends UnaryExpression {
 
 }
 
+class YieldExpression extends UnaryExpression {
+
+	var _seedType : Type;
+	var _genType : Type;
+
+	function constructor (operatorToken : Token, expr : Expression) {
+		this(operatorToken, expr, null, null);
+	}
+
+	function constructor (operatorToken : Token, expr : Expression, seedType : Type, genType : Type) {
+		super(operatorToken, expr);
+		this._seedType = seedType;
+		this._genType = genType;
+	}
+
+	override function clone () : YieldExpression {
+		return new YieldExpression(this._token, this._expr.clone(), this._seedType, this._genType);
+	}
+
+	override function analyze (context : AnalysisContext, parentExpr : Expression) : boolean {
+		if (! this._analyze(context))
+			return false;
+		var returnType = context.funcDef.getReturnType();
+		if (returnType == null) {
+			context.errors.push(new CompileError(this._token, "cannot deduce yield expression type"));
+			return false;
+		} else {
+			if (returnType instanceof ObjectType
+				&& returnType.getClassDef() instanceof InstantiatedClassDefinition
+				&& (returnType.getClassDef() as InstantiatedClassDefinition).getTemplateClassName() == "Generator") {
+					this._seedType = (returnType.getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0];
+					var genType = (returnType.getClassDef() as InstantiatedClassDefinition).getTypeArguments()[1];
+			} else {
+				// return type is not an instance of 'Generator'. the error will be reported by MemberFuncitonDefinition#analyze.
+				context.errors.push(new CompileError(this._token, "cannot convert 'Generator' to return type '" + returnType.toString() + "'"));
+				return false;
+			}
+		}
+		if (! this._expr.getType().isConvertibleTo(genType)) {
+			context.errors.push(new CompileError(this._token, "cannot convert '" + this._expr.getType().toString() + "' to yield type '" + genType.toString() + "'"));
+			return false;
+		}
+		this._genType = genType;
+		return true;
+	}
+
+	override function getType () : Type {
+		return this._seedType.toNullableType();
+	}
+
+	function getSeedType () : Type {
+		return this._seedType;
+	}
+
+	function getGenType () : Type {
+		return this._genType;
+	}
+
+	override function _doHasSideEffects(preCheckCb : (Expression) -> Nullable.<boolean>) : boolean {
+		return true;
+	}
+
+}
+
 // binary expressions
 
 abstract class BinaryExpression extends OperatorExpression {

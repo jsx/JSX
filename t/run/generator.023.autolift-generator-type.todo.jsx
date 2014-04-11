@@ -1,0 +1,22 @@
+/*EXPECTED
+0
+1
+2
+*/
+class _Main {
+	static function main (args : string[]) : void {
+
+		// Instead of `Generator.<int>`, just writing `int` at the place of return type.
+		function * foo () : int {
+			var c = 0;
+			while (true)
+				yield c++;
+		}
+
+		var gen : Generator.<int> = foo();
+
+		log gen.next().value;
+		log gen.next().value;
+		log gen.next().value;
+	}
+}
