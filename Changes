@@ -1,5 +1,9 @@
 Revision history for the JSX software development kit
 
+0.9.86 2014-04-12 21:05:00+0900
+    [BUG FIXES]
+    - bump the version number once more hoping that it would resolve the "shasum check" error of npm
+
 0.9.85 2014-04-11 17:42:00+0900
     [BUG FIXES]
     - version bump due to a report that 0.9.84 might be corrupt
