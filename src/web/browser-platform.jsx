@@ -211,9 +211,6 @@ class BrowserPlatform extends Platform {
 	override function save(path : Nullable.<string>, content : string) : void {
 		throw new Error('not supported');
 	}
-	override function runCompilationServer(arg : variant) : number {
-		throw new Error('not supported');
-	}
 	override function setWorkingDir(dir : string) : void {
 		throw new Error('not supported');
 	}
