@@ -290,13 +290,13 @@ native final class Array.<T> {
 	 * Apply a function simultaneously against two values of the array
 	 * (from right-to-left) as to reduce it to a single value.
 	 */
-	function reduceRight.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : U) : U;
-	function reduceRight.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number) : U) : U;
-	function reduceRight.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : U) : U;
+	function reduceRight.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>) : U) : U;
+	function reduceRight.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>, currentIndex : number) : U) : U;
+	function reduceRight.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : U) : U;
 	/* with initial value; won't throw exception. */
-	function reduceRight.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>) : U, initialValue : T) : U;
-	function reduceRight.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number) : U, initialValue : T) : U;
-	function reduceRight.<U>(callbackfn : function(previousValue : Nullable.<T>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : U, initialValue : T) : U;
+	function reduceRight.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>) : U, initialValue : U) : U;
+	function reduceRight.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>, currentIndex : number) : U, initialValue : U) : U;
+	function reduceRight.<U>(callbackfn : function(previousValue : Nullable.<U>, currentValue : Nullable.<T>, currentIndex : number, array : Array.<T>) : U, initialValue : U) : U;
 
 	/**
 	 * <p>A positive integer between 0 and a value less than 2<sup>32</sup> that specifies the number of elements in an array.</p>

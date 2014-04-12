@@ -1602,6 +1602,10 @@ class YieldExpression extends UnaryExpression {
 		return this._genType;
 	}
 
+	override function _doHasSideEffects(preCheckCb : (Expression) -> Nullable.<boolean>) : boolean {
+		return true;
+	}
+
 }
 
 // binary expressions

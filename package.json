@@ -1,6 +1,6 @@
 {
   "name": "jsx",
-  "version": "0.9.84",
+  "version": "0.9.85",
   "description": "a faster, safer, easier JavaScript",
   "license": "MIT",
   "keywords": [
@@ -30,7 +30,8 @@
   ],
   "bin": {
     "jsx": "./bin/jsx",
-    "jsx-with-server": "./bin/jsx-with-server"
+    "jsx-with-server": "./bin/jsx-with-server",
+    "jsx-profile-server": "./bin/jsx-profile-server"
   },
   "directories": {
     "bin": "./bin",

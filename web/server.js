@@ -82,88 +82,6 @@ function serveFile(response, uri, filename) {
 	});
 }
 
-function saveProfile(request, response) {
-	var profileDir = "web/.profile";
-
-	response.setHeader("Access-Control-Allow-Origin", "*");
-	response.setHeader("Access-Control-Allow-Methods", "POST,PUT,GET,OPTIONS");
-	response.setHeader("Access-Control-Allow-Headers", "Content-Type,*");
-	if (request.method != "POST" || request.method == "PUT") {
-		response.end();
-		return;
-	}
-
-	function twodigits(s) {
-		s = s.toString();
-		while (s.length < 2) {
-			s = "0" + s;
-		}
-		return s;
-	}
-	function YYYYmmddHHMMSS() {
-		var d = new Date();
-		return d.getFullYear() + '-' +
-			twodigits(d.getMonth() + 1) + '-' +
-			twodigits(d.getDate()) + '-' +
-			twodigits(d.getHours()) +
-			twodigits(d.getMinutes()) +
-			twodigits(d.getSeconds());
-	}
-
-	var body = "";
-	// accumulate all data
-	request.on("data", function (data) {
-		body += data;
-	});
-	request.on("end", function () {
-		// parse as JSON
-		try {
-			var json = JSON.parse(body);
-		} catch (e) {
-			response.writeHead(400, "Bad Request", {
-				"Content-Type": "text/plain"
-			});
-			response.write("POST data is corrupt: " + e.toString());
-			response.end();
-			return;
-		}
-		// save
-		try {
-			fs.mkdirSync(profileDir);
-		} catch (e) {
-			// FIXME ignore EEXIST only, but how?
-		}
-		var id = YYYYmmddHHMMSS();
-
-		fs.writeFileSync(profileDir + "/" + id + ".json", JSON.stringify(json));
-		// send response
-		response.writeHead(200, "OK", {
-			"Location" : "http://" + request.headers.host + "/web/profiler.html?" + id,
-			"Content-Type": "text/plain"
-		});
-		response.write("saved profile at http://" + request.headers.host + "/web/profiler.html?" + id);
-		response.end();
-
-		console.info("[I] saved profile at http://" + request.headers.host + "/web/profiler.html?" + id);
-	});
-}
-
-function listProfileResults(request, response) {
-	var results = fs.readdirSync("web/.profile").filter(function (file) {
-		return /\d{4}-\d{2}-\d{2}-\d{4}/.test(file);
-	}).map(function (file) {
-		return file.replace(/\.\w+$/, "");
-	}).sort(function (a, b) {
-		return b.localeCompare(a)
-	});
-
-	response.writeHead(200, "OK", {
-		"Content-Type": "application/json"
-	});
-	response.write(JSON.stringify(results), "utf8");
-	response.end();
-}
-
 function main(args) {
 	var port = args[0] || "5000";
 
@@ -177,16 +95,6 @@ function main(args) {
 			response.end();
 			return;
 		}
-
-		// profiler stuff
-		if (/^\/post-profile\/?$/.test(uri)) {
-			return saveProfile(request, response);
-		}
-		else if (/\/\.profile\/results\.json$/.test(uri)) {
-			return listProfileResults(request, response);
-		}
-
-		var filename = path.join(process.cwd(), uri);
 
 		if(/(?:\.html|\/)$/.test(filename)) {
 			child_process.execFile(

@@ -3065,6 +3065,7 @@ class JavaScriptEmitter implements Emitter {
 	var _indent : number;
 	var _emittingClass : ClassDefinition;
 	var _emittingFunction : MemberFunctionDefinition;
+	var _usesGenerator = false;
 
 	// modes
 	var _enableProfiler : boolean;
@@ -3246,6 +3247,9 @@ class JavaScriptEmitter implements Emitter {
 		for (var i = 0; i < classDefs.length; ++i) {
 			classDefs[i].forEachMemberFunction(function onFuncDef(funcDef) {
 				funcDef.forEachClosure(onFuncDef);
+				if (funcDef.isGenerator()) {
+					this._usesGenerator = true;
+				}
 				this._setupBooleanizeFlags(funcDef);
 				return true;
 			});
@@ -3507,7 +3511,9 @@ class JavaScriptEmitter implements Emitter {
 			output += this._sourceMapper.getSourceMapFooter();
 		}
 		if (this._enableMinifier) {
-			output = _Minifier.minifyJavaScript(output);
+			if (! this._usesGenerator) { // TODO: disabling js minifier components until they support es6 generators.
+				output = _Minifier.minifyJavaScript(output);
+			}
 		}
 		return output;
 	}
