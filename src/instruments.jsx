@@ -2086,7 +2086,10 @@ class CPSTransformCommand extends FunctionTransformCommand {
 			funcDef._statements = statements;
 
 			// peep-hole optimization
-			this._eliminateDeadBranches(statements);
+			this._eliminateDeadBranches(funcDef);
+
+			// resolve labels
+			this._resolveLabels(funcDef);
 
 			// replace goto statements with indirect threading
 			this._eliminateGotos(funcDef);
@@ -2096,7 +2099,9 @@ class CPSTransformCommand extends FunctionTransformCommand {
 		}
 	}
 
-	function _eliminateDeadBranches (statements : Statement[]) : void {
+	function _eliminateDeadBranches (funcDef : MemberFunctionDefinition) : void {
+
+		var statements = funcDef.getStatements();
 
 		// removal of dead code after goto statement
 		for (var i = 0; i < statements.length; ++i) {
@@ -2166,6 +2171,34 @@ class CPSTransformCommand extends FunctionTransformCommand {
 
 	}
 
+	function _resolveLabels (funcDef : MemberFunctionDefinition) : void {
+		var statements = funcDef.getStatements();
+
+		var labelIDs = new Map.<int>;
+		// resolve LabelStatements
+		for (var i = 0, c = 0; i < statements.length; ++i) {
+			if (statements[i] instanceof LabelStatement) {
+				var labelStmt = statements[i] as LabelStatement;
+				labelStmt.setID(c);
+				labelIDs[labelStmt.getName()] = c;
+				c++;
+			}
+		}
+
+		// resolve GotoStatements
+		Util.forEachStatement(function onStatement (statement) {
+			if (statement instanceof GotoStatement) {
+				var gotoStmt = statement as GotoStatement;
+				var label = gotoStmt.getLabel();
+				if (! (label in labelIDs)) {
+					throw new Error("logic flaw! label not found");
+				}
+				gotoStmt.setID(labelIDs[label]);
+			}
+			return statement.forEachStatement(onStatement);
+		}, statements);
+	}
+
 	function _eliminateGotos (funcDef : MemberFunctionDefinition) : void {
 		var statements = funcDef.getStatements();
 
@@ -2177,26 +2210,12 @@ class CPSTransformCommand extends FunctionTransformCommand {
 		var executor = _Util._createNamedFunction(funcDef, null, new Token("$loop", true), [ nextVar ], Type.voidType);
 		executor.setFuncLocal(loopVar);
 
-		// number labels
-		var labelIDs = new Map.<int>;
-		for (var i = 0, c = 0; i < statements.length; ++i) {
-			if (statements[i] instanceof LabelStatement) {
-				var name =(statements[i] as LabelStatement).getName();
-				labelIDs[name] = c++;
-			}
-		}
-
 		function makeJump (gotoStmt : GotoStatement) : Statement {
-			var name = gotoStmt.getLabel();
-			var index;
-			if ((index = labelIDs[name]) == null) {
-				throw new Error("logic flaw! label not found");
-			}
 			return new ExpressionStatement(
 				new AssignmentExpression(
 					new Token("=", false),
 					new LocalExpression(new Token("$next", true), nextVar),
-					new IntegerLiteralExpression(new Token("" + index, false))));
+					new IntegerLiteralExpression(new Token("" + gotoStmt.getID(), false))));
 		}
 
 		function makeBreak () : Statement {
@@ -2232,12 +2251,12 @@ class CPSTransformCommand extends FunctionTransformCommand {
 			}
 		}
 
-		function makeBasicBlock (label : string, body : Statement[]) : Statement[] {
+		function makeBasicBlock (label : LabelStatement, body : Statement[]) : Statement[] {
 			var statements = body.concat([]);
 			statements.unshift(
 				new CaseStatement(
 					new Token("case", false),
-					new IntegerLiteralExpression(new Token("" + labelIDs[label], false))));
+					new IntegerLiteralExpression(new Token("" + label.getID(), false))));
 			return statements;
 		}
 
@@ -2257,7 +2276,7 @@ class CPSTransformCommand extends FunctionTransformCommand {
 			}
 
 			// create a basic block
-			basicBlocks = basicBlocks.concat(makeBasicBlock(currentLabel.getName(), body));
+			basicBlocks = basicBlocks.concat(makeBasicBlock(currentLabel, body));
 		}
 
 		// create while-switch loop
