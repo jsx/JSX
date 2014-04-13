@@ -1689,9 +1689,11 @@ class DebuggerStatement extends InformationStatement {
 class GotoStatement extends Statement {
 
 	var _label : string;
+	var _id : int;
 
 	function constructor(label : string) {
 		this._label = label;
+		this._id = -1;
 	}
 
 	function getLabel () : string {
@@ -1700,6 +1702,14 @@ class GotoStatement extends Statement {
 
 	function setLabel (label : string) : void {
 		this._label = label;
+	}
+
+	function getID () : int {
+		return this._id;
+	}
+
+	function setID (id : int) : void {
+		this._id = id;
 	}
 
 	override function getToken() : Token {
@@ -1727,13 +1737,23 @@ class GotoStatement extends Statement {
 class LabelStatement extends Statement {
 
 	var _name : string;
+	var _id : int;
 
 	function constructor(name : string) {
 		this._name = name;
+		this._id = -1;
 	}
 
 	function getName () : string {
 		return this._name;
+	}
+
+	function getID () : int {
+		return this._id;
+	}
+
+	function setID (id : int) : void {
+		this._id = id;
 	}
 
 	override function getToken() : Token {
