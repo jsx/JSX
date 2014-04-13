@@ -1663,6 +1663,7 @@ class _IfStatementTransformer extends _StatementTransformer {
 class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 
 	var _statement : SwitchStatement;
+	var _hasDefault = false;
 
 	function constructor (transformer : CPSTransformCommand, statement : SwitchStatement) {
 		super(transformer, "SWITCH");
@@ -1671,6 +1672,8 @@ class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 		statement.getStatements().forEach((statement) -> {
 			if (statement instanceof CaseStatement) {
 				statement.setStash(_SwitchStatementTransformer.CaseStash.ID, new _SwitchStatementTransformer.CaseStash);
+			} else if (statement instanceof DefaultStatement) {
+				this._hasDefault = true;
 			}
 		});
 	}
@@ -1694,64 +1697,87 @@ class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 		}
 
 
-		goto $TEST_SWITCH_n;
-	$TEST_SWITCH_n;
-		switch (expr) {
-		case x:
+		goto $BEGIN_SWITCH_n;
+	$BEGIN_SWITCH_n;
+		var $v = expr;
+
+	// case x
+		if ($v == x) {
 			goto $SWITCH_n_CASE_x;
-			return;	// necessary even if it's fall-through because every goto never returns!
-		case y:
-			goto $SWITCH_n_CASE_y;
-			return;
-		default:
-			goto $SWITCH_n_DEFAULT;
-			return;
+		} else {
+			goto $SWITCH_n_END_CASE_x;
 		}
+	$SWITCH_n_END_CASE_x;
+
+	// case y
+		if ($v == y) {
+			goto $SWITCH_n_CASE_y;
+		} else {
+			goto $SWITCH_n_END_CASE_y;
+		}
+	$SWITCH_n_END_CASE_y;
+
+	// default (if exists)
+		goto $SWITCH_n_DEFAULT;
+ 	// otherwise
 		goto $END_SWITCH_n;
+
 		goto $SWITCH_n_CASE_x;
 	$SWITCH_n_CASE_x:
 		caseX;
+
 		goto $SWITCH_n_CASE_y;
 	$SWITCH_n_CASE_y:
 		caseY;
 		goto $END_SWITCH_n;
+
 		goto $SWITCH_n_DEFAULT;
 	$SWITCH_n_DEFAULT:
 		def;
+
 		goto $END_SWITCH_n;
 	$END_SWITCH_n;
 
 		 */
-		var testLabel = "$L_test_switch_" + this.getID();
-		this._transformer._emit(new GotoStatement(testLabel));
-		this._transformer._emit(new LabelStatement(testLabel));
-		this._emitConditionalSwitch();
+		var beginLabel = "$L_begin_switch_" + this.getID();
+		this._transformer._emit(new GotoStatement(beginLabel));
+		this._transformer._emit(new LabelStatement(beginLabel));
+		this._emitSwitchConditionals();
+		this._emitSwitchBodies();
 		var endLabel = "$L_end_switch_" + this.getID();
 		this._transformer._emit(new GotoStatement(endLabel));
-		this._emitSwitchBodies();
 		this._transformer._emit(new LabelStatement(endLabel));
 	}
 
-	function _emitConditionalSwitch () : void {
+	function _emitSwitchConditionals () : void {
+		var exprVar = _Util._createFreshLocalVariable(this._statement.getExpr().getType());
+		this._transformer._getTransformingFuncDef().getLocals().push(exprVar);
+		this._transformer._emit(new ExpressionStatement(
+			new AssignmentExpression(
+				new Token("=", false),
+				new LocalExpression(exprVar.getName(), exprVar),
+				this._statement.getExpr())));
+
 		var statements = this._statement.getStatements();
-		var switchCases = new Statement[];
 		for (var i = 0; i < statements.length; ++i) {
-			var stmt = statements[i];
-			if (stmt instanceof CaseStatement) {
-				switchCases.push(stmt);
-				switchCases.push(new GotoStatement(this._getLabelFromCaseStatement(stmt as CaseStatement)));
-				switchCases.push(new ReturnStatement(new Token("return", false), null));
-			} else if (stmt instanceof DefaultStatement) {
-				switchCases.push(stmt);
-				switchCases.push(new GotoStatement(this._getLabelFromDefaultStatement()));
-				switchCases.push(new ReturnStatement(new Token("return", false), null));
+			if (statements[i] instanceof CaseStatement) {
+				var caseStmt = statements[i] as CaseStatement;
+				this._transformer._emitConditionalBranch(
+					new EqualityExpression(
+						new Token("==", false),
+						new LocalExpression(exprVar.getName(), exprVar),
+						caseStmt.getExpr()),
+					this._getLabelFromCaseStatement(caseStmt),
+					this._getLabelFromEndCaseStatement(caseStmt));
+				this._transformer._emit(new LabelStatement(this._getLabelFromEndCaseStatement(caseStmt)));
 			}
 		}
-		this._transformer._emit(new SwitchStatement(
-			this._statement.getToken(),
-			this._statement.getLabel(),
-			this._statement.getExpr(),
-			switchCases));
+
+		if (this._hasDefault) {
+			this._transformer._emit(new GotoStatement(this._getLabelFromDefaultStatement()));
+		} else {
+			this._transformer._emit(new GotoStatement("$L_end_switch_" + this.getID()));
+		}
 	}
 
 	function _emitSwitchBodies () : void {
@@ -1789,6 +1815,10 @@ class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 
 	function _getLabelFromCaseStatement (caseStmt : CaseStatement) : string {
 		return "$L_switch_" + this.getID() + "_case_" + (caseStmt.getStash(_SwitchStatementTransformer.CaseStash.ID) as _SwitchStatementTransformer.CaseStash).index;
+	}
+
+	function _getLabelFromEndCaseStatement (caseStmt : CaseStatement) : string {
+		return "$L_switch_" + this.getID() + "_end_case_" + (caseStmt.getStash(_SwitchStatementTransformer.CaseStash.ID) as _SwitchStatementTransformer.CaseStash).index;
 	}
 
 	function _getLabelFromDefaultStatement () : string {
@@ -2239,15 +2269,6 @@ class CPSTransformCommand extends FunctionTransformCommand {
 				var ifStmt = stmt as IfStatement;
 				replaceGoto(ifStmt.getOnTrueStatements(), 0);
 				replaceGoto(ifStmt.getOnFalseStatements(), 0);
-			} else if (stmt instanceof SwitchStatement) {
-				var switchStmt = stmt as SwitchStatement;
-				for (var j = 0; j < switchStmt.getStatements().length; ++j) {
-					if (switchStmt.getStatements()[j] instanceof GotoStatement) {
-						j = replaceGoto(switchStmt.getStatements(), j);
-					}
-				}
-				statements.splice(i + 1, 0, makeBreak());
-				i = i + 1;
 			}
 		}
 
