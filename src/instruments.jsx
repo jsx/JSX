@@ -1202,7 +1202,7 @@ abstract class _StatementTransformer {
 
 	function replaceControlStructuresWithGotos () : void {
 		if (this._transformer._transformExprs) {
-			var funcDef = this._transformer.getTransformingFuncDef();
+			var funcDef = this._transformer._getTransformingFuncDef();
 			this.getStatement().forEachExpression(function (expr, replaceCb) {
 				var id = _Util._createIdentityFunction(funcDef, expr.getType());
 				var expr;
@@ -1299,8 +1299,9 @@ class _ReturnStatementTransformer extends _StatementTransformer {
 	}
 
 	override function _replaceControlStructuresWithGotos () : void {
+		var funcDef = this._transformer._getTransformingFuncDef();
 		if (this._statement.getExpr() != null) {
-			var returnLocal = this._transformer._getTopReturnLocal();
+			var returnLocal = CPSTransformCommand._extractReturnLocal(funcDef);
 
 			/* returnLocal should be null when the return statement is declared like this:
 			 *
@@ -1338,7 +1339,7 @@ class _DeleteStatementTransformer extends _StatementTransformer {
 
 	override function replaceControlStructuresWithGotos () : void {
 		if (this._transformer._transformExprs) {
-			var funcDef = this._transformer.getTransformingFuncDef();
+			var funcDef = this._transformer._getTransformingFuncDef();
 			var aryExpr = this._statement.getExpr() as ArrayExpression;
 			this._transformer._emitExpressionStatement(new _DeleteStatementTransformer._Stash(this._transformer, this._statement).doCPSTransform(funcDef, null, aryExpr.getType()));
 		} else {
@@ -2064,40 +2065,33 @@ class CPSTransformCommand extends FunctionTransformCommand {
 	}
 
 	function _doCPSTransform (funcDef : MemberFunctionDefinition) : void {
-		this._transformingFuncDef = funcDef;
+		this._enterFunction(funcDef);
+		try {
 
-		var returnLocal : LocalVariable = null;
-		if (! Type.voidType.equals(funcDef.getReturnType())) {
-			returnLocal = new LocalVariable(new Token("$return", false), funcDef.getReturnType(), false);
-			funcDef.getLocals().push(returnLocal);
-			this._enterFunction(returnLocal);
-		}
+			// replace control structures with goto statements
+			var statements = new Statement[];
+			this._setOutputStatements(statements);
+			for (var i = 0; i < funcDef.getStatements().length; ++i) {
+				this._getStatementTransformerFor(funcDef.getStatements()[i]).replaceControlStructuresWithGotos();
+			}
+			// insert prologue code
+			statements.unshift(
+				new LabelStatement("$L_enter")
+			);
+			// insert epilogue code
+			statements.push(
+				new GotoStatement("$L_exit"),
+				new LabelStatement("$L_exit"),
+				new ReturnStatement(new Token("return", false), null));
+			funcDef._statements = statements;
 
-		// replace control structures with goto statements
-		var statements = new Statement[];
-		this._setOutputStatements(statements);
-		for (var i = 0; i < funcDef.getStatements().length; ++i) {
-			this._getStatementTransformerFor(funcDef.getStatements()[i]).replaceControlStructuresWithGotos();
-		}
-		// insert prologue code
-		statements.unshift(
-			new LabelStatement("$L_enter")
-		);
-		// insert epilogue code
-		statements.push(
-			new GotoStatement("$L_exit"),
-			new LabelStatement("$L_exit"),
-			new ReturnStatement(new Token("return", false), null));
-		funcDef._statements = statements;
+			// peep-hole optimization
+			this._eliminateDeadBranches(statements);
 
-		// peep-hole optimization
-		this._eliminateDeadBranches(statements);
+			// replace goto statements with indirect threading
+			this._eliminateGotos(funcDef);
 
-		// replace goto statements with indirect threading
-		this._eliminateGotos(funcDef);
-
-		if (! Type.voidType.equals(funcDef.getReturnType())) {
-			funcDef._statements.push(new ReturnStatement(new Token("return", false), new LocalExpression(returnLocal.getName(), returnLocal)));
+		} finally {
 			this._leaveFunction();
 		}
 	}
@@ -2292,12 +2286,6 @@ class CPSTransformCommand extends FunctionTransformCommand {
 				[ new IntegerLiteralExpression(new Token("0", false)) ] : Expression[])));
 	}
 
-	var _transformingFuncDef : MemberFunctionDefinition = null;
-
-	function getTransformingFuncDef () : MemberFunctionDefinition {
-		return this._transformingFuncDef;
-	}
-
 	var _outputStatements = null : Statement[];
 
 	function _setOutputStatements (statements : Statement[]) : void {
@@ -2343,18 +2331,28 @@ class CPSTransformCommand extends FunctionTransformCommand {
 		this._labelStack.pop();
 	}
 
-	var _returnLocals = new LocalVariable[];
+	var _funcDefs = new MemberFunctionDefinition[];
 
-	function _getTopReturnLocal () : LocalVariable {
-		return this._returnLocals[this._returnLocals.length - 1];
-	}
+	function _enterFunction (funcDef : MemberFunctionDefinition) : void {
+		this._funcDefs.push(funcDef);
 
-	function _enterFunction (returnLocal : LocalVariable) : void {
-		this._returnLocals.push(returnLocal);
+		if (! Type.voidType.equals(funcDef.getReturnType())) {
+			var returnLocal = new LocalVariable(new Token("$return", false), funcDef.getReturnType(), false);
+			funcDef.getLocals().push(returnLocal);
+		}
 	}
 
 	function _leaveFunction () : void {
-		this._returnLocals.pop();
+		var funcDef = this._funcDefs.pop();
+		var returnLocal = CPSTransformCommand._extractReturnLocal(funcDef);
+
+		if (! Type.voidType.equals(funcDef.getReturnType())) {
+			funcDef.getStatements().push(new ReturnStatement(new Token("return", false), new LocalExpression(returnLocal.getName(), returnLocal)));
+		}
+	}
+
+	function _getTransformingFuncDef () : MemberFunctionDefinition {
+		return this._funcDefs[this._funcDefs.length - 1];
 	}
 
 	function _getStatementTransformerFor (statement : Statement) : _StatementTransformer {
