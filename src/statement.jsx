@@ -1688,18 +1688,18 @@ class DebuggerStatement extends InformationStatement {
 
 class GotoStatement extends Statement {
 
-	var label : string;
+	var _label : string;
 
 	function constructor(label : string) {
-		this.label = label;
+		this._label = label;
 	}
 
 	function getLabel () : string {
-		return this.label;
+		return this._label;
 	}
 
 	function setLabel (label : string) : void {
-		this.label = label;
+		this._label = label;
 	}
 
 	override function getToken() : Token {
@@ -1707,7 +1707,7 @@ class GotoStatement extends Statement {
 	}
 
 	override function clone() : Statement {
-		return new GotoStatement(this.label);
+		return new GotoStatement(this._label);
 	}
 
 	override function serialize():variant {
