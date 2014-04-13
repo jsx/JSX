@@ -2178,18 +2178,18 @@ class CPSTransformCommand extends FunctionTransformCommand {
 		executor.setFuncLocal(loopVar);
 
 		// number labels
-		var labelIndeces = new Map.<int>;
+		var labelIDs = new Map.<int>;
 		for (var i = 0, c = 0; i < statements.length; ++i) {
 			if (statements[i] instanceof LabelStatement) {
 				var name =(statements[i] as LabelStatement).getName();
-				labelIndeces[name] = c++;
+				labelIDs[name] = c++;
 			}
 		}
 
 		function makeJump (gotoStmt : GotoStatement) : Statement {
 			var name = gotoStmt.getLabel();
 			var index;
-			if ((index = labelIndeces[name]) == null) {
+			if ((index = labelIDs[name]) == null) {
 				throw new Error("logic flaw! label not found");
 			}
 			return new ExpressionStatement(
@@ -2237,7 +2237,7 @@ class CPSTransformCommand extends FunctionTransformCommand {
 			statements.unshift(
 				new CaseStatement(
 					new Token("case", false),
-					new IntegerLiteralExpression(new Token("" + labelIndeces[label], false))));
+					new IntegerLiteralExpression(new Token("" + labelIDs[label], false))));
 			return statements;
 		}
 
