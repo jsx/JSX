@@ -2240,22 +2240,16 @@ class CPSTransformCommand extends FunctionTransformCommand {
 		var executor = _Util._createNamedFunction(funcDef, null, new Token("$loop", true), [ nextVar ], Type.voidType);
 		executor.setFuncLocal(loopVar);
 
-		function makeJump (gotoStmt : GotoStatement) : Statement {
-			return new ExpressionStatement(
-				new AssignmentExpression(
-					new Token("=", false),
-					new LocalExpression(new Token("$next", true), nextVar),
-					new IntegerLiteralExpression(new Token("" + gotoStmt.getID(), false))));
-		}
-
-		function makeBreak () : Statement {
-			return new BreakStatement(new Token("break", false), null);
-		}
-
 		function replaceGoto (statements : Statement[], index : int) : int {
 			assert statements[index] instanceof GotoStatement;
 			var gotoStmt = statements[index] as GotoStatement;
-			statements.splice(index, 1, makeJump(gotoStmt), makeBreak());
+			statements.splice(index, 1,
+				new ExpressionStatement(
+					new AssignmentExpression(
+						new Token("=", false),
+						new LocalExpression(new Token("$next", true), nextVar),
+						new IntegerLiteralExpression(new Token("" + gotoStmt.getID(), false)))),
+				new BreakStatement(new Token("break", false), null));
 			return index + 1;
 		}
 
