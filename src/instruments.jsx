@@ -1319,7 +1319,7 @@ class _ReturnStatementTransformer extends _StatementTransformer {
 					this._statement.getExpr()));
 			}
 		}
-		this._transformer._emit(new GotoStatement("$L_exit"));
+		this._transformer._emitGotoStatement("$L_exit");
 	}
 
 }
@@ -1393,7 +1393,7 @@ class _BreakStatementTransformer extends _StatementTransformer {
 		} else {
 			label = this._transformer._getTopLabelledBlock().getBreakingLabel();
 		}
-		this._transformer._emit(new GotoStatement(label));
+		this._transformer._emitGotoStatement(label);
 	}
 
 }
@@ -1418,7 +1418,7 @@ class _ContinueStatementTransformer extends _StatementTransformer {
 		} else {
 			label = this._transformer._getTopLabelledBlock().getContinuingLabel();
 		}
-		this._transformer._emit(new GotoStatement(label));
+		this._transformer._emitGotoStatement(label);
 	}
 
 }
@@ -1468,19 +1468,19 @@ class _DoWhileStatementTransformer extends _LabellableStatementTransformer {
 
 		*/
 		var bodyLabel = "$L_body_do_while_" + this.getID();
-		this._transformer._emit(new GotoStatement(bodyLabel));
-		this._transformer._emit(new LabelStatement(bodyLabel));
+		this._transformer._emitGotoStatement(bodyLabel);
+		this._transformer._emitLabelStatement(bodyLabel);
 		this._transformer._enterLabelledBlock(this);
 		this._statement.getStatements().forEach((statement) -> {
 			this._transformer._getStatementTransformerFor(statement).replaceControlStructuresWithGotos();
 		});
 		this._transformer._leaveLabelledBlock();
 		var testLabel = "$L_test_do_while_" + this.getID();
-		this._transformer._emit(new GotoStatement(testLabel));
-		this._transformer._emit(new LabelStatement(testLabel));
+		this._transformer._emitGotoStatement(testLabel);
+		this._transformer._emitLabelStatement(testLabel);
 		var endLabel = "$L_end_do_while_" + this.getID();
 		this._transformer._emitConditionalBranch(this._statement.getExpr(), bodyLabel, endLabel);
-		this._transformer._emit(new LabelStatement(endLabel));
+		this._transformer._emitLabelStatement(endLabel);
 	}
 
 	override function getBreakingLabel () : string {
@@ -1559,14 +1559,14 @@ class _ForStatementTransformer extends _LabellableStatementTransformer {
 
 		*/
 		var initLabel = "$L_init_for_" + this.getID();
-		this._transformer._emit(new GotoStatement(initLabel));
-		this._transformer._emit(new LabelStatement(initLabel));
+		this._transformer._emitGotoStatement(initLabel);
+		this._transformer._emitLabelStatement(initLabel);
 		if (this._statement.getInitExpr() != null) {
 			this._transformer._emitExpressionStatement(this._statement.getInitExpr());
 		}
 		var testLabel = "$L_test_for_" + this.getID();
-		this._transformer._emit(new GotoStatement(testLabel));
-		this._transformer._emit(new LabelStatement(testLabel));
+		this._transformer._emitGotoStatement(testLabel);
+		this._transformer._emitLabelStatement(testLabel);
 		var bodyLabel = "$L_body_for_" + this.getID();
 		var endLabel = "$L_end_for_" + this.getID();
 		if (this._statement.getCondExpr() != null) {
@@ -1574,20 +1574,20 @@ class _ForStatementTransformer extends _LabellableStatementTransformer {
 		} else {
 			this._transformer._emitConditionalBranch(new BooleanLiteralExpression(new Token("true", false)), bodyLabel, endLabel);
 		}
-		this._transformer._emit(new LabelStatement(bodyLabel));
+		this._transformer._emitLabelStatement(bodyLabel);
 		this._transformer._enterLabelledBlock(this);
 		this._statement.getStatements().forEach((statement) -> {
 			this._transformer._getStatementTransformerFor(statement).replaceControlStructuresWithGotos();
 		});
 		this._transformer._leaveLabelledBlock();
 		var postLabel = "$L_post_for_" + this.getID();
-		this._transformer._emit(new GotoStatement(postLabel));
-		this._transformer._emit(new LabelStatement(postLabel));
+		this._transformer._emitGotoStatement(postLabel);
+		this._transformer._emitLabelStatement(postLabel);
 		if (this._statement.getPostExpr() != null) {
 			this._transformer._emitExpressionStatement(this._statement.getPostExpr());
 		}
-		this._transformer._emit(new GotoStatement(testLabel));
-		this._transformer._emit(new LabelStatement(endLabel));
+		this._transformer._emitGotoStatement(testLabel);
+		this._transformer._emitLabelStatement(endLabel);
 	}
 
 	override function getBreakingLabel () : string {
@@ -1641,21 +1641,21 @@ class _IfStatementTransformer extends _StatementTransformer {
 		var testLabel = "$L_test_if_" + this.getID();
 		var succLabel = "$L_succ_if_" + this.getID();
 		var failLabel = "$L_fail_if_" + this.getID();
-		this._transformer._emit(new GotoStatement(testLabel));
-		this._transformer._emit(new LabelStatement(testLabel));
+		this._transformer._emitGotoStatement(testLabel);
+		this._transformer._emitLabelStatement(testLabel);
 		this._transformer._emitConditionalBranch(this._statement.getExpr(), succLabel, failLabel);
-		this._transformer._emit(new LabelStatement(succLabel));
+		this._transformer._emitLabelStatement(succLabel);
 		this._statement.getOnTrueStatements().forEach((statement) -> {
 			this._transformer._getStatementTransformerFor(statement).replaceControlStructuresWithGotos();
 		});
 		var endLabel = "$L_end_if_" + this.getID();
-		this._transformer._emit(new GotoStatement(endLabel));
-		this._transformer._emit(new LabelStatement(failLabel));
+		this._transformer._emitGotoStatement(endLabel);
+		this._transformer._emitLabelStatement(failLabel);
 		this._statement.getOnFalseStatements().forEach((statement) -> {
 			this._transformer._getStatementTransformerFor(statement).replaceControlStructuresWithGotos();
 		});
-		this._transformer._emit(new GotoStatement(endLabel));
-		this._transformer._emit(new LabelStatement(endLabel));
+		this._transformer._emitGotoStatement(endLabel);
+		this._transformer._emitLabelStatement(endLabel);
 	}
 
 }
@@ -1740,13 +1740,13 @@ class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 
 		 */
 		var beginLabel = "$L_begin_switch_" + this.getID();
-		this._transformer._emit(new GotoStatement(beginLabel));
-		this._transformer._emit(new LabelStatement(beginLabel));
+		this._transformer._emitGotoStatement(beginLabel);
+		this._transformer._emitLabelStatement(beginLabel);
 		this._emitSwitchConditionals();
 		this._emitSwitchBodies();
 		var endLabel = "$L_end_switch_" + this.getID();
-		this._transformer._emit(new GotoStatement(endLabel));
-		this._transformer._emit(new LabelStatement(endLabel));
+		this._transformer._emitGotoStatement(endLabel);
+		this._transformer._emitLabelStatement(endLabel);
 	}
 
 	function _emitSwitchConditionals () : void {
@@ -1769,14 +1769,14 @@ class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 						caseStmt.getExpr()),
 					this._getLabelFromCaseStatement(caseStmt),
 					this._getLabelFromEndCaseStatement(caseStmt));
-				this._transformer._emit(new LabelStatement(this._getLabelFromEndCaseStatement(caseStmt)));
+				this._transformer._emitLabelStatement(this._getLabelFromEndCaseStatement(caseStmt));
 			}
 		}
 
 		if (this._hasDefault) {
-			this._transformer._emit(new GotoStatement(this._getLabelFromDefaultStatement()));
+			this._transformer._emitGotoStatement(this._getLabelFromDefaultStatement());
 		} else {
-			this._transformer._emit(new GotoStatement("$L_end_switch_" + this.getID()));
+			this._transformer._emitGotoStatement("$L_end_switch_" + this.getID());
 		}
 	}
 
@@ -1788,12 +1788,12 @@ class _SwitchStatementTransformer extends _LabellableStatementTransformer {
 			var stmt = statements[i];
 			if (stmt instanceof CaseStatement) {
 				var label = this._getLabelFromCaseStatement(stmt as CaseStatement);
-				this._transformer._emit(new GotoStatement(label));
-				this._transformer._emit(new LabelStatement(label));
+				this._transformer._emitGotoStatement(label);
+				this._transformer._emitLabelStatement(label);
 			} else if (stmt instanceof DefaultStatement) {
 				label = this._getLabelFromDefaultStatement();
-				this._transformer._emit(new GotoStatement(label));
-				this._transformer._emit(new LabelStatement(label));
+				this._transformer._emitGotoStatement(label);
+				this._transformer._emitLabelStatement(label);
 			} else {
 				this._transformer._getStatementTransformerFor(stmt).replaceControlStructuresWithGotos();
 			}
@@ -1907,19 +1907,19 @@ class _WhileStatementTransformer extends _LabellableStatementTransformer {
 
 		 */
 		var testLabel = "$L_test_while_" + this.getID();
-		this._transformer._emit(new GotoStatement(testLabel));
-		this._transformer._emit(new LabelStatement(testLabel));
+		this._transformer._emitGotoStatement(testLabel);
+		this._transformer._emitLabelStatement(testLabel);
 		var bodyLabel = "$L_body_while_" + this.getID();
 		var endLabel = "$L_end_while_" + this.getID();
 		this._transformer._emitConditionalBranch(this._statement.getExpr(), bodyLabel, endLabel);
-		this._transformer._emit(new LabelStatement(bodyLabel));
+		this._transformer._emitLabelStatement(bodyLabel);
 		this._transformer._enterLabelledBlock(this);
 		this._statement.getStatements().forEach((statement) -> {
 			this._transformer._getStatementTransformerFor(statement).replaceControlStructuresWithGotos();
 		});
 		this._transformer._leaveLabelledBlock();
-		this._transformer._emit(new GotoStatement(testLabel));
-		this._transformer._emit(new LabelStatement(endLabel));
+		this._transformer._emitGotoStatement(testLabel);
+		this._transformer._emitLabelStatement(endLabel);
 	}
 
 	override function getBreakingLabel () : string {
@@ -2322,6 +2322,14 @@ class CPSTransformCommand extends FunctionTransformCommand {
 
 	function _emit (statement : Statement) : void {
 		this._outputStatements.push(statement);
+	}
+
+	function _emitLabelStatement (label : string) : void {
+		this._emit(new LabelStatement(label));
+	}
+
+	function _emitGotoStatement (label : string) : void {
+		this._emit(new GotoStatement(label));
 	}
 
 	function _emitExpressionStatement (expr : Expression) : void {
