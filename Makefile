@@ -136,4 +136,4 @@ clean:
 	rm -rf bin/*
 	rm -rf jsx-*.tgz
 
-.PHONY: setup test test-debug test-release test-core test-misc test-npm _test-npm web server doc meta instal-deps
+.PHONY: deps compiler compiler-core meta doc bootstrap-compiler test test-all test-debug test-optimized test-optimized-minified test-transformed test-transformed-optimized test-core test-misc test-npm _test-npm test-bench v8bench web server web.jsx show-todo publish publish-test update-assets update-codemirror update-bootstrap clean
