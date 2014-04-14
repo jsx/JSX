@@ -46,7 +46,7 @@ test: all test-debug test-optimized-minified show-todo
 
 test-all: test test-optimized
 
-test-debug: test-core test-misc-core
+test-debug: test-core test-misc
 
 test-optimized:
 	JSX_OPTS="--optimize release,-no-log,-no-assert" $(MAKE) test-core
@@ -61,11 +61,21 @@ test-transformed-optimized:
 	JSX_OPTS="--enable-cps-transform --optimize release,-no-log,-no-assert" $(MAKE) test-core
 
 test-core:
-	$(PROVE) --jobs "$(JOBS)" t/run/*.jsx t/compile_error/*.jsx t/lib/*.jsx t/src/*.jsx t/web/*.jsx
+	$(PROVE) --jobs "$(JOBS)" t/run/*.jsx t/compile_error/*.jsx t/lib/*.jsx t/optimize/*.jsx t/complete/*.jsx
 
-test-misc-core:
-	$(PROVE) --jobs "$(JOBS)" t/*.t t/optimize/*.jsx t/complete/*.jsx
+test-misc:
+	$(PROVE) --jobs "$(JOBS)" t/*.t t/src/*.jsx t/web/*.jsx
 
+test-npm: all
+	perl -MFile::Temp=tempdir -e 'system("make _test-npm NPM_TEMPDIR=" . tempdir(CLEANUP => 1)) == 0 or exit 1'
+
+_test-npm:
+	PKG=$(shell npm pack)
+	PWD=$(shell pwd)
+	echo '{}' > $(NPM_TEMPDIR)/package.json
+	(cd $(NPM_TEMPDIR) && npm install $(PWD)/$(PKG))
+	JSX_COMPILER=$(NPM_TEMPDIR)/node_modules/.bin/jsx $(MAKE) test-core
+	rm -f $(PKG)
 
 test-bench:
 	$(PROVE) -v xt/optimize-bench/*.jsx
@@ -92,9 +102,11 @@ web.jsx:
 show-todo:
 	find t -name '*.todo.*' | grep -v '~'
 
-publish:
-	time $(MAKE) test-all COMPILER_COMPILE_OPTS="--release $(COMPILER_COMPILE_OPTS)"
+publish: publish-test
 	npm publish
+
+publish-test:
+	time $(MAKE) test-all test-npm COMPILER_COMPILE_OPTS="--release $(COMPILER_COMPILE_OPTS)"
 
 update-assets: update-bootstrap update-codemirror
 
@@ -124,4 +136,4 @@ clean:
 	rm -rf bin/*
 	rm -rf jsx-*.tgz
 
-.PHONY: setup test test-debug test-release test-core test-misc-core web server doc meta instal-deps
+.PHONY: deps compiler compiler-core meta doc bootstrap-compiler test test-all test-debug test-optimized test-optimized-minified test-transformed test-transformed-optimized test-core test-misc test-npm _test-npm test-bench v8bench web server web.jsx show-todo publish publish-test update-assets update-codemirror update-bootstrap clean
