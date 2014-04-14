@@ -2253,7 +2253,7 @@ class CPSTransformCommand extends FunctionTransformCommand {
 			return index + 1;
 		}
 
-		// replace gotos with function call (and return statement)
+		// replace gotos with indirect threading
 		for (var i = 0; i < statements.length; ++i) {
 			var stmt = statements[i];
 
@@ -2266,32 +2266,25 @@ class CPSTransformCommand extends FunctionTransformCommand {
 			}
 		}
 
-		function makeBasicBlock (label : LabelStatement, body : Statement[]) : Statement[] {
-			var statements = body.concat([]);
-			statements.unshift(
+		function replaceBasicBlock (statements : Statement[], index : int, end : int) : int {
+			assert statements[index] instanceof LabelStatement;
+			var labelStmt = statements[index] as LabelStatement;
+			statements.splice(index, 1,
 				new CaseStatement(
 					new Token("case", false),
-					new IntegerLiteralExpression(new Token("" + label.getID(), false))));
-			return statements;
+					new IntegerLiteralExpression(new Token("" + labelStmt.getID(), false))));
+			return end;
 		}
 
-		// basic blocks
-		var basicBlocks = new Statement[];
+		// replace basic blocks with simple case clauses
 		for (var i = 0; i < statements.length;) {
-			var currentLabel = statements[i] as LabelStatement;
-			++i;
+			var index = i;
 
-			// read the block
-			var body = new Statement[];
-			for (; i < statements.length; ++i) {
-				if (statements[i] instanceof LabelStatement) {
+			for (i += 1; i < statements.length; ++i) {
+				if (statements[i] instanceof LabelStatement) // advance until next label is found
 					break;
-				}
-				body.push(statements[i]);
 			}
-
-			// create a basic block
-			basicBlocks = basicBlocks.concat(makeBasicBlock(currentLabel, body));
+			i = replaceBasicBlock(statements, index, i);
 		}
 
 		// create while-switch loop
@@ -2299,7 +2292,7 @@ class CPSTransformCommand extends FunctionTransformCommand {
 			new Token("switch", false),
 			null,
 			new LocalExpression(new Token("$next", true), nextVar),
-			basicBlocks);
+			statements);
 		var whileStmt = new WhileStatement(
 			new Token("while", false),
 			null,
@@ -2310,14 +2303,15 @@ class CPSTransformCommand extends FunctionTransformCommand {
 		executor._statements = [ whileStmt ] : Statement[];
 
 		// amend funcDef._statements
-		funcDef.getStatements().length = 0;
-		funcDef.getStatements().push(new FunctionStatement(
-			new Token("function", false), executor));
-		funcDef.getStatements().push(new ExpressionStatement(
-			new CallExpression(
-				new Token("(", false),
-				new LocalExpression(new Token("$loop", true), loopVar),
-				[ new IntegerLiteralExpression(new Token("0", false)) ] : Expression[])));
+		funcDef._statements = [
+			new FunctionStatement(
+				new Token("function", false), executor),
+			new ExpressionStatement(
+				new CallExpression(
+					new Token("(", false),
+					new LocalExpression(new Token("$loop", true), loopVar),
+					[ new IntegerLiteralExpression(new Token("0", false)) ] : Expression[])),
+		];
 	}
 
 	var _outputStatements = null : Statement[];
