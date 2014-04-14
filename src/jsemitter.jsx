@@ -289,6 +289,15 @@ class _Util {
 		return stash ? (stash as _UnclassifyOptimizationCommand.Stash).inliner : null;
 	}
 
+	static function getElementTypeOfCompoundType(type : Type) : Type {
+		if (type.equals(Type.variantType)) {
+			return Type.variantType;
+		}
+		var classDef = type.getClassDef();
+		assert ! classDef.className().match(/^(Array|Map)\.$/);
+		return (classDef as InstantiatedClassDefinition).getTypeArguments()[0];
+	}
+
 }
 
 class _TempVarLister {
@@ -1715,7 +1724,7 @@ class _ArrayLiteralExpressionEmitter extends _ExpressionEmitter {
 	override function emit (outerOpPrecedence : number) : void {
 		this._emitter._emit("[ ", null);
 		var exprs = this._expr.getExprs();
-		var exprType = ((this._expr.getType() as ObjectType).getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0];
+		var exprType = _Util.getElementTypeOfCompoundType(this._expr.getType());
 		for (var i = 0; i < exprs.length; ++i) {
 			if (i != 0)
 				this._emitter._emit(", ", null);
@@ -1738,7 +1747,7 @@ class _MapLiteralExpressionEmitter extends _ExpressionEmitter {
 	override function emit (outerOpPrecedence : number) : void {
 		this._emitter._emit("({ ", null);
 		var elements = this._expr.getElements();
-		var elementType = ((this._expr.getType() as ObjectType).getClassDef() as InstantiatedClassDefinition).getTypeArguments()[0];
+		var elementType = _Util.getElementTypeOfCompoundType(this._expr.getType());
 		for (var i = 0; i < elements.length; ++i) {
 			var element = elements[i];
 			if (i != 0)
