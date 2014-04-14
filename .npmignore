@@ -1,5 +1,4 @@
 # temporary files
-
 *~
 *.swp
 *.zip
@@ -11,29 +10,33 @@ bootstrap/
 .jsx
 tmp/
 
-# products
-
-try/
+# files in git but not from npm
+.npmignore
+.travis.yml
+.proverc
+complete/
 doc/
+example/
+extlib/
+gruntfile.js
+idl2jsx/
+Makefile
+release-engineering.md
+src/
+submodules/
+t/
+tool/
+try/
+web/
+xt/
 
 # npm-related files
-
 npm-debug.log
 package/
 jsx-*.tgz
 
 # no need to include node modules
-
 node_modules/
 
-# extlib stuff
-
-.packlist
-.meta
-darwin-*
-linux-*
-*:*
-
 # git stuff
-
 .git*
