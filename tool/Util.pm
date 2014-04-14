@@ -14,7 +14,7 @@ use lib File::Basename::dirname(__FILE__) . "/../extlib/lib/perl5";
 use base qw(Exporter);
 our @EXPORT = qw(slurp get_section jsx numify_version xsystem);
 
-our $JSX = "bin/jsx";
+our $JSX = $ENV{JSX_COMPILER} || "bin/jsx";
 
 sub xsystem { # system() which returns (status code, stdout, stderr)
     my(@args) = @_;
