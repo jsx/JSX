@@ -2079,7 +2079,7 @@ class _PreIncrementExpressionEmitter extends _UnaryExpressionEmitter {
 		var opToken = this._expr.getToken();
 		if (this._expr.getType().resolveIfNullable().equals(Type.integerType)) {
 			if (this._expr.getExpr().hasSideEffects()) {
-				_Util.emitFusedIntOpWithSideEffects(this._emitter, opToken.getValue() == "++" ? "$__jsx_ipadd" : "$__jsx_ipdec", this._expr.getExpr(), function (outerPred) {
+				_Util.emitFusedIntOpWithSideEffects(this._emitter, opToken.getValue() == "++" ? "$__jsx_ipadd" : "$__jsx_ipsub", this._expr.getExpr(), function (outerPred) {
 					this._emitter._emit("1", opToken);
 				}, 0);
 			} else {
