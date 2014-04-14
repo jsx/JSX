@@ -2995,7 +2995,7 @@ abstract class _BootstrapBuilder {
 	}
 
 	function addBootstrap(code : string) : string {
-		code += this._emitter._platform.load(this._emitter._platform.getRoot() + "/src/js/launcher.js");
+		code += this._emitter._platform.load(this._emitter._platform.getRoot() + "/lib/js-startup/launcher.js");
 
 		var args;
 		switch (this._executableFor) {
@@ -3022,7 +3022,7 @@ abstract class _BootstrapBuilder {
 	abstract function _getLauncher() : string;
 
 	function _wrapOnLoad(code : string) : string {
-		var wrapper = this._emitter._platform.load(this._emitter._platform.getRoot() + "/src/js/web-launcher.js");
+		var wrapper = this._emitter._platform.load(this._emitter._platform.getRoot() + "/lib/js-startup/web-launcher.js");
 		return wrapper.replace(/\/\/--CODE--\/\//, code);
 	}
 
@@ -3237,7 +3237,7 @@ class JavaScriptEmitter implements Emitter {
 		// headers
 		this._output += "// generatedy by JSX compiler " + Meta.IDENTIFIER + "\n";
 		this._output += this._fileHeader;
-		this._output += this._platform.load(this._platform.getRoot() + "/src/js/bootstrap.js");
+		this._output += this._platform.load(this._platform.getRoot() + "/lib/js-startup/bootstrap.js");
 
 		var stash = (this.getStash(_NoDebugCommand.IDENTIFIER) as _NoDebugCommand.Stash);
 		this._emit("JSX.DEBUG = "+(stash == null || stash.debugValue ? "true" : "false")+";\n", null);
@@ -3501,7 +3501,7 @@ class JavaScriptEmitter implements Emitter {
 		}
 		output += this._output + "\n";
 		if (this._enableProfiler) {
-			output += this._platform.load(this._platform.getRoot() + "/src/js/profiler.js");
+			output += this._platform.load(this._platform.getRoot() + "/lib/js-startup/profiler.js");
 		}
 		if (this._bootstrapBuilder != null) {
 			output = this._bootstrapBuilder.addBootstrap(output);

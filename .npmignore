@@ -11,10 +11,12 @@ bootstrap/
 .jsx
 tmp/
 
+
 # products
 
 try/
 doc/
+example/
 
 # npm-related files
 
@@ -37,3 +39,27 @@ linux-*
 # git stuff
 
 .git*
+
+# only for JSX compiler developer
+
+t/
+src/
+.travis.yml
+.npmignore
+.proverc
+extlib/
+gruntfile.js
+submodules/
+xt/
+release-engineering.md
+idl2jsx/
+tool/bootstrap-compiler.js
+tool/git-hooks-pre-push
+tool/form
+tool/Util.pm
+tool/jsx.pl
+tool/make-meta
+tool/postpublish.jsx
+tool/setup.pl
+tool/toggle-todo
+web/
