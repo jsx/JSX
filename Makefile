@@ -46,7 +46,7 @@ test: all test-debug test-optimized-minified show-todo
 
 test-all: test test-optimized
 
-test-debug: test-core test-misc-core
+test-debug: test-core test-misc
 
 test-optimized:
 	JSX_OPTS="--optimize release,-no-log,-no-assert" $(MAKE) test-core
@@ -61,10 +61,10 @@ test-transformed-optimized:
 	JSX_OPTS="--enable-cps-transform --optimize release,-no-log,-no-assert" $(MAKE) test-core
 
 test-core:
-	$(PROVE) --jobs "$(JOBS)" t/run/*.jsx t/compile_error/*.jsx t/lib/*.jsx t/src/*.jsx t/web/*.jsx
+	$(PROVE) --jobs "$(JOBS)" t/run/*.jsx t/compile_error/*.jsx t/lib/*.jsx t/optimize/*.jsx t/complete/*.jsx
 
-test-misc-core:
-	$(PROVE) --jobs "$(JOBS)" t/*.t t/optimize/*.jsx t/complete/*.jsx
+test-misc:
+	$(PROVE) --jobs "$(JOBS)" t/*.t t/src/*.jsx t/web/*.jsx
 
 
 test-bench:
@@ -124,4 +124,4 @@ clean:
 	rm -rf bin/*
 	rm -rf jsx-*.tgz
 
-.PHONY: setup test test-debug test-release test-core test-misc-core web server doc meta instal-deps
+.PHONY: setup test test-debug test-release test-core test-misc web server doc meta instal-deps
