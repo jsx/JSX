@@ -2144,15 +2144,6 @@ class CPSTransformCommand extends FunctionTransformCommand {
 			}
 		}
 
-		function getLabelOffset (label : string) : int {
-			for (var i = 0; i < statements.length; ++i) {
-				if (statements[i] instanceof LabelStatement && (statements[i] as LabelStatement).getName() == label) {
-					return i;
-				}
-			}
-			return -1;
-		}
-
 		// fold trivial branches
 		for (var i = 0; i < statements.length - 1; ++i) {
 			if (statements[i] instanceof LabelStatement && statements[i + 1] instanceof GotoStatement) {
@@ -2160,18 +2151,22 @@ class CPSTransformCommand extends FunctionTransformCommand {
 				var destLabel = (statements[i + 1] as GotoStatement).getLabel();
 				statements.splice(i, 2);
 
-				var destOffset = getLabelOffset(destLabel);
-				if (destOffset == -1) {
+				for (var j = 0; j < statements.length; ++j) {
+					if (statements[j] instanceof LabelStatement && (statements[j] as LabelStatement).getName() == destLabel) {
+						break;
+					}
+				}
+				if (j == statements.length) {
 					throw new Error("logic flaw");
 				}
-				statements.splice(destOffset, 0, srcLabel);
-				if (! (destOffset < i)) {
+				statements.splice(j, 0, srcLabel);
+				if (i <= j) {
 					i--;
 				}
 			}
 		}
 
-		// fold duplicate labels
+		// fold continuous labels
 		var labelRenames = new Map.<string>;
 		for (var i = 0; i < statements.length; ++i) {
 			if (statements[i] instanceof LabelStatement) {
