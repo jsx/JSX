@@ -2540,8 +2540,8 @@ class CPSTransformCommand extends FunctionTransformCommand {
 		return CPSTransformCommand._extractLocal(funcDef, "$return");
 	}
 
-	static function _extractNextLocal (funcDef : MemberFunctionDefinition) : LocalVariable {
-		return CPSTransformCommand._extractLocal(funcDef, "$next");
+	static function _extractNextLocal (funcDef : MemberFunctionDefinition) : ArgumentDeclaration {
+		return CPSTransformCommand._extractVM(funcDef).getArguments()[0];
 	}
 
 	static function _extractLoopLocal (funcDef : MemberFunctionDefinition) : LocalVariable {
