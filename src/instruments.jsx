@@ -2510,12 +2510,17 @@ class CPSTransformCommand extends FunctionTransformCommand {
 		throw new Error("got unexpected type of expression: " + (expr != null ? JSON.stringify(expr.serialize()) : expr.toString()));
 	}
 
-	static function _extractGlobalDispatchFuncDef (funcDef : MemberFunctionDefinition) : MemberFunctionDefinition {
+	static function _extractVM (funcDef : MemberFunctionDefinition) : MemberFunctionDefinition {
 		var funcStmt = funcDef.getStatements()[0] as FunctionStatement;
 		return funcStmt.getFuncDef();
 	}
 
-	static function _extractGlobalDispatchBody (funcDef : MemberFunctionDefinition) : Statement[] {
+	static function _extractVMBody (funcDef : MemberFunctionDefinition) : Statement[] {
+		var funcStmt = funcDef.getStatements()[0] as FunctionStatement;
+		return funcStmt.getFuncDef().getStatements();
+	}
+
+	static function _extractVMDispatchBody (funcDef : MemberFunctionDefinition) : Statement[] {
 		var funcStmt = funcDef.getStatements()[0] as FunctionStatement;
 		var whileStmt = funcStmt.getFuncDef().getStatements()[0] as WhileStatement;
 		var switchStmt = whileStmt.getStatements()[0] as SwitchStatement;
@@ -2606,8 +2611,8 @@ class GeneratorTransformCommand extends FunctionTransformCommand {
 
 		this._performCPSTransformation(funcDef);
 
-		var cpsFuncDef = CPSTransformCommand._extractGlobalDispatchFuncDef(funcDef);
-		var statements = CPSTransformCommand._extractGlobalDispatchBody(funcDef);
+		var cpsFuncDef = CPSTransformCommand._extractVM(funcDef);
+		var statements = CPSTransformCommand._extractVMDispatchBody(funcDef);
 
 		// unfold CPS expressions
 		for (var i = 0; i < statements.length; ++i) {
