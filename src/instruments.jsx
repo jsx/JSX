@@ -1202,7 +1202,7 @@ abstract class _StatementTransformer {
 
 	function replaceControlStructuresWithGotos () : void {
 		if (this._transformer._transformExprs) {
-			var funcDef = this._transformer._getTransformingFuncDef();
+			var funcDef = CPSTransformCommand._extractVM(this._transformer._getTransformingFuncDef());
 			this.getStatement().forEachExpression(function (expr, replaceCb) {
 				var id = _Util._createIdentityFunction(funcDef, expr.getType());
 				var expr;
@@ -1299,9 +1299,8 @@ class _ReturnStatementTransformer extends _StatementTransformer {
 	}
 
 	override function _replaceControlStructuresWithGotos () : void {
-		var funcDef = this._transformer._getTransformingFuncDef();
 		if (this._statement.getExpr() != null) {
-			var returnLocal = CPSTransformCommand._extractReturnLocal(funcDef);
+			var returnLocal = CPSTransformCommand._extractReturnLocal(this._transformer._getTransformingFuncDef());
 
 			/* returnLocal should be null when the return statement is declared like this:
 			 *
@@ -1339,7 +1338,7 @@ class _DeleteStatementTransformer extends _StatementTransformer {
 
 	override function replaceControlStructuresWithGotos () : void {
 		if (this._transformer._transformExprs) {
-			var funcDef = this._transformer._getTransformingFuncDef();
+			var funcDef = CPSTransformCommand._extractVM(this._transformer._getTransformingFuncDef());
 			var aryExpr = this._statement.getExpr() as ArrayExpression;
 			this._transformer._emitExpressionStatement(new _DeleteStatementTransformer._Stash(this._transformer, this._statement).doCPSTransform(funcDef, null, aryExpr.getType()));
 		} else {
@@ -2095,35 +2094,78 @@ class CPSTransformCommand extends FunctionTransformCommand {
 	}
 
 	function _doCPSTransform (funcDef : MemberFunctionDefinition) : void {
+
+		// create and set a VM
+		this._createAndSetVMReady(funcDef);
+
+		// replace control structures with goto statements
+		this._replaceControlStructuresWithGotos(funcDef);
+
+		// peep-hole optimization
+		this._eliminateDeadBranches(funcDef);
+
+		// resolve labels
+		this._resolveLabels(funcDef);
+
+		// replace goto statements with indirect threading
+		this._eliminateGotos(funcDef);
+
+	}
+
+	function _createAndSetVMReady (funcDef : MemberFunctionDefinition) : void {
+
+		// create a VM
+		var loopVar = new LocalVariable(new Token("$loop", true), new StaticFunctionType(null, Type.voidType, [ Type.integerType ], true), false);
+		funcDef.getLocals().push(loopVar);
+		var vm = _Util._createNamedFunction(
+			funcDef,
+			null,	// Token
+			new Token("$loop", true),
+			[ new ArgumentDeclaration(new Token("$next", true), Type.integerType) ],
+			Type.voidType
+		);
+		vm.setFuncLocal(loopVar);
+
+		// amend vm._statements; lift statements up to the VM
+		vm._statements = funcDef.getStatements();
+		Util.rebaseClosures(funcDef, vm);
+
+		// amend funcDef._statements; invoke the VM
+		funcDef._statements = [
+			new FunctionStatement(
+				new Token("function", false), vm),
+			new ExpressionStatement(
+				new CallExpression(
+					new Token("(", false),
+					new LocalExpression(new Token("$loop", true), loopVar),
+					[ new IntegerLiteralExpression(new Token("0", false)) ])),
+		];
+
+	}
+
+	function _replaceControlStructuresWithGotos (funcDef : MemberFunctionDefinition) : void {
 		this._enterFunction(funcDef);
 		try {
+			var inStatements = CPSTransformCommand._extractVMBody(funcDef);
+			var outStatements = new Statement[];
 
-			// replace control structures with goto statements
-			var statements = new Statement[];
-			this._setOutputStatements(statements);
-			for (var i = 0; i < funcDef.getStatements().length; ++i) {
-				this._getStatementTransformerFor(funcDef.getStatements()[i]).replaceControlStructuresWithGotos();
+			this._setOutputStatements(outStatements);
+
+			for (var i = 0; i < inStatements.length; ++i) {
+				this._getStatementTransformerFor(inStatements[i]).replaceControlStructuresWithGotos();
 			}
+
 			// insert prologue code
-			statements.unshift(
+			outStatements.unshift(
 				new LabelStatement("$L_enter")
 			);
 			// insert epilogue code
-			statements.push(
+			outStatements.push(
 				new GotoStatement("$L_exit"),
 				new LabelStatement("$L_exit"),
 				new ReturnStatement(new Token("return", false), null));
-			funcDef._statements = statements;
 
-			// peep-hole optimization
-			this._eliminateDeadBranches(funcDef);
-
-			// resolve labels
-			this._resolveLabels(funcDef);
-
-			// replace goto statements with indirect threading
-			this._eliminateGotos(funcDef);
-
+			CPSTransformCommand._extractVM(funcDef)._statements = outStatements;
 		} finally {
 			this._leaveFunction();
 		}
@@ -2131,7 +2173,7 @@ class CPSTransformCommand extends FunctionTransformCommand {
 
 	function _eliminateDeadBranches (funcDef : MemberFunctionDefinition) : void {
 
-		var statements = funcDef.getStatements();
+		var statements = CPSTransformCommand._extractVMBody(funcDef);
 
 		// removal of dead code after goto statement
 		for (var i = 0; i < statements.length; ++i) {
@@ -2197,7 +2239,7 @@ class CPSTransformCommand extends FunctionTransformCommand {
 	}
 
 	function _resolveLabels (funcDef : MemberFunctionDefinition) : void {
-		var statements = funcDef.getStatements();
+		var statements = CPSTransformCommand._extractVMBody(funcDef);
 
 		var labelIDs = new Map.<int>;
 		// resolve LabelStatements
@@ -2225,15 +2267,9 @@ class CPSTransformCommand extends FunctionTransformCommand {
 	}
 
 	function _eliminateGotos (funcDef : MemberFunctionDefinition) : void {
-		var statements = funcDef.getStatements();
+		var statements = CPSTransformCommand._extractVMBody(funcDef);
 
-		var loopVar = new LocalVariable(new Token("$loop", true), new StaticFunctionType(null, Type.voidType, [ Type.integerType ] : Type[], true), false);
-		funcDef.getLocals().push(loopVar);
-
-		// create executor
-		var nextVar = new ArgumentDeclaration(new Token("$next", true), Type.integerType);
-		var executor = _Util._createNamedFunction(funcDef, null, new Token("$loop", true), [ nextVar ], Type.voidType);
-		executor.setFuncLocal(loopVar);
+		var nextVar = CPSTransformCommand._extractNextLocal(funcDef);
 
 		function replaceGoto (statements : Statement[], index : int) : int {
 			assert statements[index] instanceof GotoStatement;
@@ -2294,25 +2330,19 @@ class CPSTransformCommand extends FunctionTransformCommand {
 			new BooleanLiteralExpression(new Token("true", false)),
 			[ switchStmt ] : Statement[]);
 
-		// set the vm to executor
-		executor._statements = [ whileStmt ] : Statement[];
+		// set indirect threading loop to the VM
+		CPSTransformCommand._extractVM(funcDef)._statements = [ whileStmt ] : Statement[];
 
-		// amend funcDef._statements
-		funcDef._statements = [
-			new FunctionStatement(
-				new Token("function", false), executor),
-			new ExpressionStatement(
-				new CallExpression(
-					new Token("(", false),
-					new LocalExpression(new Token("$loop", true), loopVar),
-					[ new IntegerLiteralExpression(new Token("0", false)) ] : Expression[])),
-		];
 	}
 
 	var _outputStatements = null : Statement[];
 
 	function _setOutputStatements (statements : Statement[]) : void {
 		this._outputStatements = statements;
+	}
+
+	function _getOutputStatements () : Statement[] {
+		return this._outputStatements;
 	}
 
 	function _emit (statement : Statement) : void {
