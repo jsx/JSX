@@ -3888,8 +3888,12 @@ class _ArrayLengthOptimizeCommand extends _FunctionOptimizeCommand {
 					}
 				return true;
 			};
-			statement.getCondExpr().forEachExpression(onExpr);
-			statement.getPostExpr().forEachExpression(onExpr);
+			if (statement.getCondExpr() != null) {
+				statement.getCondExpr().forEachExpression(onExpr);
+			}
+			if (statement.getPostExpr() != null) {
+				statement.getPostExpr().forEachExpression(onExpr);
+			}
 			statement.forEachStatement(function onStatement2(statement : Statement) : boolean {
 				statement.forEachStatement(onStatement2);
 				statement.forEachExpression(onExpr);
