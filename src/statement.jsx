@@ -281,6 +281,15 @@ class FunctionStatement extends Statement {
 			context.errors.push(new CompileError(this._token, "argument / return types were not automatically deductable, please specify them by hand"));
 			return false;
 		}
+		var returnType = this._funcDef.getReturnType();
+		if (this._funcDef.isGenerator()) {
+			var classDef;
+			if (! (returnType instanceof ObjectType
+				&& (classDef = returnType.getClassDef()) instanceof InstantiatedClassDefinition
+				&& (classDef as InstantiatedClassDefinition).getTemplateClassName() == "Generator")) {
+					this._funcDef.setReturnType(new ObjectType(Util.instantiateTemplate(context, this._token, "Generator", [ Type.voidType, returnType ])));
+			}
+		}
 		this._funcDef.analyze(context);
 		// the function can be used from the scope of the same level
 		context.getTopBlock().localVariableStatuses.setStatus(this._funcDef.getFuncLocal());

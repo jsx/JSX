@@ -917,6 +917,20 @@ class FunctionExpression extends Expression {
 			context.errors.push(new CompileError(this._token, "argument types were not automatically deductable, please specify them by hand"));
 			return false;
 		}
+		var returnType = this._funcDef.getReturnType();
+		if (this._funcDef.isGenerator()) {
+			if (returnType == null) {
+				context.errors.push(new CompileError(this._token, "return type was not automatically deductable, please specify them by hand"));
+				return false;
+			} else {
+				var classDef;
+				if (! (returnType instanceof ObjectType
+					&& (classDef = returnType.getClassDef()) instanceof InstantiatedClassDefinition
+					&& (classDef as InstantiatedClassDefinition).getTemplateClassName() == "Generator")) {
+						this._funcDef.setReturnType(new ObjectType(Util.instantiateTemplate(context, this._token, "Generator", [ Type.voidType, returnType ])));
+				}
+			}
+		}
 		this._funcDef.analyze(context);
 		return true; // return true since everything is resolved correctly even if analysis of the function definition failed
 	}
