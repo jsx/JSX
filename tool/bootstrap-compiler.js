@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// generatedy by JSX compiler 0.9.86 (2014-04-14 16:47:21 +0900; 6366d986690f51bccc60569a7a1c6b77f37f641d)
+// generatedy by JSX compiler 0.9.86 (2014-04-18 14:04:03 +0900; c83e8c53332f8cd6df20119c5d1c50c01edbcd09)
 var JSX = {};
 (function (JSX) {
 /**
@@ -19989,8 +19989,12 @@ _ArrayLengthOptimizeCommand.prototype._optimizeArrayLength$LMemberFunctionDefini
 			}
 			return true;
 		});
-		statement.getCondExpr$().forEachExpression$F$LExpression$F$LExpression$V$B$(onExpr);
-		statement.getPostExpr$().forEachExpression$F$LExpression$F$LExpression$V$B$(onExpr);
+		if (statement.getCondExpr$() != null) {
+			statement.getCondExpr$().forEachExpression$F$LExpression$F$LExpression$V$B$(onExpr);
+		}
+		if (statement.getPostExpr$() != null) {
+			statement.getPostExpr$().forEachExpression$F$LExpression$F$LExpression$V$B$(onExpr);
+		}
 		statement.forEachStatement$F$LStatement$B$((function onStatement2(statement) {
 			statement.forEachStatement$F$LStatement$B$(onStatement2);
 			statement.forEachExpression$F$LExpression$F$LExpression$V$B$(onExpr);
@@ -27431,8 +27435,8 @@ $__jsx_lazy_init(NodePlatform, "_isColorSupported", function () {
 });
 Meta.VERSION_STRING = "0.9.86";
 Meta.VERSION_NUMBER = 0.009086;
-Meta.LAST_COMMIT_HASH = "6366d986690f51bccc60569a7a1c6b77f37f641d";
-Meta.LAST_COMMIT_DATE = "2014-04-14 16:47:21 +0900";
+Meta.LAST_COMMIT_HASH = "c83e8c53332f8cd6df20119c5d1c50c01edbcd09";
+Meta.LAST_COMMIT_DATE = "2014-04-18 14:04:03 +0900";
 $__jsx_lazy_init(Meta, "IDENTIFIER", function () {
 	return Meta.VERSION_STRING + " (" + Meta.LAST_COMMIT_DATE + "; " + Meta.LAST_COMMIT_HASH + ")";
 });
