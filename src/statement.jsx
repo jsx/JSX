@@ -49,6 +49,12 @@ abstract class Statement implements Stashable {
 	}
 
 	function forEachStatement (cb : function(:Statement):boolean) : boolean {
+		return this.forEachStatement(function(stmt,_) {
+			return cb(stmt);
+		});
+	}
+
+	function forEachStatement (cb : function(:Statement,:function(:Statement):void):boolean) : boolean {
 		return true;
 	}
 
@@ -651,7 +657,7 @@ abstract class ContinuableStatement extends LabellableStatement {
 		return this._statements;
 	}
 
-	override function forEachStatement (cb : function(:Statement):boolean) : boolean {
+	override function forEachStatement (cb : function(:Statement,:function(:Statement):void):boolean) : boolean {
 		if (! Util.forEachStatement(cb, this._statements))
 			return false;
 		return true;
@@ -994,7 +1000,7 @@ class IfStatement extends Statement implements Block {
 		return true;
 	}
 
-	override function forEachStatement (cb : function(:Statement):boolean) : boolean {
+	override function forEachStatement (cb : function(:Statement,:function(:Statement):void):boolean) : boolean {
 		if (! Util.forEachStatement(cb, this._onTrueStatements))
 			return false;
 		if (! Util.forEachStatement(cb, this._onFalseStatements))
@@ -1107,7 +1113,7 @@ class SwitchStatement extends LabellableStatement {
 		return true;
 	}
 
-	override function forEachStatement (cb : function(:Statement):boolean) : boolean {
+	override function forEachStatement (cb : function(:Statement,:function(:Statement):void):boolean) : boolean {
 		if (! Util.forEachStatement(cb, this._statements))
 			return false;
 		return true;
@@ -1332,10 +1338,6 @@ class TryStatement extends Statement implements Block {
 	}
 
 	override function doAnalyze (context : AnalysisContext) : boolean {
-		if ((context.funcDef.flags() & ClassDefinition.IS_GENERATOR) != 0) {
-			context.errors.push(new CompileError(this._token, "invalid use of try block inside generator"));
-			return false;
-		}
 		// try
 		context.blockStack.push(new BlockContext(context.getTopBlock().localVariableStatuses.clone(), this));
 		var lvStatusesAfterTryCatch = null : LocalVariableStatuses;
@@ -1385,7 +1387,7 @@ class TryStatement extends Statement implements Block {
 		return true;
 	}
 
-	override function forEachStatement (cb : function(:Statement):boolean) : boolean {
+	override function forEachStatement (cb : function(:Statement,:function(:Statement):void):boolean) : boolean {
 		if (! Util.forEachStatement(cb, this._tryStatements))
 			return false;
 		if (! Util.forEachStatement(cb, this._catchStatements.map.<Statement>((s) -> { return s; })))
@@ -1469,7 +1471,7 @@ class CatchStatement extends Statement implements Block {
 		return true;
 	}
 
-	override function forEachStatement (cb : function(:Statement):boolean) : boolean {
+	override function forEachStatement (cb : function(:Statement,:function(:Statement):void):boolean) : boolean {
 		return Util.forEachStatement(cb, this._statements);
 	}
 

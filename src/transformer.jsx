@@ -188,3 +188,103 @@ class FixedExpressionTransformCommand extends ExpressionTransformCommand {
 	}
 
 }
+
+abstract class StatementTransformCommand extends FunctionTransformCommand {
+
+	function constructor(compiler : Compiler, identifier : string) {
+		super(compiler, identifier);
+	}
+
+	override function transformFunction(funcDef : MemberFunctionDefinition) : void {
+		funcDef.forEachStatement((stmt, replaceCb) -> this.touchStatement(stmt, replaceCb));
+	}
+
+	function touchStatement(stmt : Statement, replaceCb : (Statement) -> void) : boolean {
+		// the default
+		stmt.forEachStatement((stmt, replaceCb) -> {
+			return this.touchStatement(stmt, replaceCb);
+		});
+		return true;
+	}
+
+}
+
+class NormalizeTryStatementTransformCommand extends StatementTransformCommand {
+
+	// normalized try statement always have single catch clause that captures a variable of variant type.
+
+	static const IDENTIFIER = "normalize-try";
+
+	function constructor(compiler : Compiler) {
+		super(compiler, __CLASS__.IDENTIFIER);
+	}
+
+	override function touchStatement (statement : Statement, replaceCb : (Statement) -> void) : boolean {
+		if (statement instanceof TryStatement) {
+			var tryStatement = statement as TryStatement;
+			var catchStatements = tryStatement.getCatchStatements();
+
+			var newCaught = new CaughtVariable(new Token("e", true), Type.variantType);
+
+			catchStatements.forEach(catchStmt => {
+				catchStmt.forEachStatement(function onStmt (stmt) {
+					return stmt.forEachExpression(function onExpr (expr, replaceCb) {
+						if (expr instanceof LocalExpression) {
+							var local = (expr as LocalExpression).getLocal();
+							if (local  == catchStmt.getLocal()) {
+								var expr = new AsNoConvertExpression(
+									new Token("as", false),
+									new LocalExpression(
+										newCaught.getName(),
+										newCaught),
+									local.getType());
+								replaceCb(expr);
+								return true;
+							}
+						}
+						return expr.forEachExpression(onExpr);
+					}) && stmt.forEachStatement(onStmt);
+				});
+			});
+
+			var newBody = catchStatements.reduceRight(function (elseStmts : Statement[], catchStmt) {
+
+				var caughtVar = catchStmt.getLocal();
+				if (caughtVar.getType() instanceof ObjectType) {
+					return [
+						new IfStatement(
+							new Token("if", false),
+							new InstanceofExpression(
+								new Token("instanceof", false),
+								new LocalExpression(
+									newCaught.getName(),
+									newCaught),
+								caughtVar.getType()),
+							catchStmt.getStatements(),
+							elseStmts)
+					] : Statement[];
+				} else {
+					assert Type.variantType.equals(caughtVar.getType());
+
+					return catchStmt.getStatements();
+				}
+
+			}, [
+				new ThrowStatement(
+					new Token("throw", false),
+					new LocalExpression(
+						newCaught.getName(),
+						newCaught))
+			] : Statement[]);
+
+			var newCatch = new CatchStatement(new Token("catch", false), newCaught, newBody);
+
+			tryStatement.getCatchStatements().length = 0;
+			tryStatement.getCatchStatements().push(newCatch);
+		}
+
+		// default handler
+		return super.touchStatement(statement, replaceCb);
+	}
+
+}
