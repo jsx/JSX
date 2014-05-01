@@ -97,7 +97,7 @@ sub run_compiled {
     $src .= sprintf <<'EOT', $filename;
 ;
 // workaround for node.js to set "JSX" to global
-(function () { return this; })().JSX = JSX;
+Function("return this")().JSX = JSX;
 // invoke the test
 try {
     JSX.require("%s")._Main.main([]);
