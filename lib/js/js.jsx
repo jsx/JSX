@@ -54,7 +54,7 @@ final native class js {
 	static function newFunction(...argsAndBody : string) : variant;
 
 } = """(function () {
-	var global = (function () { return this; }());
+	var global = Function("return this")();
 	return {
 		global: global,
 		eval: global.eval,
