@@ -150,7 +150,9 @@ class NodePlatform extends Platform {
 		});
 
 		if (process.env["JSX_RUNJS"]) {
-			var child = node.child_process.spawn(process.env["JSX_RUNJS"], [jsFile].concat(args));
+			// JSX_RUNJS may contain "cmd args", and thus we need to split it, but should we better shell-unescape it?
+			var argv = process.env["JSX_RUNJS"].split(/\s+/).concat([jsFile]).concat(args);
+			var child = node.child_process.spawn(argv.shift(), argv);
 			child.stdin.end();
 			child.stdout.on("data", function (data) {
 				process.stdout.write(data as string);
