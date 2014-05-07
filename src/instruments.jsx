@@ -2920,6 +2920,124 @@ class CPSTransformCommand extends FunctionTransformCommand {
 
 }
 
+class ANFTransformCommand extends FunctionTransformCommand {
+
+	static const IDENTIFIER = "anf";
+
+	var _vm : MemberFunctionDefinition;
+
+	function constructor (compiler : Compiler) {
+		super(compiler, __CLASS__.IDENTIFIER);
+	}
+
+	function _performCPSTransformation (funcDef : MemberFunctionDefinition) : void {
+		var cpsTransformer = new CPSTransformCommand(this._compiler);
+		cpsTransformer.setup([]);
+		cpsTransformer.setTransformYield(true);
+		cpsTransformer.setTransformExprs(true);
+		cpsTransformer.transformFunction(funcDef);
+	}
+
+	override function transformFunction (funcDef : MemberFunctionDefinition) : void {
+
+		this._performCPSTransformation(funcDef);
+
+		// unfold expressions
+		this._vm  = CPSTransformCommand._extractVM(funcDef);
+		try {
+			this._unfoldExpressions(CPSTransformCommand._extractVMDispatchBody(funcDef));
+		} finally {
+			this._vm = null;
+		}
+
+	}
+
+	function _unfoldExpressions (statements : Statement[]) : void {
+		for (var i = 0; i < statements.length; ++i) {
+			var assignExprs = new AssignmentExpression[];
+			Util.forEachStatement(function onStatement(statement) {
+				return statement.forEachExpression(function onExpr(expr, replaceCb) {
+					if (! (expr instanceof CallExpression))
+						return true;
+
+					if (! ((expr as CallExpression).getExpr() instanceof FunctionExpression))
+						return true;
+
+					replaceCb(this._unfoldExpr(expr, assignExprs));
+
+					return true;
+				}) && statement.forEachStatement(onStatement);
+			}, [ statements[i] ]);
+
+			for (var j = assignExprs.length - 1; j >= 0; --j) {
+				statements.splice(i, 0, new ExpressionStatement(assignExprs[j]));
+			}
+			i += assignExprs.length;
+		}
+	}
+
+	function _unfoldExpr (expr : Expression, assignExprs : AssignmentExpression[]) : Expression {
+		if (expr instanceof CallExpression) {
+			/** Expected AST structure:
+			 *
+			 * (function ($aXX) { ... })(primitiveExpr)
+			 *
+			 */
+			var callExpr = expr as CallExpression;
+			assert callExpr.getArguments().length == 1;
+			assert callExpr.getExpr() instanceof FunctionExpression;
+
+			var funcExpr = callExpr.getExpr() as FunctionExpression;
+			assert funcExpr.getFuncDef().getArguments().length == 1;
+			var argVar = funcExpr.getFuncDef().getArguments()[0];
+			var localVar = new LocalVariable(argVar.getName(), argVar.getType(), false);
+			this._vm.getLocals().push(localVar);
+
+			/**
+			 * (function ($aXX) { ... })(primitiveExpr)
+			 *
+			 * -> $aXX = primitiveExpr
+			 *    ...
+			 */
+			assignExprs.push(
+				new AssignmentExpression(
+					new Token("=", false),
+					new LocalExpression(localVar.getName(), localVar),
+					callExpr.getArguments()[0]));
+
+			funcExpr.getFuncDef().forEachStatement(function onStmt (stmt) {
+				return stmt.forEachExpression(function onExpr (expr) {
+					if (expr instanceof LocalExpression) {
+						var local = (expr as LocalExpression).getLocal();
+						if (local == argVar) {
+							(expr as LocalExpression).setLocal(localVar);
+						}
+					}
+					if (expr instanceof FunctionExpression) {
+						(expr as FunctionExpression).getFuncDef().forEachStatement(onStmt);
+					}
+					return expr.forEachExpression(onExpr);
+				}) && stmt.forEachStatement(onStmt);
+			});
+
+			assert funcExpr.getFuncDef().getStatements().length == 1;
+			assert funcExpr.getFuncDef().getStatements()[0] instanceof ReturnStatement;
+			var retStmt = funcExpr.getFuncDef().getStatements()[0] as ReturnStatement;
+
+			assert retStmt.getExpr() != null;
+			return this._unfoldExpr(retStmt.getExpr(), assignExprs);
+		}
+		else if (expr instanceof LocalExpression) {
+			assert ! ((expr as LocalExpression).getLocal() instanceof ArgumentDeclaration);
+			return expr;
+		}
+		else {
+			throw new Error('logic flaw!');
+		}
+	}
+
+}
+
 class GeneratorTransformCommand extends FunctionTransformCommand {
 
 	static const IDENTIFIER = "generator";
@@ -2954,12 +3072,10 @@ class GeneratorTransformCommand extends FunctionTransformCommand {
 		funcDef.setFlags(funcDef.flags() & ~ClassDefinition.IS_GENERATOR);
 	}
 
-	function _performCPSTransformation (funcDef : MemberFunctionDefinition) : void {
-		var cpsTransformer = new CPSTransformCommand(this._compiler);
-		cpsTransformer.setup([]);
-		cpsTransformer.setTransformYield(true);
-		cpsTransformer.setTransformExprs(true);
-		cpsTransformer.transformFunction(funcDef);
+	function _performANFTransformation (funcDef : MemberFunctionDefinition) : void {
+		var anfTransformer = new ANFTransformCommand(this._compiler);
+		anfTransformer.setup([]);
+		anfTransformer.transformFunction(funcDef);
 	}
 
 	function _transformGeneratorCore (funcDef : MemberFunctionDefinition) : void {
@@ -2980,93 +3096,9 @@ class GeneratorTransformCommand extends FunctionTransformCommand {
 		var jsxGenLocal = new LocalVariable(new Token("$generator", false), jsxGenType, false);
 		funcDef.getLocals().push(jsxGenLocal);
 
-		this._performCPSTransformation(funcDef);
+		this._performANFTransformation(funcDef);
 
-		var cpsFuncDef = CPSTransformCommand._extractVM(funcDef);
 		var statements = CPSTransformCommand._extractVMDispatchBody(funcDef);
-
-		// unfold CPS expressions
-		for (var i = 0; i < statements.length; ++i) {
-			var staticAssigns = new AssignmentExpression[];
-			Util.forEachStatement(function onStatement(statement) {
-				return statement.forEachExpression(function onExpr(expr, replaceCb) {
-					if (! (expr instanceof CallExpression))
-						return true;
-
-					if (! ((expr as CallExpression).getExpr() instanceof FunctionExpression))
-						return true;
-
-					function unfoldExpr (expr : Expression) : Expression {
-						if (expr instanceof CallExpression) {
-							/** Expected AST structure:
-							 *
-							 * (function ($aXX) { ... })(primitiveExpr)
-							 *
-							 */
-							var callExpr = expr as CallExpression;
-							assert callExpr.getArguments().length == 1;
-							assert callExpr.getExpr() instanceof FunctionExpression;
-
-							var funcExpr = callExpr.getExpr() as FunctionExpression;
-							assert funcExpr.getFuncDef().getArguments().length == 1;
-							var argVar = funcExpr.getFuncDef().getArguments()[0];
-							var localVar = new LocalVariable(argVar.getName(), argVar.getType(), false);
-							cpsFuncDef.getLocals().push(localVar);
-
-							/**
-							 * (function ($aXX) { ... })(primitiveExpr)
-							 *
-							 * -> $aXX = primitiveExpr
-							 *    ...
-							 */
-							staticAssigns.push(
-								new AssignmentExpression(
-									new Token("=", false),
-									new LocalExpression(localVar.getName(), localVar),
-									callExpr.getArguments()[0]));
-
-							funcExpr.getFuncDef().forEachStatement(function onStmt (stmt) {
-								return stmt.forEachExpression(function onExpr (expr) {
-									if (expr instanceof LocalExpression) {
-										var local = (expr as LocalExpression).getLocal();
-										if (local == argVar) {
-											(expr as LocalExpression).setLocal(localVar);
-										}
-									}
-									if (expr instanceof FunctionExpression) {
-										(expr as FunctionExpression).getFuncDef().forEachStatement(onStmt);
-									}
-									return expr.forEachExpression(onExpr);
-								}) && stmt.forEachStatement(onStmt);
-							});
-
-							assert funcExpr.getFuncDef().getStatements().length == 1;
-							assert funcExpr.getFuncDef().getStatements()[0] instanceof ReturnStatement;
-							var retStmt = funcExpr.getFuncDef().getStatements()[0] as ReturnStatement;
-
-							assert retStmt.getExpr() != null;
-							return unfoldExpr(retStmt.getExpr());
-						}
-						else if (expr instanceof LocalExpression) {
-							assert ! ((expr as LocalExpression).getLocal() instanceof ArgumentDeclaration);
-							return expr;
-						}
-						else {
-							throw new Error('logic flaw!');
-						}
-					}
-
-					replaceCb(unfoldExpr(expr));
-
-					return true;
-				}) && statement.forEachStatement(onStatement);
-			}, [ statements[i] ]);
-
-			for (var j = staticAssigns.length - 1; j >= 0; --j) {
-				statements.splice(i, 0, new ExpressionStatement(staticAssigns[j]));
-			}
-			i += staticAssigns.length;
-		}
 
 		var caseCnt = 0;
 		statements.forEach(function (statement) {
