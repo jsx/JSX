@@ -2738,6 +2738,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand implements _Struct
 		return altered;
 	}
 
+	// returns a map containing the use count for each formal argument (and "this"), or -Infinity if the arg is used as LHS
 	function _countNumberOfArgsUsed(funcDef : MemberFunctionDefinition) : Map.<number> {
 		var formalArgs = new TypedMap.<LocalVariable, boolean>;
 		var map = new Map.<number>;
@@ -2752,10 +2753,20 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand implements _Struct
 			statement.forEachStatement(onStatement);
 			statement.forEachExpression(function onExpr(expr : Expression) : boolean {
 				expr.forEachExpression(onExpr);
-				if (expr instanceof LocalExpression && formalArgs.has((expr as LocalExpression).getLocal())) {
-					map[(expr as LocalExpression).getLocal().getName().getValue()]++;
-				}
-				else if (expr instanceof ThisExpression) {
+				if (expr instanceof LocalExpression) {
+					var local = (expr as LocalExpression).getLocal();
+					if (formalArgs.has(local)) {
+						map[local.getName().getValue()]++;
+					}
+				} else if (expr instanceof AssignmentExpression) {
+					var assignExpr = expr as AssignmentExpression;
+					if (assignExpr.getFirstExpr() instanceof LocalExpression) {
+						var local = (assignExpr.getFirstExpr() as LocalExpression).getLocal();
+						if (formalArgs.has(local)) {
+							map[local.getName().getValue()] = -Infinity;
+						}
+					}
+				} else if (expr instanceof ThisExpression) {
 					map["this"]++;
 				}
 				return true;
@@ -3144,7 +3155,7 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand implements _Struct
 		for (var i = 0; i < formalArgs.length; ++i) {
 			var numberOfUsed = argUsed[formalArgs[i].getName().getValue()];
 			var argExpr = argsAndThisAndLocals[i];
-			if (! (argExpr instanceof LeafExpression || (numberOfUsed <= exprIsInlineableFor(argExpr)))) {
+			if (numberOfUsed == -Infinity || ! (argExpr instanceof LeafExpression || (numberOfUsed <= exprIsInlineableFor(argExpr)))) {
 				argsAndThisAndLocals[i] = createVarWithInit(callerFuncDef, formalArgs[i].getType(), formalArgs[i].getName().getValue(), argExpr);
 			}
 		}
