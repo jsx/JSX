@@ -4,3 +4,6 @@
 [submodule "submodules/v8bench"]
 	path = submodules/v8bench
 	url = git://github.com/jsx/jsx-v8bench.git
+[submodule "submodules/oktavia"]
+	path = submodules/oktavia
+	url = git://github.com/shibukawa/oktavia.git
