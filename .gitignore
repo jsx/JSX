@@ -15,7 +15,6 @@ cpanm
 # build products
 
 try/
-doc/
 bin/
 src/doc.jsx
 src/meta.jsx
