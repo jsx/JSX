@@ -12,9 +12,15 @@
 <?
 use File::Find;
 
-sub to_show {
-  my($name) = @_;
-  $name =~ s{^.*jsxdoc/}{};
+sub to_link {
+  my ($path) = @_;
+  $path =~ s{^.*jsxdoc/}{jsxdoc/};
+  return $path;
+}
+
+sub to_name {
+  my ($path) = @_;
+  my $name = to_link($path);
   $name =~ s{\.html$}{};
   return $name;
 }
@@ -24,11 +30,11 @@ find {
         return if -d $_;
         return unless /\.html$/;
 ?>
-<li><a href="/<?= $_  ?>"><?= to_show($_) ?></a></li>
+<li><a href="<?= to_link($_)  ?>"><?= to_name($_) ?></a></li>
 <?
     },
     no_chdir => 1,
-}, '../jsxdoc';
+}, 'jsx.github.com/jsxdoc';
 ?>
 </ul>
 </div>

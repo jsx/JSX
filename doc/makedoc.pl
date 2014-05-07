@@ -19,7 +19,7 @@ die "no files"
     if @ARGV == 0;
 
 for my $src_file (@ARGV) {
-    (my $dst_file = $src_file) =~ s|^src/(.*)\.mt$|../$1\.html|
+    (my $dst_file = $src_file) =~ s|^src/(.*)\.mt$|jsx.github.com/$1\.html|
         or die "file name should be \"src/**.mt\", but got: $src_file";
     print "# generate $dst_file from $src_file\n";
     my @notes;
