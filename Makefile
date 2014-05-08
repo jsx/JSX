@@ -31,9 +31,16 @@ meta:
 		tool/make-meta package.json src/meta.jsx ; \
 	fi
 
-doc: compiler
-	rm -rf doc
-	find lib -name '*.jsx' | xargs -n 1 -- bin/jsx --mode doc --output doc
+doc: compiler libdoc doc-core doc-index
+
+libdoc:
+	find lib -name '*.jsx' | xargs -n 1 -- bin/jsx --mode doc --output doc/jsx.github.com/jsxdoc
+
+doc-core:
+	(cd doc && ./makedoc.pl `find src -type f -name '*.mt'`)
+
+doc-index:
+	(cd doc/jsx.github.com && ../../submodules/oktavia/bin/oktavia-mkindex -i jsxdoc -i doc -i faq.html -i doc.html -i index.html -m html -u h2 -c 10 -t js -s english)
 
 bootstrap-compiler: compiler
 	$(MAKE) compiler-core BOOTSTRAP_COMPILER=bin/jsx COMPILER_TARGET=$(BOOTSTRAP_COMPILER) COMPILER_COMPILE_OPTS="--disable-type-check --optimize no-assert --executable node" # again
@@ -136,4 +143,4 @@ clean:
 	rm -rf bin/*
 	rm -rf jsx-*.tgz
 
-.PHONY: deps compiler compiler-core meta doc bootstrap-compiler test test-all test-debug test-optimized test-optimized-minified test-transformed test-transformed-optimized test-core test-misc test-npm _test-npm test-bench v8bench web server web.jsx show-todo publish publish-test update-assets update-codemirror update-bootstrap clean
+.PHONY: deps compiler compiler-core meta doc libdoc doc-core doc-index bootstrap-compiler test test-all test-debug test-optimized test-optimized-minified test-transformed test-transformed-optimized test-core test-misc test-npm _test-npm test-bench v8bench web server web.jsx show-todo publish publish-test update-assets update-codemirror update-bootstrap clean
