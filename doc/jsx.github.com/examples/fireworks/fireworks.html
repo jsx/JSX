@@ -1,0 +1,39 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width,user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="robots" content="noindex,nofollow" />
+
+    <title>Fireworks</title>
+    <style>
+      body {
+        background-color: #222;
+        overflow: hidden;
+      }
+
+      #night-sky {
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: #000;
+      }
+      #fps {
+        position: absolute;
+        top: 0;
+        left: 10px;
+        padding: 0;
+        margin: 0;
+        font-size: 20px;
+        color: #fff;
+      }
+    </style>
+    <script src="fireworks.jsx.js"></script>
+  </head>
+  <body>
+  <div>
+    <canvas id="night-sky" width="640" height="960"></canvas>
+    <p id="fps">not running</p>
+  </div>
+  </body>
+</html>
