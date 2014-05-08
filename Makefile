@@ -37,7 +37,7 @@ libdoc:
 	find lib -name '*.jsx' | xargs -n 1 -- bin/jsx --mode doc --output doc/jsx.github.com/jsxdoc
 
 doc-core:
-	(cd doc && ./makedoc.pl `find src -type f -name '*.mt'`)
+	(cd doc && PERL5LIB=../extlib/lib/perl5 ./makedoc.pl `find src -type f -name '*.mt'`)
 
 doc-index:
 	(cd doc/jsx.github.com && ../../submodules/oktavia/bin/oktavia-mkindex -i jsxdoc -i doc -i faq.html -i doc.html -i index.html -m html -u h2 -c 10 -t js -s english)

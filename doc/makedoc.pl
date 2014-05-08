@@ -6,7 +6,6 @@ no warnings qw(once);
 
 use File::Basename qw(dirname);
 use File::Path qw(mkpath);
-use File::Slurp qw(write_file);
 use Scalar::Util qw(looks_like_number);
 use Text::MicroTemplate qw(build_mt render_mt);
 use Text::MicroTemplate::File;
@@ -55,6 +54,9 @@ for my $src_file (@ARGV) {
     mkpath(dirname($dst_file));
 
     chmod 0666, $dst_file;
-    write_file($dst_file, { binmode => ':utf8' }, $output);
+    open my $dst_fh, '>:utf8', $dst_file
+        or die "failed to open file:$dst_file:$!";
+    print $dst_fh $output;
+    close $dst_fh;
     chmod 0444, $dst_file;
 }
