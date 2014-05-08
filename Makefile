@@ -53,6 +53,9 @@ doc-index:
 doc-index-clean:
 	rm -f doc/jsx.github.com/search/searchindex.js
 
+doc-publish: doc
+	(cd doc/jsx.github.com && ../../tool/git-pushdir -m "`git log --format='doc at commit %h' | head -1`" git@github.com:jsx/jsx.github.com.git)
+
 bootstrap-compiler: compiler
 	$(MAKE) compiler-core BOOTSTRAP_COMPILER=bin/jsx COMPILER_TARGET=$(BOOTSTRAP_COMPILER) COMPILER_COMPILE_OPTS="--disable-type-check --optimize no-assert --executable node" # again
 
@@ -122,6 +125,7 @@ show-todo:
 
 publish: publish-test
 	npm publish
+	$(MAKE) doc-publish
 
 publish-test:
 	time $(MAKE) test-all test-npm COMPILER_COMPILE_OPTS="--release $(COMPILER_COMPILE_OPTS)"
@@ -154,4 +158,4 @@ clean: doc-clean
 	rm -rf bin/*
 	rm -rf jsx-*.tgz
 
-.PHONY: deps compiler compiler-core meta doc doc-clean libdoc libdoc-clean doc-core doc-core-clean doc-index doc-index-clean bootstrap-compiler test test-all test-debug test-optimized test-optimized-minified test-transformed test-transformed-optimized test-core test-misc test-npm _test-npm test-bench v8bench web server web.jsx show-todo publish publish-test update-assets update-codemirror update-bootstrap clean
+.PHONY: deps compiler compiler-core meta doc doc-clean libdoc libdoc-clean doc-core doc-core-clean doc-index doc-index-clean doc-publish bootstrap-compiler test test-all test-debug test-optimized test-optimized-minified test-transformed test-transformed-optimized test-core test-misc test-npm _test-npm test-bench v8bench web server web.jsx show-todo publish publish-test update-assets update-codemirror update-bootstrap clean
