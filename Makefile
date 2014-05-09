@@ -54,7 +54,7 @@ doc-index-clean:
 	rm -f doc/jsx.github.com/search/searchindex.js
 
 doc-publish: doc
-	(cd doc/jsx.github.com && ../../tool/git-pushdir -m "`git log --format='doc at commit %h' | head -1`" git@github.com:jsx/jsx.github.com.git)
+	(cd doc/jsx.github.com && ../../submodules/git-pushdir/git-pushdir -m "`git log --format='doc at commit %h' | head -1`" git@github.com:jsx/jsx.github.com.git)
 
 bootstrap-compiler: compiler
 	$(MAKE) compiler-core BOOTSTRAP_COMPILER=bin/jsx COMPILER_TARGET=$(BOOTSTRAP_COMPILER) COMPILER_COMPILE_OPTS="--disable-type-check --optimize no-assert --executable node" # again
