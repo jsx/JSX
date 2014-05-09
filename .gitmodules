@@ -10,3 +10,6 @@
 [submodule "submodules/git-pushdir"]
 	path = submodules/git-pushdir
 	url = git://github.com/kazuho/git-pushdir.git
+[submodule "submodules/nodejs.jsx"]
+	path = submodules/nodejs.jsx
+	url = git://github.com/jsx/nodejs.jsx.git
