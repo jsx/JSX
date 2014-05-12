@@ -7,7 +7,7 @@ COMPILER_COMPILE_OPTS:=--executable node --warn none
 
 PORT:=2012
 
-all: deps compiler doc web
+all: deps compiler doc profiler web
 
 ## compiler stuff
 
@@ -22,6 +22,9 @@ compiler: meta src/doc.jsx
 
 compiler-core:
 	node $(BOOTSTRAP_COMPILER) $(COMPILER_COMPILE_OPTS) --output $(COMPILER_TARGET) src/jsx-node-front.jsx
+
+profiler:
+	bin/jsx --executable node --add-search-path submodules/nodejs.jsx/lib --output bin/jsx-profile-server src/profile-server.jsx
 
 src/doc.jsx: src/_doc.jsx
 	submodules/picotemplate/picotemplate.pl $<
