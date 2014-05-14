@@ -49,8 +49,8 @@ EOT
 </p>
 
 <?= $context->{prettify}->('bash', <<'EOT')
-$ make server
-# or `make server PORT=8080` will listen the port 8080
+$ jsx-profile-server
+# or `jsx-profile-server 8080` will listen the port 8080
 EOT
 ?>
 
