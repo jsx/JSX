@@ -1425,6 +1425,10 @@ class _ForInStatementTransformer extends _LabellableStatementTransformer {
 		return this._statement;
 	}
 
+	override function replaceControlStructuresWithGotos () : void {
+		this._transformer._emit(this._statement);
+	}
+
 	override function _replaceControlStructuresWithGotos () : void {
 		throw new Error("logic flaw");
 	}
@@ -2118,8 +2122,6 @@ class CPSTransformCommand extends FunctionTransformCommand {
 		if (funcDef.getNameToken() != null && funcDef.name() == "constructor")
 			return false;
 		return funcDef.forEachStatement(function onStatement (statement) {
-			if (statement instanceof ForInStatement)
-				return false;
 			return statement.forEachExpression(function onExpr (expr) {
 				if (! this._transformYield && expr instanceof YieldExpression)
 					return false;
@@ -2129,11 +2131,17 @@ class CPSTransformCommand extends FunctionTransformCommand {
 	}
 
 	override function transformFunction (funcDef : MemberFunctionDefinition) : void {
+		var cmd : StatementTransformCommand;
+
 		if (! this._functionIsTransformable(funcDef))
 			return;
 
 		// depends on normalize-try transform command
-		var cmd = new NormalizeTryStatementTransformCommand(this._compiler);
+		cmd = new NormalizeTryStatementTransformCommand(this._compiler);
+		cmd.setup([]);
+		cmd.transformFunction(funcDef);
+
+		cmd = new ForInStatementTransformCommand(this._compiler);
 		cmd.setup([]);
 		cmd.transformFunction(funcDef);
 
