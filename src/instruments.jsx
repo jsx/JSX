@@ -30,87 +30,7 @@ import "./transformer.jsx";
 import "./type.jsx";
 import "./util.jsx";
 import "./emitter.jsx";
-
-class _Util {
-
-	static function _getFunctionNestDepth (funcDef : MemberFunctionDefinition) : number {
-		var depth = 0;
-		var parent : MemberFunctionDefinition;
-		while ((parent = funcDef.getParent()) != null) {
-			depth++;
-			funcDef = parent;
-		}
-		return depth;
-	}
-
-	static function _getGeneratorNestDepth (funcDef : MemberFunctionDefinition) : number {
-		var depth = 0;
-		var parent : MemberFunctionDefinition;
-		while ((parent = funcDef.getParent()) != null) {
-			if (parent.isGenerator())
-				depth++;
-			funcDef = parent;
-		}
-		return depth;
-	}
-
-	static var _numUniqVar = 0;
-
-	static function _createFreshArgumentDeclaration (type : Type) : ArgumentDeclaration {
-		var id = _Util._numUniqVar++;
-		return new ArgumentDeclaration(new Token("$a" + id, true), type);
-	}
-
-	static function _createFreshLocalVariable (type : Type) : LocalVariable {
-		var id = _Util._numUniqVar++;
-		return new LocalVariable(new Token("$a" + id, true), type, false);
-	}
-
-	static function _createAnonymousFunction (parent : MemberFunctionDefinition, token : Token /* null for auto-gen */, args : ArgumentDeclaration[], returnType : Type) : MemberFunctionDefinition {
-		return _Util._createNamedFunction(parent, token, null, args, returnType);
-	}
-
-	static function _createNamedFunction (parent : MemberFunctionDefinition, token : Token /* null for auto-gen */, nameToken : Token, args : ArgumentDeclaration[], returnType : Type) : MemberFunctionDefinition {
-		if (token == null) {
-			token = new Token("function", false);
-		}
-		var funcDef = new MemberFunctionDefinition(
-			token,
-			nameToken,
-			ClassDefinition.IS_STATIC,
-			returnType,
-			args,
-			[], // locals
-			[], // statements
-			[], // closures
-			null,
-			null
-		);
-		Util.linkFunction(funcDef, parent);
-		return funcDef;
-	}
-
-	static function _createIdentityFunction (parent : MemberFunctionDefinition, type : Type) : FunctionExpression {
-		assert ! type.equals(Type.voidType);
-
-		var arg = _Util._createFreshArgumentDeclaration(type);
-		var identity = new MemberFunctionDefinition(
-			new Token("function", false),
-			null,	// name
-			ClassDefinition.IS_STATIC,
-			type,
-			[ arg ],
-			[],	// locals
-			[ new ReturnStatement(new Token("return", false), new LocalExpression(new Token(arg.getName().getValue(), true), arg)) ] : Statement[],
-			[],	// closures
-			null,	// lastToken
-			null
-		);
-		Util.linkFunction(identity, parent);
-		return new FunctionExpression(identity.getToken(), identity);
-	}
-
-}
+import _Util from "./transformer.jsx";
 
 abstract class _ExpressionTransformer {
 
@@ -1505,6 +1425,10 @@ class _ForInStatementTransformer extends _LabellableStatementTransformer {
 		return this._statement;
 	}
 
+	override function replaceControlStructuresWithGotos () : void {
+		this._transformer._emit(this._statement);
+	}
+
 	override function _replaceControlStructuresWithGotos () : void {
 		throw new Error("logic flaw");
 	}
@@ -2198,8 +2122,6 @@ class CPSTransformCommand extends FunctionTransformCommand {
 		if (funcDef.getNameToken() != null && funcDef.name() == "constructor")
 			return false;
 		return funcDef.forEachStatement(function onStatement (statement) {
-			if (statement instanceof ForInStatement)
-				return false;
 			return statement.forEachExpression(function onExpr (expr) {
 				if (! this._transformYield && expr instanceof YieldExpression)
 					return false;
@@ -2209,11 +2131,17 @@ class CPSTransformCommand extends FunctionTransformCommand {
 	}
 
 	override function transformFunction (funcDef : MemberFunctionDefinition) : void {
+		var cmd : StatementTransformCommand;
+
 		if (! this._functionIsTransformable(funcDef))
 			return;
 
 		// depends on normalize-try transform command
-		var cmd = new NormalizeTryStatementTransformCommand(this._compiler);
+		cmd = new NormalizeTryStatementTransformCommand(this._compiler);
+		cmd.setup([]);
+		cmd.transformFunction(funcDef);
+
+		cmd = new ForInStatementTransformCommand(this._compiler);
 		cmd.setup([]);
 		cmd.transformFunction(funcDef);
 
@@ -2920,6 +2848,124 @@ class CPSTransformCommand extends FunctionTransformCommand {
 
 }
 
+class ANFTransformCommand extends FunctionTransformCommand {
+
+	static const IDENTIFIER = "anf";
+
+	var _vm : MemberFunctionDefinition;
+
+	function constructor (compiler : Compiler) {
+		super(compiler, __CLASS__.IDENTIFIER);
+	}
+
+	function _performCPSTransformation (funcDef : MemberFunctionDefinition) : void {
+		var cpsTransformer = new CPSTransformCommand(this._compiler);
+		cpsTransformer.setup([]);
+		cpsTransformer.setTransformYield(true);
+		cpsTransformer.setTransformExprs(true);
+		cpsTransformer.transformFunction(funcDef);
+	}
+
+	override function transformFunction (funcDef : MemberFunctionDefinition) : void {
+
+		this._performCPSTransformation(funcDef);
+
+		// unfold expressions
+		this._vm  = CPSTransformCommand._extractVM(funcDef);
+		try {
+			this._unfoldExpressions(CPSTransformCommand._extractVMDispatchBody(funcDef));
+		} finally {
+			this._vm = null;
+		}
+
+	}
+
+	function _unfoldExpressions (statements : Statement[]) : void {
+		for (var i = 0; i < statements.length; ++i) {
+			var assignExprs = new AssignmentExpression[];
+			Util.forEachStatement(function onStatement(statement) {
+				return statement.forEachExpression(function onExpr(expr, replaceCb) {
+					if (! (expr instanceof CallExpression))
+						return true;
+
+					if (! ((expr as CallExpression).getExpr() instanceof FunctionExpression))
+						return true;
+
+					replaceCb(this._unfoldExpr(expr, assignExprs));
+
+					return true;
+				}) && statement.forEachStatement(onStatement);
+			}, [ statements[i] ]);
+
+			for (var j = assignExprs.length - 1; j >= 0; --j) {
+				statements.splice(i, 0, new ExpressionStatement(assignExprs[j]));
+			}
+			i += assignExprs.length;
+		}
+	}
+
+	function _unfoldExpr (expr : Expression, assignExprs : AssignmentExpression[]) : Expression {
+		if (expr instanceof CallExpression) {
+			/** Expected AST structure:
+			 *
+			 * (function ($aXX) { ... })(primitiveExpr)
+			 *
+			 */
+			var callExpr = expr as CallExpression;
+			assert callExpr.getArguments().length == 1;
+			assert callExpr.getExpr() instanceof FunctionExpression;
+
+			var funcExpr = callExpr.getExpr() as FunctionExpression;
+			assert funcExpr.getFuncDef().getArguments().length == 1;
+			var argVar = funcExpr.getFuncDef().getArguments()[0];
+			var localVar = new LocalVariable(argVar.getName(), argVar.getType(), false);
+			this._vm.getLocals().push(localVar);
+
+			/**
+			 * (function ($aXX) { ... })(primitiveExpr)
+			 *
+			 * -> $aXX = primitiveExpr
+			 *    ...
+			 */
+			assignExprs.push(
+				new AssignmentExpression(
+					new Token("=", false),
+					new LocalExpression(localVar.getName(), localVar),
+					callExpr.getArguments()[0]));
+
+			funcExpr.getFuncDef().forEachStatement(function onStmt (stmt) {
+				return stmt.forEachExpression(function onExpr (expr) {
+					if (expr instanceof LocalExpression) {
+						var local = (expr as LocalExpression).getLocal();
+						if (local == argVar) {
+							(expr as LocalExpression).setLocal(localVar);
+						}
+					}
+					if (expr instanceof FunctionExpression) {
+						(expr as FunctionExpression).getFuncDef().forEachStatement(onStmt);
+					}
+					return expr.forEachExpression(onExpr);
+				}) && stmt.forEachStatement(onStmt);
+			});
+
+			assert funcExpr.getFuncDef().getStatements().length == 1;
+			assert funcExpr.getFuncDef().getStatements()[0] instanceof ReturnStatement;
+			var retStmt = funcExpr.getFuncDef().getStatements()[0] as ReturnStatement;
+
+			assert retStmt.getExpr() != null;
+			return this._unfoldExpr(retStmt.getExpr(), assignExprs);
+		}
+		else if (expr instanceof LocalExpression) {
+			assert ! ((expr as LocalExpression).getLocal() instanceof ArgumentDeclaration);
+			return expr;
+		}
+		else {
+			throw new Error('logic flaw!');
+		}
+	}
+
+}
+
 class GeneratorTransformCommand extends FunctionTransformCommand {
 
 	static const IDENTIFIER = "generator";
@@ -2954,12 +3000,10 @@ class GeneratorTransformCommand extends FunctionTransformCommand {
 		funcDef.setFlags(funcDef.flags() & ~ClassDefinition.IS_GENERATOR);
 	}
 
-	function _performCPSTransformation (funcDef : MemberFunctionDefinition) : void {
-		var cpsTransformer = new CPSTransformCommand(this._compiler);
-		cpsTransformer.setup([]);
-		cpsTransformer.setTransformYield(true);
-		cpsTransformer.setTransformExprs(true);
-		cpsTransformer.transformFunction(funcDef);
+	function _performANFTransformation (funcDef : MemberFunctionDefinition) : void {
+		var anfTransformer = new ANFTransformCommand(this._compiler);
+		anfTransformer.setup([]);
+		anfTransformer.transformFunction(funcDef);
 	}
 
 	function _transformGeneratorCore (funcDef : MemberFunctionDefinition) : void {
@@ -2980,93 +3024,9 @@ class GeneratorTransformCommand extends FunctionTransformCommand {
 		var jsxGenLocal = new LocalVariable(new Token("$generator", false), jsxGenType, false);
 		funcDef.getLocals().push(jsxGenLocal);
 
-		this._performCPSTransformation(funcDef);
+		this._performANFTransformation(funcDef);
 
-		var cpsFuncDef = CPSTransformCommand._extractVM(funcDef);
 		var statements = CPSTransformCommand._extractVMDispatchBody(funcDef);
-
-		// unfold CPS expressions
-		for (var i = 0; i < statements.length; ++i) {
-			var staticAssigns = new AssignmentExpression[];
-			Util.forEachStatement(function onStatement(statement) {
-				return statement.forEachExpression(function onExpr(expr, replaceCb) {
-					if (! (expr instanceof CallExpression))
-						return true;
-
-					if (! ((expr as CallExpression).getExpr() instanceof FunctionExpression))
-						return true;
-
-					function unfoldExpr (expr : Expression) : Expression {
-						if (expr instanceof CallExpression) {
-							/** Expected AST structure:
-							 *
-							 * (function ($aXX) { ... })(primitiveExpr)
-							 *
-							 */
-							var callExpr = expr as CallExpression;
-							assert callExpr.getArguments().length == 1;
-							assert callExpr.getExpr() instanceof FunctionExpression;
-
-							var funcExpr = callExpr.getExpr() as FunctionExpression;
-							assert funcExpr.getFuncDef().getArguments().length == 1;
-							var argVar = funcExpr.getFuncDef().getArguments()[0];
-							var localVar = new LocalVariable(argVar.getName(), argVar.getType(), false);
-							cpsFuncDef.getLocals().push(localVar);
-
-							/**
-							 * (function ($aXX) { ... })(primitiveExpr)
-							 *
-							 * -> $aXX = primitiveExpr
-							 *    ...
-							 */
-							staticAssigns.push(
-								new AssignmentExpression(
-									new Token("=", false),
-									new LocalExpression(localVar.getName(), localVar),
-									callExpr.getArguments()[0]));
-
-							funcExpr.getFuncDef().forEachStatement(function onStmt (stmt) {
-								return stmt.forEachExpression(function onExpr (expr) {
-									if (expr instanceof LocalExpression) {
-										var local = (expr as LocalExpression).getLocal();
-										if (local == argVar) {
-											(expr as LocalExpression).setLocal(localVar);
-										}
-									}
-									if (expr instanceof FunctionExpression) {
-										(expr as FunctionExpression).getFuncDef().forEachStatement(onStmt);
-									}
-									return expr.forEachExpression(onExpr);
-								}) && stmt.forEachStatement(onStmt);
-							});
-
-							assert funcExpr.getFuncDef().getStatements().length == 1;
-							assert funcExpr.getFuncDef().getStatements()[0] instanceof ReturnStatement;
-							var retStmt = funcExpr.getFuncDef().getStatements()[0] as ReturnStatement;
-
-							assert retStmt.getExpr() != null;
-							return unfoldExpr(retStmt.getExpr());
-						}
-						else if (expr instanceof LocalExpression) {
-							assert ! ((expr as LocalExpression).getLocal() instanceof ArgumentDeclaration);
-							return expr;
-						}
-						else {
-							throw new Error('logic flaw!');
-						}
-					}
-
-					replaceCb(unfoldExpr(expr));
-
-					return true;
-				}) && statement.forEachStatement(onStatement);
-			}, [ statements[i] ]);
-
-			for (var j = staticAssigns.length - 1; j >= 0; --j) {
-				statements.splice(i, 0, new ExpressionStatement(staticAssigns[j]));
-			}
-			i += staticAssigns.length;
-		}
 
 		var caseCnt = 0;
 		statements.forEach(function (statement) {
@@ -3089,47 +3049,49 @@ class GeneratorTransformCommand extends FunctionTransformCommand {
 			*/
 			var exprStmt;
 			var assignExpr;
-			if (statements[i] instanceof ExpressionStatement && ((exprStmt = (statements[i] as ExpressionStatement)).getExpr() instanceof AssignmentExpression) && (assignExpr = (exprStmt.getExpr() as AssignmentExpression)).getSecondExpr() instanceof YieldExpression) {
-				var yieldExpr = assignExpr.getSecondExpr() as YieldExpression;
-				var caseLabel = caseCnt++;
-				statements.splice(i, 1,
-					new ExpressionStatement(
-						new AssignmentExpression(
-							new Token("=", false),
-							new PropertyExpression(
-								new Token(".", false),
-								new LocalExpression(new Token("$generator", false), jsxGenLocal),
-								new Token("__value", false),
-								[],
-								genType.toNullableType()),
-							yieldExpr.getExpr())),
-					new ExpressionStatement(
-						new AssignmentExpression(
-							new Token("=", false),
-							new PropertyExpression(
-								new Token(".", false),
-								new LocalExpression(new Token("$generator", false), jsxGenLocal),
-								new Token("__next", true),
-								[],
-								Type.integerType.toNullableType()),
-							new IntegerLiteralExpression(new Token("" + caseLabel, false)))),
-					new ReturnStatement(
-						new Token("return", false),
-						null),
-					new CaseStatement(
-						new Token("case", false),
-						new IntegerLiteralExpression(new Token("" + caseLabel, false))),
-					new ExpressionStatement(
-						new AssignmentExpression(
-							new Token("=", false),
-							assignExpr.getFirstExpr(),
-							new PropertyExpression(
-								new Token(".", false),
-								new LocalExpression(new Token("$generator", false), jsxGenLocal),
-								new Token("__seed", true),
-								[],
-								seedType.toNullableType()))));
-				i += 4;
+			if (statements[i] instanceof ExpressionStatement
+			    	&& ((exprStmt = (statements[i] as ExpressionStatement)).getExpr() instanceof AssignmentExpression)
+				&& (assignExpr = (exprStmt.getExpr() as AssignmentExpression)).getSecondExpr() instanceof YieldExpression) {
+					var yieldExpr = assignExpr.getSecondExpr() as YieldExpression;
+					var caseLabel = caseCnt++;
+					statements.splice(i, 1,
+						new ExpressionStatement(
+							new AssignmentExpression(
+								new Token("=", false),
+								new PropertyExpression(
+									new Token(".", false),
+									new LocalExpression(new Token("$generator", false), jsxGenLocal),
+									new Token("__value", false),
+									[],
+									genType.toNullableType()),
+								yieldExpr.getExpr())),
+						new ExpressionStatement(
+							new AssignmentExpression(
+								new Token("=", false),
+								new PropertyExpression(
+									new Token(".", false),
+									new LocalExpression(new Token("$generator", false), jsxGenLocal),
+									new Token("__next", true),
+									[],
+									Type.integerType.toNullableType()),
+								new IntegerLiteralExpression(new Token("" + caseLabel, false)))),
+						new ReturnStatement(
+							new Token("return", false),
+							null),
+						new CaseStatement(
+							new Token("case", false),
+							new IntegerLiteralExpression(new Token("" + caseLabel, false))),
+						new ExpressionStatement(
+							new AssignmentExpression(
+								new Token("=", false),
+								assignExpr.getFirstExpr(),
+								new PropertyExpression(
+									new Token(".", false),
+									new LocalExpression(new Token("$generator", false), jsxGenLocal),
+									new Token("__seed", true),
+									[],
+									seedType.toNullableType()))));
+					i += 4;
 			}
 			// insert return code
 			/*
