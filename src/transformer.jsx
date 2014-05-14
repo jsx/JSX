@@ -29,6 +29,66 @@ import "./statement.jsx";
 import "./type.jsx";
 import "./util.jsx";
 
+class _Util {
+
+	static var _numUniqVar = 0;
+
+	static function _createFreshArgumentDeclaration (type : Type) : ArgumentDeclaration {
+		var id = _Util._numUniqVar++;
+		return new ArgumentDeclaration(new Token("$a" + id, true), type);
+	}
+
+	static function _createFreshLocalVariable (type : Type) : LocalVariable {
+		var id = _Util._numUniqVar++;
+		return new LocalVariable(new Token("$a" + id, true), type, false);
+	}
+
+	static function _createAnonymousFunction (parent : MemberFunctionDefinition, token : Token /* null for auto-gen */, args : ArgumentDeclaration[], returnType : Type) : MemberFunctionDefinition {
+		return _Util._createNamedFunction(parent, token, null, args, returnType);
+	}
+
+	static function _createNamedFunction (parent : MemberFunctionDefinition, token : Token /* null for auto-gen */, nameToken : Token, args : ArgumentDeclaration[], returnType : Type) : MemberFunctionDefinition {
+		if (token == null) {
+			token = new Token("function", false);
+		}
+		var funcDef = new MemberFunctionDefinition(
+			token,
+			nameToken,
+			ClassDefinition.IS_STATIC,
+			returnType,
+			args,
+			[], // locals
+			[], // statements
+			[], // closures
+			null,
+			null
+		);
+		Util.linkFunction(funcDef, parent);
+		return funcDef;
+	}
+
+	static function _createIdentityFunction (parent : MemberFunctionDefinition, type : Type) : FunctionExpression {
+		assert ! type.equals(Type.voidType);
+
+		var arg = _Util._createFreshArgumentDeclaration(type);
+		var identity = new MemberFunctionDefinition(
+			new Token("function", false),
+			null,	// name
+			ClassDefinition.IS_STATIC,
+			type,
+			[ arg ],
+			[],	// locals
+			[ new ReturnStatement(new Token("return", false), new LocalExpression(new Token(arg.getName().getValue(), true), arg)) ] : Statement[],
+			[],	// closures
+			null,	// lastToken
+			null
+		);
+		Util.linkFunction(identity, parent);
+		return new FunctionExpression(identity.getToken(), identity);
+	}
+
+}
+
 abstract class TransformCommand {
 
 	var _compiler : Compiler;
