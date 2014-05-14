@@ -7,8 +7,8 @@ end
 class _Main {
 	static function main (args : string[]) : void {
 
-		function * foo (ary : Map.<string>) : Generator.<void,string> {
-			for (var i in ary) {
+		function * foo (map : Map.<string>) : void yield string {
+			for (var i in map) {
 				yield i;
 			}
 		}
