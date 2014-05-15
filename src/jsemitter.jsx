@@ -289,6 +289,15 @@ class _Util {
 		return stash ? (stash as _UnclassifyOptimizationCommand.Stash).inliner : null;
 	}
 
+	static function getElementTypeOfCompoundType(type : Type) : Type {
+		if (type.equals(Type.variantType)) {
+			return Type.variantType;
+		}
+		var classDef = type.getClassDef();
+		assert ! classDef.className().match(/^(Array|Map)\.$/);
+		return (classDef as InstantiatedClassDefinition).getTypeArguments()[0];
+	}
+
 }
 
 class _TempVarLister {
@@ -1683,10 +1692,11 @@ class _ArrayLiteralExpressionEmitter extends _ExpressionEmitter {
 	override function emit (outerOpPrecedence : number) : void {
 		this._emitter._emit("[ ", null);
 		var exprs = this._expr.getExprs();
+		var exprType = _Util.getElementTypeOfCompoundType(this._expr.getType());
 		for (var i = 0; i < exprs.length; ++i) {
 			if (i != 0)
 				this._emitter._emit(", ", null);
-			this._emitter._getExpressionEmitterFor(exprs[i]).emit(0);
+			this._emitter._emitRHSOfAssignment(exprs[i], exprType);
 		}
 		this._emitter._emit(" ]", null);
 	}
@@ -1705,13 +1715,14 @@ class _MapLiteralExpressionEmitter extends _ExpressionEmitter {
 	override function emit (outerOpPrecedence : number) : void {
 		this._emitter._emit("({ ", null);
 		var elements = this._expr.getElements();
+		var elementType = _Util.getElementTypeOfCompoundType(this._expr.getType());
 		for (var i = 0; i < elements.length; ++i) {
 			var element = elements[i];
 			if (i != 0)
 				this._emitter._emit(", ", null);
 			this._emitter._emit(element.getKey().getValue(), element.getKey());
 			this._emitter._emit(": ", null);
-			this._emitter._getExpressionEmitterFor(element.getExpr()).emit(0);
+			this._emitter._emitRHSOfAssignment(element.getExpr(), elementType);
 		}
 		this._emitter._emit(" })", null);
 	}
@@ -2047,7 +2058,7 @@ class _PreIncrementExpressionEmitter extends _UnaryExpressionEmitter {
 		var opToken = this._expr.getToken();
 		if (this._expr.getType().resolveIfNullable().equals(Type.integerType)) {
 			if (this._expr.getExpr().hasSideEffects()) {
-				_Util.emitFusedIntOpWithSideEffects(this._emitter, opToken.getValue() == "++" ? "$__jsx_ipadd" : "$__jsx_ipdec", this._expr.getExpr(), function (outerPred) {
+				_Util.emitFusedIntOpWithSideEffects(this._emitter, opToken.getValue() == "++" ? "$__jsx_ipadd" : "$__jsx_ipsub", this._expr.getExpr(), function (outerPred) {
 					this._emitter._emit("1", opToken);
 				}, 0);
 			} else {

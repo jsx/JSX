@@ -1,5 +1,10 @@
 Revision history for the JSX software development kit
 
+0.9.87 2014-04-14 14:52:00+0900
+    [BUG FIXES]
+    - fix compiler crash when prefixed decrement of int is against a property with side effect (#320)
+    - round literals within an array or map literal of int to int
+
 0.9.86 2014-04-12 21:05:00+0900
     [BUG FIXES]
     - bump the version number once more hoping that it would resolve the "shasum check" error of npm
