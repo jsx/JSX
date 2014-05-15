@@ -2201,7 +2201,7 @@ class CPSTransformCommand extends FunctionTransformCommand {
 					new ArrayLiteralExpression(
 						new Token("[", false),
 						[],
-						Type.integerType))),
+						this._instantiateArrayType(Type.integerType)))),
 			new FunctionStatement(
 				new Token("function", false), vm),
 			new ExpressionStatement(
