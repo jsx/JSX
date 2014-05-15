@@ -1,5 +1,12 @@
 Revision history for the JSX software development kit
 
+0.9.88 2014-05-15 11:50:00+0900
+    [FEATURES]
+    - default arguments can now refer to preceding arguments (#326)
+    - profile server is now installed as "bin/jsx-profile-server"
+    [BUG FIXES]
+    - fix bugs in the optimizer (#321, #325)
+
 0.9.87 2014-04-14 14:52:00+0900
     [BUG FIXES]
     - fix compiler crash when prefixed decrement of int is against a property with side effect (#320)
