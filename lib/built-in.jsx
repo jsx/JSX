@@ -1030,11 +1030,11 @@ native final class Promise.<T> {
 	static function resolve (result : T) : Promise.<T>;
 	static function reject (reason : variant) : Promise.<T>;
 
-	function constructor (handler : function(resolve :function(result:T):void, reject :function(reason:variant):void):void);
+	function constructor (handler : function(resolve:function(result:T):void, reject:function(reason:variant):void):void);
 
-	function then.<U> (onFulfilled : function(result:T):U) : Promise.<U>;
-	function then.<U> (onFulfilled : function(result:T):U, onRejected : function(reason:variant):void) : Promise.<U>;
-	function catch (onRejected : function(reason:variant):void) : void;
+	function then.<U> (onFulfilled : function(result:T):Promise.<U>) : Promise.<U>;
+	function then.<U> (onFulfilled : function(result:T):Promise.<U>, onRejected : function(reason:variant):Promise.<U>) : Promise.<U>;
+	function catch.<U> (onRejected : function(reason:variant):Promise.<U>) : Promise.<U>;
 
 }
 
