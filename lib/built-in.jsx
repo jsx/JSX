@@ -1024,7 +1024,7 @@ native class __jsx_generator_object.<SeedT,GenT> extends Generator.<SeedT,GenT> 
 /** @see http://wiki.ecmascript.org/doku.php?id=harmony:specification_drafts */
 native final class Promise.<T> {
 
-	static function all (promises : Array.<Promise.<T>>) : Promise.<Array.<T>>;
+	static function all (promises : Array.<Promise.<T>>) : Promise.<variant>;
 	static function race (promises : Array.<Promise.<T>>) : Promise.<T>;
 
 	static function resolve (result : T) : Promise.<T>;
