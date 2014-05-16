@@ -152,15 +152,25 @@ class _Util {
 				}
 				else if (classDef.getNativeSource() != null) {
 					// with in-line natie definition
-					setOutputName(classDef, newUniqueName(classDef.classFullName()));
+					var stash = classDef.getStash(_Util.OUTPUTNAME_IDENTIFIER) as _Util.OutputNameStash;
+					if (stash == null) {
+						setOutputName(classDef, newUniqueName(classDef.classFullName()));
+					}
 				}
 				else {
-					// with in-line natie definition
 					if (classDef instanceof InstantiatedClassDefinition) {
 						var instantiated = classDef as InstantiatedClassDefinition;
-						var className = instantiated.getTemplateClassName()
-							+ newUniqueName(".<" + instantiated.getTypeArguments().map.<string>( (type) -> type.toString() ).join(",") + ">");
-						setOutputName(classDef, escapeClassName(className));
+						if (instantiated.getTemplateClass().getNativeSource() != null) {
+							// with in-line natie definition
+							var stash = instantiated.getTemplateClass().getStash(_Util.OUTPUTNAME_IDENTIFIER) as _Util.OutputNameStash;
+							if (stash == null) {
+								_Util.setOutputClassNames([instantiated.getTemplateClass()]);
+							}
+							setOutputName(classDef, _Util.getOutputClassName(instantiated.getTemplateClass()));
+						} else {
+							var className = instantiated.getTemplateClassName();
+							setOutputName(classDef, escapeClassName(className));
+						}
 					}
 					else {
 						setOutputName(classDef, escapeClassName(classDef.classFullName()));
