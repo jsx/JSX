@@ -2749,22 +2749,27 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand implements _Struct
 		});
 		map["this"] = 0;
 
+		function updateCountOfLocal(local : LocalVariable, delta : number) : void {
+			if (formalArgs.has(local)) {
+				map[local.getName().getValue()] += delta;
+			}
+		}
+
 		funcDef.forEachStatement(function onStatement(statement : Statement) : boolean {
 			statement.forEachStatement(onStatement);
 			statement.forEachExpression(function onExpr(expr : Expression) : boolean {
 				expr.forEachExpression(onExpr);
 				if (expr instanceof LocalExpression) {
-					var local = (expr as LocalExpression).getLocal();
-					if (formalArgs.has(local)) {
-						map[local.getName().getValue()]++;
-					}
+					updateCountOfLocal((expr as LocalExpression).getLocal(), 1);
 				} else if (expr instanceof AssignmentExpression) {
 					var assignExpr = expr as AssignmentExpression;
 					if (assignExpr.getFirstExpr() instanceof LocalExpression) {
-						var local = (assignExpr.getFirstExpr() as LocalExpression).getLocal();
-						if (formalArgs.has(local)) {
-							map[local.getName().getValue()] = -Infinity;
-						}
+						updateCountOfLocal((assignExpr.getFirstExpr() as LocalExpression).getLocal(), -Infinity);
+					}
+				} else if (expr instanceof IncrementExpression) {
+					var incrExpr = expr as IncrementExpression;
+					if (incrExpr.getExpr() instanceof LocalExpression) {
+						updateCountOfLocal((incrExpr.getExpr() as LocalExpression).getLocal(), -Infinity);
 					}
 				} else if (expr instanceof ThisExpression) {
 					map["this"]++;
