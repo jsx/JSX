@@ -2761,8 +2761,9 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand implements _Struct
 				expr.forEachExpression(onExpr);
 				if (expr instanceof LocalExpression) {
 					updateCountOfLocal((expr as LocalExpression).getLocal(), 1);
-				} else if (expr instanceof AssignmentExpression) {
-					var assignExpr = expr as AssignmentExpression;
+				} else if (expr instanceof AssignmentExpression
+					|| expr instanceof FusedAssignmentExpression) {
+					var assignExpr = expr as BinaryExpression;
 					if (assignExpr.getFirstExpr() instanceof LocalExpression) {
 						updateCountOfLocal((assignExpr.getFirstExpr() as LocalExpression).getLocal(), -Infinity);
 					}
