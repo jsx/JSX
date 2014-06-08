@@ -28,3 +28,7 @@ npm-debug.log
 package/
 jsx-*.tgz
 node_modules/
+
+# docs
+try/
+doc/
