@@ -23,7 +23,7 @@ Type the following commands and see what happens:
     # compile it and output the generated code to stdout
     jsx example/hello.jsx
 
-    # compile it with fully optimizations
+    # compile it with full optimizations
     jsx --release --output hello.jsx.js example/hello.jsx
 
     # compile it for node and execute it
