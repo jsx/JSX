@@ -46,7 +46,7 @@ class JSXCommand {
 			"Options:\n" +
 			"  --add-search-path path     adds a path to library search paths\n" +
 			"  --executable RUNENV        adds launcher to call _Main.main(:string[]):void\n" +
-			"                             supported RUNENV is node, commonjs and web.\n" +
+			"                             RUNENV is raw, node, commonjs, and web.\n" +
 			"  --run                      runs _Main.main(:string[]):void after compiling\n" +
 			"  --test                     runs _Test#test*():void after compiling\n" +
 			"  --define name=var          defines compile-time constant as a property of JSX.ENV\n" +
@@ -283,10 +283,9 @@ class JSXCommand {
 					return 1;
 				}
 				switch (optarg) {
+				case "raw": // implies JavaScriptEmitter
 				case "web": // implies JavaScriptEmitter
-					break;
 				case "commonjs": // implies JavaScriptEmitter
-					break;
 				case "node": // implies JavaScriptEmitter
 					break;
 				default:
