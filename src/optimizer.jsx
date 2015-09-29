@@ -205,6 +205,7 @@ class Optimizer {
 			"no-debug",
 			"fold-const",
 			"tail-rec",
+			"lambda-lifting",
 			"return-if",
 			"inline",
 			"dce",
@@ -251,6 +252,9 @@ class Optimizer {
 				this._commands.push(new _StripOptimizeCommand());
 			} else if (cmd == "staticize") {
 				this._commands.push(new _StaticizeOptimizeCommand());
+				calleesAreDetermined = false;
+			} else if (cmd == "lambda-lifting") {
+				this._commands.push(new _LambdaLiftingOptimizeCommand());
 				calleesAreDetermined = false;
 			} else if (cmd == "unclassify") {
 				this._commands.push(new _UnclassifyOptimizationCommand());
@@ -4024,7 +4028,6 @@ class _NoDebugCommand extends _OptimizeCommand implements _StructuredStashAccess
 	}
 }
 
-
 class _TailRecursionOptimizeCommand extends _FunctionOptimizeCommand {
 	static const IDENTIFIER = "tail-rec";
 
@@ -4118,4 +4121,253 @@ class _TailRecursionOptimizeCommand extends _FunctionOptimizeCommand {
 			statements.splice(idx, 1, new ExpressionStatement(setupArgs), new ExpressionStatement(localsToArgs), retry);
 		}
 	}
+}
+
+class _LambdaLiftingOptimizeCommand extends _OptimizeCommand {
+	static const IDENTIFIER = "lambda-lifting";
+
+	function constructor() {
+		super(_LambdaLiftingOptimizeCommand.IDENTIFIER);
+	}
+
+	override function _createStash () : Stash {
+		return new _LambdaLiftingOptimizeCommand._Stash();
+	}
+
+	override function performOptimization () : void {
+
+		/** TODOs
+		 *  - function expressions
+		 *  - nested function statements
+		 *  - function statement containing some "this" expressions
+		 */
+
+		function onMethod(method : MemberFunctionDefinition) : boolean {
+			if (method.getStatements() == null)
+				return true;
+			var statements = method.getStatements();
+			(function onSubStatements (statements : Statement[]) : boolean {
+				for (var i = 0; i < statements.length; ++i) {
+					var left = statements.length - i;
+					if (statements[i] instanceof FunctionStatement) {
+						var funcDef = (statements[i] as FunctionStatement).getFuncDef();
+						if (this._closureIsLiftable(funcDef) && this._closureIsStatic(funcDef)) {
+							this.log("staticizing closure: " + funcDef.name());
+							this._staticizeClosure(funcDef, statements, i);
+						}
+					} else {
+						_Util.handleSubStatements(onSubStatements, statements[i]);
+					}
+					i = statements.length - left;
+				}
+				return true;
+			}(statements));
+			return true;
+		}
+
+		// lift up (staticize) closures
+		this.getCompiler().forEachClassDef(function (parser, classDef) {
+			// skip interfaces and mixins
+			if ((classDef.flags() & (ClassDefinition.IS_INTERFACE | ClassDefinition.IS_MIXIN)) != 0)
+				return true;
+			classDef.forEachMemberFunction(onMethod);
+			return true;
+		});
+
+		// rewrite closure invocations to method calls
+		this.getCompiler().forEachClassDef(function (parser, classDef) {
+			this.log("rewriting closure calls in class: " + classDef.className());
+			// rewrite member variables
+			classDef.forEachMemberVariable(function (varDef) {
+				if (varDef.getInitialValue() == null)
+					return true;
+
+				this._rewriteClosureCallsToMethod(varDef.getInitialValue(), function (expr) {
+					varDef.setInitialValue(expr);
+				}, null);
+				return true;
+			});
+			// rewrite member functions
+			classDef.forEachMemberFunction(function onFunction (funcDef : MemberFunctionDefinition) : boolean {
+				return funcDef.forEachStatement(function onStatement (statement : Statement) : boolean {
+					return statement.forEachExpression(function (expr, replaceCb) {
+						this._rewriteClosureCallsToMethod(expr, replaceCb, funcDef);
+						return true;
+					}) && statement.forEachStatement(onStatement);
+				}) && funcDef.forEachClosure(onFunction);
+			});
+			return true;
+		});
+	}
+
+	class _Mark extends Stash {
+
+		var mark : boolean;
+
+		function constructor () {
+			this.mark  = false;
+		}
+
+		function constructor (that: _LambdaLiftingOptimizeCommand._Mark) {
+			this.mark  = that.mark;
+		}
+
+		override function clone () : Stash {
+			return new _LambdaLiftingOptimizeCommand._Mark(this);
+		}
+
+	}
+
+	function _closureIsLiftable(funcDef : MemberFunctionDefinition) : boolean {
+		function getMark (local : LocalVariable) : _LambdaLiftingOptimizeCommand._Mark {
+			var stash = local.getStash("lambda-lifting-mark");
+			if (stash == null) {
+				stash = local.setStash("lambda-lifting-mark", new _LambdaLiftingOptimizeCommand._Mark);
+			}
+			return stash as _LambdaLiftingOptimizeCommand._Mark;
+		}
+
+		function markUpperVariables (funcDef : MemberFunctionDefinition, mark : boolean) : void {
+			var parent = funcDef.getParent();
+			while (parent != null) {
+				var locals = parent.getLocals();
+				for (var i = 0; i < locals.length; ++i) {
+					getMark(locals[i]).mark = mark;
+				}
+				var args = parent.getArguments();
+				for (var i = 0; i < args.length; ++i) {
+					getMark(args[i]).mark = mark;
+				}
+				parent = parent.getParent();
+			}
+		}
+
+		// mark all upper locals/arguments
+		markUpperVariables(funcDef, true);
+		try {
+
+			return Util.forEachStatement(function onStatement (statement) {
+				if (statement instanceof FunctionStatement) {
+					var funcDef = (statement as FunctionStatement).getFuncDef();
+					return Util.forEachStatement(onStatement, funcDef.getStatements());
+				}
+				return statement.forEachExpression(function onExpr (expr) {
+					if (expr instanceof FunctionExpression) {
+						var funcDef = (expr as FunctionExpression).getFuncDef();
+						return Util.forEachStatement(onStatement, funcDef.getStatements());
+					} else if (expr instanceof LocalExpression) {
+						if (getMark((expr as LocalExpression).getLocal()).mark == true)
+							return false;
+					}
+					return expr.forEachExpression(onExpr);
+				}) && statement.forEachStatement(onStatement);
+			}, funcDef.getStatements());
+
+		} finally {
+			// unset marks
+			markUpperVariables(funcDef, false);
+		}
+	}
+
+	function _closureIsStatic(funcDef : MemberFunctionDefinition) : boolean {
+		return Util.forEachStatement(function onStatement(statement) {
+			if (statement instanceof FunctionStatement) {
+				var funcDef = (statement as FunctionStatement).getFuncDef();
+				return Util.forEachStatement(onStatement, funcDef.getStatements());
+			}
+			return statement.forEachExpression(function onExpr (expr) {
+				if (expr instanceof FunctionExpression) {
+					var funcDef = (expr as FunctionExpression).getFuncDef();
+					return Util.forEachStatement(onStatement, funcDef.getStatements());
+				} else if (expr instanceof ThisExpression) {
+					return false;
+				}
+				return expr.forEachExpression(onExpr);
+			}) && statement.forEachStatement(onStatement);
+		}, funcDef.getStatements());
+	}
+
+	class _Stash extends Stash {
+
+		var altName : Nullable.<string>;
+
+		function constructor () {
+			this.altName = null;
+		}
+
+		function constructor (that : _LambdaLiftingOptimizeCommand._Stash) {
+			this.altName = that.altName;
+		}
+
+		override function clone () : Stash {
+			return new _LambdaLiftingOptimizeCommand._Stash(this);
+		}
+
+	}
+
+	function _staticizeClosure (funcDef : MemberFunctionDefinition, statements : Statement[], index : int) : void {
+		assert statements[index] instanceof FunctionStatement;
+		assert funcDef == (statements[index] as FunctionStatement).getFuncDef();
+		assert funcDef.getParent() != null;
+
+		var classDef = funcDef.getClassDef();
+
+		// rename
+		var newName = this._newMethodName(classDef, funcDef.name(), (funcDef.getType() as ResolvedFunctionType).getArgumentTypes(), true);
+		(this.getStash(funcDef.getFuncLocal()) as _LambdaLiftingOptimizeCommand._Stash).altName = newName;
+		funcDef._nameToken = new Token(newName, true);
+
+		var locals = funcDef.getParent().getLocals();
+		for (var i = 0, length = locals.length; i < length; ++i) {
+			if (locals[i] == funcDef.getFuncLocal()) {
+				locals.splice(i, 1);
+				break;
+			}
+		}
+		assert i != length;
+		funcDef.setFuncLocal(null);
+
+		// update flags
+		funcDef.setFlags(funcDef.flags() & ~ClassDefinition.IS_EXPORT);
+
+		// detach from the parent, attach to the classDef
+		Util.unlinkFunction(funcDef, funcDef.getParent());
+		classDef.members().push(funcDef);
+
+		statements.splice(index, 1);
+	}
+
+	function _newMethodName (classDef : ClassDefinition, baseName : string, argTypes : Type[], isStatic : boolean) : string {
+		var index = 0;
+		var newName = baseName;
+		// search for a name which does not conflict with existing function
+		while (Util.findFunctionInClass(classDef, newName, argTypes, isStatic) != null) {
+			var newName = Util.format("%1_%2", [ baseName, index as string ]);
+			++index;
+		}
+		return newName;
+	}
+
+	function _rewriteClosureCallsToMethod (expr : Expression, replaceCb : function(:Expression):void, funcDef : MemberFunctionDefinition) : void {
+		function onExpr(expr : Expression, replaceCb : function(:Expression):void) : boolean {
+			if (expr instanceof LocalExpression) {
+				var localExpr = expr as LocalExpression;
+
+				var newName;
+				if ((newName = (this.getStash(localExpr.getLocal()) as _LambdaLiftingOptimizeCommand._Stash).altName) != null) {
+					// found, rewrite
+					replaceCb(new PropertyExpression(
+						new Token(".", false),
+						new ClassExpression(new Token(funcDef.getClassDef().className(), true), new ObjectType(funcDef.getClassDef())),
+						new Token(newName, true),
+						[], // typeArgs
+						localExpr.getType()));
+				}
+				return true;
+			}
+			return expr.forEachExpression(onExpr);
+		}
+		onExpr(expr, replaceCb);
+	}
+
 }
