@@ -1770,6 +1770,11 @@ class _AsExpressionEmitter extends _ExpressionEmitter {
 				new _AsNoConvertExpressionEmitter(this._emitter, new AsNoConvertExpression(this._expr.getToken(), this._expr.getExpr(), this._expr.getType())).emit(outerOpPrecedence);
 				return;
 			}
+			if (destType.equals(Type.stringType)) {
+				var prec = _AdditiveExpressionEmitter._operatorPrecedence;
+				this._emitWithParens(outerOpPrecedence, prec, prec, null, " + \"\"");
+				return;
+			}
 		}
 		if (srcType.resolveIfNullable().equals(Type.booleanType)) {
 			// from boolean

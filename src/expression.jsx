@@ -1127,6 +1127,9 @@ class AsExpression extends UnaryExpression {
 				// ok
 				success = true;
 			}
+		} else if (this._type.equals(Type.stringType)) {
+			// ok: any-but-null => string
+			success = true;
 		} else if (exprType instanceof PrimitiveType) {
 			if (this._type instanceof PrimitiveType) {
 				// ok: primitive => primitive
