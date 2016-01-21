@@ -81,12 +81,6 @@ Expressions and statements, however, are mostly equal to JavaScript, so it is ea
 <table align="center">
 <tr>
 <td>
-<a href="images/benchmarks.png" target="_blank"><img src="images/benchmarks.png" width="225" height="150"></a>
-<div class="caption">
-Benchmarks
-</div>
-</td>
-<td>
 <a href="images/source-code-debugger.png" target="_blank"><img src="images/source-code-debugger.png" width="225" height="150"></a>
 <div class="caption">
 Source-code debugger
