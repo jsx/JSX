@@ -2767,6 +2767,11 @@ class _InlineOptimizeCommand extends _FunctionOptimizeCommand implements _Struct
 					if (assignExpr.getFirstExpr() instanceof LocalExpression) {
 						updateCountOfLocal((assignExpr.getFirstExpr() as LocalExpression).getLocal(), -Infinity);
 					}
+				} else if (expr instanceof FusedAssignmentExpression) {
+					var fusedAssignExpr = expr as FusedAssignmentExpression;
+					if (fusedAssignExpr.getFirstExpr() instanceof LocalExpression) {
+						updateCountOfLocal((fusedAssignExpr.getFirstExpr() as LocalExpression).getLocal(), -Infinity);
+					}
 				} else if (expr instanceof IncrementExpression) {
 					var incrExpr = expr as IncrementExpression;
 					if (incrExpr.getExpr() instanceof LocalExpression) {
