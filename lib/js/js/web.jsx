@@ -7427,4 +7427,25 @@ native final class DOMStringList {
 
 } // end of DOMStringList
 
+/** @see http://www.w3.org/TR/progress-events/ */
+native final class ProgressEvent extends Event {
+	__readonly__ var lengthComputable : boolean/*boolean*/;
+	__readonly__ var loaded           : number/*unsigned long long*/;
+	__readonly__ var total            : number/*unsigned long long*/;
+	
+	function constructor(type : string, eventInitDict : ProgressEventInit);
+	
+	function initProgressEvent(
+		typeArg : string/*DOMString*/,
+		canBubbleArg : boolean,
+		cancelableArg : boolean,
+		viewArg : Nullable.<AbstractView>,
+		detailArg : variant
+	) : void;                                                                                                          
+}  
 
+native final class ProgressEventInit extends EventInit {
+	var lengthComputable : boolean;
+	var loaded           : number;
+	var total            : number;
+}
