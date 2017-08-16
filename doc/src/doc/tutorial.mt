@@ -153,7 +153,7 @@ EOT
 var a1 = [] : Array.<string>;  // a1 is Array.<string>, and is empty
 var a2 = [ 1, 2, 3 ];          // a2 is Array.<number> with three elements
 
-var m1 : {} : Map.<number>;    // m1 is Map.<number>
+var m1 = {} : Map.<number>;    // m1 is Map.<number>
 var m2 = {                     // m2 is Map.<string>
   en: "Good morning",
   de: "Guten Morgen",
