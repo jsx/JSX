@@ -383,7 +383,7 @@ When overriding a member function, the use the <code>override</code> keyword is 
 <p>
 In JSX, functions are first-class objects and they have static types.  You can declare a variable of a function type like <code>var f : function(arg : number) : number</code>, a function that takes a number as an argument and returns another number (or, just returns the same value as the argument; but it's not important here). The variable <code>f</code> can be called as <code>f(42)</code> from which you will get a number value.
 </p>
-It is possible to define closures using the <code>function</code> expression or the <code>function</code> statement.   They are typically used to implement callbacks ore event listeners which are popular in GUI programming.  Closures are similar to JavaScript except for what <code>this</code> points at: when a closure is defined within a member function, it refers to the receiver of the member function.  See the following example.
+It is possible to define closures using the <code>function</code> expression or the <code>function</code> statement.   They are typically used to implement callbacks or event listeners which are popular in GUI programming.  Closures are similar to JavaScript except for what <code>this</code> points at. When a closure is defined within a member function, it refers to the receiver of the member function.  See the following example.
 </p>
 <?= $context->{prettify}->('jsx', <<'EOT')
 class _Main {
@@ -474,7 +474,7 @@ EOT
 Once you compile <code>hello.jsx</code> by the following command, then you can access the HTML and you will see it saying "Hello, world!."
 </p>
 <?= $context->{prettify}->('bash', <<'EOT')
-$ bin/jsx --executable web --output hello.jsx.js hello.jsx
+$ jsx --executable web --output hello.jsx.js hello.jsx
 EOT
 ?>
 
