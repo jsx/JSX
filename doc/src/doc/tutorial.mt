@@ -25,6 +25,9 @@ Therefore, JSX is designed as a statically-typed language. All the values and va
 <p>
 Also, another important reason why JSX was developed is to boost JavaScript performance. JavaScript itself is not so slow but large-scale development tends to have many abstraction layers, e.g. proxy classes and accessor methods, which often have negative impact on performance.  JSX boosts performance by <em>inline expansion</em>: function bodies are expanded to where they are being called, if the functions being called could be determined at compile-time. This is the power of the statically-typed language in terms of performance.
 </p>
+<p>
+If you're here looking for the <a href="https://reactjs.org/docs/introducing-jsx.html">preprocessor and templating system</a> used by the popular React framework, you should be aware that this is a different JSX and not related to that one.
+</p>
 
 <h2 id="run-hello-world">Run "Hello, World!"</h2>
 
