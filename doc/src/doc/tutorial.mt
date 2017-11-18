@@ -116,7 +116,7 @@ Basic type concept will be described in this section.  Primitive types, object t
 </p>
 <h3 id="primitive-types">Primitive Types</h3>
 <p>
-There are three Primitive types in JSX: <code>string</code>, <code>number</code>, and <code>boolean</code>.  The three are non-nullable, immutable types.  The code snippet below declares three variables <code>s</code>, <code>n</code>, <code>b</code> with their repective types, annocated to the right of the name of the variables using the <code>:</code> mark.
+There are three primitive types in JSX: <code>string</code>, <code>number</code>, and <code>boolean</code>.  The three are non-nullable, immutable types.  The code snippet below declares three variables <code>s</code>, <code>n</code>, <code>b</code> with their repective types, annocated to the right of the name of the variables using the <code>:</code> mark.
 </p>
 <?= $context->{prettify}->('jsx', <<'EOT')
 var s : string;
