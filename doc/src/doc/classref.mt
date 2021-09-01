@@ -160,7 +160,7 @@ EOT
 <h2>Interface</h2>
 
 <p>
-An interface in JSX is similar to that of Java, except for the fact that it may have abstract variables. All the non-static functions are implicitly marked as <code>abstract</code>, and they cannot have bodies. An interface may <em>implement</em> other intefaces.
+An interface in JSX is similar to that of Java, except for the fact that it may have abstract variables. All the non-static functions are implicitly marked as <code>abstract</code>, and they cannot have bodies. An interface may <em>implement</em> other interfaces.
 </p>
 
 <h2>Mixin</h2>
